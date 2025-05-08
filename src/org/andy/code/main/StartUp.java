@@ -1,11 +1,11 @@
 package org.andy.code.main;
 
-import static main.java.toolbox.crypto.License.getLicense;
-import static main.java.toolbox.misc.Tools.CheckService;
-import static main.java.toolbox.misc.Tools.getServiceQuery;
-import static main.java.toolbox.misc.Tools.getServiceStart;
-import static main.java.toolbox.misc.Tools.getServiceStop;
-import static main.java.toolbox.misc.Tools.isServiceAutomatic;
+import static org.andy.toolbox.crypto.License.getLicense;
+import static org.andy.toolbox.misc.Tools.CheckService;
+import static org.andy.toolbox.misc.Tools.getServiceQuery;
+import static org.andy.toolbox.misc.Tools.getServiceStart;
+import static org.andy.toolbox.misc.Tools.getServiceStop;
+import static org.andy.toolbox.misc.Tools.isServiceAutomatic;
 
 import java.io.IOException;
 import java.io.InputStream;

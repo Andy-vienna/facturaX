@@ -1,6 +1,8 @@
 package org.andy.code.sql;
 
-import static main.java.toolbox.sql.Read.sqlReadArrayList;
+import static org.andy.toolbox.sql.Read.sqlReadArrayList;
+import static org.andy.toolbox.misc.Tools.cutBack;
+import static org.andy.toolbox.misc.Tools.cutFront;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -95,17 +97,17 @@ public class SQLmasterData {
 
 	private static void loadDBNummern() throws SQLException, IOException, ClassNotFoundException {
 
-		arrListAnNr = main.java.toolbox.sql.Read.sqlReadArrayList(sConn, TBL_AN, SORT_BY_ID, LoadData.getStrAktGJ());
-		arrListReNr = main.java.toolbox.sql.Read.sqlReadArrayList(sConn, TBL_RE, SORT_BY_ID, LoadData.getStrAktGJ());
+		arrListAnNr = sqlReadArrayList(sConn, TBL_AN, SORT_BY_ID, LoadData.getStrAktGJ());
+		arrListReNr = sqlReadArrayList(sConn, TBL_RE, SORT_BY_ID, LoadData.getStrAktGJ());
 
 		if(arrListAnNr.size() >= 1) {
 			String sCutTextAn = "";
 			int iIncAn = 0;
-			sCutTextAn = main.java.toolbox.misc.Tools.cutFront(arrListAnNr.get(arrListAnNr.size()-1).toString(), "-", 2);
-			String sAnNr = main.java.toolbox.misc.Tools.cutBack(sCutTextAn, "]", 1);
+			sCutTextAn = cutFront(arrListAnNr.get(arrListAnNr.size()-1).toString(), "-", 2);
+			String sAnNr = cutBack(sCutTextAn, "]", 1);
 			iIncAn = Integer.parseInt(sAnNr) + 1;
-			String sAn = main.java.toolbox.misc.Tools.cutFront(arrListAnNr.get(arrListAnNr.size()-1).toString(), "[", 1);
-			strAktAnNr = main.java.toolbox.misc.Tools.cutBack(sAn, "-", 1) + "-" + String.format("%04d", iIncAn);
+			String sAn = cutFront(arrListAnNr.get(arrListAnNr.size()-1).toString(), "[", 1);
+			strAktAnNr = cutBack(sAn, "-", 1) + "-" + String.format("%04d", iIncAn);
 		}else {
 			strAktAnNr = "AN-" + LoadData.getStrAktGJ() + "-0001";
 		}
@@ -113,11 +115,11 @@ public class SQLmasterData {
 		if(arrListReNr.size() >= 1) {
 			String sCutTextRe = "";
 			int iIncRe = 0;
-			sCutTextRe = main.java.toolbox.misc.Tools.cutFront(arrListReNr.get(arrListReNr.size()-1).toString(), "-", 2);
-			String sReNr = main.java.toolbox.misc.Tools.cutBack(sCutTextRe, "]", 1);
+			sCutTextRe = cutFront(arrListReNr.get(arrListReNr.size()-1).toString(), "-", 2);
+			String sReNr = cutBack(sCutTextRe, "]", 1);
 			iIncRe = Integer.parseInt(sReNr) + 1;
-			String sRe = main.java.toolbox.misc.Tools.cutFront(arrListReNr.get(arrListReNr.size()-1).toString(), "[", 1);
-			strAktReNr = main.java.toolbox.misc.Tools.cutBack(sRe, "-", 1) + "-" + String.format("%04d", iIncRe);
+			String sRe = cutFront(arrListReNr.get(arrListReNr.size()-1).toString(), "[", 1);
+			strAktReNr = cutBack(sRe, "-", 1) + "-" + String.format("%04d", iIncRe);
 		}else {
 			strAktReNr = "RE-" + LoadData.getStrAktGJ() + "-0001";
 		}

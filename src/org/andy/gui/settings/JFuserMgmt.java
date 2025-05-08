@@ -1,12 +1,12 @@
 package org.andy.gui.settings;
 
-import static main.java.toolbox.crypto.Password.checkComplexity;
-import static main.java.toolbox.crypto.Password.hashPwd;
-import static main.java.toolbox.crypto.Password.verifyPwd;
-import static main.java.toolbox.misc.CreateObject.createButton;
-import static main.java.toolbox.sql.Insert.sqlInsert;
-import static main.java.toolbox.sql.Read.sqlReadArrayList;
-import static main.java.toolbox.sql.Update.sqlUpdate;
+import static org.andy.toolbox.crypto.Password.checkComplexity;
+import static org.andy.toolbox.crypto.Password.hashPwd;
+import static org.andy.toolbox.crypto.Password.verifyPwd;
+import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.toolbox.sql.Insert.sqlInsert;
+import static org.andy.toolbox.sql.Read.sqlReadArrayList;
+import static org.andy.toolbox.sql.Update.sqlUpdate;
 
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -31,7 +31,7 @@ import javax.swing.border.EmptyBorder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import main.java.toolbox.misc.SetFrameIcon;
+import org.andy.toolbox.misc.SetFrameIcon;
 
 public class JFuserMgmt extends JFrame {
 

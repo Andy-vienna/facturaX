@@ -1,13 +1,13 @@
 package org.andy.gui.expenses;
 
-import static main.java.toolbox.misc.CreateObject.changeKomma;
-import static main.java.toolbox.misc.CreateObject.createButton;
-import static main.java.toolbox.misc.SelectFile.chooseFile;
-import static main.java.toolbox.misc.SelectFile.choosePath;
-import static main.java.toolbox.misc.SelectFile.getNotSelected;
-import static main.java.toolbox.sql.Read.sqlExtractFile;
-import static main.java.toolbox.sql.Read.sqlReadArray;
-import static main.java.toolbox.sql.Update.sqlUpdate;
+import static org.andy.toolbox.misc.CreateObject.changeKomma;
+import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.toolbox.misc.SelectFile.chooseFile;
+import static org.andy.toolbox.misc.SelectFile.choosePath;
+import static org.andy.toolbox.misc.SelectFile.getNotSelected;
+import static org.andy.toolbox.sql.Read.sqlExtractFile;
+import static org.andy.toolbox.sql.Read.sqlReadArray;
+import static org.andy.toolbox.sql.Update.sqlUpdate;
 
 import java.awt.Color;
 import java.awt.EventQueue;

@@ -1,5 +1,9 @@
 package org.andy.code.dataExport;
 
+import static org.andy.toolbox.misc.Tools.FormatIBAN;
+import static org.andy.toolbox.misc.Tools.isLocked;
+import static org.andy.toolbox.sql.Update.sqlUpdate;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,6 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.andy.code.main.LoadData;
+import org.andy.code.main.StartUp;
+import org.andy.code.sql.SQLmasterData;
+import org.andy.gui.main.JFoverview;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
@@ -23,11 +31,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-import org.andy.code.main.LoadData;
-import org.andy.code.main.StartUp;
-import org.andy.code.sql.SQLmasterData;
-import org.andy.gui.main.JFoverview;
 
 public class ExcelMahnung{
 
@@ -246,7 +249,7 @@ public class ExcelMahnung{
 					arrReminderContent[4].length > 3) {
 
 				remBank.setCellValue(arrReminderContent[4][1] != null ? arrReminderContent[4][1] : "");
-				remIBAN.setCellValue(arrReminderContent[4][2] != null ? main.java.toolbox.misc.Tools.FormatIBAN(arrReminderContent[4][2]) : "");
+				remIBAN.setCellValue(arrReminderContent[4][2] != null ? FormatIBAN(arrReminderContent[4][2]) : "");
 				remBIC.setCellValue(arrReminderContent[4][3] != null ? arrReminderContent[4][3] : "");
 			} else {
 				System.out.println("Fehler: arrReminderContent ist null oder hat keine Bankdaten.");
@@ -268,7 +271,7 @@ public class ExcelMahnung{
 		SaveAsPdf.toPDF(sExcelOut, sPdfOut);
 		SaveAsPdf.setPdfMetadata(sNr, "ZE", sPdfOut);
 
-		boolean bLockedPDF = main.java.toolbox.misc.Tools.isLocked(sPdfOut);
+		boolean bLockedPDF = isLocked(sPdfOut);
 		while(bLockedPDF) {
 			System.out.println("warte auf Datei ...");
 		}
@@ -290,7 +293,7 @@ public class ExcelMahnung{
 						+ FileNamePath + "', SINGLE_BLOB) AS DATA) WHERE [IdNummer] = '" + sNr + "'";
 			}
 
-			main.java.toolbox.sql.Update.sqlUpdate(sConn, sSQLStatementB);
+			sqlUpdate(sConn, sSQLStatementB);
 
 		} catch (SQLException | ClassNotFoundException e) {
 			logger.error("error inserting payment reminder files into database - " + e);
@@ -305,8 +308,8 @@ public class ExcelMahnung{
 		//#######################################################################
 		// Ursprungs-Excel und -pdf löschen
 		//#######################################################################
-		boolean bLockedpdf = main.java.toolbox.misc.Tools.isLocked(sPdfOut);
-		boolean bLockedxlsx = main.java.toolbox.misc.Tools.isLocked(sExcelOut);
+		boolean bLockedpdf = isLocked(sPdfOut);
+		boolean bLockedxlsx = isLocked(sExcelOut);
 		while(bLockedpdf || bLockedxlsx) {
 			System.out.println("warte auf Dateien ...");
 		}

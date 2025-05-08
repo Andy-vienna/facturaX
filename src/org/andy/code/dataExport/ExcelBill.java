@@ -1,5 +1,9 @@
 package org.andy.code.dataExport;
 
+import static org.andy.toolbox.misc.Tools.FormatIBAN;
+import static org.andy.toolbox.misc.Tools.isLocked;
+import static org.andy.toolbox.sql.Insert.sqlInsert;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,6 +16,12 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.andy.code.eRechnung.CreateXRechnungXML;
+import org.andy.code.eRechnung.CreateZUGFeRDpdf;
+import org.andy.code.main.LoadData;
+import org.andy.code.qr.ZxingQR;
+import org.andy.code.sql.SQLmasterData;
+import org.andy.gui.main.JFoverview;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,13 +41,6 @@ import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.google.zxing.WriterException;
-
-import org.andy.code.eRechnung.CreateXRechnungXML;
-import org.andy.code.eRechnung.CreateZUGFeRDpdf;
-import org.andy.code.main.LoadData;
-import org.andy.code.qr.ZxingQR;
-import org.andy.code.sql.SQLmasterData;
-import org.andy.gui.main.JFoverview;
 
 public class ExcelBill{
 
@@ -393,7 +396,7 @@ public class ExcelBill{
 			reText1.setCellValue(arrReContent[3][1]);
 			reText2.setCellValue(arrReContent[3][2]);
 			reBank.setCellValue(arrReContent[4][1]);
-			reIBAN.setCellValue(main.java.toolbox.misc.Tools.FormatIBAN(arrReContent[4][2]));
+			reIBAN.setCellValue(FormatIBAN(arrReContent[4][2]));
 			reBIC.setCellValue(arrReContent[4][3]);
 			//#######################################################################
 			// QR Code erzeugen und im Anwendungsverzeichnis ablegen
@@ -461,7 +464,7 @@ public class ExcelBill{
 				logger.error("error generating zugferd - " + e);
 			}
 
-			boolean bLockedpdf = main.java.toolbox.misc.Tools.isLocked(sFeRDpdf);
+			boolean bLockedpdf = isLocked(sFeRDpdf);
 			while(bLockedpdf) {
 				System.out.println("warte auf Datei ...");
 			}
@@ -476,7 +479,7 @@ public class ExcelBill{
 				String sSQLstatement = "INSERT INTO " + tblName + " ([IdNummer],[REFileName],[REpdfFile]) VALUES ('" + sNr + "','" + FileName
 						+ "',(SELECT * FROM OPENROWSET(BULK '" + FileNamePath + "', SINGLE_BLOB) AS DATA))";
 
-				main.java.toolbox.sql.Insert.sqlInsert(sConn, sSQLstatement);
+				sqlInsert(sConn, sSQLstatement);
 			} catch (SQLException | ClassNotFoundException e) {
 				logger.error("error writing zugferd to database - " + e);
 			}
@@ -498,7 +501,7 @@ public class ExcelBill{
 				logger.error("error generating xrechnung - " + e);
 			}
 
-			boolean bLockedXML = main.java.toolbox.misc.Tools.isLocked(sXRxml);
+			boolean bLockedXML = isLocked(sXRxml);
 			while(bLockedXML) {
 				System.out.println("warte auf Datei ...");
 			}
@@ -513,7 +516,7 @@ public class ExcelBill{
 				String sSQLstatement = "INSERT INTO " + tblName + " ([IdNummer],[REFileName],[REpdfFile]) VALUES ('" + sNr + "','" + FileName
 						+ "',(SELECT * FROM OPENROWSET(BULK '" + FileNamePath + "', SINGLE_BLOB) AS DATA))";
 
-				main.java.toolbox.sql.Insert.sqlInsert(sConn, sSQLstatement);
+				sqlInsert(sConn, sSQLstatement);
 			} catch (SQLException | ClassNotFoundException e) {
 				logger.error("error writing xrechnung to database - " + e);
 			}
@@ -530,8 +533,8 @@ public class ExcelBill{
 		//#######################################################################
 		// Ursprungs-Excel und -pdf löschen
 		//#######################################################################
-		boolean bLockedpdf = main.java.toolbox.misc.Tools.isLocked(sPdfOut);
-		boolean bLockedxlsx = main.java.toolbox.misc.Tools.isLocked(sExcelOut);
+		boolean bLockedpdf = isLocked(sPdfOut);
+		boolean bLockedxlsx = isLocked(sExcelOut);
 		while(bLockedpdf || bLockedxlsx) {
 			System.out.println("warte auf Dateien ...");
 		}

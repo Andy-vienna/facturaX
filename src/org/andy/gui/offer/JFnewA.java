@@ -1,9 +1,9 @@
 package org.andy.gui.offer;
 
-import static main.java.toolbox.misc.CreateObject.createButton;
-import static main.java.toolbox.misc.Tools.FormatIBAN;
-import static main.java.toolbox.misc.Tools.cutBack2;
-import static main.java.toolbox.sql.Insert.sqlInsert;
+import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.toolbox.misc.Tools.FormatIBAN;
+import static org.andy.toolbox.misc.Tools.cutBack2;
+import static org.andy.toolbox.sql.Insert.sqlInsert;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

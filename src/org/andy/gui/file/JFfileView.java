@@ -1,15 +1,15 @@
 package org.andy.gui.file;
 
-import static main.java.toolbox.misc.SelectFile.chooseFile;
-import static main.java.toolbox.misc.SelectFile.choosePath;
-import static main.java.toolbox.misc.SelectFile.getNotSelected;
-import static main.java.toolbox.misc.Tools.cutFromRight;
-import static main.java.toolbox.misc.Tools.isLocked;
-import static main.java.toolbox.sql.Delete.sqlDeleteNoReturn;
-import static main.java.toolbox.sql.Insert.sqlInsert;
-import static main.java.toolbox.sql.Read.sqlExtractFile;
-import static main.java.toolbox.sql.Read.sqlReadSingleString;
-import static main.java.toolbox.sql.Update.sqlUpdate;
+import static org.andy.toolbox.misc.SelectFile.chooseFile;
+import static org.andy.toolbox.misc.SelectFile.choosePath;
+import static org.andy.toolbox.misc.SelectFile.getNotSelected;
+import static org.andy.toolbox.misc.Tools.cutFromRight;
+import static org.andy.toolbox.misc.Tools.isLocked;
+import static org.andy.toolbox.sql.Delete.sqlDeleteNoReturn;
+import static org.andy.toolbox.sql.Insert.sqlInsert;
+import static org.andy.toolbox.sql.Read.sqlExtractFile;
+import static org.andy.toolbox.sql.Read.sqlReadSingleString;
+import static org.andy.toolbox.sql.Update.sqlUpdate;
 
 import java.awt.BorderLayout;
 import java.awt.Desktop;
@@ -41,7 +41,7 @@ import com.jacob.com.Dispatch;
 
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
-import main.java.toolbox.misc.SetFrameIcon;
+import org.andy.toolbox.misc.SetFrameIcon;
 
 public class JFfileView extends JFrame {
 

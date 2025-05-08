@@ -1,6 +1,6 @@
 package org.andy.gui.settings;
 
-import static main.java.toolbox.misc.Tools.saveSettingsApp;
+import static org.andy.toolbox.misc.Tools.saveSettingsApp;
 
 import java.awt.EventQueue;
 import java.awt.event.MouseAdapter;
@@ -19,8 +19,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.andy.code.main.LoadData;
-import main.java.toolbox.misc.SelectFile;
-import main.java.toolbox.misc.SetFrameIcon;
+import org.andy.toolbox.misc.SelectFile;
+import org.andy.toolbox.misc.SetFrameIcon;
 
 
 public class JFpathMgmt extends JFrame {

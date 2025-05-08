@@ -1,7 +1,7 @@
 package org.andy.gui.main;
 
-import static main.java.toolbox.misc.CreateObject.changeKomma;
-import static main.java.toolbox.misc.CreateObject.createButton;
+import static org.andy.toolbox.misc.CreateObject.changeKomma;
+import static org.andy.toolbox.misc.CreateObject.createButton;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;

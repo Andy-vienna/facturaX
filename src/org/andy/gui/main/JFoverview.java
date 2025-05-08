@@ -1,12 +1,12 @@
 package org.andy.gui.main;
 
-import static main.java.toolbox.misc.CreateObject.applyHighlighting;
-import static main.java.toolbox.misc.CreateObject.createButton;
-import static main.java.toolbox.misc.Tools.saveSettingsApp;
-import static main.java.toolbox.sql.Backup.sqlBackup;
-import static main.java.toolbox.sql.Read.sqlReadArray;
-import static main.java.toolbox.sql.TableHandling.sqlCreateTable;
-import static main.java.toolbox.sql.Update.sqlUpdate;
+import static org.andy.toolbox.misc.CreateObject.applyHighlighting;
+import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.toolbox.misc.Tools.saveSettingsApp;
+import static org.andy.toolbox.sql.Backup.sqlBackup;
+import static org.andy.toolbox.sql.Read.sqlReadArray;
+import static org.andy.toolbox.sql.TableHandling.sqlCreateTable;
+import static org.andy.toolbox.sql.Update.sqlUpdate;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -95,7 +95,7 @@ import org.andy.gui.settings.JFsepaQR;
 import org.andy.gui.settings.JFuserMgmt;
 import org.andy.gui.svtax.JFeditSvTax;
 import org.andy.gui.svtax.JFnewSvTax;
-import main.java.toolbox.misc.*;
+import org.andy.toolbox.misc.*;
 
 public class JFoverview extends JFrame {
 

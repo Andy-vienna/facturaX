@@ -1,7 +1,7 @@
 package org.andy.gui.offer;
 
-import static main.java.toolbox.misc.CreateObject.createButton;
-import static main.java.toolbox.sql.Update.sqlUpdate;
+import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.toolbox.sql.Update.sqlUpdate;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

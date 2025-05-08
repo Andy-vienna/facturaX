@@ -1,5 +1,7 @@
 package org.andy.code.eRechnung;
 
+import static org.andy.toolbox.misc.SelectFile.chooseFile;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -29,11 +31,11 @@ public class CreateZUGFeRDpdf {
 		int dialogButton = 0;
 		dialogButton = JOptionPane.showConfirmDialog (null, "Soll eine Anlage angefügt werden ?","Attachment", dialogButton);
 		if(dialogButton == JOptionPane.YES_OPTION) {
-			sAttachment[0] = main.java.toolbox.misc.SelectFile.chooseFile(LoadData.getWorkPath());
+			sAttachment[0] = chooseFile(LoadData.getWorkPath());
 			for(int num = 1; num < 10; num++) {
 				dialogButton = JOptionPane.showConfirmDialog (null, num + "/10 Anlagen vorhanden, soll eine weitere angefügt werden ?","Attachment", dialogButton);
 				if(dialogButton == JOptionPane.YES_OPTION) {
-					sAttachment[num] = main.java.toolbox.misc.SelectFile.chooseFile(LoadData.getWorkPath());
+					sAttachment[num] = chooseFile(LoadData.getWorkPath());
 				}
 				if(dialogButton == JOptionPane.NO_OPTION) {
 					break;

@@ -1,5 +1,7 @@
 package org.andy.code.sql;
 
+import static org.andy.toolbox.sql.Update.sqlUpdate;
+
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -77,7 +79,7 @@ public class SQLproductiveData {
 				"', [IdArt12] = '" + arrWriteA[43] + "', [Menge12] = '" + arrWriteA[44] + "', [EPreis12] = '" + arrWriteA[45] +
 				"' WHERE [IdNummer] = '" + arrWriteA[0] + "'";
 
-		main.java.toolbox.sql.Update.sqlUpdate(sConn, sStatement);
+		sqlUpdate(sConn, sStatement);
 
 	}
 
@@ -129,7 +131,7 @@ public class SQLproductiveData {
 				"', [IdArt12] = '" + arrWriteR[48] + "', [Menge12] = '" + arrWriteR[49] + "', [EPreis12] = '" + arrWriteR[50] +
 				"' WHERE [IdNummer] = '" + arrWriteR[0] + "'";
 
-		main.java.toolbox.sql.Update.sqlUpdate(sConn, sStatement);
+		sqlUpdate(sConn, sStatement);
 
 	}
 

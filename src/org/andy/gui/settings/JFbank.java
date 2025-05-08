@@ -1,11 +1,11 @@
 package org.andy.gui.settings;
 
-import static main.java.toolbox.misc.CreateObject.addBorderFocusListener;
-import static main.java.toolbox.misc.CreateObject.createButton;
-import static main.java.toolbox.sql.Delete.sqlDeleteNoReturn;
-import static main.java.toolbox.sql.Insert.sqlInsert;
-import static main.java.toolbox.sql.Read.sqlReadArray;
-import static main.java.toolbox.sql.Update.sqlUpdate;
+import static org.andy.toolbox.misc.CreateObject.addBorderFocusListener;
+import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.toolbox.sql.Delete.sqlDeleteNoReturn;
+import static org.andy.toolbox.sql.Insert.sqlInsert;
+import static org.andy.toolbox.sql.Read.sqlReadArray;
+import static org.andy.toolbox.sql.Update.sqlUpdate;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -37,7 +37,7 @@ import org.apache.logging.log4j.Logger;
 
 import org.andy.code.sql.SQLmasterData;
 import org.andy.org.eclipse.wb.swing.FocusTraversalOnArray;
-import main.java.toolbox.misc.SetFrameIcon;
+import org.andy.toolbox.misc.SetFrameIcon;
 
 public class JFbank extends JFrame {
 

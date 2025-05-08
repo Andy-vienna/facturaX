@@ -1,5 +1,10 @@
 package org.andy.code.dataExport;
 
+import static org.andy.toolbox.misc.Tools.FormatIBAN;
+import static org.andy.toolbox.misc.Tools.isLocked;
+import static org.andy.toolbox.sql.Insert.sqlInsert;
+import static org.andy.toolbox.sql.Update.sqlUpdate;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -351,7 +356,7 @@ public class ExcelOffer{
 			anText6.setCellValue(arrAnContent[3][7]);
 			anText7.setCellValue(ReplaceText.doReplace(arrAnContent[3][6], "none", "none", "none", "none", arrAnContent[1][11], "none", "none", "none", "none", "none"));
 			anBank.setCellValue(arrAnContent[4][1]);
-			anIBAN.setCellValue(main.java.toolbox.misc.Tools.FormatIBAN(arrAnContent[4][2]));
+			anIBAN.setCellValue(FormatIBAN(arrAnContent[4][2]));
 			anBIC.setCellValue(arrAnContent[4][3]);
 			//#######################################################################
 			// QR Code erzeugen und im Anwendungsverzeichnis ablegen
@@ -404,8 +409,8 @@ public class ExcelOffer{
 		SaveAsPdf.toPDF(sExcelOut, sPdfOut);
 		SaveAsPdf.setPdfMetadata(sNr, "AN", sPdfOut);
 
-		boolean bLockedXLSX = main.java.toolbox.misc.Tools.isLocked(sExcelOut);
-		boolean bLockedPDF = main.java.toolbox.misc.Tools.isLocked(sPdfOut);
+		boolean bLockedXLSX = isLocked(sExcelOut);
+		boolean bLockedPDF = isLocked(sPdfOut);
 		while(bLockedXLSX || bLockedPDF) {
 			System.out.println("warte auf Datei ...");
 		}
@@ -420,7 +425,7 @@ public class ExcelOffer{
 			String sSQLstatementA = "INSERT INTO " + tblName + " ([IdNummer],[ANFileName],[ANpdfFile]) VALUES ('" + sNr + "','" + FileName
 					+ "',(SELECT * FROM OPENROWSET(BULK '" + FileNamePath + "', SINGLE_BLOB) AS DATA))";
 
-			main.java.toolbox.sql.Insert.sqlInsert(sConn, sSQLstatementA);
+			sqlInsert(sConn, sSQLstatementA);
 
 			String FileNamePathU = sExcelOut;
 			File fnU = new File(FileNamePathU);
@@ -429,7 +434,7 @@ public class ExcelOffer{
 			String sSQLStatementB = "UPDATE " + tblName + " SET [AddFileName01] = '" + FileNameU + "',[AddFile01] = (SELECT * FROM OPENROWSET(BULK '"
 					+ FileNamePathU + "', SINGLE_BLOB) AS DATA) WHERE [IdNummer] = '" + sNr + "'";
 
-			main.java.toolbox.sql.Update.sqlUpdate(sConn, sSQLStatementB);
+			sqlUpdate(sConn, sSQLStatementB);
 
 		} catch (SQLException | ClassNotFoundException e) {
 			logger.error("error inserting offer files into database - " + e);
@@ -438,8 +443,8 @@ public class ExcelOffer{
 		//#######################################################################
 		// Ursprungs-Excel und -pdf löschen
 		//#######################################################################
-		boolean bLockedpdf = main.java.toolbox.misc.Tools.isLocked(sPdfOut);
-		boolean bLockedxlsx = main.java.toolbox.misc.Tools.isLocked(sExcelOut);
+		boolean bLockedpdf = isLocked(sPdfOut);
+		boolean bLockedxlsx = isLocked(sExcelOut);
 		while(bLockedpdf || bLockedxlsx) {
 			System.out.println("warte auf Dateien ...");
 		}

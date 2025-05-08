@@ -1,6 +1,6 @@
 package org.andy.gui.settings;
 
-import static main.java.toolbox.misc.CreateObject.createButton;
+import static org.andy.toolbox.misc.CreateObject.createButton;
 
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -18,8 +18,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.andy.code.main.LoadData;
-import main.java.toolbox.misc.SetFrameIcon;
-import main.java.toolbox.misc.Tools;
+import org.andy.toolbox.misc.SetFrameIcon;
+import org.andy.toolbox.misc.Tools;
 
 public class JFsepaQR extends JFrame {
 

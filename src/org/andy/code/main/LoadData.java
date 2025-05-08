@@ -1,7 +1,8 @@
 package org.andy.code.main;
 
-import static main.java.toolbox.misc.Tools.loadSettingsEx;
-import static main.java.toolbox.misc.Tools.saveSettingsApp;
+import static org.andy.toolbox.misc.Tools.loadSettingsEx;
+import static org.andy.toolbox.misc.Tools.saveSettingsApp;
+import static org.andy.toolbox.crypto.Caesar.decryptString;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -154,7 +155,7 @@ public class LoadData {
 			strDBNameDest = prpDBSettings.getProperty("named");
 			strDBUser = prpDBSettings.getProperty("user");
 			String tmpPass = prpDBSettings.getProperty("pass");
-			strDBPass = main.java.toolbox.crypto.Caesar.decryptString(tmpPass, 13);
+			strDBPass = decryptString(tmpPass, 13);
 			strDBencrypted = prpDBSettings.getProperty("encrypt");
 			strDBServerCert = prpDBSettings.getProperty("cert");
 		} catch (FileNotFoundException e) {

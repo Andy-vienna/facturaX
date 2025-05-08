@@ -1,8 +1,8 @@
 package org.andy.gui.main;
 
-import static main.java.toolbox.crypto.Password.verifyPwd;
-import static main.java.toolbox.misc.CreateObject.createButton;
-import static main.java.toolbox.sql.Read.sqlReadArrayList;
+import static org.andy.toolbox.crypto.Password.verifyPwd;
+import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.toolbox.sql.Read.sqlReadArrayList;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

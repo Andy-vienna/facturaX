@@ -1,7 +1,7 @@
 package org.andy.gui.reminder;
 
-import static main.java.toolbox.misc.CreateObject.createButton;
-import static main.java.toolbox.sql.Update.sqlUpdate;
+import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.toolbox.sql.Update.sqlUpdate;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -27,7 +27,7 @@ import org.andy.code.dataExport.ExcelMahnung;
 import org.andy.code.dataExport.ExcelReminder;
 import org.andy.code.main.LoadData;
 import org.andy.gui.main.JFoverview;
-import main.java.toolbox.misc.SetFrameIcon;
+import org.andy.toolbox.misc.SetFrameIcon;
 
 public class JFnewReminder extends JFrame {
 

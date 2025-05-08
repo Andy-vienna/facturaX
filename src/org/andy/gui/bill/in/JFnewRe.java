@@ -1,10 +1,10 @@
 package org.andy.gui.bill.in;
 
-import static main.java.toolbox.misc.CreateObject.changeKomma;
-import static main.java.toolbox.misc.CreateObject.createButton;
-import static main.java.toolbox.misc.SelectFile.chooseFile;
-import static main.java.toolbox.misc.SelectFile.getNotSelected;
-import static main.java.toolbox.sql.Insert.sqlInsert;
+import static org.andy.toolbox.misc.CreateObject.changeKomma;
+import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.toolbox.misc.SelectFile.chooseFile;
+import static org.andy.toolbox.misc.SelectFile.getNotSelected;
+import static org.andy.toolbox.sql.Insert.sqlInsert;
 
 import java.awt.EventQueue;
 import java.awt.Font;

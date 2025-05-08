@@ -1,6 +1,6 @@
 package org.andy.gui.main;
 
-import static main.java.toolbox.misc.CreateObject.createButton;
+import static org.andy.toolbox.misc.CreateObject.createButton;
 
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -22,7 +22,7 @@ import org.apache.logging.log4j.Logger;
 
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
-import main.java.toolbox.misc.SetFrameIcon;
+import org.andy.toolbox.misc.SetFrameIcon;
 
 public class JFinfo extends JFrame {
 

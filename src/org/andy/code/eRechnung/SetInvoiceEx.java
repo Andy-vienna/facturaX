@@ -1,5 +1,8 @@
 package org.andy.code.eRechnung;
 
+import static org.andy.toolbox.misc.Tools.cutBack;
+import static org.andy.toolbox.misc.Tools.cutFront;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -72,8 +75,8 @@ public class SetInvoiceEx {
 		due = addDaysInMilis(sArray[2][1], ziel); // Fälligkeit
 
 		// Leisutngszeitraum zerlegen
-		String LZvon = main.java.toolbox.misc.Tools.cutBack(sArray[2][3], "-", 1);
-		String LZbis = main.java.toolbox.misc.Tools.cutFront(sArray[2][3], "-", 1);
+		String LZvon = cutBack(sArray[2][3], "-", 1);
+		String LZbis = cutFront(sArray[2][3], "-", 1);
 
 		start = dateInMilis(LZvon); // Lieferdatum (aus Leistungszeitraum von)
 		end = dateInMilis(LZbis); // Lieferdatum (aus Leistungszeitraum von)

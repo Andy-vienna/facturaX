@@ -1,8 +1,8 @@
 package org.andy.gui.settings;
 
-import static main.java.toolbox.misc.CreateObject.createButton;
-import static main.java.toolbox.sql.Read.sqlReadArrayList;
-import static main.java.toolbox.sql.Update.sqlUpdate;
+import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.toolbox.sql.Read.sqlReadArrayList;
+import static org.andy.toolbox.sql.Update.sqlUpdate;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -27,7 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.andy.code.sql.SQLmasterData;
-import main.java.toolbox.misc.SetFrameIcon;
+import org.andy.toolbox.misc.SetFrameIcon;
 
 public class JFowner extends JFrame {
 
