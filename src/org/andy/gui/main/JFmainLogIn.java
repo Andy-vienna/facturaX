@@ -32,12 +32,10 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
-
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
 import org.andy.code.sql.SQLmasterData;
@@ -54,6 +52,8 @@ public class JFmainLogIn {
 	private static String sConn;
 
 	private static JFrame frame;
+	
+	private static String userRights = null; // user rights for the current user
 
 	// ###################################################################################################################################################
 	// ###################################################################################################################################################
@@ -62,7 +62,7 @@ public class JFmainLogIn {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-
+				
 				FlatIntelliJLaf.setup();
 
 				try {
@@ -214,13 +214,13 @@ public class JFmainLogIn {
 				// Anmeldedaten erfassen und auswerten
 				//------------------------------------------------------------------------------
 				LoadData.setStrAktUser(textLIUser.getText());
-				if(LoadData.getStrAktUser().equals("admin")){
+				/*if(LoadData.getStrAktUser().equals("admin")){
 					JOptionPane.showMessageDialog(null, "user nicht zur Anmeldung freigegeben", "Anmeldefehler", JOptionPane.ERROR_MESSAGE);
 					LoadData.setStrAktUser(null);
 					textLIUser.setText("");
 					pwdLIPasswort.setText("");
 					return;
-				}
+				}*/
 				ArrayList<String> User = new ArrayList<String>();
 				String storedUser;
 				boolean bCheckUser = false, bLogIn = false;
@@ -232,11 +232,13 @@ public class JFmainLogIn {
 						User = arrUser.get(x);
 						storedUser = User.get(0).toString();
 						if(storedUser.equals(LoadData.getStrAktUser())) {
-							if(!(LoadData.getStrAktUser().equals("admin"))) {
+							/*if(!(LoadData.getStrAktUser().equals("admin"))) {
 								bCheckUser = true;
 								storedUser = null;
 								break;
-							}
+							}*/
+							bCheckUser = true; // user exists
+							break;
 						}
 					}
 					if(bCheckUser) {
@@ -250,6 +252,7 @@ public class JFmainLogIn {
 				}
 
 				if(bLogIn) {
+					userRights = User.get(2).toString(); // user rights for the current user
 					try {
 						SQLmasterData.loadBaseData();
 					} catch (SQLException | ParseException | ClassNotFoundException e1) {
@@ -294,6 +297,10 @@ public class JFmainLogIn {
 
 	public static void setsConn(String sConn) {
 		JFmainLogIn.sConn = sConn;
+	}
+	
+	public static String getUserRights() {
+		return userRights;
 	}
 
 }

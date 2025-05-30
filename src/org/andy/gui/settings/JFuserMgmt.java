@@ -32,6 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.andy.toolbox.misc.SetFrameIcon;
+import javax.swing.JComboBox;
 
 public class JFuserMgmt extends JFrame {
 
@@ -73,7 +74,7 @@ public class JFuserMgmt extends JFrame {
 		setResizable(false);
 		setTitle("Benutzerverwaltung");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 446, 158);
+		setBounds(100, 100, 446, 186);
 		setLocationRelativeTo(null);
 
 		contentPane = new JPanel();
@@ -85,21 +86,32 @@ public class JFuserMgmt extends JFrame {
 		JLabel lbl02 = new JLabel("Kennwort alt");
 		JLabel lbl03 = new JLabel("Kennwort neu");
 		JLabel lbl04 = new JLabel("Kennw. wiederh.");
+		JLabel lblBenutzerrolle = new JLabel("Benutzerrolle");
 
 		JTextField textUserName = new JTextField();
 		JPasswordField pwdPassOld = new JPasswordField();
 		JPasswordField pwdPassNew = new JPasswordField();
 		JPasswordField pwdPassNewR = new JPasswordField();
+		
+		ArrayList<String> roles = new ArrayList<>();
+		roles.add(" ");
+		roles.add("user");
+		roles.add("superuser");
+		roles.add("finacialuser");
+		roles.add("admin");
+		JComboBox<String> cmbRoles = new JComboBox<>(roles.toArray(new String[0]));
 
 		lbl01.setBounds(10, 10, 60, 25);
 		lbl02.setBounds(10, 35, 90, 25);
 		lbl03.setBounds(10, 60, 90, 25);
 		lbl04.setBounds(10, 85, 90, 25);
+		lblBenutzerrolle.setBounds(10, 115, 90, 25);
 
 		textUserName.setBounds(100, 10, 220, 25);
 		pwdPassOld.setBounds(100, 35, 220, 25);
 		pwdPassNew.setBounds(100, 60, 220, 25);
 		pwdPassNewR.setBounds(100, 85, 220, 25);
+		cmbRoles.setBounds(100, 115, 220, 25);
 
 		pwdPassOld.setText("");
 		pwdPassOld.setEchoChar('*');
@@ -123,10 +135,12 @@ public class JFuserMgmt extends JFrame {
 		contentPane.add(lbl02);
 		contentPane.add(lbl03);
 		contentPane.add(lbl04);
+		contentPane.add(lblBenutzerrolle);
 		contentPane.add(textUserName);
 		contentPane.add(pwdPassOld);
 		contentPane.add(pwdPassNew);
 		contentPane.add(pwdPassNewR);
+		contentPane.add(cmbRoles);
 		contentPane.add(btnShowPwd);
 		contentPane.add(btnPwdOK);
 
@@ -207,10 +221,16 @@ public class JFuserMgmt extends JFrame {
 					if(Arrays.equals(pwdPassNew.getPassword(), pwdPassNewR.getPassword())) {
 						char[] passwordChars = pwdPassNew.getPassword();
 						String newPass = hashPwd(passwordChars);
+						
+						String userRole = cmbRoles.getSelectedItem().toString();
+						if(userRole.equals(" ")) {
+							JOptionPane.showMessageDialog(null, "Bitte Benutzerrolle auswählen", "Usermanagement", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
 
 						try {
 
-							String sSQLStatement = "INSERT INTO " + TBL_USER + " VALUES ('" + textUserName.getText() + "','" + newPass + "')"; //SQL Befehlszeile
+							String sSQLStatement = "INSERT INTO " + TBL_USER + " VALUES ('" + textUserName.getText() + "','" + newPass + "','" + userRole + "')"; //SQL Befehlszeile
 
 							sqlInsert(sConn, sSQLStatement);
 
@@ -283,5 +303,4 @@ public class JFuserMgmt extends JFrame {
 	public static void setsConn(String sConn) {
 		JFuserMgmt.sConn = sConn;
 	}
-
 }

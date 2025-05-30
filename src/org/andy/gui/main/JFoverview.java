@@ -137,7 +137,7 @@ public class JFoverview extends JFrame {
 	private static List<JButton> updateButtons = new ArrayList<>();
 
 	private static JTabbedPane tabPanel;
-	private static JPanel pageA, pageRa, pageRe, pageE, pageSvTax, pageText;
+	private static JPanel pageA, pageRa, pageRe, pageE, pageSvTax, pageOv, pageText;
 
 	private static JMenu menu1, menu2, menu3, menu5, menu6, menu9;
 	private static JMenuItem logoff, backup, exit, newAN, editAN, printAN, stateAN, printAB, newREa, editREa, printREa, stateREa, printRErem,
@@ -147,7 +147,8 @@ public class JFoverview extends JFrame {
 	private static JTable tableA, tableRa, tableRe, tableE, tableSvTax;
 	private static JScrollPane sPaneA, sPaneRa, sPaneRe, sPaneE, sPaneSvTax, sPaneText;
 
-	public static JButton btnNewAN, btnPrintAN, btnStateAN, btnPrintAB, btnNewREa, btnPrintREa, btnStateREa, btnPrintRem, btnNewREe, btnStateREe, btnNewEx, btnEditEx, btnNewSvTax, btnEditSvTax;
+	public static JButton btnNewAN, btnPrintAN, btnStateAN, btnPrintAB, btnNewREa, btnPrintREa, btnStateREa, btnPrintRem,
+		btnNewREe, btnStateREe, btnNewEx, btnEditEx, btnNewSvTax, btnEditSvTax, btnExportP109a;
 
 	private static JLabel lblState, lblANopen, lblANclosed, lblREaOpen, lblREaClosed, lblREeOpen, lblREeClosed, lblExNetto, lblExBrutto, lblSvTaxOpen, lblSvTaxClosed;
 	private static JTextField txtANopen, txtANclosed, txtREaOpen, txtREaClosed, txtREeOpen, txtREeClosed, txtExNetto, txtExBrutto, txtSvTaxOpen, txtSvTaxClosed;
@@ -158,7 +159,7 @@ public class JFoverview extends JFrame {
 
 	private static String sLic = null, vZelleRa = null, vZelleRe = null, vZelleA = null, vZelleSvTax = null;
 	private static Wrapper<String> vZelleE = new Wrapper<>("");
-	private static int iLic = 0, iRowRa, iRowA;
+	private static int iLic = 0, iUserRights = 0, iRowRa, iRowA;
 
 	//###################################################################################################################################################
 	//###################################################################################################################################################
@@ -195,6 +196,18 @@ public class JFoverview extends JFrame {
 
 		sLic = StartUp.getAPP_LICENSE();
 		iLic = StartUp.getAPP_MODE();
+		
+		if(JFmainLogIn.getUserRights().equals("user")) {
+			iUserRights = 1; // User
+		} else if(JFmainLogIn.getUserRights().equals("superuser")) {
+			iUserRights = 2; // SuperUser
+		} else if(JFmainLogIn.getUserRights().equals("financialuser")) {
+			iUserRights = 5; // FinancialUser
+		} else if(JFmainLogIn.getUserRights().equals("admin")) {
+			iUserRights = 9; // Admin
+		} else {
+			iUserRights = 0; // kein User angemeldet
+		}
 
 		try {
 			setIconImage(SetFrameIcon.getFrameIcon("icon.png"));
@@ -290,7 +303,9 @@ public class JFoverview extends JFrame {
 
 
 		menu1.add(logoff);
-		menu1.add(backup);
+		if(iUserRights > 1) {
+			menu1.add(backup);
+		}
 		menu1.addSeparator();
 		menu1.add(exit);
 
@@ -306,17 +321,21 @@ public class JFoverview extends JFrame {
 		menu3.add(stateREa);
 		menu3.add(printRErem);
 
-		menu5.add(userMgmt);
-		menu5.add(pathMgmt);
-		menu5.add(qrCodeSetup);
-		menu5.add(dbSettings);
-		menu5.addSeparator();
+		if(iUserRights > 8) {
+			menu5.add(userMgmt);
+			menu5.add(pathMgmt);
+			menu5.add(qrCodeSetup);
+			menu5.add(dbSettings);
+			menu5.addSeparator();
+		}
 		menu5.add(editArtikel);
 		menu5.add(editBank);
 		menu5.add(editKunde);
-		menu5.addSeparator();
-		menu5.add(editOwner);
-
+		if(iUserRights > 1) {
+			menu5.addSeparator();
+			menu5.add(editOwner);
+		}
+		
 		menu6.add(aktualisieren);
 
 		menu9.add(info);
@@ -370,7 +389,6 @@ public class JFoverview extends JFrame {
 		// TAB 1 - Angebote
 		//------------------------------------------------------------------------------
 		pageA = new JPanel();
-		tabPanel.addTab("Angebote", pageA);
 		pageA.setLayout(null);
 
 		tableA = new JTable(sTempA, HEADER_A);
@@ -396,8 +414,10 @@ public class JFoverview extends JFrame {
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}
-		btnNewAN.setEnabled(true);
-
+		if(iUserRights != 5) { // FinancialUser
+			btnNewAN.setEnabled(true);
+		}
+		
 		pageA.add(btnNewAN);
 		pageA.add(btnPrintAN);
 		pageA.add(btnStateAN);
@@ -407,7 +427,6 @@ public class JFoverview extends JFrame {
 		// TAB 2 - Ausgangsechnungen
 		//------------------------------------------------------------------------------
 		pageRa = new JPanel();
-		tabPanel.addTab("Ausgangsrechnungen", pageRa);
 		pageRa.setLayout(null);
 
 		tableRa = new JTable(sTempRa, HEADER_Ra);
@@ -433,7 +452,9 @@ public class JFoverview extends JFrame {
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}
-		btnNewREa.setEnabled(true);
+		if(iUserRights != 5) { // FinancialUser
+			btnNewREa.setEnabled(true);
+		}
 
 		pageRa.add(btnNewREa);
 		pageRa.add(btnPrintREa);
@@ -444,7 +465,6 @@ public class JFoverview extends JFrame {
 		// TAB 3 - Eingangsechnungen
 		//------------------------------------------------------------------------------
 		pageRe = new JPanel();
-		tabPanel.addTab("Eingangsrechnungen", pageRe);
 		pageRe.setLayout(null);
 
 		tableRe = new JTable(sTempRe, HEADER_Re);
@@ -477,7 +497,6 @@ public class JFoverview extends JFrame {
 		// TAB 4 - Ausgaben
 		//------------------------------------------------------------------------------
 		pageE = new JPanel();
-		tabPanel.addTab("Betriebsausgaben", pageE);
 		pageE.setLayout(null);
 
 		tableE = new JTable(sTempE, HEADER_E);
@@ -510,7 +529,6 @@ public class JFoverview extends JFrame {
 		// TAB 5 - SVS und Steuern
 		//------------------------------------------------------------------------------
 		pageSvTax = new JPanel();
-		tabPanel.addTab("SV und Steuer", pageSvTax);
 		pageSvTax.setLayout(null);
 
 		tableSvTax = new JTable(sTempSvTax, HEADER_SVTAX);
@@ -538,9 +556,24 @@ public class JFoverview extends JFrame {
 
 		pageSvTax.add(btnNewSvTax);
 		pageSvTax.add(btnEditSvTax);
+		
+		//------------------------------------------------------------------------------
+		// TAB 6 - Jahresergebnis
+		//------------------------------------------------------------------------------
+		pageOv = new JPanel();
+		pageOv.setLayout(null);
+		
+		try {
+			btnExportP109a = createButton("<html>Export<br>§109a</html>", "export.png");
+		} catch (RuntimeException e1) {
+			logger.error("error creating button - " + e1);
+		}
+		btnExportP109a.setEnabled(true);
+		
+		pageOv.add(btnExportP109a);
 
 		//------------------------------------------------------------------------------
-		// TAB 6 - Textbausteine
+		// TAB 7 - Textbausteine
 		//------------------------------------------------------------------------------
 		pageText = new JPanel();
 		pageText.setLayout(new GridBagLayout()); // Verwende GridBagLayout für flexible Anordnung
@@ -636,20 +669,40 @@ public class JFoverview extends JFrame {
 		// ScrollPane für das Panel
 		sPaneText = new JScrollPane(pageText);
 
-		tabPanel.addTab("Textbausteine", sPaneText);
-
 		//------------------------------------------------------------------------------
 		// Tabpanel allgemeines
 		//------------------------------------------------------------------------------
+		
+		if(iUserRights > 0) { // User oder SuperUser oder FinancialUser oder Admin
+			tabPanel.addTab("Angebote", pageA);
+			tabPanel.addTab("Ausgangsrechnungen", pageRa);
+			
+			tabPanel.setIconAt(0, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/offer.png")));
+			tabPanel.setIconAt(1, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/invoice.png")));
+		}
+		if(iUserRights > 1) { // SuperUser oder FinancialUser oder Admin
+			tabPanel.addTab("Eingangsrechnungen", pageRe);
+			tabPanel.addTab("Betriebsausgaben", pageE);
+			
+			tabPanel.setIconAt(2, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/cost.png")));
+			tabPanel.setIconAt(3, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/expenses.png")));
+		}
+		if(iUserRights > 4) { // FinancialUser oder Admin
+			tabPanel.addTab("SV und Steuer", pageSvTax);
+			tabPanel.addTab("Jahresergebnis", pageOv);
+			
+			tabPanel.setIconAt(4, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/tax.png")));
+			tabPanel.setIconAt(5, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/result.png")));
+		}
+		if(iUserRights > 8) { // Admin
+			tabPanel.addTab("Textbausteine", sPaneText);
+			
+			tabPanel.setIconAt(6, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/bausteine.png")));
+		}
 
 		// Add the JTabbedPane to the JFrame's content
 		tabPanel.setFont(new Font("Tahoma", Font.BOLD, 12));
-		tabPanel.setIconAt(0, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/offer.png")));
-		tabPanel.setIconAt(1, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/invoice.png")));
-		tabPanel.setIconAt(2, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/cost.png")));
-		tabPanel.setIconAt(3, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/expenses.png")));
-		tabPanel.setIconAt(4, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/tax.png")));
-		tabPanel.setIconAt(5, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/bausteine.png")));
+	
 		tabPanel.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -674,7 +727,7 @@ public class JFoverview extends JFrame {
 					menu2.setEnabled(false);
 					menu3.setEnabled(false);
 				}
-				if(selectedIndex == 5) {
+				if(selectedIndex == 6) {
 					menu2.setEnabled(false);
 					menu3.setEnabled(false);
 				}
@@ -1972,7 +2025,7 @@ public class JFoverview extends JFrame {
 
 		String sStatus = "<html>"
 				+ "<b>" + StartUp.getDtNow() + "</b> | " + sLic
-				+ " | Angemeldeter Benutzer: <font color='blue'><b>" + LoadData.getStrAktUser() + "</b></font>"
+				+ " | Angemeldeter Benutzer: <font color='blue'><b>" + LoadData.getStrAktUser() + "</b> (" + JFmainLogIn.getUserRights() + ")</font>"
 				+ " | Master-DB: <font color='blue'><b>" + LoadData.getStrDBNameSource() + "</b></font>"
 				+ " | Produktiv-DB: <font color='blue'><b>" + LoadData.getStrDBNameDest() + "</b></font>"
 				+ "</html>";
@@ -2180,6 +2233,10 @@ public class JFoverview extends JFrame {
 		txtSvTaxClosed.setBounds(BASEX + (2 * BUTTONX) + 95, iButtonSvTaxTop + 25, 110, STATEY - 10);
 
 		//#############################################################################################################
+		
+		btnExportP109a.setBounds( 0 * BUTTONX, iButtonSvTaxTop, BUTTONX, BUTTONY);
+		
+		//#############################################################################################################
 
 		lblState.setBounds(BASEX, iStateTop+1, x - 100, STATEY-4);
 		txtWirtschaftsjahr.setBounds(x - 90, iStateTop-1, 80, STATEY);
@@ -2207,7 +2264,7 @@ public class JFoverview extends JFrame {
 					vZelleRa = null;
 					vZelleA = value.toString();
 					iRowA = row;
-					if(iLic == 2) {
+					if(iLic == 2 && iUserRights != 5) { // nur bei Lizenz 2 und nicht FinancialUser
 						if(sTempA[row][1].equals(JFstatusA.getNotactive())) {
 							btnPrintAN.setEnabled(false);
 							btnStateAN.setEnabled(false);
@@ -2326,7 +2383,7 @@ public class JFoverview extends JFrame {
 					vZelleRa = value.toString();
 					vZelleA = null;
 					iRowRa = row;
-					if(iLic == 2) {
+					if(iLic == 2 && iUserRights != 5) { // nur bei Lizenz 2 und nicht FinancialUser
 						if(sTempRa[row][1].equals(JFstatusRa.getNotactive())) {
 							btnPrintREa.setEnabled(false);
 							btnStateREa.setEnabled(false);

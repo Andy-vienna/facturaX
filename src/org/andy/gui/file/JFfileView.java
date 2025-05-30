@@ -750,19 +750,19 @@ public class JFfileView extends JFrame {
 		button.setFont(new Font("Tahoma", Font.BOLD, 11));
 		switch(btnText) {
 		case UPLOAD:
-			button.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/up.png")));
+			button.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/up.png")));
 			break;
 		case DOWNLOAD:
-			button.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/down.png")));
+			button.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/down.png")));
 			break;
 		case UPDATE:
-			button.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/update.png")));
+			button.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/update.png")));
 			break;
 		case DELETE:
-			button.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/delete.png")));
+			button.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/delete.png")));
 			break;
 		case SEND:
-			button.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/mail.png")));
+			button.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/mail.png")));
 			break;
 		}
 		return button;
@@ -860,64 +860,64 @@ public class JFfileView extends JFrame {
 		String typ = cutFromRight(fileName, '.');
 		switch(typ) {
 		case PDF:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/pdf.png")));
+			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/pdf.png")));
 			return 1;
 		case PNG:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/png.png")));
+			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/png.png")));
 			return 1;
 		case JPG:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/jpg.png")));
+			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/jpg.png")));
 			return 1;
 		case CSV:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/csv.png")));
+			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/csv.png")));
 			return 1;
 		case MSG:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/msg.png")));
+			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/msg.png")));
 			return 1;
 		case XML:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/xml.png")));
+			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/xml.png")));
 			return 1;
 		case XLSX:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/xlsx.png")));
+			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/xlsx.png")));
 			return 1;
 		case XLSM:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/xlsm.png")));
+			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/xlsm.png")));
 			return 1;
 		case RAR:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/rar.png")));
+			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/rar.png")));
 			return 1;
 		case ZIP:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/zip.png")));
+			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/zip.png")));
 			return 1;
 		case UPDF:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/pdf.png")));
+			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/pdf.png")));
 			return 1;
 		case UPNG:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/png.png")));
+			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/png.png")));
 			return 1;
 		case UJPG:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/jpg.png")));
+			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/jpg.png")));
 			return 1;
 		case UCSV:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/csv.png")));
+			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/csv.png")));
 			return 1;
 		case UMSG:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/msg.png")));
+			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/msg.png")));
 			return 1;
 		case UXML:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/xml.png")));
+			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/xml.png")));
 			return 1;
 		case UXLSX:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/xlsx.png")));
+			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/xlsx.png")));
 			return 1;
 		case UXLSM:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/xlsm.png")));
+			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/xlsm.png")));
 			return 1;
 		case URAR:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/rar.png")));
+			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/rar.png")));
 			return 1;
 		case UZIP:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/main/resources/icons/zip.png")));
+			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/zip.png")));
 			return 1;
 		default:
 			lbl.setIcon(null);

@@ -1,0 +1,44 @@
+2025-05-28 08:23:44 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.3
+2025-05-28 08:23:45 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.3
+2025-05-28 08:25:57 [AWT-EventQueue-0] FATAL org.andy.gui.file.JFfileView - loadGUI(String sID) fehlgeschlagen - java.lang.NullPointerException: Cannot invoke "java.net.URL.toExternalForm()" because "location" is null
+2025-05-28 08:26:11 [AWT-EventQueue-0] FATAL org.andy.gui.file.JFfileView - loadGUI(String sID) fehlgeschlagen - java.lang.NullPointerException: Cannot invoke "java.net.URL.toExternalForm()" because "location" is null
+2025-05-28 08:26:35 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.3
+2025-05-28 08:27:15 [AWT-EventQueue-0] FATAL org.andy.gui.file.JFfileView - loadGUI(String sID) fehlgeschlagen - java.lang.NullPointerException: Cannot invoke "java.net.URL.toExternalForm()" because "location" is null
+2025-05-28 08:39:06 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.3
+2025-05-28 08:39:35 [AWT-EventQueue-0] FATAL org.andy.gui.file.JFfileView - loadGUI(String sID) fehlgeschlagen - java.lang.NullPointerException: Cannot invoke "java.net.URL.toExternalForm()" because "location" is null
+2025-05-28 08:40:15 [AWT-EventQueue-0] FATAL org.andy.gui.file.JFfileView - loadGUI(String sID) fehlgeschlagen - java.lang.NullPointerException: Cannot invoke "java.net.URL.toExternalForm()" because "location" is null
+2025-05-28 08:40:19 [AWT-EventQueue-0] FATAL org.andy.gui.file.JFfileView - loadGUI(String sID) fehlgeschlagen - java.lang.NullPointerException: Cannot invoke "java.net.URL.toExternalForm()" because "location" is null
+2025-05-28 08:51:33 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.3
+2025-05-28 08:54:41 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.3
+2025-05-28 09:24:54 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.3
+2025-05-28 09:34:19 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.3
+2025-05-28 09:34:31 [AWT-EventQueue-0] FATAL org.andy.gui.main.JFoverview - loadGUI fehlgeschlagen - java.lang.NullPointerException: Cannot invoke "java.net.URL.toExternalForm()" because "location" is null
+2025-05-28 09:35:23 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.3
+2025-05-28 09:48:33 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.3
+2025-05-28 10:07:50 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.3
+2025-05-28 10:31:08 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.3
+2025-05-28 10:49:20 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.3
+2025-05-28 10:50:59 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.3
+2025-05-28 10:53:57 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.3
+2025-05-28 10:57:11 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.3
+2025-05-28 11:13:07 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.42
+2025-05-28 11:34:58 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.42
+2025-05-28 11:35:10 [AWT-EventQueue-0] FATAL org.andy.gui.main.JFoverview - loadGUI fehlgeschlagen - java.lang.IndexOutOfBoundsException: Index 4 out of bounds for length 4
+2025-05-28 11:40:22 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.42
+2025-05-28 11:40:45 [AWT-EventQueue-0] INFO  org.andy.gui.main.JFoverview - facturaX wird beendet - Version: 1.8.42
+2025-05-28 11:42:01 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.42
+2025-05-28 11:44:25 [AWT-EventQueue-0] INFO  org.andy.gui.main.JFoverview - facturaX wird beendet - Version: 1.8.42
+2025-05-28 11:48:16 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.42
+2025-05-28 11:54:36 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.42
+2025-05-28 11:55:27 [AWT-EventQueue-0] INFO  org.andy.gui.main.JFoverview - facturaX wird beendet - Version: 1.8.42
+2025-05-28 11:57:40 [AWT-EventQueue-0] INFO  org.andy.gui.main.JFoverview - facturaX wird beendet - Version: 1.8.42
+2025-05-28 12:44:54 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.42
+2025-05-28 12:48:07 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.42
+2025-05-28 12:48:41 [AWT-EventQueue-0] INFO  org.andy.gui.main.JFoverview - facturaX wird beendet - Version: 1.8.42
+2025-05-28 12:49:57 [AWT-EventQueue-0] INFO  org.andy.gui.main.JFoverview - facturaX wird beendet - Version: 1.8.42
+2025-05-28 12:50:27 [AWT-EventQueue-0] INFO  org.andy.gui.main.JFoverview - facturaX wird beendet - Version: 1.8.42
+2025-05-28 12:52:27 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.42
+2025-05-28 13:02:29 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.42
+2025-05-28 13:07:10 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.42
+2025-05-28 13:07:23 [AWT-EventQueue-0] FATAL org.andy.gui.main.JFoverview - loadGUI fehlgeschlagen - java.lang.IndexOutOfBoundsException: Index 2 out of bounds for length 2
+2025-05-28 13:12:53 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.42
