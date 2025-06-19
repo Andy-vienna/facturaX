@@ -42,3 +42,17 @@
 2025-05-28 13:07:10 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.42
 2025-05-28 13:07:23 [AWT-EventQueue-0] FATAL org.andy.gui.main.JFoverview - loadGUI fehlgeschlagen - java.lang.IndexOutOfBoundsException: Index 2 out of bounds for length 2
 2025-05-28 13:12:53 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.42
+2025-06-19 10:03:14 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.45-raw
+2025-06-19 10:05:21 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.45-raw
+2025-06-19 10:08:53 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.45-raw
+2025-06-19 10:10:50 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.45-raw
+2025-06-19 10:35:09 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.46-raw
+2025-06-19 10:36:56 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.46-raw
+2025-06-19 10:52:23 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.46-raw
+2025-06-19 10:55:40 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.46-raw
+2025-06-19 10:57:43 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.46-raw
+2025-06-19 10:58:11 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.46-raw
+2025-06-19 11:01:32 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.46-raw
+2025-06-19 11:00:27 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.46-raw
+2025-06-19 11:03:16 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.46-raw
+2025-06-19 11:04:41 [AWT-EventQueue-0] ERROR org.andy.gui.expenses.JFeditEx - error writing new expenses - com.microsoft.sqlserver.jdbc.SQLServerException: Massenladen ist nicht möglich. Die Datei "null" ist nicht vorhanden, oder Sie besitzen keine Rechte für den Dateizugriff.

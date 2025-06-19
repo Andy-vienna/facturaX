@@ -64,15 +64,17 @@ public class JFnewEx extends JFrame {
 	private JLabel lbl03 = new JLabel("Buchungstext des Beleges:");
 	private JLabel lbl04 = new JLabel("Betrag netto (EUR):");
 	private JLabel lbl05 = new JLabel("Steuersatz (%):");
+	private JLabel lbl05_2 = new JLabel("Betrag Steuer (EUR):");
 	private JLabel lbl06 = new JLabel("Betrag brutto (EUR):");
 	private JLabel lbl07 = new JLabel("Dateianhang:");
 
 	private static JTextField txt02 = new JTextField();
 	private static JTextField txt03 = new JTextField();
 	private static JTextField txt04 = new JTextField();
+	private static JTextField txt04_2 = new JTextField();
 	private static JTextField txt05 = new JTextField();
 	private static JTextField txt06 = new JTextField(getNotSelected());
-
+	
 	//###################################################################################################################################################
 	//###################################################################################################################################################
 
@@ -104,7 +106,7 @@ public class JFnewEx extends JFrame {
 		setTitle(StartUp.APP_NAME + StartUp.APP_VERSION);
 		//setIconImage(Toolkit.getDefaultToolkit().getImage(JFoverview.class.getResource("/main/resources/icons/edit_color.png")));
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 678, 284);
+		setBounds(100, 100, 678, 310);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLocationRelativeTo(null);
@@ -116,7 +118,7 @@ public class JFnewEx extends JFrame {
 
 		JButton btnSelect = new JButton("select");
 		btnSelect.setToolTipText("");
-		btnSelect.setBounds(85, 165, 65, 25);
+		btnSelect.setBounds(85, 190, 65, 25);
 
 		JButton btnSave = null;
 		try {
@@ -125,7 +127,7 @@ public class JFnewEx extends JFrame {
 			logger.error("error creating button - " + e1);
 		}
 		btnSave.setEnabled(true);
-		btnSave.setBounds(520, 190, JFoverview.getButtonx(), JFoverview.getButtony());
+		btnSave.setBounds(520, 220, JFoverview.getButtonx(), JFoverview.getButtony());
 
 		lbl01.setForeground(Color.BLUE);
 		lbl01.setFont(new Font("Tahoma", Font.BOLD, 16));
@@ -134,8 +136,9 @@ public class JFnewEx extends JFrame {
 		lbl03.setBounds(10, 65, 150, 25);
 		lbl04.setBounds(10, 90, 150, 25);
 		lbl05.setBounds(10, 115, 150, 25);
-		lbl06.setBounds(10, 140, 150, 25);
-		lbl07.setBounds(10, 165, 80, 25);
+		lbl05_2.setBounds(10, 140, 150, 25);
+		lbl06.setBounds(10, 165, 150, 25);
+		lbl07.setBounds(10, 190, 80, 25);
 
 		DemoPanel panelDate = new DemoPanel();
 		panelDate.scrollPaneForButtons.setEnabled(false);
@@ -173,15 +176,23 @@ public class JFnewEx extends JFrame {
 				SwingUtilities.invokeLater(() -> txt05.setText(changeKomma(txt05)));
 			}
 		});
-		txt05.setBounds(150, 140, 180, 25);
+		txt05.setBounds(150, 165, 180, 25);
+		txt04_2.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				SwingUtilities.invokeLater(() -> txt04_2.setText(changeKomma(txt04_2)));
+			}
+		});
+		txt04_2.setBounds(150, 140, 180, 25);
 		txt06.setEditable(false);
-		txt06.setBounds(150, 165, 500, 25);
+		txt06.setBounds(150, 190, 500, 25);
 
 		contentPane.add(lbl01);
 		contentPane.add(lbl02);
 		contentPane.add(lbl03);
 		contentPane.add(lbl04);
 		contentPane.add(lbl05);
+		contentPane.add(lbl05_2);
 		contentPane.add(lbl06);
 		contentPane.add(lbl07);
 
@@ -190,6 +201,7 @@ public class JFnewEx extends JFrame {
 		contentPane.add(txt02);
 		contentPane.add(txt03);
 		contentPane.add(txt04);
+		contentPane.add(txt04_2);
 		contentPane.add(txt05);
 		contentPane.add(txt06);
 
@@ -202,6 +214,7 @@ public class JFnewEx extends JFrame {
 		txt02.setText("");
 		txt03.setText("");
 		txt04.setText("");
+		txt04_2.setText("");
 		txt05.setText("");
 		txt06.setText(getNotSelected());
 
@@ -256,21 +269,22 @@ public class JFnewEx extends JFrame {
 
 	private static String writeNewExpense() {
 
-		String[] arrTmp = new String[8];
+		String[] arrTmp = new String[9];
 		Arrays.fill(arrTmp, null);
 
 		int iId = JFoverview.getAnzExpenses() + 1;
 
 		arrTmp[0] = sDatum; //txt01.getText();
-		arrTmp[1] = txt02.getText();
-		arrTmp[2] = txt03.getText();
-		arrTmp[3] = txt04.getText();
-		arrTmp[4] = txt05.getText();
-		arrTmp[5] = txt06.getText();
-		arrTmp[6] = FilePath;
-		arrTmp[7] = String.valueOf(iId);
+		arrTmp[1] = txt02.getText(); // Buchungstext
+		arrTmp[2] = txt03.getText(); // Betrag netto
+		arrTmp[3] = txt04.getText(); // Steuersatz
+		arrTmp[4] = txt04_2.getText(); // Steuer
+		arrTmp[5] = txt05.getText(); // Betrag brutto
+		arrTmp[6] = txt06.getText(); // Dateiname
+		arrTmp[7] = FilePath; // Dateipfad
+		arrTmp[8] = String.valueOf(iId); // Id
 
-		for(int x = 0; x < 8; x++) {
+		for(int x = 0; x < 9; x++) {
 			if(arrTmp == null) {
 				JOptionPane.showMessageDialog(null, "Dateneingabe unvollständig - bitte alle Felder ausfüllen ...", "Beleg erfassen nicht möglich", JOptionPane.INFORMATION_MESSAGE);
 				return NOK;
@@ -279,9 +293,9 @@ public class JFnewEx extends JFrame {
 
 		String tblName = TBL_EXPENSES.replace("_", LoadData.getStrAktGJ());
 
-		String sSQLStatement = "INSERT INTO " + tblName + " ([Datum],[Art],[netto],[Steuersatz],[brutto],[dateiname],[datei],[Id]) VALUES ('" + arrTmp[0] + "','" + arrTmp[1]
-				+ "','" + arrTmp[2]  + "','" + arrTmp[3]  + "','" + arrTmp[4]  + "','" + arrTmp[5] + "',(SELECT * FROM OPENROWSET(BULK '" + arrTmp[6] + "', SINGLE_BLOB) AS DATA),'"
-				+ arrTmp[7]  + "')";
+		String sSQLStatement = "INSERT INTO " + tblName + " ([Datum],[Art],[netto],[Steuersatz],[steuer],[brutto],[dateiname],[datei],[Id]) VALUES ('"
+				+ arrTmp[0] + "','" + arrTmp[1]	+ "','" + arrTmp[2] + "','" + arrTmp[3] + "','" + arrTmp[4] + "','" + arrTmp[5] + "','" + arrTmp[6]
+				+ "',(SELECT * FROM OPENROWSET(BULK '" + arrTmp[7] + "', SINGLE_BLOB) AS DATA),'" + arrTmp[8]  + "')";
 
 		try {
 			sqlInsert(sConn, sSQLStatement);
@@ -295,5 +309,4 @@ public class JFnewEx extends JFrame {
 	public static void setsConn(String sConn) {
 		JFnewEx.sConn = sConn;
 	}
-
 }

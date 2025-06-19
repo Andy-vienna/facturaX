@@ -120,11 +120,11 @@ public class JFoverview extends JFrame {
 			"USt. (EUR)", "Brutto (EUR)" };
 	private static final String[] HEADER_Re = {"RE-Nummer", "RE-Datum", "Kreditor Name", "Kreditor Strasse", "Kreditor PLZ", "Kreditor Ort",
 			"Kreditor Land", "Kreditor UID", "Waehrung", "Steuersatz", "Netto", "Anzahlung", "USt.", "Brutto", "Zahlungsziel", "Hinweis", "Dateiname" };
-	private static final String[] HEADER_E = { "Id", "Datum", "Bezeichnung", "Netto (EUR)", "Steuersatz (%)", "Brutto (EUR)", "Dateiname" };
+	private static final String[] HEADER_E = { "Id", "Datum", "Bezeichnung", "Netto (EUR)", "Steuersatz (%)", "Steuer (EUR)", "Brutto (EUR)", "Dateiname" };
 	private static final String[] HEADER_SVTAX = { "Datum", "Zahlungsempfänger", "Bezeichnung", "Zahllast", "Fälligkeit", "Dateiname" };
 
 	private static String[][] arrYearOffer = new String[100][60], arrYearBillOut = new String[100][60], arrYearBillIn = new String[100][20], arrExpenses = new String[100][9], arrSvTax = new String[100][9];
-	private static String[][] sTempA = new String [100][6], sTempRa = new String [100][9], sTempRe = new String [100][17], sTempE = new String [100][7], sTempSvTax = new String [100][6];
+	private static String[][] sTempA = new String [100][6], sTempRa = new String [100][9], sTempRe = new String [100][17], sTempE = new String [100][8], sTempSvTax = new String [100][6];
 	private static boolean[] bActiveA = new boolean[100], bPrintA = new boolean[100], bOrderA = new boolean[100], bActiveRa = new boolean[100], bPrintRa = new boolean[100],
 			bMoneyRa = new boolean[100], bPayedRe = new boolean[100], bPayedSvTax = new boolean[100];
 	private static int AnzYearOffer, AnzYearBillOut, AnzYearBillIn, AnzExpenses, AnzSvTax;
@@ -1323,7 +1323,7 @@ public class JFoverview extends JFrame {
 
 			for(int x = 1; (x - 1) < AnzExpenses; x++) {
 
-				sTempE[x-1][0] = arrExpenses[x][8]; // Spalte 0 - Id
+				sTempE[x-1][0] = arrExpenses[x][9]; // Spalte 0 - Id
 				LocalDate datum = LocalDate.parse(arrExpenses[x][1], inputFormat);
 				String stmpD = datum.format(formatter);
 				sTempE[x-1][1] = stmpD; // Spalte 1 - Datum
@@ -1332,10 +1332,13 @@ public class JFoverview extends JFrame {
 				String stmpN = decimalFormat.format(bdtmpN);
 				sTempE[x-1][3] = stmpN + "  EUR"; // Spalte 3 - Netto
 				sTempE[x-1][4] = arrExpenses[x][4]; // Spalte 4 - Steuersatz
-				BigDecimal bdtmpB = new BigDecimal(arrExpenses[x][5]).setScale(2, RoundingMode.HALF_UP);
+				BigDecimal bdtmpU = new BigDecimal(arrExpenses[x][5]).setScale(2, RoundingMode.HALF_UP);
+				String stmpU = decimalFormat.format(bdtmpU);
+				sTempE[x-1][5] = stmpU + "  EUR"; // Spalte 5 - USt.
+				BigDecimal bdtmpB = new BigDecimal(arrExpenses[x][6]).setScale(2, RoundingMode.HALF_UP);
 				String stmpB = decimalFormat.format(bdtmpB);
-				sTempE[x-1][5] = stmpB + "  EUR"; // Spalte 5 - Brutto
-				sTempE[x-1][6] = arrExpenses[x][6]; // Spalte 6 - Dateianlage
+				sTempE[x-1][6] = stmpB + "  EUR"; // Spalte 6 - Brutto
+				sTempE[x-1][7] = arrExpenses[x][7]; // Spalte 6 - Dateianlage
 			}
 		} catch (SQLException e) {
 			logger.error("error loading data from database - " + e);
@@ -1779,7 +1782,7 @@ public class JFoverview extends JFrame {
 			if(AnzExpenses > 0) {
 				for(int x = 1; (x - 1) < AnzExpenses; x++) {
 					String sValueNetto = arrExpenses[x][3].trim();
-					String sValueBrutto = arrExpenses[x][5].trim();
+					String sValueBrutto = arrExpenses[x][6].trim();
 
 					bdTmpNetto = new BigDecimal(sValueNetto);
 					bdNetto = bdNetto.add(bdTmpNetto);
@@ -2204,7 +2207,7 @@ public class JFoverview extends JFrame {
 		tableE.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
 		int col_dyn = ((x-20)-450)/2;
-		setColumnWidths(tableE,50,100,col_dyn,100,100,100,col_dyn);
+		setColumnWidths(tableE,50,100,col_dyn,100,100,100,100,col_dyn);
 
 		btnNewEx.setBounds( 0 * BUTTONX, iButtonETop, BUTTONX, BUTTONY);
 		btnEditEx.setBounds( 1 * BUTTONX, iButtonETop, BUTTONX, BUTTONY);
@@ -2608,7 +2611,7 @@ public class JFoverview extends JFrame {
 			}
 			if(column == 0 || column == 1 || column == 4) {
 				label.setHorizontalAlignment(SwingConstants.CENTER);
-			} else if(column == 3 || column == 5){
+			} else if(column == 3 || column == 5 || column == 6){
 				label.setHorizontalAlignment(SwingConstants.RIGHT);
 			} else {
 				label.setHorizontalAlignment(SwingConstants.LEFT);
