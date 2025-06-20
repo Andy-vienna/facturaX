@@ -56,3 +56,55 @@
 2025-06-19 11:00:27 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.46-raw
 2025-06-19 11:03:16 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.46-raw
 2025-06-19 11:04:41 [AWT-EventQueue-0] ERROR org.andy.gui.expenses.JFeditEx - error writing new expenses - com.microsoft.sqlserver.jdbc.SQLServerException: Massenladen ist nicht möglich. Die Datei "null" ist nicht vorhanden, oder Sie besitzen keine Rechte für den Dateizugriff.
+2025-06-20 09:13:56 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 09:16:10 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 09:19:34 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 09:20:17 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 09:24:28 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 09:27:34 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 09:29:16 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 09:35:55 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 09:36:34 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 09:39:23 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 09:40:46 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 09:50:11 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 09:50:55 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 10:13:44 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 10:19:14 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 10:21:40 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 10:23:02 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 10:33:11 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 10:27:09 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 10:35:25 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 10:37:22 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 10:46:07 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 10:47:10 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 10:50:52 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 10:55:11 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 11:04:10 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 10:58:57 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 10:59:23 [AWT-EventQueue-0] ERROR org.andy.gui.main.JFoverview - no data table for financial year 2024 available - asking to create it
+2025-06-20 10:59:26 [AWT-EventQueue-0] INFO  org.andy.gui.main.JFoverview - data table for financial year 2024 available - successfully created
+2025-06-20 11:05:40 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 11:06:54 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 11:14:30 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 11:15:26 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 11:17:10 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 11:19:38 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 11:25:18 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 11:26:06 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 11:28:32 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 12:57:53 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 13:08:34 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 13:10:06 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 13:22:47 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 13:23:15 [AWT-EventQueue-0] INFO  org.andy.gui.main.JFoverview - facturaX wird beendet - Version: 1.8.47
+2025-06-20 13:24:10 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 13:40:16 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 14:31:12 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 14:40:26 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 14:53:59 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 14:55:22 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 15:00:44 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 15:06:47 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
+2025-06-20 15:07:49 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.47
