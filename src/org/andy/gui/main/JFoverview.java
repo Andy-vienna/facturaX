@@ -141,11 +141,12 @@ public class JFoverview extends JFrame {
 	private static JTabbedPane tabPanel;
 	private static JPanel pageA, pageRa, pageRe, pageE, pageSvTax, pageOv, pageText;
 	
-	private static JPanel panelUSt;
-	private static JScrollPane sPaneUSt;
+	private static JPanel panelUSt, panelP109a;
+	private static JScrollPane sPaneUSt, sPaneP109a;
 	
 	private static JSeparator sep1 = new JSeparator(), sep2 = new JSeparator(), sep3 = new JSeparator(), sep4 = new JSeparator(),
-			sep5 = new JSeparator(), sep6 = new JSeparator(), sep7 = new JSeparator();
+			sep5 = new JSeparator(), sep6 = new JSeparator(), sep7 = new JSeparator(), sep8 = new JSeparator(), sep9 = new JSeparator(), sep10 = new JSeparator(),
+			sep11 = new JSeparator(), sep12 = new JSeparator(), sep13 = new JSeparator(), sep14 = new JSeparator(), sep15 = new JSeparator();
 
 	private static JMenu menu1, menu2, menu3, menu5, menu6, menu9;
 	private static JMenuItem logoff, backup, exit, newAN, editAN, printAN, stateAN, printAB, newREa, editREa, printREa, stateREa, printRErem,
@@ -161,6 +162,8 @@ public class JFoverview extends JFrame {
 	private static JLabel lblState, lblANopen, lblANclosed, lblREaOpen, lblREaClosed, lblREeOpen, lblREeClosed, lblExNetto, lblExBrutto, lblSvTaxOpen, lblSvTaxClosed;
 	private static JLabel lblQ1, lblQ2, lblQ3, lblQ4, lblYear;
 	private static JLabel lblOvText0, lblOvText1, lblOvText2, lblOvText3, lblOvText4, lblOvText5, lblOvText6, lblOvText7;
+	private static JLabel lblP109aText0, lblP109aText1, lblP109aText2, lblP109aText3, lblP109aText4, lblP109aText5, lblP109aText6, lblP109aText7,
+			lblP109aText8, lblP109aText9, lblP109aText10, lblP109aText11, lblP109aText12, lblP109aText13, lblP109aText14, lblP109aText15;
 	
 	private static JTextField txtANopen, txtANclosed, txtREaOpen, txtREaClosed, txtREeOpen, txtREeClosed, txtExNetto, txtExBrutto, txtSvTaxOpen, txtSvTaxClosed;
 	private static JTextField txtWirtschaftsjahr;
@@ -171,6 +174,9 @@ public class JFoverview extends JFrame {
 	private static JFormattedTextField txt067Q1, txt067Q2, txt067Q3, txt067Q4, txt067Year;
 	private static JFormattedTextField txt068Q1, txt068Q2, txt068Q3, txt068Q4, txt068Year;
 	private static JFormattedTextField txtZahlLastQ1, txtZahlLastQ2, txtZahlLastQ3, txtZahlLastQ4, txtZahlLastYear;
+	
+	private static JFormattedTextField txtP109aEin, txtP109aSVS1, txtP109aSVS2, txtP109aSVS3, txtP109aSVS4, txtP109aSVSall,
+			txtP109aOeffiP, txtP109aAPausch, txtP109aExpenses, txtP109aGrundfrei, txtP109aErgebnis;
 
 	private static JProgressBar progBarA, progBarRa, progBarRe;
 	private static JLabel lblProgBarA, lblProgBarRa, lblProgBarRe;
@@ -580,13 +586,17 @@ public class JFoverview extends JFrame {
 		//------------------------------------------------------------------------------
 		pageOv = new JPanel(null);
 		
+		panelUSt = createUStPanel(); // Erstelle das Panel für die Umsatzsteuerdaten
 		
-		createUStPanel(); // Erstelle das Panel für die Umsatzsteuerdaten
-		
-		sPaneUSt = new JScrollPane(panelUSt);
-		
+		sPaneUSt = new JScrollPane(panelUSt); // ScrollPane für das Panel
 		sPaneUSt.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		sPaneUSt.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		
+		panelP109a = createP109aPanel(); // Erstelle das Panel für die P109a-Daten
+		
+		sPaneP109a = new JScrollPane(panelP109a); // ScrollPane für das Panel
+		sPaneP109a.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		sPaneP109a.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		
 		try {
 			btnExportP109a = createButton("<html>Export<br>§109a</html>", "export.png");
@@ -595,8 +605,9 @@ public class JFoverview extends JFrame {
 		}
 		btnExportP109a.setEnabled(true);
 		
-		pageOv.add(sPaneUSt);
-		pageOv.add(btnExportP109a);
+		pageOv.add(sPaneUSt); // Füge das ScrollPane zum Panel hinzu
+		pageOv.add(sPaneP109a); // Füge das ScrollPane zum Panel hinzu
+		pageOv.add(btnExportP109a); // Füge den Button zum Panel hinzu
 
 		//------------------------------------------------------------------------------
 		// TAB 7 - Textbausteine
@@ -2245,12 +2256,12 @@ public class JFoverview extends JFrame {
 		txtSvTaxClosed.setColumns(10);
 	}
 	
-	static void createUStPanel() {
+	private static JPanel createUStPanel() {
 		
 		NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.GERMANY);
 		int iUStLeft = 10, iUStTop = 50, iUStHeight = 25, iUStWidth = 400;
 		
-		panelUSt = new JPanel(null);
+		JPanel content = new JPanel(null);
 		
 		lblOvText0 = new JLabel("Umsatzsteuer-Voranmeldung (UVA)");
 		lblOvText1 = new JLabel("000 - Umsätze zum Normalsteuersatz (20%)");
@@ -2468,68 +2479,190 @@ public class JFoverview extends JFrame {
 		sep7.setBounds(iUStLeft + 880 + 150 + 5, 20, 5, 230);
 		sep7.setOrientation(SwingConstants.VERTICAL);
 		
-		panelUSt.setPreferredSize(new Dimension(iUStLeft + 1040 + 150 + 10, 250)); // "Größe des Inhalts"
+		content.setPreferredSize(new Dimension(iUStLeft + 1040 + 150 + 10, 250)); // "Größe des Inhalts"
 		
-		panelUSt.add(lblOvText0);
-		panelUSt.add(lblOvText1);
-		panelUSt.add(lblOvText2);
-		panelUSt.add(lblOvText3);
-		panelUSt.add(lblOvText4);
-		panelUSt.add(lblOvText5);
-		panelUSt.add(lblOvText6);
-		panelUSt.add(lblOvText7);
+		content.add(lblOvText0);
+		content.add(lblOvText1);
+		content.add(lblOvText2);
+		content.add(lblOvText3);
+		content.add(lblOvText4);
+		content.add(lblOvText5);
+		content.add(lblOvText6);
+		content.add(lblOvText7);
 		
-		panelUSt.add(lblQ1);
-		panelUSt.add(lblQ2);
-		panelUSt.add(lblQ3);
-		panelUSt.add(lblQ4);
-		panelUSt.add(lblYear);
+		content.add(lblQ1);
+		content.add(lblQ2);
+		content.add(lblQ3);
+		content.add(lblQ4);
+		content.add(lblYear);
 		
-		panelUSt.add(txt000Q1);
-		panelUSt.add(txt000Q2);
-		panelUSt.add(txt000Q3);
-		panelUSt.add(txt000Q4);
-		panelUSt.add(txt010Q1);
-		panelUSt.add(txt010Q2);
-		panelUSt.add(txt010Q3);
-		panelUSt.add(txt010Q4);
-		panelUSt.add(txt021Q1);
-		panelUSt.add(txt021Q2);
-		panelUSt.add(txt021Q3);
-		panelUSt.add(txt021Q4);
-		panelUSt.add(txt066Q1);
-		panelUSt.add(txt066Q2);
-		panelUSt.add(txt066Q3);
-		panelUSt.add(txt066Q4);
-		panelUSt.add(txt067Q1);
-		panelUSt.add(txt067Q2);
-		panelUSt.add(txt067Q3);
-		panelUSt.add(txt067Q4);
-		panelUSt.add(txt068Q1);
-		panelUSt.add(txt068Q2);
-		panelUSt.add(txt068Q3);
-		panelUSt.add(txt068Q4);
-		panelUSt.add(txt000Year);
-		panelUSt.add(txt010Year);
-		panelUSt.add(txt021Year);
-		panelUSt.add(txt066Year);
-		panelUSt.add(txt067Year);
-		panelUSt.add(txt068Year);
+		content.add(txt000Q1);
+		content.add(txt000Q2);
+		content.add(txt000Q3);
+		content.add(txt000Q4);
+		content.add(txt010Q1);
+		content.add(txt010Q2);
+		content.add(txt010Q3);
+		content.add(txt010Q4);
+		content.add(txt021Q1);
+		content.add(txt021Q2);
+		content.add(txt021Q3);
+		content.add(txt021Q4);
+		content.add(txt066Q1);
+		content.add(txt066Q2);
+		content.add(txt066Q3);
+		content.add(txt066Q4);
+		content.add(txt067Q1);
+		content.add(txt067Q2);
+		content.add(txt067Q3);
+		content.add(txt067Q4);
+		content.add(txt068Q1);
+		content.add(txt068Q2);
+		content.add(txt068Q3);
+		content.add(txt068Q4);
+		content.add(txt000Year);
+		content.add(txt010Year);
+		content.add(txt021Year);
+		content.add(txt066Year);
+		content.add(txt067Year);
+		content.add(txt068Year);
 		
-		panelUSt.add(txtZahlLastQ1);
-		panelUSt.add(txtZahlLastQ2);
-		panelUSt.add(txtZahlLastQ3);
-		panelUSt.add(txtZahlLastQ4);
-		panelUSt.add(txtZahlLastYear);
+		content.add(txtZahlLastQ1);
+		content.add(txtZahlLastQ2);
+		content.add(txtZahlLastQ3);
+		content.add(txtZahlLastQ4);
+		content.add(txtZahlLastYear);
 		
-		panelUSt.add(sep1);
-		panelUSt.add(sep2);
-		panelUSt.add(sep3);
-		panelUSt.add(sep4);
-		panelUSt.add(sep5);
-		panelUSt.add(sep6);
-		panelUSt.add(sep7);
+		content.add(sep1);
+		content.add(sep2);
+		content.add(sep3);
+		content.add(sep4);
+		content.add(sep5);
+		content.add(sep6);
+		content.add(sep7);
 		
+		return content;
+		
+	}
+	
+	private static JPanel createP109aPanel() {
+		
+		NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.GERMANY);
+		int iUStLeft = 10, iUStTop = 50, iUStHeight = 25, iUStWidth = 400;
+		
+		JPanel content = new JPanel(null);
+		
+		lblP109aText0 = new JLabel("E/A-Rechnung ($109a Mitteilung) - " + LoadData.getStrAktGJ());
+		lblP109aText1 = new JLabel("Einkünfte aus selbstständiger Tätigkeit");
+		lblP109aText2 = new JLabel("SVS Vorschreibung Q1/" + LoadData.getStrAktGJ());
+		lblP109aText3 = new JLabel("SVS Vorschreibung Q2/" + LoadData.getStrAktGJ());
+		lblP109aText4 = new JLabel("SVS Vorschreibung Q3/" + LoadData.getStrAktGJ());
+		lblP109aText5 = new JLabel("SVS Vorschreibung Q4/" + LoadData.getStrAktGJ());
+		lblP109aText6 = new JLabel("50% Öffi-Pauschale");
+		lblP109aText7 = new JLabel("großes Arbeitsplatzpauschale");
+		lblP109aText8 = new JLabel("Betriebsausgaben netto");
+		lblP109aText9 = new JLabel("Grundfreibetrag");
+		lblP109aText10 = new JLabel("Einnahmenüberschuss");
+		
+		lblP109aText0.setBounds( iUStLeft, 20, iUStWidth, iUStHeight);
+		lblP109aText1.setBounds( iUStLeft, iUStTop + 0 * iUStHeight, iUStWidth, iUStHeight);
+		lblP109aText2.setBounds( iUStLeft, iUStTop + 1 * iUStHeight, iUStWidth, iUStHeight);
+		lblP109aText3.setBounds( iUStLeft, iUStTop + 2 * iUStHeight, iUStWidth, iUStHeight);
+		lblP109aText4.setBounds( iUStLeft, iUStTop + 3 * iUStHeight, iUStWidth, iUStHeight);
+		lblP109aText5.setBounds( iUStLeft, iUStTop + 4 * iUStHeight, iUStWidth, iUStHeight);
+		lblP109aText6.setBounds( iUStLeft, iUStTop + 5 * iUStHeight, iUStWidth, iUStHeight);
+		lblP109aText7.setBounds( iUStLeft, iUStTop + 6 * iUStHeight, iUStWidth, iUStHeight);
+		lblP109aText8.setBounds( iUStLeft, iUStTop + 7 * iUStHeight, iUStWidth, iUStHeight);
+		lblP109aText9.setBounds( iUStLeft, iUStTop + 8 * iUStHeight, iUStWidth, iUStHeight);
+		lblP109aText10.setBounds( iUStLeft, 290, iUStWidth, iUStHeight);
+		
+		lblP109aText0.setFont(new Font("Tahoma", Font.BOLD, 11));
+		
+		lblP109aText10.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblP109aText10.setForeground(Color.BLUE);
+
+		txtP109aEin = new JFormattedTextField(currencyFormat);
+		txtP109aEin.setBounds( iUStLeft + 560, iUStTop + 0 * iUStHeight, 150, iUStHeight);
+		txtP109aEin.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		txtP109aSVS1 = new JFormattedTextField(currencyFormat);
+		txtP109aSVS1.setBounds( iUStLeft + 400, iUStTop + 1 * iUStHeight, 150, iUStHeight);
+		txtP109aSVS1.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		txtP109aSVS2 = new JFormattedTextField(currencyFormat);
+		txtP109aSVS2.setBounds( iUStLeft + 400, iUStTop + 2 * iUStHeight, 150, iUStHeight);
+		txtP109aSVS2.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		txtP109aSVS3 = new JFormattedTextField(currencyFormat);
+		txtP109aSVS3.setBounds( iUStLeft + 400, iUStTop + 3 * iUStHeight, 150, iUStHeight);
+		txtP109aSVS3.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		txtP109aSVS4 = new JFormattedTextField(currencyFormat);
+		txtP109aSVS4.setBounds( iUStLeft + 400, iUStTop + 4 * iUStHeight, 150, iUStHeight);
+		txtP109aSVS4.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		txtP109aSVSall = new JFormattedTextField(currencyFormat);
+		txtP109aSVSall.setBounds( iUStLeft + 560, iUStTop + 4 * iUStHeight, 150, iUStHeight);
+		txtP109aSVSall.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		txtP109aOeffiP = new JFormattedTextField(currencyFormat);
+		txtP109aOeffiP.setBounds( iUStLeft + 560, iUStTop + 5 * iUStHeight, 150, iUStHeight);
+		txtP109aOeffiP.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		txtP109aAPausch = new JFormattedTextField(currencyFormat);
+		txtP109aAPausch.setBounds( iUStLeft + 560, iUStTop + 6 * iUStHeight, 150, iUStHeight);
+		txtP109aAPausch.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		txtP109aExpenses = new JFormattedTextField(currencyFormat);
+		txtP109aExpenses.setBounds( iUStLeft + 560, iUStTop + 7 * iUStHeight, 150, iUStHeight);
+		txtP109aExpenses.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		txtP109aGrundfrei = new JFormattedTextField(currencyFormat);
+		txtP109aGrundfrei.setBounds( iUStLeft + 560, iUStTop + 8 * iUStHeight, 150, iUStHeight);
+		txtP109aGrundfrei.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		txtP109aErgebnis = new JFormattedTextField(currencyFormat);
+		txtP109aErgebnis.setBounds( iUStLeft + 560, 290, 150, iUStHeight);
+		txtP109aErgebnis.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		sep8.setBounds(405, 20, 5, 305);
+		sep8.setOrientation(SwingConstants.VERTICAL);
+		sep9.setBounds(iUStLeft, 45, iUStLeft + 560 + 150 - 5, 5);
+		sep9.setOrientation(SwingConstants.HORIZONTAL);
+		sep10.setBounds(iUStLeft, 280, iUStLeft + 560 + 150 - 5, 5);
+		sep10.setOrientation(SwingConstants.HORIZONTAL);
+		
+		content.setPreferredSize(new Dimension(iUStLeft + 1040 + 150 + 10, 325)); // "Größe des Inhalts"
+		
+		content.add(lblP109aText0);
+		content.add(lblP109aText1);
+		content.add(lblP109aText2);
+		content.add(lblP109aText3);
+		content.add(lblP109aText4);
+		content.add(lblP109aText5);
+		content.add(lblP109aText6);
+		content.add(lblP109aText7);
+		content.add(lblP109aText8);
+		content.add(lblP109aText9);
+		content.add(lblP109aText10);
+		
+		content.add(txtP109aEin);
+		content.add(txtP109aSVS1);
+		content.add(txtP109aSVS2);
+		content.add(txtP109aSVS3);
+		content.add(txtP109aSVS4);
+		content.add(txtP109aSVSall);
+		content.add(txtP109aOeffiP);
+		content.add(txtP109aAPausch);
+		content.add(txtP109aExpenses);
+		content.add(txtP109aGrundfrei);
+		content.add(txtP109aErgebnis);
+		
+		content.add(sep8);
+		content.add(sep9);
+		content.add(sep10);
+		
+		return content;
 	}
 
 	static void createStatus() {
@@ -2746,6 +2879,7 @@ public class JFoverview extends JFrame {
 		//#############################################################################################################
 		
 		sPaneUSt.setBounds(0, 20, x - 20, 280); // Sichtbarer Bereich im Hauptpanel
+		sPaneP109a.setBounds(0, 320, x - 20, 355); // Sichtbarer Bereich im Hauptpanel
 		
 		btnExportP109a.setBounds( 0 * BUTTONX, iButtonSvTaxTop, BUTTONX, BUTTONY);
 		
