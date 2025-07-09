@@ -20,6 +20,7 @@ import org.andy.code.dataExport.ExcelConfirmation;
 import org.andy.code.dataExport.ExcelMahnung;
 import org.andy.code.dataExport.ExcelOffer;
 import org.andy.code.dataExport.ExcelReminder;
+import org.andy.code.main.overview.AnnualResult;
 import org.andy.code.sql.SQLmasterData;
 import org.andy.code.sql.SQLproductiveData;
 import org.andy.gui.bill.in.JFeditRe;
@@ -38,10 +39,12 @@ import org.andy.gui.reminder.JFnewReminder;
 import org.andy.gui.settings.JFartikel;
 import org.andy.gui.settings.JFbank;
 import org.andy.gui.settings.JFdbSettings;
+import org.andy.gui.settings.JFgwbValues;
 import org.andy.gui.settings.JFkunde;
 import org.andy.gui.settings.JFowner;
 import org.andy.gui.settings.JFpathMgmt;
 import org.andy.gui.settings.JFsepaQR;
+import org.andy.gui.settings.JFtaxValues;
 import org.andy.gui.settings.JFuserMgmt;
 import org.andy.gui.svtax.JFeditSvTax;
 import org.andy.gui.svtax.JFnewSvTax;
@@ -196,6 +199,9 @@ public class LoadData {
 		JFbank.setsConn(tmpConnA);
 		JFkunde.setsConn(tmpConnA);
 		JFowner.setsConn(tmpConnA);
+		JFtaxValues.setsConn(tmpConnA);
+		JFgwbValues.setsConn(tmpConnA);
+		AnnualResult.setsConn(tmpConnA);
 
 		String tmpConnB = "jdbc:sqlserver://" + LoadData.strDBComputer + ":" + LoadData.strDBPort + ";database="
 				+ LoadData.strDBNameDest + ";user=" + LoadData.strDBUser + ";password=" + LoadData.strDBPass
