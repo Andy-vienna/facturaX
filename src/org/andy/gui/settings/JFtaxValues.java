@@ -25,11 +25,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import org.andy.toolbox.misc.SetFrameIcon;
-import java.text.Format;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class JFtaxValues extends JFrame {
 
@@ -40,7 +39,7 @@ public class JFtaxValues extends JFrame {
 	private JPanel contentPane = new JPanel();
 
 	private static String sConn;
-	private static String[][] arrTaxData = new String[100][10];
+	private static String[][] arrTaxData = new String[100][25];
 	private static ArrayList<String> TaxData = new ArrayList<>();
 	private static int AnzData;
 	private JButton btnDoInsert = null, btnDoUpdate = null;
@@ -93,7 +92,7 @@ public class JFtaxValues extends JFrame {
 		setResizable(false);
 		setTitle("Einkommens-/Steuertabelle");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 625, 411);
+		setBounds(100, 100, 625, 489);
 		setLocationRelativeTo(null);
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add(contentPane, BorderLayout.CENTER);
@@ -114,7 +113,7 @@ public class JFtaxValues extends JFrame {
 		btnDoInsert.setVisible(false);
 		btnDoUpdate.setEnabled(false);
 		btnDoInsert.setBounds(300, 35, 300, 25);
-		btnDoUpdate.setBounds(470, 315, 130, 50);
+		btnDoUpdate.setBounds(470, 380, 130, 50);
 
 		contentPane.add(btnDoInsert);
 		contentPane.add(btnDoUpdate);
@@ -164,17 +163,17 @@ public class JFtaxValues extends JFrame {
 		JLabel lbl10 = new JLabel("Pauschalen");
 		lbl10.setHorizontalAlignment(SwingConstants.LEFT);
 		lbl10.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lbl10.setBounds(10, 275, 261, 25);
+		lbl10.setBounds(10, 350, 261, 25);
 		
 		JLabel lbl11 = new JLabel("Öffi-Pauschale");
 		lbl11.setHorizontalAlignment(SwingConstants.LEFT);
 		lbl11.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lbl11.setBounds(10, 310, 150, 25);
+		lbl11.setBounds(10, 380, 150, 25);
 		
 		JLabel lbl12 = new JLabel("großes Arbeitsplatzpausch.");
 		lbl12.setHorizontalAlignment(SwingConstants.LEFT);
 		lbl12.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lbl12.setBounds(10, 340, 150, 25);
+		lbl12.setBounds(10, 410, 150, 25);
 		
 		JTextField txt00 = new JTextField();
 		txt00.setBounds(450, 10, 150, 25);
@@ -241,13 +240,37 @@ public class JFtaxValues extends JFrame {
 		txtTax05.setBounds(310, 240, 150, 25);
 		txtTax05.setHorizontalAlignment(SwingConstants.RIGHT);
 		
+		JFormattedTextField txtVon06 = new JFormattedTextField(currencyFormat);
+		txtVon06.setBounds(10, 270, 150, 25);
+		txtVon06.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		JFormattedTextField txtBis06 = new JFormattedTextField(currencyFormat);
+		txtBis06.setBounds(160, 270, 150, 25);
+		txtBis06.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		JFormattedTextField txtTax06 = new JFormattedTextField(percentageFormat);
+		txtTax06.setBounds(310, 270, 150, 25);
+		txtTax06.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		JFormattedTextField txtVon07 = new JFormattedTextField(currencyFormat);
+		txtVon07.setBounds(10, 300, 150, 25);
+		txtVon07.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		JFormattedTextField txtBis07 = new JFormattedTextField(currencyFormat);
+		txtBis07.setBounds(160, 300, 150, 25);
+		txtBis07.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		JFormattedTextField txtTax07 = new JFormattedTextField(percentageFormat);
+		txtTax07.setBounds(310, 300, 150, 25);
+		txtTax07.setHorizontalAlignment(SwingConstants.RIGHT);
+		
 		JFormattedTextField txtOpnvP = new JFormattedTextField(currencyFormat);
 		txtOpnvP.setHorizontalAlignment(SwingConstants.RIGHT);
-		txtOpnvP.setBounds(160, 310, 150, 25);
+		txtOpnvP.setBounds(160, 380, 150, 25);
 		
 		JFormattedTextField txtArPlP = new JFormattedTextField(currencyFormat);
 		txtArPlP.setHorizontalAlignment(SwingConstants.RIGHT);
-		txtArPlP.setBounds(160, 340, 150, 25);
+		txtArPlP.setBounds(160, 410, 150, 25);
 		
 		contentPane.add(cmbYear);
 		contentPane.add(lbl00);
@@ -275,6 +298,12 @@ public class JFtaxValues extends JFrame {
 		contentPane.add(txtVon05);
 		contentPane.add(txtBis05);
 		contentPane.add(txtTax05);
+		contentPane.add(txtVon06);
+		contentPane.add(txtBis06);
+		contentPane.add(txtTax06);
+		contentPane.add(txtVon07);
+		contentPane.add(txtBis07);
+		contentPane.add(txtTax07);
 		contentPane.add(txtOpnvP);
 		contentPane.add(txtArPlP);
 		
@@ -305,6 +334,8 @@ public class JFtaxValues extends JFrame {
 					+ txtVon03.getValue() + "','" + txtBis03.getValue() + "','" + txtTax03.getValue() + "','"
 					+ txtVon04.getValue() + "','" + txtBis04.getValue() + "','" + txtTax04.getValue() + "','"
 					+ txtVon05.getValue() + "','" + txtBis05.getValue() + "','" + txtTax05.getValue() + "','"
+					+ txtVon06.getValue() + "','" + txtBis06.getValue() + "','" + txtTax06.getValue() + "','"
+					+ txtVon07.getValue() + "','" + txtBis07.getValue() + "','" + txtTax07.getValue() + "','"
 					+ txtOpnvP.getValue() + "','" + txtArPlP.getValue() + "')";
 
 					bResult = sqlInsert(sConn, sSQLStatement);
@@ -351,6 +382,8 @@ public class JFtaxValues extends JFrame {
 							+ "[von_3] = '" + txtVon03.getValue() + "', [bis_3] = '" + txtBis03.getValue() + "', [tax_3] = '" + txtTax03.getValue() + "', "
 							+ "[von_4] = '" + txtVon04.getValue() + "', [bis_4] = '" + txtBis04.getValue() + "', [tax_4] = '" + txtTax04.getValue() + "', "
 							+ "[von_5] = '" + txtVon05.getValue() + "', [bis_5] = '" + txtBis05.getValue() + "', [tax_5] = '" + txtTax05.getValue() + "', "
+							+ "[von_6] = '" + txtVon06.getValue() + "', [bis_6] = '" + txtBis06.getValue() + "', [tax_6] = '" + txtTax06.getValue() + "', "
+							+ "[von_7] = '" + txtVon07.getValue() + "', [bis_7] = '" + txtBis07.getValue() + "', [tax_7] = '" + txtTax07.getValue() + "', "
 							+ "[opnv_pausch] = '" + txtOpnvP.getValue() + "', [arbeitspl_pausch] = '" + txtArPlP.getValue() + "' "
 							+ "WHERE [id_year] = '" + cmbYear.getSelectedItem().toString() + "'";
 
@@ -406,8 +439,16 @@ public class JFtaxValues extends JFrame {
 					txtBis05.setValue(Double.valueOf(arrTaxData[cmbYear.getSelectedIndex()][15].replace(",", ".")));
 					txtTax05.setValue(Double.valueOf(arrTaxData[cmbYear.getSelectedIndex()][16].replace(",", ".")));
 					
-					txtOpnvP.setValue(Double.valueOf(arrTaxData[cmbYear.getSelectedIndex()][17].replace(",", ".")));
-					txtArPlP.setValue(Double.valueOf(arrTaxData[cmbYear.getSelectedIndex()][18].replace(",", ".")));
+					txtVon06.setValue(Double.valueOf(arrTaxData[cmbYear.getSelectedIndex()][17].replace(",", ".")));
+					txtBis06.setValue(Double.valueOf(arrTaxData[cmbYear.getSelectedIndex()][18].replace(",", ".")));
+					txtTax06.setValue(Double.valueOf(arrTaxData[cmbYear.getSelectedIndex()][19].replace(",", ".")));
+					
+					txtVon07.setValue(Double.valueOf(arrTaxData[cmbYear.getSelectedIndex()][20].replace(",", ".")));
+					txtBis07.setValue(Double.valueOf(arrTaxData[cmbYear.getSelectedIndex()][21].replace(",", ".")));
+					txtTax07.setValue(Double.valueOf(arrTaxData[cmbYear.getSelectedIndex()][22].replace(",", ".")));
+					
+					txtOpnvP.setValue(Double.valueOf(arrTaxData[cmbYear.getSelectedIndex()][23].replace(",", ".")));
+					txtArPlP.setValue(Double.valueOf(arrTaxData[cmbYear.getSelectedIndex()][24].replace(",", ".")));
 					
 					lbl00.setVisible(false);
 					txt00.setVisible(false);
@@ -436,6 +477,14 @@ public class JFtaxValues extends JFrame {
 					txtVon05.setValue(Double.valueOf("0.00"));
 					txtBis05.setValue(Double.valueOf("0.00"));
 					txtTax05.setValue(Double.valueOf("0.00"));
+					
+					txtVon06.setValue(Double.valueOf("0.00"));
+					txtBis06.setValue(Double.valueOf("0.00"));
+					txtTax06.setValue(Double.valueOf("0.00"));
+					
+					txtVon07.setValue(Double.valueOf("0.00"));
+					txtBis07.setValue(Double.valueOf("0.00"));
+					txtTax07.setValue(Double.valueOf("0.00"));
 					
 					txtOpnvP.setValue(Double.valueOf("0.00"));
 					txtArPlP.setValue(Double.valueOf("0.00"));

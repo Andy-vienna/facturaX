@@ -1874,10 +1874,6 @@ public class JFoverview extends JFrame {
 
 	}
 	
-	
-	
-	
-
 	//###################################################################################################################################################
 	//###################################################################################################################################################
 
@@ -2098,10 +2094,6 @@ public class JFoverview extends JFrame {
 		txtSvTaxClosed.setColumns(10);
 	}
 	
-	
-	
-	
-
 	static void createStatus() {
 
 		String sStatus = "<html>"
@@ -2316,7 +2308,7 @@ public class JFoverview extends JFrame {
 		//#############################################################################################################
 		
 		sPaneUSt.setBounds(0, 20, x - 20, 280); // Sichtbarer Bereich im Hauptpanel
-		sPaneP109a.setBounds(0, 320, x - 20, 390); // Sichtbarer Bereich im Hauptpanel
+		sPaneP109a.setBounds(0, 320, x - 20, 415); // Sichtbarer Bereich im Hauptpanel
 		
 		//#############################################################################################################
 
