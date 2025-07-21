@@ -54,8 +54,8 @@ import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
+import org.andy.code.main.overview.LoadOffer;
 import org.andy.code.sql.SQLmasterData;
-import org.andy.gui.main.JFoverview;
 import org.andy.gui.misc.RoundedBorder;
 import org.andy.org.eclipse.wb.swing.FocusTraversalOnArray;
 
@@ -918,7 +918,7 @@ public class JFnewA extends JFrame {
 								logger.error("error creating new offer - " + e2);
 							}
 
-							JFoverview.loadAngebot(false);
+							LoadOffer.loadAngebot(false);
 							dispose();
 							Runtime.getRuntime().gc();
 						}else {

@@ -56,7 +56,7 @@ import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
-import org.andy.gui.main.JFoverview;
+import org.andy.code.main.overview.LoadBillIn;
 import org.andy.gui.misc.RoundedBorder;
 
 public class JFnewRe extends JFrame {
@@ -403,7 +403,7 @@ public class JFnewRe extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				writeNewREe();
-				JFoverview.loadEingangsRechnung(false);
+				LoadBillIn.loadEingangsRechnung(false);
 				dispose();
 			}
 		});

@@ -43,6 +43,7 @@ import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
+import org.andy.code.main.overview.LoadExpenses;
 import org.andy.gui.main.JFoverview;
 import org.andy.gui.misc.RoundedBorder;
 
@@ -246,7 +247,7 @@ public class JFnewEx extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				String sResult = writeNewExpense();
 				if(sResult.equals(OK)) {
-					JFoverview.loadExpenses(false);
+					LoadExpenses.loadAusgaben(false);
 					dispose();
 				}
 			}

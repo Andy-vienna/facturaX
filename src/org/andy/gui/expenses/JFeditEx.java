@@ -50,6 +50,7 @@ import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
+import org.andy.code.main.overview.LoadExpenses;
 import org.andy.code.misc.Wrapper;
 import org.andy.gui.file.JFfileView;
 import org.andy.gui.main.JFoverview;
@@ -298,7 +299,7 @@ public class JFeditEx extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				String sResult = writeUpdateExpense(sId);
 				if(sResult.equals(OK)) {
-					JFoverview.loadExpenses(false);
+					LoadExpenses.loadAusgaben(false);
 					dispose();
 				}
 			}

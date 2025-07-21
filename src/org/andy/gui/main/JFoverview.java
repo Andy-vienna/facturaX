@@ -1,11 +1,8 @@
 package org.andy.gui.main;
 
-import static org.andy.toolbox.misc.CreateObject.applyHighlighting;
 import static org.andy.toolbox.misc.CreateObject.createButton;
 import static org.andy.toolbox.misc.Tools.saveSettingsApp;
 import static org.andy.toolbox.sql.Backup.sqlBackup;
-import static org.andy.toolbox.sql.Read.sqlReadArray;
-import static org.andy.toolbox.sql.TableHandling.sqlCreateTable;
 import static org.andy.toolbox.sql.Update.sqlUpdate;
 
 import java.awt.Color;
@@ -13,9 +10,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -30,16 +24,12 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -47,30 +37,33 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
-import javax.swing.text.BadLocationException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.andy.code.dataExport.ExcelBill;
 import org.andy.code.dataExport.ExcelOffer;
 import org.andy.code.main.*;
-import org.andy.code.main.overview.AnnualResult;
+import org.andy.code.main.overview.CalcTaxData;
+import org.andy.code.main.overview.CalcUStData;
+import org.andy.code.main.overview.LoadOffer;
+import org.andy.code.main.overview.LoadSvTax;
+import org.andy.code.main.overview.LoadBillOut;
+import org.andy.code.main.overview.LoadExpenses;
+import org.andy.code.main.overview.LoadBillIn;
+import org.andy.code.main.overview.panels.UStPanel;
+import org.andy.code.main.overview.panels.TaxPanel;
+import org.andy.code.main.overview.panels.TextPanel;
 import org.andy.code.misc.Wrapper;
 import org.andy.code.sql.SQLmasterData;
 import org.andy.gui.bill.in.JFeditRe;
@@ -107,7 +100,7 @@ public class JFoverview extends JFrame {
 
 	private static File lock = new File(System.getProperty("user.dir") + "\\.lock");
 
-	private static String sConnMaster, sConn;
+	private static String sConn;
 
 	private static final int BASEX = 10;
 	private static final int BASEY = 25;
@@ -116,7 +109,6 @@ public class JFoverview extends JFrame {
 	private static final int BUTTONY = 50;
 	private static final int STATEY = 30;
 
-	private static final String TBL_OFFER = "tbl_an", TBL_BILL_OUT = "tbl_reOUT", TBL_BILL_IN = "tbl_reIN", TBL_EXPENSES = "tbl_expenses", TBL_SVTAX = "tbl_svtax";
 	private static final String[] HEADER_A = { "AN-Nummer", "Status", "Datum", "Referenz", "Kunde", "Netto (EUR)" };
 	private static final String[] HEADER_Ra = { "RE-Nummer", "Status", "Datum", "Leistungszeitraum", "Referenz", "Kunde", "Netto (EUR)",
 			"USt. (EUR)", "Brutto (EUR)" };
@@ -134,14 +126,11 @@ public class JFoverview extends JFrame {
 	private static JFoverview frame;
 	private static JPanel contentPane;
 
-	private static List<JLabel> labelList = new ArrayList<>();
-	private static List<JTextPane> textAreas = new ArrayList<>();
-	private static List<JButton> updateButtons = new ArrayList<>();
-
 	private static JTabbedPane tabPanel;
 	private static JPanel pageA, pageRa, pageRe, pageE, pageSvTax, pageOv, pageText;
 	
-	private static JPanel panelUSt, panelP109a;
+	private static UStPanel panelUSt;
+	private static TaxPanel panelP109a;
 	private static JScrollPane sPaneUSt, sPaneP109a;
 	
 	private static JMenu menu1, menu2, menu3, menu5, menu6, menu9;
@@ -182,13 +171,6 @@ public class JFoverview extends JFrame {
 
 					SQLmasterData.loadBaseData();
 					SQLmasterData.loadNummernkreis();
-
-					loadAngebot(false);
-					loadAusgangsRechnung(false);
-					loadEingangsRechnung(false);
-					loadExpenses(false);
-					loadSvTax(false);
-					loadTexte();
 
 				} catch (Exception  e) {
 					logger.fatal("loadGUI fehlgeschlagen - " + e);
@@ -405,6 +387,8 @@ public class JFoverview extends JFrame {
 		//------------------------------------------------------------------------------
 		pageA = new JPanel();
 		pageA.setLayout(null);
+		
+		sTempA = LoadOffer.loadAngebot(false);
 
 		tableA = new JTable(sTempA, HEADER_A);
 		tableA.setDefaultEditor(Object.class, null);
@@ -444,6 +428,8 @@ public class JFoverview extends JFrame {
 		pageRa = new JPanel();
 		pageRa.setLayout(null);
 
+		sTempRa = LoadBillOut.loadAusgangsRechnung(false);
+		
 		tableRa = new JTable(sTempRa, HEADER_Ra);
 		tableRa.setDefaultEditor(Object.class, null);
 		tableRa.addMouseListener( new MouseAdapter() {
@@ -481,6 +467,8 @@ public class JFoverview extends JFrame {
 		//------------------------------------------------------------------------------
 		pageRe = new JPanel();
 		pageRe.setLayout(null);
+		
+		sTempRe = LoadBillIn.loadEingangsRechnung(false);
 
 		tableRe = new JTable(sTempRe, HEADER_Re);
 		tableRe.setDefaultEditor(Object.class, null);
@@ -513,6 +501,8 @@ public class JFoverview extends JFrame {
 		//------------------------------------------------------------------------------
 		pageE = new JPanel();
 		pageE.setLayout(null);
+		
+		sTempE = LoadExpenses.loadAusgaben(false);
 
 		tableE = new JTable(sTempE, HEADER_E);
 		tableE.setDefaultEditor(Object.class, null);
@@ -545,6 +535,8 @@ public class JFoverview extends JFrame {
 		//------------------------------------------------------------------------------
 		pageSvTax = new JPanel();
 		pageSvTax.setLayout(null);
+		
+		sTempSvTax = LoadSvTax.loadSvTax(false, null);
 
 		tableSvTax = new JTable(sTempSvTax, HEADER_SVTAX);
 		tableSvTax.setDefaultEditor(Object.class, null);
@@ -577,13 +569,15 @@ public class JFoverview extends JFrame {
 		//------------------------------------------------------------------------------
 		pageOv = new JPanel(null);
 		
-		panelUSt = AnnualResult.createUStPanel(); // Erstelle das Panel für die Umsatzsteuerdaten
+		panelUSt = new UStPanel(); // Erstelle das Panel für die Umsatzsteuerdaten
 		
 		sPaneUSt = new JScrollPane(panelUSt); // ScrollPane für das Panel
 		sPaneUSt.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		sPaneUSt.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		
-		panelP109a = AnnualResult.createP109aPanel(); // Erstelle das Panel für die P109a-Daten
+		panelP109a = new TaxPanel();
+		
+		sTempSvTax = LoadSvTax.loadSvTax(false, panelP109a);
 		
 		sPaneP109a = new JScrollPane(panelP109a); // ScrollPane für das Panel
 		sPaneP109a.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -595,97 +589,9 @@ public class JFoverview extends JFrame {
 		//------------------------------------------------------------------------------
 		// TAB 7 - Textbausteine
 		//------------------------------------------------------------------------------
-		pageText = new JPanel();
-		pageText.setLayout(new GridBagLayout()); // Verwende GridBagLayout für flexible Anordnung
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.insets = new Insets(3, 3, 3, 3);
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-
-
-		// Arrays für Labels und TextAreas
-		String[] labels = {
-				"Textbaustein Angebot A33", "Textbaustein Angebot A36", "Textbaustein Angebot A37",
-				"Textbaustein Angebot A39", "Textbaustein Angebot A40", "Textbaustein Angebot A44",
-				"Textbaustein Angebot A47", "Textbaustein Angebot QR-Code", "Textbaustein Angebot A12/a",
-				"Textbaustein Angebot A12/b", "Textbaustein Angebot A13", "Textbaustein Angebot A14",
-				"Textbaustein Auftragsbestätigung A35", "Textbaustein Auftragsbestätigung A38",
-				"Textbaustein Auftragsbestätigung A44", "Textbaustein Auftragsbestätigung A47",
-				"Textbaustein Auftragsbestätigung QR-Code",
-				"Textbaustein Umsatzsteuerhinweis A36/a", "Textbaustein Umsatzsteuerhinweis A36/b",
-				"Textbaustein Zahlungsziel A38/a", "Textbaustein Zahlungsziel A38/b",
-				"Textbaustein Zahlungserinnerung B16", "Textbaustein Zahlungserinnerung B18/a",
-				"Textbaustein Zahlungserinnerung B18/b", "Textbaustein Zahlungserinnerung B18/c",
-				"Textbaustein Zahlungserinnerung B20", "Textbaustein Zahlungserinnerung B21",
-				"Textbaustein Zahlungserinnerung B22", "Textbaustein Zahlungserinnerung B23",
-				"Textbaustein Zahlungserinnerung B26", "Textbaustein Zahlungserinnerung B27",
-				"Textbaustein Mahnung B16", "Textbaustein Mahnung B18/a",
-				"Textbaustein Mahnung B18/b", "Textbaustein Mahnung B18/c",
-				"Textbaustein Mahnung B20/a", "Textbaustein Mahnung B20/b",
-				"Textbaustein Mahnung B21/a", "Textbaustein Mahnung B21/b",
-				"Textbaustein Mahnung B22/a", "Textbaustein Mahnung B22/b",
-				"Textbaustein Mahnung B23/a", "Textbaustein Mahnung B23/b",
-				"Textbaustein Mahnung B26", "Textbaustein Mahnung B27"};
-
-		for (int i = 0; i < labels.length; i++) {
-
-			String label = labels[i];
-
-			//------------------------------------------------------------------------------
-			gbc.gridx = 0; // erste Spalte
-			JLabel lbl = new JLabel(label);
-			JLabel lblInf = new JLabel();
-			lblInf.setVisible(false);
-			labelList.add(lblInf); // Label zur Liste hinzufügen)
-			gbc.weightx = 0.08;  // Label nimmt 8 % des Platzes
-			pageText.add(lbl, gbc);
-			pageText.add(lblInf, gbc);
-
-			//------------------------------------------------------------------------------
-			gbc.gridx = 1; // Wechsel zur nächsten Spalte
-			JTextPane txtPane = new JTextPane(); // Verwende JTextPane statt JTextArea
-			txtPane.setFont(new Font("Tahoma", Font.BOLD, 12));
-			txtPane.setEditable(true);
-
-			JScrollPane txtScroll = new JScrollPane(txtPane);
-			txtScroll.setPreferredSize(new Dimension(0, 30));
-			txtScroll.setBorder(new RoundedBorder(10));
-			textAreas.add(txtPane); // TextPane zur Liste hinzufügen
-			gbc.weightx = 0.85; // Textfeld nimmt 92 % des Platzes
-			pageText.add(txtScroll, gbc);
-
-			//------------------------------------------------------------------------------
-			gbc.gridx = 2; // Wechsel zur nächsten Spalte
-			JButton btnUpdateText = null;
-			try {
-				btnUpdateText = createButton("Ändern", "menu/edit.png");
-				btnUpdateText.setPreferredSize(new Dimension(0, 30));
-			} catch (RuntimeException e1) {
-				logger.error("error creating button - " + e1);
-			}
-			if (btnUpdateText != null) {
-				JButton finalBtn = btnUpdateText; // Lokale Kopie des Buttons
-				int index = i; // Lokale Variable für Lambda (verhindert Probleme mit final/effektiv final)
-				btnUpdateText.addActionListener(_ -> handleButtonClick(index, lblInf.getText(), label, txtPane));
-				txtPane.getDocument().addDocumentListener(new DocumentListener() {
-					@Override
-					public void insertUpdate(DocumentEvent e) { finalBtn.setEnabled(true); }
-					@Override
-					public void removeUpdate(DocumentEvent e) { finalBtn.setEnabled(true); }
-					@Override
-					public void changedUpdate(DocumentEvent e) { finalBtn.setEnabled(true); }
-				});
-			}
-			updateButtons.add(btnUpdateText); // Button zur Liste hinzufügen
-			gbc.weightx = 0.07; // Button nimmt 7 % des Platzes
-			pageText.add(btnUpdateText, gbc);
-
-			//------------------------------------------------------------------------------
-			gbc.gridy++;   // Nächste Zeile
-		}
-
+		pageText = new TextPanel();
+		TextPanel.loadTexte();
+		
 		// ScrollPane für das Panel
 		sPaneText = new JScrollPane(pageText);
 
@@ -699,6 +605,9 @@ public class JFoverview extends JFrame {
 			
 			tabPanel.setIconAt(0, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/offer.png")));
 			tabPanel.setIconAt(1, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/invoice.png")));
+			
+			createSumInfoA(); // Summen-Infos Angebote
+			createSumInfoRa(); // Summen-Infos Ausgangsrechnungen
 		}
 		if(iUserRights > 1) { // SuperUser oder FinancialUser oder Admin
 			tabPanel.addTab("Eingangsrechnungen", pageRe);
@@ -706,6 +615,9 @@ public class JFoverview extends JFrame {
 			
 			tabPanel.setIconAt(2, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/cost.png")));
 			tabPanel.setIconAt(3, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/expenses.png")));
+			
+			createSumInfoRe(); // Summen-Infos Eingangsrechnungen
+			createSumInfoE(); // Summen-Infos Ausgaben
 		}
 		if(iUserRights > 4) { // FinancialUser oder Admin
 			tabPanel.addTab("SV und Steuer", pageSvTax);
@@ -713,6 +625,8 @@ public class JFoverview extends JFrame {
 			
 			tabPanel.setIconAt(4, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/tax.png")));
 			tabPanel.setIconAt(5, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/result.png")));
+			
+			createSumInfoSvTax(); // Summen-Infos SV und Steuern
 		}
 		if(iUserRights > 8) { // Admin
 			tabPanel.addTab("Textbausteine", sPaneText);
@@ -730,45 +644,49 @@ public class JFoverview extends JFrame {
 				if(selectedIndex == 0) {
 					menu2.setEnabled(true);
 					menu3.setEnabled(false);
+					setSumAN(); // Summen-Infos Angebote
 				}
 				if(selectedIndex == 1) {
 					menu2.setEnabled(false);
 					menu3.setEnabled(true);
+					setSumREa(); // Summen-Infos Ausgangsrechnungen
 				}
 				if(selectedIndex == 2) {
 					menu2.setEnabled(false);
 					menu3.setEnabled(false);
+					setSumREe(); // Summen-Infos Eingangsrechnungen
 				}
 				if(selectedIndex == 3) {
 					menu2.setEnabled(false);
 					menu3.setEnabled(false);
+					setSumEX(); // Summen-Infos Ausgaben
 				}
 				if(selectedIndex == 4) {
 					menu2.setEnabled(false);
 					menu3.setEnabled(false);
+					//setSumSvTax(); // Summen-Infos SV und Steuern
 				}
 				if(selectedIndex == 5) {
 					menu2.setEnabled(false);
 					menu3.setEnabled(false);
+					
+					setSumEX(); // Summen-Infos Ausgaben
+					LoadSvTax.loadSvTax(false, panelP109a);
+					CalcUStData.setValuesUVA(panelUSt, AnzYearBillIn, AnzYearBillOut, AnzExpenses, arrYearBillIn, arrYearBillOut, arrExpenses);
+					CalcTaxData.setValuesTax(panelP109a, AnzYearBillOut, arrYearBillOut);
 				}
 				if(selectedIndex == 6) {
 					menu2.setEnabled(false);
 					menu3.setEnabled(false);
+					TextPanel.loadTexte(); // Textbausteine neu laden
 				}
-				actionAct();
+				//actionAct(); auskommentiert wegen Performance-Problemen bei TAB-Wechsel
 			}
 		});
 		contentPane.add(tabPanel);
 
-		createSumInfoA(); // Summen-Infos Angebote
-		createSumInfoRa(); // Summen-Infos Ausgangsrechnungen
-		createSumInfoRe(); // Summen-Infos Eingangsrechnungen
-		createSumInfoE(); // Summen-Infos Ausgaben
-		createSumInfoSvTax(); // Summen-Infos SV und Steuern
-		
 		createStatus(); // Statuszeile
-
-
+		setSumAN(); // Summen-Infos Angebote
 
 		// ------------------------------------------------------------------------------
 		// Action Listener für JFrame und JPanel
@@ -1054,555 +972,214 @@ public class JFoverview extends JFrame {
 			logger.error("JFoverview() - " + e1);
 		}
 	}
-
+	
 	//###################################################################################################################################################
 	//###################################################################################################################################################
+	
+	private void resizeGUI(Dimension xy) {
+		int x = xy.width;
+		int y = xy.height;
 
-	public static void loadAngebot(boolean reRun) {
+		int iStateTop = y - BOTTOMY - STATEY;
+		int iTblAHeight = y - 185;
+		int iButtonATop = BASEY + iTblAHeight - 10;
+		int iTblRaHeight = y - 185;
+		int iButtonRaTop = BASEY + iTblRaHeight - 10;
+		int iTblReHeight = y - 185;
+		int iButtonReTop = BASEY + iTblRaHeight - 10;
+		int iTblEHeight = y - 185;
+		int iButtonETop = BASEY + iTblEHeight - 10;
+		int iTblSvTaxHeight = y - 185;
+		int iButtonSvTaxTop = BASEY + iTblSvTaxHeight - 10;
 
-		boolean bResult = false;
+		menuBar.setBounds(0, 0, x, STATEY - 10);
 
-		NumberFormat nf = NumberFormat.getNumberInstance(Locale.GERMANY);
-		DecimalFormat df = (DecimalFormat) nf;
-		df.applyPattern("###,###.00");
+		tabPanel.setLocation(10, STATEY);
+		tabPanel.setSize(x - 20, y - 80);
 
-		Arrays.stream(sTempA).forEach(a -> Arrays.fill(a, null));
-		Arrays.fill(bActiveA, Boolean.FALSE);
-		Arrays.fill(bPrintA, Boolean.FALSE);
-		Arrays.fill(bOrderA, Boolean.FALSE);
-
-		try {
-
-			Arrays.stream(arrYearOffer).forEach(a -> Arrays.fill(a, null));
-			String sTblName = TBL_OFFER.replace("_", LoadData.getStrAktGJ());
-			String sSQLStatement = "SELECT * FROM " + sTblName + " ORDER BY [IdNummer]";
-
-			arrYearOffer = sqlReadArray(sConn, sSQLStatement);
-
-			if(arrYearOffer[0][0] != null) {
-				AnzYearOffer = Integer.parseInt(arrYearOffer[0][0]);
-			}else {
-				AnzYearOffer = 0;
-			}
-
-			if(AnzYearOffer == 0) {
-				actualizeWindow();
-				return;
-			}
-
-			for(int i = 0; i < 100; i++) {
-				bActiveA[i] = true;
-			}
-
-			for(int x = 1; (x - 1) < AnzYearOffer; x++) {
-				switch(arrYearOffer[x][2]) {
-				case "0":
-					bActiveA[x-1] = false;
-					break;
-				case "1":
-					bActiveA[x-1] = true;
-					break;
-				}
-				switch(arrYearOffer[x][3]) {
-				case "0":
-					bPrintA[x-1] = false;
-					break;
-				case "1":
-					bPrintA[x-1] = true;
-					break;
-				}
-				switch(arrYearOffer[x][4]) {
-				case "0":
-					bOrderA[x-1] = false;
-					break;
-				case "1":
-					bOrderA[x-1] = true;
-					break;
-				}
-				sTempA[x-1][0] = arrYearOffer[x][1]; // Spalte 0 - AN-Nummer
-				sTempA[x-1][1] = arrYearOffer[x][5]; // Spalte 1 - Status
-				sTempA[x-1][2] = arrYearOffer[x][6]; // Spalte 2 - Datum
-				sTempA[x-1][3] = arrYearOffer[x][7]; // Spalte 3 - Referenz
-				sTempA[x-1][4] = searchKunde(arrYearOffer[x][8]); // Spalte 4 - Kunde
-				double tmpN = Double.parseDouble(arrYearOffer[x][10]);
-				sTempA[x-1][5] = df.format(tmpN) + "  EUR"; // Spalte 5 - Netto
-
-			}
-
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-			bResult = questionCreate();
-			if(bResult == false) {
-				return;
-			}
-			loadAngebot(bResult);
-		} catch (ClassNotFoundException e) {
-			System.out.println(e.getMessage());
-			logger.error("error cause class for database connection is not found - " + e);
-		} finally {
-			if(!reRun) {
-				setSumAN();
-			}
-			actualizeWindow();
-		}
-
-	}
-
-	public static void loadAusgangsRechnung(boolean reRun) {
-
-		NumberFormat nf = NumberFormat.getNumberInstance(Locale.GERMANY);
-		DecimalFormat df = (DecimalFormat) nf;
-		df.applyPattern("###,###.00");
-
-		Arrays.stream(sTempRa).forEach(a -> Arrays.fill(a, null));
-		Arrays.fill(bActiveRa, Boolean.FALSE);
-		Arrays.fill(bPrintRa, Boolean.FALSE);
-		Arrays.fill(bMoneyRa, Boolean.FALSE);
-
-		try {
-
-			Arrays.stream(arrYearBillOut).forEach(a -> Arrays.fill(a, null));
-			String sTblName = TBL_BILL_OUT.replace("_", LoadData.getStrAktGJ());
-			String sSQLStatement = "SELECT * FROM " + sTblName + " ORDER BY [IdNummer]";
-
-			arrYearBillOut = sqlReadArray(sConn, sSQLStatement);
-
-			if(arrYearBillOut[0][0] != null) {
-				AnzYearBillOut = Integer.parseInt(arrYearBillOut[0][0]);
-			}else {
-				AnzYearBillOut = 0;
-			}
-
-			if(AnzYearBillOut == 0) {
-				actualizeWindow();
-				return;
-			}
-
-			for(int i = 0; i < 100; i++) {
-				bActiveRa[i] = true;
-			}
-
-			for(int x = 1; (x - 1) < AnzYearBillOut; x++) {
-				switch(arrYearBillOut[x][2]) {
-				case "0":
-					bActiveRa[x-1] = false;
-					break;
-				case "1":
-					bActiveRa[x-1] = true;
-					break;
-				}
-				switch(arrYearBillOut[x][3]) {
-				case "0":
-					bPrintRa[x-1] = false;
-					break;
-				case "1":
-					bPrintRa[x-1] = true;
-					break;
-				}
-				switch(arrYearBillOut[x][4]) {
-				case "0":
-					bMoneyRa[x-1] = false;
-					break;
-				case "1":
-					bMoneyRa[x-1] = true;
-					break;
-				}
-				sTempRa[x-1][0] = arrYearBillOut[x][1]; // Spalte 0 - RE-Nummer
-				sTempRa[x-1][1] = arrYearBillOut[x][5]; // Spalte 1 - Status
-				sTempRa[x-1][2] = arrYearBillOut[x][6]; // Spalte 2 - Datum
-				sTempRa[x-1][3] = arrYearBillOut[x][7]; // Spalte 3 - L-Zeitr.
-				sTempRa[x-1][4] = arrYearBillOut[x][8]; // Spalte 4 - Referenz
-				sTempRa[x-1][5] = searchKunde(arrYearBillOut[x][9]); // Spalte 5 - Kunde
-				double tmpN = Double.parseDouble(arrYearBillOut[x][12]);
-				sTempRa[x-1][6] = df.format(tmpN) + "  EUR"; // Spalte 6 - Netto
-				double tmpU = Double.parseDouble(arrYearBillOut[x][13]);
-				sTempRa[x-1][7] = df.format(tmpU) + "  EUR"; // Spalte 7 - USt.
-				double tmpB = Double.parseDouble(arrYearBillOut[x][14]);
-				sTempRa[x-1][8] = df.format(tmpB) + "  EUR"; // Spalte 8 - Brutto
-			}
-		} catch (SQLException e) {
-			logger.error("error loading data from database - " + e);
-		} catch (ClassNotFoundException e) {
-			logger.error("error cause class for database connection is not found - " + e);
-		} finally {
-			if(!reRun) {
-				setSumREa();
-			}
-			actualizeWindow();
-		}
-
-	}
-
-	public static void loadEingangsRechnung(boolean reRun) {
-
-		DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-		NumberFormat nf = NumberFormat.getNumberInstance(Locale.GERMANY);
-		DecimalFormat df = (DecimalFormat) nf;
-		df.applyPattern("###,###.00");
-
-		Arrays.stream(sTempRe).forEach(a -> Arrays.fill(a, null));
-
-		try {
-
-			Arrays.stream(arrYearBillIn).forEach(a -> Arrays.fill(a, null));
-			String sTblName = TBL_BILL_IN.replace("_", LoadData.getStrAktGJ());
-			String sSQLStatement = "SELECT * FROM " + sTblName + " ORDER BY [re_datum]";
-
-			arrYearBillIn = sqlReadArray(sConn, sSQLStatement);
-
-			if(arrYearBillIn[0][0] != null) {
-				AnzYearBillIn = Integer.parseInt(arrYearBillIn[0][0]);
-			}else {
-				AnzYearBillIn = 0;
-			}
-
-			if(AnzYearBillIn == 0) {
-				actualizeWindow();
-				return;
-			}
-
-			for(int x = 1; (x - 1) < AnzYearBillIn; x++) {
-				switch(Integer.parseInt(arrYearBillIn[x][19])) {
-				case 0:
-					bPayedRe[x-1] = false;
-					break;
-				case 1:
-					bPayedRe[x-1] = true;
-					break;
-				}
-			}
-
-			for(int x = 1; (x - 1) < AnzYearBillIn; x++) {
-
-				sTempRe[x-1][0] = arrYearBillIn[x][1];
-
-				LocalDate datum1 = LocalDate.parse(arrYearBillIn[x][2], inputFormat);
-				String stmpA = datum1.format(formatter);
-				sTempRe[x-1][1] = stmpA;
-
-				sTempRe[x-1][2] = arrYearBillIn[x][3];
-				sTempRe[x-1][3] = arrYearBillIn[x][4];
-				sTempRe[x-1][4] = arrYearBillIn[x][5];
-				sTempRe[x-1][5] = arrYearBillIn[x][6];
-				sTempRe[x-1][6] = arrYearBillIn[x][7];
-				sTempRe[x-1][7] = arrYearBillIn[x][8];
-				sTempRe[x-1][8] = arrYearBillIn[x][9];
-
-				BigDecimal bdtmpN1 = new BigDecimal(arrYearBillIn[x][10]).setScale(2, RoundingMode.HALF_UP);
-				String stmpN1 = df.format(bdtmpN1);
-				sTempRe[x-1][9] = stmpN1;
-
-				BigDecimal bdtmpN2 = new BigDecimal(arrYearBillIn[x][11]).setScale(2, RoundingMode.HALF_UP);
-				String stmpN2 = df.format(bdtmpN2);
-				sTempRe[x-1][10] = stmpN2;
-
-				BigDecimal bdtmpN3 = new BigDecimal(arrYearBillIn[x][12]).setScale(2, RoundingMode.HALF_UP);
-				String stmpN3 = df.format(bdtmpN3);
-				sTempRe[x-1][11] = stmpN3;
-
-				BigDecimal bdtmpN4 = new BigDecimal(arrYearBillIn[x][13]).setScale(2, RoundingMode.HALF_UP);
-				String stmpN4 = df.format(bdtmpN4);
-				sTempRe[x-1][12] = stmpN4;
-
-				BigDecimal bdtmpN5 = new BigDecimal(arrYearBillIn[x][14]).setScale(2, RoundingMode.HALF_UP);
-				String stmpN5 = df.format(bdtmpN5);
-				sTempRe[x-1][13] = stmpN5;
-
-				LocalDate datum2 = LocalDate.parse(arrYearBillIn[x][15], inputFormat);
-				String stmpG = datum2.format(formatter);
-				sTempRe[x-1][14] = stmpG;
-
-				sTempRe[x-1][15] = arrYearBillIn[x][16];
-				sTempRe[x-1][16] = arrYearBillIn[x][17];
-
-			}
-		} catch (SQLException e) {
-			logger.error("error loading data from database - " + e);
-		} catch (ClassNotFoundException e) {
-			logger.error("error cause class for database connection is not found - " + e);
-		} finally {
-			if(!reRun) {
-				setSumREe();
-			}
-			actualizeWindow();
-		}
-
-	}
-
-	public static void loadExpenses(boolean reRun) {
-
-		DecimalFormat decimalFormat = new DecimalFormat("#,###.00");
-		DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-
-		Arrays.stream(sTempE).forEach(a -> Arrays.fill(a, null));
-
-		try {
-
-			Arrays.stream(arrExpenses).forEach(a -> Arrays.fill(a, null));
-			String sTblName = TBL_EXPENSES.replace("_", LoadData.getStrAktGJ());
-			String sSQLStatement = "SELECT * FROM " + sTblName + " ORDER BY [Datum]";
-
-			arrExpenses = sqlReadArray(sConn, sSQLStatement);
-
-			if(arrExpenses[0][0] != null) {
-				AnzExpenses = Integer.parseInt(arrExpenses[0][0]);
-			}else {
-				AnzExpenses = 0;
-			}
-
-			if(AnzExpenses == 0) {
-				actualizeWindow();
-				return;
-			}
-
-			for(int x = 1; (x - 1) < AnzExpenses; x++) {
-
-				sTempE[x-1][0] = arrExpenses[x][9]; // Spalte 0 - Id
-				LocalDate datum = LocalDate.parse(arrExpenses[x][1], inputFormat);
-				String stmpD = datum.format(formatter);
-				sTempE[x-1][1] = stmpD; // Spalte 1 - Datum
-				sTempE[x-1][2] = arrExpenses[x][2]; // Spalte 2 - Art
-				BigDecimal bdtmpN = new BigDecimal(arrExpenses[x][3]).setScale(2, RoundingMode.HALF_UP);
-				String stmpN = decimalFormat.format(bdtmpN);
-				sTempE[x-1][3] = stmpN + "  EUR"; // Spalte 3 - Netto
-				sTempE[x-1][4] = arrExpenses[x][4]; // Spalte 4 - Steuersatz
-				BigDecimal bdtmpU = new BigDecimal(arrExpenses[x][5]).setScale(2, RoundingMode.HALF_UP);
-				String stmpU = decimalFormat.format(bdtmpU);
-				sTempE[x-1][5] = stmpU + "  EUR"; // Spalte 5 - USt.
-				BigDecimal bdtmpB = new BigDecimal(arrExpenses[x][6]).setScale(2, RoundingMode.HALF_UP);
-				String stmpB = decimalFormat.format(bdtmpB);
-				sTempE[x-1][6] = stmpB + "  EUR"; // Spalte 6 - Brutto
-				sTempE[x-1][7] = arrExpenses[x][7]; // Spalte 6 - Dateianlage
-			}
-		} catch (SQLException e) {
-			logger.error("error loading data from database - " + e);
-		} catch (ClassNotFoundException e) {
-			logger.error("error cause class for database connection is not found - " + e);
-		} finally {
-			if(!reRun) {
-				setSumEX();
-			}
-			actualizeWindow();
-		}
-	}
-
-	public static void loadSvTax(boolean reRun) {
-
-		DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-		NumberFormat nf = NumberFormat.getNumberInstance(Locale.GERMANY);
-		DecimalFormat df = (DecimalFormat) nf;
-		df.applyPattern("###,###.00");
+		//#############################################################################################################
+		// Angebote
 		
-		BigDecimal bdSvQ1 = BigDecimal.ZERO, 
-				bdSvQ2 = BigDecimal.ZERO, 
-				bdSvQ3 = BigDecimal.ZERO, 
-				bdSvQ4 = BigDecimal.ZERO;
+		if(iUserRights > 0) { // User oder SuperUser oder FinancialUser oder Admin
+			sPaneA.setBounds(0, 10, x - 20, iTblAHeight);
+			tableA.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
-		Arrays.stream(sTempSvTax).forEach(a -> Arrays.fill(a, null));
+			int col_RefA = ((x-20)-710);
+			setColumnWidths(tableA,120,120,120,col_RefA,200,150);
+
+			btnNewAN.setBounds( 0 * BUTTONX, iButtonATop, BUTTONX, BUTTONY);
+			btnPrintAN.setBounds( 1 * BUTTONX, iButtonATop, BUTTONX, BUTTONY);
+			btnStateAN.setBounds( 2 * BUTTONX, iButtonATop, BUTTONX, BUTTONY);
+			btnPrintAB.setBounds( 3 * BUTTONX, iButtonATop, BUTTONX, BUTTONY);
+
+			lblANopen.setBounds(  4 * BUTTONX, iButtonRaTop + 5, 90, STATEY - 10);
+			lblANclosed.setBounds(4 * BUTTONX, iButtonRaTop + 25, 90, STATEY - 10);
+
+			txtANopen.setBounds(  BASEX + (4 * BUTTONX) + 95, iButtonRaTop + 5, 110, STATEY - 10);
+			txtANclosed.setBounds(BASEX + (4 * BUTTONX) + 95, iButtonRaTop + 25, 110, STATEY - 10);
+
+			progBarA.setBounds(BASEX + (4 * BUTTONX) + 210, iButtonRaTop, BUTTONX / 2, BUTTONY);
+			lblProgBarA.setBounds((BASEX + (4 * BUTTONX) + 210) + (BUTTONX / 2), iButtonRaTop, BUTTONX - 50, BUTTONY);
+		}
+
+		//#############################################################################################################
+		// Ausgangsrechnungen
+		
+		if(iUserRights > 0) { // User oder SuperUser oder FinancialUser oder Admin
+			sPaneRa.setBounds(0, 10, x - 20, iTblRaHeight);
+			tableRa.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+
+			int col_RefRa = ((x-20)-1210);
+			setColumnWidths(tableRa,120,120,120,200,col_RefRa,200,150,150,150);
+
+			btnNewREa.setBounds( 0 * BUTTONX, iButtonRaTop, BUTTONX, BUTTONY);
+			btnPrintREa.setBounds( 1 * BUTTONX, iButtonRaTop, BUTTONX, BUTTONY);
+			btnStateREa.setBounds( 2 * BUTTONX, iButtonRaTop, BUTTONX, BUTTONY);
+			btnPrintRem.setBounds( 3 * BUTTONX, iButtonRaTop, BUTTONX, BUTTONY);
+
+			lblREaOpen.setBounds(  4 * BUTTONX, iButtonRaTop + 5, 90, STATEY - 10);
+			lblREaClosed.setBounds(4 * BUTTONX, iButtonRaTop + 25, 90, STATEY - 10);
+
+			txtREaOpen.setBounds(  BASEX + (4 * BUTTONX) + 95, iButtonRaTop + 5, 110, STATEY - 10);
+			txtREaClosed.setBounds(BASEX + (4 * BUTTONX) + 95, iButtonRaTop + 25, 110, STATEY - 10);
+
+			progBarRa.setBounds(BASEX + (4 * BUTTONX) + 210, iButtonRaTop, BUTTONX / 2, BUTTONY);
+			lblProgBarRa.setBounds((BASEX + (4 * BUTTONX) + 210) + (BUTTONX / 2), iButtonRaTop, BUTTONX - 50, BUTTONY);
+		}
+
+		//#############################################################################################################
+		// Eingangsrechnungen
+		
+		if(iUserRights > 1) { // SuperUser oder FinancialUser oder Admin
+			sPaneRe.setBounds(0, 10, x - 20, iTblReHeight);
+			tableRe.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+
+			//int col_RefRe = ((x-20)-1210);
+			setColumnWidths(tableRe,100,80,150,150,80,150,80,100,60,60,70,70,70,70,100,250,250);
+
+			btnNewREe.setBounds( 0 * BUTTONX, iButtonReTop, BUTTONX, BUTTONY);
+			btnStateREe.setBounds( 1 * BUTTONX, iButtonReTop, BUTTONX, BUTTONY);
+
+			lblREeOpen.setBounds(  2 * BUTTONX, iButtonReTop + 5, 90, STATEY - 10);
+			lblREeClosed.setBounds(2 * BUTTONX, iButtonReTop + 25, 90, STATEY - 10);
+
+			txtREeOpen.setBounds(  BASEX + (2 * BUTTONX) + 95, iButtonReTop + 5, 110, STATEY - 10);
+			txtREeClosed.setBounds(BASEX + (2 * BUTTONX) + 95, iButtonReTop + 25, 110, STATEY - 10);
+
+			progBarRe.setBounds(BASEX + (2 * BUTTONX) + 210, iButtonReTop, BUTTONX / 2, BUTTONY);
+			lblProgBarRe.setBounds((BASEX + (2 * BUTTONX) + 210) + (BUTTONX / 2), iButtonReTop, BUTTONX - 50, BUTTONY);
+		}
+
+		//#############################################################################################################
+		// Ausgaben
+		
+		if(iUserRights > 1) { // SuperUser oder FinancialUser oder Admin
+			sPaneE.setBounds(0, 10, x - 20, iTblEHeight);
+			tableE.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+
+			int col_dyn = ((x-20)-450)/2;
+			setColumnWidths(tableE,50,100,col_dyn,100,100,100,100,col_dyn);
+
+			btnNewEx.setBounds( 0 * BUTTONX, iButtonETop, BUTTONX, BUTTONY);
+			btnEditEx.setBounds( 1 * BUTTONX, iButtonETop, BUTTONX, BUTTONY);
+
+			lblExNetto.setBounds(  2 * BUTTONX, iButtonETop + 5, 90, STATEY - 10);
+			lblExBrutto.setBounds(2 * BUTTONX, iButtonETop + 25, 90, STATEY - 10);
+
+			txtExNetto.setBounds(  BASEX + (2 * BUTTONX) + 95, iButtonETop + 5, 110, STATEY - 10);
+			txtExBrutto.setBounds(BASEX + (2 * BUTTONX) + 95, iButtonETop + 25, 110, STATEY - 10);
+		}
+
+		//#############################################################################################################
+		// Sozialversicherung und Steuer
+		
+		if(iUserRights > 4) { // FinancialUser oder Admin
+			sPaneSvTax.setBounds(0, 10, x - 20, iTblSvTaxHeight);
+			tableSvTax.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+
+			//int col_dyn = ((x-20)-450)/2;
+			setColumnWidths(tableSvTax,80,400,400,100,80,400);
+
+			btnNewSvTax.setBounds( 0 * BUTTONX, iButtonSvTaxTop, BUTTONX, BUTTONY);
+			btnEditSvTax.setBounds( 1 * BUTTONX, iButtonSvTaxTop, BUTTONX, BUTTONY);
+
+			lblSvTaxOpen.setBounds(  2 * BUTTONX, iButtonSvTaxTop + 5, 90, STATEY - 10);
+			lblSvTaxClosed.setBounds(2 * BUTTONX, iButtonSvTaxTop + 25, 90, STATEY - 10);
+
+			txtSvTaxOpen.setBounds(  BASEX + (2 * BUTTONX) + 95, iButtonSvTaxTop + 5, 110, STATEY - 10);
+			txtSvTaxClosed.setBounds(BASEX + (2 * BUTTONX) + 95, iButtonSvTaxTop + 25, 110, STATEY - 10);
+		}
+
+		//#############################################################################################################
+		// Jahresergebnis
+		
+		if(iUserRights > 4) { // FinancialUser oder Admin
+			sPaneUSt.setBounds(0, 20, x - 20, 280); // Sichtbarer Bereich im Hauptpanel
+			sPaneP109a.setBounds(0, 320, x - 20, 415); // Sichtbarer Bereich im Hauptpanel
+		}
+		
+		//#############################################################################################################
+
+		lblState.setBounds(BASEX, iStateTop+1, x - 100, STATEY-4);
+		txtWirtschaftsjahr.setBounds(x - 90, iStateTop-1, 80, STATEY);
+
+		LoadData.setsSizeX(String.valueOf(x));
+		LoadData.setsSizeY(String.valueOf(y));
+
+		LoadData.setPrpAppSettings("screenx", LoadData.getsSizeX());
+		LoadData.setPrpAppSettings("screeny", LoadData.getsSizeY());
+		try {
+			saveSettingsApp(LoadData.getPrpAppSettings());
+		} catch (IOException e1) {
+			logger.error("error saving settings - " + e1);
+		}
+
+	}
+	
+	//###################################################################################################################################################
+	//###################################################################################################################################################
+
+	private static void actionAct() {
 
 		try {
-
-			Arrays.stream(arrSvTax).forEach(a -> Arrays.fill(a, null));
-			String sTblName = TBL_SVTAX.replace("_", LoadData.getStrAktGJ());
-			String sSQLStatement = "SELECT * FROM " + sTblName + " ORDER BY [datum]";
-
-			arrSvTax = sqlReadArray(sConn, sSQLStatement);
-
-			if(arrSvTax[0][0] != null) {
-				AnzSvTax = Integer.parseInt(arrSvTax[0][0]);
-			}else {
-				AnzSvTax = 0;
-			}
-
-			if(AnzSvTax == 0) {
-				actualizeWindow();
-				return;
-			}
-
-			for(int x = 1; (x - 1) < AnzSvTax; x++) {
-				switch(Integer.parseInt(arrSvTax[x][9])) {
-				case 0:
-					bPayedSvTax[x-1] = false;
-					break;
-				case 1:
-					bPayedSvTax[x-1] = true;
-					break;
-				}
-			}
-
-			for(int x = 1; (x - 1) < AnzSvTax; x++) {
-
-				LocalDate datum1 = LocalDate.parse(arrSvTax[x][2], inputFormat);
-				String stmpA = datum1.format(formatter);
-				sTempSvTax[x-1][0] = stmpA; // Spalte 1 - Datum
-
-				sTempSvTax[x-1][1] = arrSvTax[x][3]; // Spalte 2 - Empfänger
-				sTempSvTax[x-1][2] = arrSvTax[x][4]; // Spalte 3 - Bezeichnung
-
-				BigDecimal bdtmpN1 = new BigDecimal(arrSvTax[x][5]).setScale(2, RoundingMode.HALF_UP);
-				String stmpN1 = df.format(bdtmpN1);
-				sTempSvTax[x-1][3] = stmpN1 + "  EUR"; // Spalte 4 - Zahllast
-
-				LocalDate datum2 = LocalDate.parse(arrSvTax[x][6], inputFormat);
-				String stmpB = datum2.format(formatter);
-				sTempSvTax[x-1][4] = stmpB; // Spalte 5 - Fälligkeit
-
-				sTempSvTax[x-1][5] = arrSvTax[x][7]; // Spalte 6 - Dateiname
-				
-				if(arrSvTax[x][3].contains("Sozialversicherung")) {
-					if(arrSvTax[x][4].contains("Q1")){
-						BigDecimal tmpQ1 = new BigDecimal(arrSvTax[x][5]).setScale(2, RoundingMode.HALF_UP);
-						bdSvQ1 = bdSvQ1.add(tmpQ1);
-					}
-					if(arrSvTax[x][4].contains("Q2")){
-						BigDecimal tmpQ2 = new BigDecimal(arrSvTax[x][5]).setScale(2, RoundingMode.HALF_UP);
-						bdSvQ2 = bdSvQ2.add(tmpQ2);
-					}
-					if(arrSvTax[x][4].contains("Q3")){
-						BigDecimal tmpQ3 = new BigDecimal(arrSvTax[x][5]).setScale(2, RoundingMode.HALF_UP);
-						bdSvQ3 = bdSvQ3.add(tmpQ3);
-					}
-					if(arrSvTax[x][4].contains("Q4")){
-						BigDecimal tmpQ4 = new BigDecimal(arrSvTax[x][5]).setScale(2, RoundingMode.HALF_UP);
-						bdSvQ4 = bdSvQ4.add(tmpQ4);
-					}
-					AnnualResult.getSVData(bdSvQ1, bdSvQ2, bdSvQ3, bdSvQ4);
-				}
-				
-
-			}
-		} catch (SQLException e) {
-			logger.error("error loading data from database - " + e);
+			SQLmasterData.loadBaseData();
+			SQLmasterData.loadNummernkreis();
+		} catch (SQLException | ParseException e1) {
+			logger.error("txtWirtschaftsjahr.addActionListener(new ActionListener() - " + e1);
+		} catch (IOException e1) {
+			logger.error("txtWirtschaftsjahr.addActionListener(new ActionListener() - " + e1);
 		} catch (ClassNotFoundException e) {
-			logger.error("error cause class for database connection is not found - " + e);
-		} finally {
-			if(!reRun) {
-				//setSumEX();
-			}
-			actualizeWindow();
+			logger.error("txtWirtschaftsjahr.addActionListener(new ActionListener() - " + e);
+		}
+		
+		if(iUserRights > 0) { // User oder SuperUser oder FinancialUser oder Admin
+			LoadOffer.loadAngebot(false);
+			LoadBillOut.loadAusgangsRechnung(false);
+		}
+		if(iUserRights > 1) { // SuperUser oder FinancialUser oder Admin
+			LoadBillIn.loadEingangsRechnung(false);
+			LoadExpenses.loadAusgaben(false);
+		}
+		if(iUserRights > 4) { // FinancialUser oder Admin
+			LoadSvTax.loadSvTax(false, panelP109a);
+			CalcUStData.setValuesUVA(panelUSt, AnzYearBillIn, AnzYearBillOut, AnzExpenses, arrYearBillIn, arrYearBillOut, arrExpenses);
+			CalcTaxData.setValuesTax(panelP109a, AnzYearBillOut, arrYearBillOut);
+		}
+		if(iUserRights > 8) { // Admin
+			TextPanel.loadTexte();
 		}
 
+		actualizeWindow();
+
+		frame.setTitle(StartUp.APP_NAME + StartUp.APP_VERSION + " - Wirtschaftsjahr " + LoadData.getStrAktGJ());
+		
 	}
-
-	public static void loadTexte() {
-
-		if(SQLmasterData.getArrListText().size()>0) {
-			textAreas.get(0).setText(SQLmasterData.getsArrText()[1][4]);
-			textAreas.get(1).setText(SQLmasterData.getsArrText()[2][4]);
-			textAreas.get(2).setText(SQLmasterData.getsArrText()[3][4]);
-			textAreas.get(3).setText(SQLmasterData.getsArrText()[4][4]);
-			textAreas.get(4).setText(SQLmasterData.getsArrText()[5][4]);
-			textAreas.get(5).setText(SQLmasterData.getsArrText()[6][4]);
-			textAreas.get(6).setText(SQLmasterData.getsArrText()[7][4]);
-			textAreas.get(7).setText(SQLmasterData.getsArrText()[8][4]);
-			textAreas.get(8).setText(SQLmasterData.getsArrText()[9][4]);
-			textAreas.get(9).setText(SQLmasterData.getsArrText()[10][4]);
-			textAreas.get(10).setText(SQLmasterData.getsArrText()[11][4]);
-			textAreas.get(11).setText(SQLmasterData.getsArrText()[12][4]);
-			textAreas.get(12).setText(SQLmasterData.getsArrText()[1][6]);
-			textAreas.get(13).setText(SQLmasterData.getsArrText()[2][6]);
-			textAreas.get(14).setText(SQLmasterData.getsArrText()[3][6]);
-			textAreas.get(15).setText(SQLmasterData.getsArrText()[4][6]);
-			textAreas.get(16).setText(SQLmasterData.getsArrText()[5][6]);
-			textAreas.get(17).setText(SQLmasterData.getsArrText()[1][2]);
-			textAreas.get(18).setText(SQLmasterData.getsArrText()[2][2]);
-			textAreas.get(19).setText(SQLmasterData.getsArrText()[1][3]);
-			textAreas.get(20).setText(SQLmasterData.getsArrText()[2][3]);
-			textAreas.get(21).setText(SQLmasterData.getsArrText()[1][5]);
-			textAreas.get(22).setText(SQLmasterData.getsArrText()[2][5]);
-			textAreas.get(23).setText(SQLmasterData.getsArrText()[3][5]);
-			textAreas.get(24).setText(SQLmasterData.getsArrText()[4][5]);
-			textAreas.get(25).setText(SQLmasterData.getsArrText()[5][5]);
-			textAreas.get(26).setText(SQLmasterData.getsArrText()[6][5]);
-			textAreas.get(27).setText(SQLmasterData.getsArrText()[7][5]);
-			textAreas.get(28).setText(SQLmasterData.getsArrText()[8][5]);
-			textAreas.get(29).setText(SQLmasterData.getsArrText()[9][5]);
-			textAreas.get(30).setText(SQLmasterData.getsArrText()[10][5]);
-			textAreas.get(31).setText(SQLmasterData.getsArrText()[1][7]);
-			textAreas.get(32).setText(SQLmasterData.getsArrText()[2][7]);
-			textAreas.get(33).setText(SQLmasterData.getsArrText()[3][7]);
-			textAreas.get(34).setText(SQLmasterData.getsArrText()[4][7]);
-			textAreas.get(35).setText(SQLmasterData.getsArrText()[5][7]);
-			textAreas.get(36).setText(SQLmasterData.getsArrText()[6][7]);
-			textAreas.get(37).setText(SQLmasterData.getsArrText()[7][7]);
-			textAreas.get(38).setText(SQLmasterData.getsArrText()[8][7]);
-			textAreas.get(39).setText(SQLmasterData.getsArrText()[9][7]);
-			textAreas.get(40).setText(SQLmasterData.getsArrText()[10][7]);
-			textAreas.get(41).setText(SQLmasterData.getsArrText()[11][7]);
-			textAreas.get(42).setText(SQLmasterData.getsArrText()[12][7]);
-			textAreas.get(43).setText(SQLmasterData.getsArrText()[13][7]);
-			textAreas.get(44).setText(SQLmasterData.getsArrText()[14][7]);
-
-			labelList.get(0).setText(SQLmasterData.getsArrText()[1][1]);
-			labelList.get(1).setText(SQLmasterData.getsArrText()[2][1]);
-			labelList.get(2).setText(SQLmasterData.getsArrText()[3][1]);
-			labelList.get(3).setText(SQLmasterData.getsArrText()[4][1]);
-			labelList.get(4).setText(SQLmasterData.getsArrText()[5][1]);
-			labelList.get(5).setText(SQLmasterData.getsArrText()[6][1]);
-			labelList.get(6).setText(SQLmasterData.getsArrText()[7][1]);
-			labelList.get(7).setText(SQLmasterData.getsArrText()[8][1]);
-			labelList.get(8).setText(SQLmasterData.getsArrText()[9][1]);
-			labelList.get(9).setText(SQLmasterData.getsArrText()[10][1]);
-			labelList.get(10).setText(SQLmasterData.getsArrText()[11][1]);
-			labelList.get(11).setText(SQLmasterData.getsArrText()[12][1]);
-			labelList.get(12).setText(SQLmasterData.getsArrText()[1][1]);
-			labelList.get(13).setText(SQLmasterData.getsArrText()[2][1]);
-			labelList.get(14).setText(SQLmasterData.getsArrText()[3][1]);
-			labelList.get(15).setText(SQLmasterData.getsArrText()[4][1]);
-			labelList.get(16).setText(SQLmasterData.getsArrText()[5][1]);
-			labelList.get(17).setText(SQLmasterData.getsArrText()[1][1]);
-			labelList.get(18).setText(SQLmasterData.getsArrText()[2][1]);
-			labelList.get(19).setText(SQLmasterData.getsArrText()[1][1]);
-			labelList.get(20).setText(SQLmasterData.getsArrText()[2][1]);
-			labelList.get(21).setText(SQLmasterData.getsArrText()[1][1]);
-			labelList.get(22).setText(SQLmasterData.getsArrText()[2][1]);
-			labelList.get(23).setText(SQLmasterData.getsArrText()[3][1]);
-			labelList.get(24).setText(SQLmasterData.getsArrText()[4][1]);
-			labelList.get(25).setText(SQLmasterData.getsArrText()[5][1]);
-			labelList.get(26).setText(SQLmasterData.getsArrText()[6][1]);
-			labelList.get(27).setText(SQLmasterData.getsArrText()[7][1]);
-			labelList.get(28).setText(SQLmasterData.getsArrText()[8][1]);
-			labelList.get(29).setText(SQLmasterData.getsArrText()[9][1]);
-			labelList.get(30).setText(SQLmasterData.getsArrText()[10][1]);
-			labelList.get(31).setText(SQLmasterData.getsArrText()[1][1]);
-			labelList.get(32).setText(SQLmasterData.getsArrText()[2][1]);
-			labelList.get(33).setText(SQLmasterData.getsArrText()[3][1]);
-			labelList.get(34).setText(SQLmasterData.getsArrText()[4][1]);
-			labelList.get(35).setText(SQLmasterData.getsArrText()[5][1]);
-			labelList.get(36).setText(SQLmasterData.getsArrText()[6][1]);
-			labelList.get(37).setText(SQLmasterData.getsArrText()[7][1]);
-			labelList.get(38).setText(SQLmasterData.getsArrText()[8][1]);
-			labelList.get(39).setText(SQLmasterData.getsArrText()[9][1]);
-			labelList.get(40).setText(SQLmasterData.getsArrText()[10][1]);
-			labelList.get(41).setText(SQLmasterData.getsArrText()[11][1]);
-			labelList.get(42).setText(SQLmasterData.getsArrText()[12][1]);
-			labelList.get(43).setText(SQLmasterData.getsArrText()[13][1]);
-			labelList.get(44).setText(SQLmasterData.getsArrText()[14][1]);
-		}
-
-		for (int n = 0; n < textAreas.size(); n++) {
-			if (textAreas.get(n).getText().length() > 0) {
-				if (textAreas.get(n).getText().contains("{")) {
-					String text = textAreas.get(n).getText();
-					textAreas.get(n).setText(""); // Zurücksetzen, um doppeltes Styling zu vermeiden
-					try {
-						applyHighlighting(textAreas.get(n), text);
-					} catch (BadLocationException e) {
-						logger.error("error applying text highlighting - " + e);
-					}
-				}
-			}
-		}
-
-		for (int m = 0; m < updateButtons.size(); m++) {
-			updateButtons.get(m).setEnabled(false);
-		}
-
+	
+	static void actualizeWindow() {
+		contentPane.revalidate();
+		contentPane.repaint();
 	}
-
+	
 	//###################################################################################################################################################
 	//###################################################################################################################################################
 
@@ -1857,7 +1434,7 @@ public class JFoverview extends JFrame {
 			sNetto = decimalFormat.format(bdNetto);
 			sBrutto = decimalFormat.format(bdBrutto);
 			
-			AnnualResult.setBdExpNetto(bdNetto);
+			CalcTaxData.setBdExpNetto(bdNetto);
 
 		} catch (NullPointerException e1){
 			logger.error("error in calculatin expenses sum - " + e1);
@@ -1874,63 +1451,6 @@ public class JFoverview extends JFrame {
 
 	}
 	
-	//###################################################################################################################################################
-	//###################################################################################################################################################
-
-	static boolean questionCreate() {
-
-		logger.error("no data table for financial year " + LoadData.getStrAktGJ() + " available - asking to create it");
-
-		int auswahl = JOptionPane.showConfirmDialog(null, "<html>keine Tabelle für <b>" + LoadData.getStrAktGJ()
-		+ "</b> vorhanden ...<br>soll diese angelegt werden ?</html>", "erzeugen ?", JOptionPane.YES_NO_OPTION);
-
-		if (auswahl == JOptionPane.NO_OPTION) {
-			logger.error("user cancelled creating new data table");
-			return false;
-		}
-		if (auswahl == JOptionPane.YES_OPTION) {
-			try {
-				sqlCreateTable(sConn, Integer.parseInt(LoadData.getStrAktGJ()), LoadData.getStrDBNameSource());
-				logger.info("data table for financial year " + LoadData.getStrAktGJ() + " available - successfully created");
-				return true;
-			} catch (NumberFormatException | ClassNotFoundException | SQLException e1) {
-				logger.error("error creating new data table - " + e1);
-				return false;
-			}
-		}
-		return false;
-	}
-
-	private static void actionAct() {
-
-		try {
-			SQLmasterData.loadBaseData();
-			SQLmasterData.loadNummernkreis();
-		} catch (SQLException | ParseException e1) {
-			logger.error("txtWirtschaftsjahr.addActionListener(new ActionListener() - " + e1);
-		} catch (IOException e1) {
-			logger.error("txtWirtschaftsjahr.addActionListener(new ActionListener() - " + e1);
-		} catch (ClassNotFoundException e) {
-			logger.error("txtWirtschaftsjahr.addActionListener(new ActionListener() - " + e);
-		}
-		loadAngebot(false);
-		loadAusgangsRechnung(false);
-		loadEingangsRechnung(false);
-		loadExpenses(false);
-		loadSvTax(false);
-		
-		AnnualResult.setValues(AnzYearBillIn, AnzYearBillOut, AnzExpenses, arrYearBillIn, arrYearBillOut, arrExpenses);
-		
-		//LoadOverview();
-		loadTexte();
-		actualizeWindow();
-
-		frame.setTitle(StartUp.APP_NAME + StartUp.APP_VERSION + " - Wirtschaftsjahr " + LoadData.getStrAktGJ());
-		
-		
-
-	}
-
 	//###################################################################################################################################################
 	//###################################################################################################################################################
 
@@ -2138,34 +1658,9 @@ public class JFoverview extends JFrame {
 		txtWirtschaftsjahr.setForeground(Color.BLACK);
 		contentPane.add(txtWirtschaftsjahr);
 	}
-
-	static void actualizeWindow() {
-		contentPane.revalidate();
-		contentPane.repaint();
-	}
-
-	static String searchKunde(String sKdNr) {
-		List<ArrayList<String>> kundenListe = SQLmasterData.getArrListKunde();
-
-		// Prüfen, ob die Kundenliste null ist
-		if (kundenListe == null || kundenListe.isEmpty()) {
-			return sKdNr; // Falls die Liste leer oder null ist, gib die ursprüngliche Kundennummer zurück.
-		}
-
-		for (int kd = 0; kd < kundenListe.size(); kd++) {
-			ArrayList<String> kunde = kundenListe.get(kd);
-
-			// Prüfen, ob die Kunde-Liste null oder zu kurz ist
-			if (kunde == null || kunde.size() < 2 || kunde.get(0) == null) {
-				continue; // Überspringe ungültige Einträge
-			}
-
-			if (kunde.get(0).equals(sKdNr)) {
-				return kunde.get(1); // Gib den Kundennamen zurück
-			}
-		}
-		return sKdNr; // Falls keine Übereinstimmung gefunden wurde, gib die Nummer zurück
-	}
+	
+	//###################################################################################################################################################
+	//###################################################################################################################################################
 
 	static ArrayList<String> searchKundeAll(String sKdNr) {
 		List<ArrayList<String>> kundenListe = SQLmasterData.getArrListKunde();
@@ -2183,148 +1678,6 @@ public class JFoverview extends JFrame {
 			}
 		}
 		return null;
-
-	}
-
-	private void resizeGUI(Dimension xy) {
-		int x = xy.width;
-		int y = xy.height;
-
-		int iStateTop = y - BOTTOMY - STATEY;
-		int iTblAHeight = y - 185;
-		int iButtonATop = BASEY + iTblAHeight - 10;
-		int iTblRaHeight = y - 185;
-		int iButtonRaTop = BASEY + iTblRaHeight - 10;
-		int iTblReHeight = y - 185;
-		int iButtonReTop = BASEY + iTblRaHeight - 10;
-		int iTblEHeight = y - 185;
-		int iButtonETop = BASEY + iTblEHeight - 10;
-		int iTblSvTaxHeight = y - 185;
-		int iButtonSvTaxTop = BASEY + iTblSvTaxHeight - 10;
-
-		menuBar.setBounds(0, 0, x, STATEY - 10);
-
-		tabPanel.setLocation(10, STATEY);
-		tabPanel.setSize(x - 20, y - 80);
-
-		//#############################################################################################################
-
-		sPaneA.setBounds(0, 10, x - 20, iTblAHeight);
-		tableA.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-
-		int col_RefA = ((x-20)-710);
-		setColumnWidths(tableA,120,120,120,col_RefA,200,150);
-
-		btnNewAN.setBounds( 0 * BUTTONX, iButtonATop, BUTTONX, BUTTONY);
-		btnPrintAN.setBounds( 1 * BUTTONX, iButtonATop, BUTTONX, BUTTONY);
-		btnStateAN.setBounds( 2 * BUTTONX, iButtonATop, BUTTONX, BUTTONY);
-		btnPrintAB.setBounds( 3 * BUTTONX, iButtonATop, BUTTONX, BUTTONY);
-
-		lblANopen.setBounds(  4 * BUTTONX, iButtonRaTop + 5, 90, STATEY - 10);
-		lblANclosed.setBounds(4 * BUTTONX, iButtonRaTop + 25, 90, STATEY - 10);
-
-		txtANopen.setBounds(  BASEX + (4 * BUTTONX) + 95, iButtonRaTop + 5, 110, STATEY - 10);
-		txtANclosed.setBounds(BASEX + (4 * BUTTONX) + 95, iButtonRaTop + 25, 110, STATEY - 10);
-
-		progBarA.setBounds(BASEX + (4 * BUTTONX) + 210, iButtonRaTop, BUTTONX / 2, BUTTONY);
-		lblProgBarA.setBounds((BASEX + (4 * BUTTONX) + 210) + (BUTTONX / 2), iButtonRaTop, BUTTONX - 50, BUTTONY);
-
-		//#############################################################################################################
-
-		sPaneRa.setBounds(0, 10, x - 20, iTblRaHeight);
-		tableRa.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-
-		int col_RefRa = ((x-20)-1210);
-		setColumnWidths(tableRa,120,120,120,200,col_RefRa,200,150,150,150);
-
-		btnNewREa.setBounds( 0 * BUTTONX, iButtonRaTop, BUTTONX, BUTTONY);
-		btnPrintREa.setBounds( 1 * BUTTONX, iButtonRaTop, BUTTONX, BUTTONY);
-		btnStateREa.setBounds( 2 * BUTTONX, iButtonRaTop, BUTTONX, BUTTONY);
-		btnPrintRem.setBounds( 3 * BUTTONX, iButtonRaTop, BUTTONX, BUTTONY);
-
-		lblREaOpen.setBounds(  4 * BUTTONX, iButtonRaTop + 5, 90, STATEY - 10);
-		lblREaClosed.setBounds(4 * BUTTONX, iButtonRaTop + 25, 90, STATEY - 10);
-
-		txtREaOpen.setBounds(  BASEX + (4 * BUTTONX) + 95, iButtonRaTop + 5, 110, STATEY - 10);
-		txtREaClosed.setBounds(BASEX + (4 * BUTTONX) + 95, iButtonRaTop + 25, 110, STATEY - 10);
-
-		progBarRa.setBounds(BASEX + (4 * BUTTONX) + 210, iButtonRaTop, BUTTONX / 2, BUTTONY);
-		lblProgBarRa.setBounds((BASEX + (4 * BUTTONX) + 210) + (BUTTONX / 2), iButtonRaTop, BUTTONX - 50, BUTTONY);
-
-		//#############################################################################################################
-
-		sPaneRe.setBounds(0, 10, x - 20, iTblReHeight);
-		tableRe.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-
-		//int col_RefRe = ((x-20)-1210);
-		setColumnWidths(tableRe,100,80,150,150,80,150,80,100,60,60,70,70,70,70,100,250,250);
-
-		btnNewREe.setBounds( 0 * BUTTONX, iButtonReTop, BUTTONX, BUTTONY);
-		btnStateREe.setBounds( 1 * BUTTONX, iButtonReTop, BUTTONX, BUTTONY);
-
-		lblREeOpen.setBounds(  2 * BUTTONX, iButtonReTop + 5, 90, STATEY - 10);
-		lblREeClosed.setBounds(2 * BUTTONX, iButtonReTop + 25, 90, STATEY - 10);
-
-		txtREeOpen.setBounds(  BASEX + (2 * BUTTONX) + 95, iButtonReTop + 5, 110, STATEY - 10);
-		txtREeClosed.setBounds(BASEX + (2 * BUTTONX) + 95, iButtonReTop + 25, 110, STATEY - 10);
-
-		progBarRe.setBounds(BASEX + (2 * BUTTONX) + 210, iButtonReTop, BUTTONX / 2, BUTTONY);
-		lblProgBarRe.setBounds((BASEX + (2 * BUTTONX) + 210) + (BUTTONX / 2), iButtonReTop, BUTTONX - 50, BUTTONY);
-
-		//#############################################################################################################
-
-		sPaneE.setBounds(0, 10, x - 20, iTblEHeight);
-		tableE.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-
-		int col_dyn = ((x-20)-450)/2;
-		setColumnWidths(tableE,50,100,col_dyn,100,100,100,100,col_dyn);
-
-		btnNewEx.setBounds( 0 * BUTTONX, iButtonETop, BUTTONX, BUTTONY);
-		btnEditEx.setBounds( 1 * BUTTONX, iButtonETop, BUTTONX, BUTTONY);
-
-		lblExNetto.setBounds(  2 * BUTTONX, iButtonETop + 5, 90, STATEY - 10);
-		lblExBrutto.setBounds(2 * BUTTONX, iButtonETop + 25, 90, STATEY - 10);
-
-		txtExNetto.setBounds(  BASEX + (2 * BUTTONX) + 95, iButtonETop + 5, 110, STATEY - 10);
-		txtExBrutto.setBounds(BASEX + (2 * BUTTONX) + 95, iButtonETop + 25, 110, STATEY - 10);
-
-		//#############################################################################################################
-
-		sPaneSvTax.setBounds(0, 10, x - 20, iTblSvTaxHeight);
-		tableSvTax.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-
-		//int col_dyn = ((x-20)-450)/2;
-		setColumnWidths(tableSvTax,80,250,400,100,80,400);
-
-		btnNewSvTax.setBounds( 0 * BUTTONX, iButtonSvTaxTop, BUTTONX, BUTTONY);
-		btnEditSvTax.setBounds( 1 * BUTTONX, iButtonSvTaxTop, BUTTONX, BUTTONY);
-
-		lblSvTaxOpen.setBounds(  2 * BUTTONX, iButtonSvTaxTop + 5, 90, STATEY - 10);
-		lblSvTaxClosed.setBounds(2 * BUTTONX, iButtonSvTaxTop + 25, 90, STATEY - 10);
-
-		txtSvTaxOpen.setBounds(  BASEX + (2 * BUTTONX) + 95, iButtonSvTaxTop + 5, 110, STATEY - 10);
-		txtSvTaxClosed.setBounds(BASEX + (2 * BUTTONX) + 95, iButtonSvTaxTop + 25, 110, STATEY - 10);
-
-		//#############################################################################################################
-		
-		sPaneUSt.setBounds(0, 20, x - 20, 280); // Sichtbarer Bereich im Hauptpanel
-		sPaneP109a.setBounds(0, 320, x - 20, 415); // Sichtbarer Bereich im Hauptpanel
-		
-		//#############################################################################################################
-
-		lblState.setBounds(BASEX, iStateTop+1, x - 100, STATEY-4);
-		txtWirtschaftsjahr.setBounds(x - 90, iStateTop-1, 80, STATEY);
-
-		LoadData.setsSizeX(String.valueOf(x));
-		LoadData.setsSizeY(String.valueOf(y));
-
-		LoadData.setPrpAppSettings("screenx", LoadData.getsSizeX());
-		LoadData.setPrpAppSettings("screeny", LoadData.getsSizeY());
-		try {
-			saveSettingsApp(LoadData.getPrpAppSettings());
-		} catch (IOException e1) {
-			logger.error("error saving settings - " + e1);
-		}
 
 	}
 
@@ -2786,46 +2139,6 @@ public class JFoverview extends JFrame {
 	//###################################################################################################################################################
 	//###################################################################################################################################################
 
-	private void handleButtonClick(int index, String lblInf, String label, JTextPane txtPane) {
-
-		String sPreSql = "UPDATE tblText SET [{Column}] = '" + txtPane.getText() + "' WHERE [Id] = '{Id}'";
-
-		if(label.contains("Angebot")) {
-			sPreSql = sPreSql.replace("{Column}", "TextAngebot");
-		}
-		if(label.contains("Auftragsbestätigung")) {
-			sPreSql = sPreSql.replace("{Column}", "TextOrderConfirm");
-		}
-		if(label.contains("Umsatzsteuerhinweis")) {
-			sPreSql = sPreSql.replace("{Column}", "TextUSt");
-		}
-		if(label.contains("Zahlungsziel")) {
-			sPreSql = sPreSql.replace("{Column}", "TextZahlZiel");
-		}
-		if(label.contains("Zahlungserinnerung")) {
-			sPreSql = sPreSql.replace("{Column}", "TextZahlErin");
-		}
-		if(label.contains("Mahnung")) {
-			sPreSql = sPreSql.replace("{Column}", "TextMahnung");
-		}
-
-		String sSQLStatement = sPreSql.replace("{Id}", lblInf);
-
-		try {
-			sqlUpdate(sConnMaster, sSQLStatement);
-		} catch (ClassNotFoundException | SQLException e) {
-			logger.error("error updating texts into database - " + e);
-		}
-
-		try {
-			SQLmasterData.loadBaseData();
-		} catch (ClassNotFoundException | SQLException | ParseException e) {
-			logger.error("error loading base data from database - " + e);
-		}
-		loadTexte();
-
-	}
-
 	private void actionDblClickOfferBill(JTable table, MouseEvent e) {
 		if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1 && !e.isConsumed()) {
 
@@ -2963,7 +2276,7 @@ public class JFoverview extends JFrame {
 			logger.error("actionAN3() - " + e1);
 		}
 
-		String tblName = TBL_OFFER.replace("_", LoadData.getStrAktGJ());
+		String tblName = LoadOffer.getDatatbl().replace("_", LoadData.getStrAktGJ());
 		String sStatement = "UPDATE " + tblName + " SET [printState] = '1', [Status] = '" + JFstatusA.getPrinted() + "' WHERE [IdNummer] = '" + vZelleA + "'";
 
 		try {
@@ -2972,7 +2285,7 @@ public class JFoverview extends JFrame {
 			logger.error("error updating offer state to database - " + e1);
 		}
 
-		loadAngebot(false);
+		LoadOffer.loadAngebot(false);
 		btnPrintAN.setEnabled(false);
 		btnStateAN.setEnabled(false);
 		btnPrintAB.setEnabled(false);
@@ -3051,7 +2364,7 @@ public class JFoverview extends JFrame {
 			logger.error("actionRE3() - " + e1);
 		}
 
-		String tblName = TBL_BILL_OUT.replace("_", LoadData.getStrAktGJ());
+		String tblName = LoadBillOut.getDatatbl().replace("_", LoadData.getStrAktGJ());
 		String sStatement = "UPDATE " + tblName + " SET [printState] = '1', [Status] = 'gedruckt' WHERE [IdNummer] = '" + vZelleRa + "'";
 
 		try {
@@ -3060,7 +2373,7 @@ public class JFoverview extends JFrame {
 			logger.error("error updating bill state to database - " + e1);
 		}
 
-		loadAusgangsRechnung(false);
+		LoadBillOut.loadAusgangsRechnung(false);
 		btnPrintREa.setEnabled(false);
 		btnStateREa.setEnabled(false);
 		Runtime.getRuntime().gc();
@@ -3115,6 +2428,7 @@ public class JFoverview extends JFrame {
 	}
 
 	//###################################################################################################################################################
+	// Getter und Setter für Felder
 	//###################################################################################################################################################
 	
 	public static File getLock() {
@@ -3149,8 +2463,76 @@ public class JFoverview extends JFrame {
 		JFoverview.sConn = sConn;
 	}
 
-	public static void setsConnMaster(String sConnMaster) {
-		JFoverview.sConnMaster = sConnMaster;
+	public static void setbActiveA(int idx, boolean bActiveA) {
+		JFoverview.bActiveA[idx] = bActiveA;
+	}
+
+	public static void setbPrintA(int idx, boolean bPrintA) {
+		JFoverview.bPrintA[idx] = bPrintA;
+	}
+
+	public static void setbOrderA(int idx, boolean bOrderA) {
+		JFoverview.bOrderA[idx] = bOrderA;
+	}
+
+	public static void setAnzYearOffer(int anzYearOffer) {
+		AnzYearOffer = anzYearOffer;
+	}
+
+	public static void setbActiveRa(int idx, boolean bActiveRa) {
+		JFoverview.bActiveRa[idx] = bActiveRa;
+	}
+
+	public static void setbPrintRa(int idx, boolean bPrintRa) {
+		JFoverview.bPrintRa[idx] = bPrintRa;
+	}
+
+	public static void setbMoneyRa(int idx, boolean bMoneyRa) {
+		JFoverview.bMoneyRa[idx] = bMoneyRa;
+	}
+
+	public static void setAnzYearBillOut(int anzYearBillOut) {
+		AnzYearBillOut = anzYearBillOut;
+	}
+
+	public static void setbPayedRe(int idx, boolean bPayedRe) {
+		JFoverview.bPayedRe[idx] = bPayedRe;
+	}
+
+	public static void setAnzYearBillIn(int anzYearBillIn) {
+		AnzYearBillIn = anzYearBillIn;
+	}
+
+	public static void setArrYearOffer(String[][] arrYearOffer) {
+		JFoverview.arrYearOffer = arrYearOffer;
+	}
+
+	public static void setArrYearBillOut(String[][] arrYearBillOut) {
+		JFoverview.arrYearBillOut = arrYearBillOut;
+	}
+
+	public static void setArrYearBillIn(String[][] arrYearBillIn) {
+		JFoverview.arrYearBillIn = arrYearBillIn;
+	}
+
+	public static void setArrExpenses(String[][] arrExpenses) {
+		JFoverview.arrExpenses = arrExpenses;
+	}
+
+	public static void setArrSvTax(String[][] arrSvTax) {
+		JFoverview.arrSvTax = arrSvTax;
+	}
+
+	public static void setAnzExpenses(int anzExpenses) {
+		AnzExpenses = anzExpenses;
+	}
+
+	public static void setbPayedSvTax(int idx, boolean bPayedSvTax) {
+		JFoverview.bPayedSvTax[idx] = bPayedSvTax;
+	}
+
+	public static void setAnzSvTax(int anzSvTax) {
+		AnzSvTax = anzSvTax;
 	}
 
 }

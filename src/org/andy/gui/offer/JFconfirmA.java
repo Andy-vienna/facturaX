@@ -34,7 +34,7 @@ import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 import org.andy.code.dataExport.ExcelConfirmation;
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
-import org.andy.gui.main.JFoverview;
+import org.andy.code.main.overview.LoadOffer;
 import org.andy.gui.misc.RoundedBorder;
 import org.andy.org.eclipse.wb.swing.FocusTraversalOnArray;
 
@@ -185,7 +185,7 @@ public class JFconfirmA extends JFrame {
 					logger.error("error updating offer state to database - " + e2);
 				}
 
-				JFoverview.loadAngebot(false);
+				LoadOffer.loadAngebot(false);
 				dispose();
 			}
 		});

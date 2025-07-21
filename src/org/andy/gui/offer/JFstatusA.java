@@ -33,7 +33,7 @@ import org.apache.logging.log4j.Logger;
 
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
-import org.andy.gui.main.JFoverview;
+import org.andy.code.main.overview.LoadOffer;
 
 public class JFstatusA extends JFrame {
 
@@ -90,7 +90,7 @@ public class JFstatusA extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosed(WindowEvent e) {
-				JFoverview.loadAngebot(false);
+				LoadOffer.loadAngebot(false);
 			}
 		});
 		setBounds(100, 100, 401, 141);
@@ -240,7 +240,7 @@ public class JFstatusA extends JFrame {
 					logger.error("error updating offer state to database - " + e1);
 				}
 
-				JFoverview.loadAngebot(false);
+				LoadOffer.loadAngebot(false);
 				dispose(); // Dialog-Fenster loswerden ...
 			}
 		});

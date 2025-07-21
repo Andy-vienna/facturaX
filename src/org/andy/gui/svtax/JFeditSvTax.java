@@ -57,8 +57,8 @@ import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
+import org.andy.code.main.overview.LoadSvTax;
 import org.andy.gui.file.JFfileView;
-import org.andy.gui.main.JFoverview;
 import org.andy.gui.misc.RoundedBorder;
 
 public class JFeditSvTax extends JFrame {
@@ -325,7 +325,7 @@ public class JFeditSvTax extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				writeUpdateREe();
-				JFoverview.loadSvTax(false);
+				LoadSvTax.loadSvTax(false, null);
 				dispose();
 			}
 		});

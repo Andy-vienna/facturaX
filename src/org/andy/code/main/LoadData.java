@@ -20,7 +20,13 @@ import org.andy.code.dataExport.ExcelConfirmation;
 import org.andy.code.dataExport.ExcelMahnung;
 import org.andy.code.dataExport.ExcelOffer;
 import org.andy.code.dataExport.ExcelReminder;
-import org.andy.code.main.overview.AnnualResult;
+import org.andy.code.main.overview.CalcTaxData;
+import org.andy.code.main.overview.LoadOffer;
+import org.andy.code.main.overview.LoadSvTax;
+import org.andy.code.main.overview.panels.TextPanel;
+import org.andy.code.main.overview.LoadBillOut;
+import org.andy.code.main.overview.LoadExpenses;
+import org.andy.code.main.overview.LoadBillIn;
 import org.andy.code.sql.SQLmasterData;
 import org.andy.code.sql.SQLproductiveData;
 import org.andy.gui.bill.in.JFeditRe;
@@ -191,7 +197,7 @@ public class LoadData {
 
 		SQLmasterData.setsConn(tmpConnA);
 		JFmainLogIn.setsConn(tmpConnA);
-		JFoverview.setsConnMaster(tmpConnA);
+		TextPanel.setsConnMaster(tmpConnA);
 		JFnewA.setsConnSource(tmpConnA);
 		JFnewRa.setsConnSource(tmpConnA);
 		JFuserMgmt.setsConn(tmpConnA);
@@ -201,7 +207,7 @@ public class LoadData {
 		JFowner.setsConn(tmpConnA);
 		JFtaxValues.setsConn(tmpConnA);
 		JFgwbValues.setsConn(tmpConnA);
-		AnnualResult.setsConn(tmpConnA);
+		CalcTaxData.setsConn(tmpConnA);
 
 		String tmpConnB = "jdbc:sqlserver://" + LoadData.strDBComputer + ":" + LoadData.strDBPort + ";database="
 				+ LoadData.strDBNameDest + ";user=" + LoadData.strDBUser + ";password=" + LoadData.strDBPass
@@ -228,6 +234,11 @@ public class LoadData {
 		JFeditEx.setsConn(tmpConnB);
 		JFnewSvTax.setsConn(tmpConnB);
 		JFeditSvTax.setsConn(tmpConnB);
+		LoadOffer.setsConn(tmpConnB);
+		LoadBillOut.setsConn(tmpConnB);
+		LoadBillIn.setsConn(tmpConnB);
+		LoadExpenses.setsConn(tmpConnB);
+		LoadSvTax.setsConn(tmpConnB);
 
 		StartUp.setSERVICE_NAME("\"SQL Server (" + strDBservice + ")\"");
 

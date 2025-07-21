@@ -56,6 +56,7 @@ import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
+import org.andy.code.main.overview.LoadBillOut;
 import org.andy.code.sql.SQLmasterData;
 import org.andy.gui.main.JFoverview;
 import org.andy.gui.misc.RoundedBorder;
@@ -970,7 +971,7 @@ public class JFnewRa extends JFrame {
 							} catch (ClassNotFoundException | SQLException | IOException e2) {
 								logger.error("error creating new outgoing bill - " + e2);
 							}
-							JFoverview.loadAusgangsRechnung(false);
+							LoadBillOut.loadAusgangsRechnung(false);
 							JFoverview.btnPrintREa.setEnabled(false);
 							JFoverview.btnStateREa.setEnabled(false);
 
