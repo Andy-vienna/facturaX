@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.andy.code.main.LoadData;
-import org.andy.code.main.overview.panels.TaxPanel;
+import org.andy.gui.main.overview_panels.TaxPanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,7 +22,6 @@ public class CalcTaxData {
 	
 	private static NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.GERMANY);
 	
-	private static BigDecimal bdExpNetto = BigDecimal.ZERO;
 	private static BigDecimal bdSVQ1 = BigDecimal.ZERO, bdSVQ2 = BigDecimal.ZERO, bdSVQ3 = BigDecimal.ZERO, bdSVQ4 = BigDecimal.ZERO;
 	private static BigDecimal bdSVYear = BigDecimal.ZERO;
 	
@@ -34,15 +33,15 @@ public class CalcTaxData {
 	// public Teil
 	//###################################################################################################################################################
 	
-	public static void setValuesTax(TaxPanel panel, int AnzYearBillOut, String[][] arrYearBillOut) {	
-		setValues(panel, AnzYearBillOut, arrYearBillOut);
+	public static void setValuesTax(TaxPanel panel, int AnzYearBillOut, String[][] arrYearBillOut, BigDecimal bdREnetto, BigDecimal bdEnetto) {	
+		setValues(panel, AnzYearBillOut, arrYearBillOut, bdREnetto, bdEnetto);
 	}
 	
 	//###################################################################################################################################################
 	// private Teil
 	//###################################################################################################################################################
 	
-	private static void setValues(TaxPanel panel, int AnzYearBillOut, String[][] arrYearBillOut) {
+	private static void setValues(TaxPanel panel, int AnzYearBillOut, String[][] arrYearBillOut, BigDecimal bdREnetto, BigDecimal bdEnetto) {
 		
 		getDBData(); // Steuergrenzen und Gewinnfreibetragsgrenzen aus DB lesen
 		
@@ -72,7 +71,8 @@ public class CalcTaxData {
 				}
 			}
 			
-			bdExpenses = new BigDecimal(bdExpNetto.toString().replace(",", ".")).multiply(new BigDecimal("-1")).setScale(2, RoundingMode.HALF_UP); // Ausgaben netto negativ
+			BigDecimal bdBA = bdREnetto.add(bdEnetto); // Betriebsausgaben netto komplett
+			bdExpenses = bdBA.multiply(new BigDecimal("-1")).setScale(2, RoundingMode.HALF_UP); // Betriebsausgaben netto negativ
 			
 			bdVorGwb = bdTmp2.add(bdSVYear).add(bdOeffiP).add(bdAPausch).add(bdExpenses); // VorGWB wird aus der Summe der Einnahmen, SV, öffentlicher Pauschale, APauschale und Ausgaben netto berechnet
 			
@@ -128,6 +128,22 @@ public class CalcTaxData {
 		panel.setTxtE1Tax(5, Double.valueOf(TaxStufe.get(12).toString().replace(",", "."))); // voraussichtliche Steuer in Stufe 6
 		panel.setTxtE1Tax(6, Double.valueOf(TaxStufe.get(13).toString().replace(",", "."))); // voraussichtliche Steuer in Stufe 7
 		panel.setTxtE1Summe(Double.valueOf(bdTaxTotal.toString().replace(",", "."))); // voraussichtliche Einkommensteuer gesamt
+		
+		ArrayList<BigDecimal> tmpListe = new ArrayList<>(); // Liste für §109a Formular erzeugen und in Setter schreiben
+		tmpListe.add(bdTmp2); // Einnahmen
+		tmpListe.add(bdSVQ1); // SV Q1
+		tmpListe.add(bdSVQ2); // SV Q2
+		tmpListe.add(bdSVQ3); // SV Q3
+		tmpListe.add(bdSVQ4); // SV Q4
+		tmpListe.add(bdSVYear); // SV Jahr
+		tmpListe.add(bdOeffiP); // Öffi-Pauschale
+		tmpListe.add(bdAPausch); // Arbeitsplatzpauschale
+		tmpListe.add(bdExpenses); // Betriebsausgaben netto
+		tmpListe.add(bdVorGwb); // Zwischensumme
+		tmpListe.add(bdGwbTotalNeg); // Gewinnfreibetrag
+		tmpListe.add(bdErgYear); // Ergebnis
+		
+		panel.setDataExcel(tmpListe); // Liste für P109a in Setter schreiben
 		
 	}
 	
@@ -407,13 +423,12 @@ public class CalcTaxData {
 		
 	}
 	
+	//###################################################################################################################################################
+	// Getter und Setter für Felder
+	//###################################################################################################################################################
+	
 	public static void setsConn(String sConn) {
 		CalcTaxData.sConn = sConn;
 	}
-
-	public static void setBdExpNetto(BigDecimal bdExpNetto) {
-		CalcTaxData.bdExpNetto = bdExpNetto;
-	}
-
 
 }

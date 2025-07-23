@@ -13,8 +13,8 @@ import java.util.Arrays;
 import java.util.Locale;
 
 import org.andy.code.main.LoadData;
-import org.andy.code.main.overview.panels.TaxPanel;
 import org.andy.gui.main.JFoverview;
+import org.andy.gui.main.overview_panels.TaxPanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

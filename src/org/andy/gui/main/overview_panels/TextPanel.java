@@ -1,4 +1,4 @@
-package org.andy.code.main.overview.panels;
+package org.andy.gui.main.overview_panels;
 
 import static org.andy.toolbox.misc.CreateObject.applyHighlighting;
 import static org.andy.toolbox.misc.CreateObject.createButton;

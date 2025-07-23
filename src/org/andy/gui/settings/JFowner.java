@@ -2,9 +2,9 @@ package org.andy.gui.settings;
 
 import static org.andy.toolbox.misc.CreateObject.createButton;
 import static org.andy.toolbox.sql.Read.sqlReadArrayList;
-import static org.andy.toolbox.sql.Update.sqlUpdate;
+import static org.andy.toolbox.sql.Insert.sqlInsert;
+import static org.andy.toolbox.sql.Delete.sqlDeleteNoReturn;
 
-import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,10 +19,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,16 +33,16 @@ public class JFowner extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
-	private JPanel contentPane = new JPanel();
-
 	private static String sConn;
 	static ArrayList<ArrayList<String>> sArrOwner = null;
 	static ArrayList<String> sOwnerData = new ArrayList<>();
 
-	private JTextField txt01, txt02, txt03, txt04, txt05, txt06, txt07, txt08, txt09, txt10;
+	private JLabel[] lbl = new JLabel[11];
+	private JTextField[] txt = new JTextField[11];
 	private JButton btnDoInsert = null, btnCancel = null;
 
 	//###################################################################################################################################################
+	// public Teil
 	//###################################################################################################################################################
 
 	public static void loadGUI() {
@@ -65,8 +63,12 @@ public class JFowner extends JFrame {
 			logger.fatal("fatal error loading gui for editing data - " + e);
 		}
 	}
+	
+	//###################################################################################################################################################
+	// private Teil
+	//###################################################################################################################################################
 
-	public JFowner() {
+	private JFowner() {
 
 		try {
 			setIconImage(SetFrameIcon.getFrameIcon("config.png"));
@@ -77,12 +79,64 @@ public class JFowner extends JFrame {
 		setResizable(false);
 		setTitle("Kundendaten bearbeiten");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 660, 420);
+		setBounds(100, 100, 660, 450);
 		setLocationRelativeTo(null);
-		getContentPane().setLayout(new BorderLayout());
-		getContentPane().add(contentPane, BorderLayout.CENTER);
-		contentPane.setLayout(null);
+		setLayout(null);
 
+		// Überschriften und Feldbeschriftungen
+	    String[] labels = {"Firma", "Strasse", "PLZ", "Ort", "Land", "USt.ID", "Kontakt", "Telefon", "E-Mail", "Währung", "Steuer.ID"};
+		
+		//------------------------------------------------------------------------------
+		// Labels anlegen
+		//------------------------------------------------------------------------------
+	    for (int r = 0; r < labels.length; r++) {
+	        lbl[r] = new JLabel(labels[r]);
+	        lbl[r].setBounds(10, 10 + r * 30, 110, 30);
+	        if (r == 0) {
+	            lbl[r].setFont(new Font("Tahoma", Font.BOLD, 14));
+	        } else {
+	            lbl[r].setFont(new Font("Tahoma", Font.PLAIN, 12));
+	        }
+	        add(lbl[r]);
+	    }
+		
+		//------------------------------------------------------------------------------
+		// Textfelder anlegen
+		//------------------------------------------------------------------------------
+	    for (int r = 0; r < txt.length; r++) {
+	    	txt[r] = new JTextField(sOwnerData.get(r));
+	        txt[r].setBounds(130, 10 + r * 30, 500, 30);
+	        txt[r].setHorizontalAlignment(SwingConstants.LEFT);
+            if (r == 0) {
+	            txt[r].setFont(new Font("Tahoma", Font.BOLD, 14));
+	        } else {
+	        	txt[r].setFont(new Font("Tahoma", Font.PLAIN, 12));
+	        }
+            add(txt[r]);
+        }
+		
+		//------------------------------------------------------------------------------
+		// Buttons anlegen
+		//------------------------------------------------------------------------------
+		try {
+			btnDoInsert = createButton("<html>Owner<br>schreiben</html>", "new.png");
+			btnCancel = createButton("cancel", "exit.png");
+		} catch (RuntimeException e1) {
+			logger.error("error creating button - " + e1);
+		}
+
+		btnDoInsert.setEnabled(true);
+		btnCancel.setEnabled(true);
+		btnDoInsert.setBounds(10, 350, 130, 50);
+		btnCancel.setBounds(500, 350, 130, 50);
+
+		add(btnDoInsert);
+		add(btnCancel);
+		
+		//###################################################################################################################################################
+		// Windows Listener
+		//###################################################################################################################################################
+		
 		//------------------------------------------------------------------------------
 		// WindowListener für den Dialog aufschlagen
 		//------------------------------------------------------------------------------
@@ -99,64 +153,57 @@ public class JFowner extends JFrame {
 			}
 		});
 
-		//------------------------------------------------------------------------------
-		// Buttons anlegen
-		//------------------------------------------------------------------------------
-		try {
-			btnDoInsert = createButton("<html>Owner<br>schreiben</html>", "new.png");
-			btnCancel = createButton("cancel", "exit.png");
-		} catch (RuntimeException e1) {
-			logger.error("error creating button - " + e1);
-		}
+		//###################################################################################################################################################
+		// Action Listeners für Buttons
+		//###################################################################################################################################################
 
-		btnDoInsert.setEnabled(true);
-		btnCancel.setEnabled(true);
-		btnDoInsert.setBounds(10, 320, 130, 50);
-		btnCancel.setBounds(500, 320, 130, 50);
-
-		contentPane.add(btnDoInsert);
-		contentPane.add(btnCancel);
-
-		//------------------------------------------------------------------------------
-		// Action Listeners
-		//------------------------------------------------------------------------------
 		btnDoInsert.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				//------------------------------------------------------------------------------
 				// Prüfung der Eingaben
 				//------------------------------------------------------------------------------
-				if(txt01.getText().isEmpty() || txt02.getText().isEmpty() || txt03.getText().isEmpty() | txt04.getText().isEmpty() || txt05.getText().isEmpty()
-						|| txt06.getText().isEmpty() || txt07.getText().isEmpty() || txt08.getText().isEmpty() || txt09.getText().isEmpty() || txt10.getText().isEmpty()){
-					JOptionPane.showMessageDialog(rootPane, "Daten unvollständig ...","Eingabefehler", JOptionPane.ERROR_MESSAGE);
-					return;
+				boolean foundEmpty = false;
+				for (JTextField check : txt) {
+				    if (check.getText().trim().isEmpty()) {
+				        foundEmpty = true;
+				        break;
+				    }
+				}
+
+				if (foundEmpty) {
+				    JOptionPane.showMessageDialog(null, "Daten unvollständig ...","Eingabefehler", JOptionPane.ERROR_MESSAGE);
+				    return;
 				}
 				//------------------------------------------------------------------------------
 				//Prüfung fertig, in Datenbank schreiben
 				//------------------------------------------------------------------------------
 				boolean bResult = false;
-				String[] tmpArray = new String[10];
-				tmpArray[0] = txt01.getText();
-				tmpArray[1] = txt02.getText();
-				tmpArray[2] = txt03.getText();
-				tmpArray[3] = txt04.getText();
-				tmpArray[4] = txt05.getText();
-				tmpArray[5] = txt06.getText();
-				tmpArray[6] = txt07.getText();
-				tmpArray[7] = txt08.getText();
-				tmpArray[8] = txt09.getText();
-				tmpArray[9] = txt10.getText();
+				String[] tmpArray = new String[11];
+				for (int i = 0; i < txt.length; i++) {
+					tmpArray[i] = txt[i].getText();
+				}
+				
+				try { // vorhandene Datensätze entfernen
+					
+					String sSQLStatement = "DELETE FROM [tblOwner]"; //SQL Befehlszeile
+					
+					sqlDeleteNoReturn(sConn, sSQLStatement);
+					
+				} catch (SQLException | ClassNotFoundException e1) {
+					logger.error("error deleting old owner data from database - " + e1);
+				}
 
-				try {
+				try { // neuen Datensatz schreiben
+					
+					String sSQLStatement = "INSERT INTO [tblOwner] VALUES ('" + tmpArray[0] + "','" + tmpArray[1] + "','" + tmpArray[2] + "','"
+							+ tmpArray[3] + "','" + tmpArray[4] + "','" + tmpArray[5] + "','" + tmpArray[6] + "','" + tmpArray[7] + "','"
+							+ tmpArray[8] + "','" + tmpArray[9] + "','" + tmpArray[10] + "')" ; //SQL Befehlszeile
 
-					String sSQLStatement = "UPDATE [tblOwner] SET [Name] = '" + tmpArray[0] + "',[Adresse] = '" + tmpArray[1] + "',[PLZ] = '" + tmpArray[2]
-							+ "',[Ort] = '" + tmpArray[3] + "',[Land] = '" + tmpArray[4] + "',[UStId] = '" + tmpArray[5] + "',[KontaktName] = '" + tmpArray[6]
-									+ "',[KontaktTel] = '" + tmpArray[7] + "',[KontaktMail] = '" + tmpArray[8] + "',[Currency] = '" + tmpArray[9] + "'"; //SQL Befehlszeile
-
-					bResult = sqlUpdate(sConn, sSQLStatement);
+					bResult = sqlInsert(sConn, sSQLStatement);
 
 				} catch (SQLException | ClassNotFoundException e1) {
-					logger.error("error inserting owner data into database - " + e1);
+					logger.error("error writing owner data into database - " + e1);
 				}
 				//------------------------------------------------------------------------------
 				// return auswerten
@@ -170,136 +217,17 @@ public class JFowner extends JFrame {
 				dispose();
 			}
 		});
+		
 		btnCancel.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				dispose();
 			}
 		});
-
-		JLabel lbl1 = new JLabel("Firma");
-		lbl1.setBounds(10, 10, 115, 30);
-		lbl1.setHorizontalAlignment(SwingConstants.LEFT);
-		lbl1.setFont(new Font("Tahoma", Font.BOLD, 14));
-		contentPane.add(lbl1);
-
-		JLabel lbl2 = new JLabel("Strasse");
-		lbl2.setBounds(10, 40, 110, 30);
-		lbl2.setHorizontalAlignment(SwingConstants.LEFT);
-		lbl2.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		contentPane.add(lbl2);
-
-		JLabel lbl3 = new JLabel("PLZ");
-		lbl3.setBounds(10, 70, 110, 30);
-		lbl3.setHorizontalAlignment(SwingConstants.LEFT);
-		lbl3.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		contentPane.add(lbl3);
-
-		JLabel lbl4 = new JLabel("Ort");
-		lbl4.setBounds(10, 100, 110, 30);
-		lbl4.setHorizontalAlignment(SwingConstants.LEFT);
-		lbl4.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		contentPane.add(lbl4);
-
-		JLabel lbl5 = new JLabel("Land");
-		lbl5.setBounds(10, 130, 110, 30);
-		lbl5.setHorizontalAlignment(SwingConstants.LEFT);
-		lbl5.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		contentPane.add(lbl5);
-
-		JLabel lbl6 = new JLabel("USt.ID");
-		lbl6.setBounds(10, 160, 110, 30);
-		lbl6.setHorizontalAlignment(SwingConstants.LEFT);
-		lbl6.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		contentPane.add(lbl6);
-
-		JLabel lbl7 = new JLabel("Kontakt");
-		lbl7.setBounds(10, 190, 110, 30);
-		lbl7.setHorizontalAlignment(SwingConstants.LEFT);
-		lbl7.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		contentPane.add(lbl7);
-
-		JLabel lbl8 = new JLabel("Telefon");
-		lbl8.setBounds(10, 220, 110, 30);
-		lbl8.setHorizontalAlignment(SwingConstants.LEFT);
-		lbl8.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		contentPane.add(lbl8);
-
-		JLabel lbl9 = new JLabel("E-Mail");
-		lbl9.setBounds(10, 250, 110, 30);
-		lbl9.setHorizontalAlignment(SwingConstants.LEFT);
-		lbl9.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		contentPane.add(lbl9);
-
-		JLabel lbl10 = new JLabel("Währung");
-		lbl10.setBounds(10, 280, 110, 30);
-		lbl10.setHorizontalAlignment(SwingConstants.LEFT);
-		lbl10.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		contentPane.add(lbl10);
-
-		txt01 = new JTextField(sOwnerData.get(0));
-		txt01.setBounds(130, 10, 500, 30);
-		txt01.setFont(new Font("Tahoma", Font.BOLD, 14));
-		contentPane.add(txt01);
-		txt01.setColumns(40);
-
-		txt02 = new JTextField(sOwnerData.get(1));
-		txt02.setBounds(130, 40, 500, 30);
-		txt02.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		txt02.setColumns(40);
-		contentPane.add(txt02);
-
-		txt03 = new JTextField(sOwnerData.get(2));
-		txt03.setBounds(130, 70, 500, 30);
-		txt03.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		txt03.setColumns(40);
-		contentPane.add(txt03);
-
-		txt04 = new JTextField(sOwnerData.get(3));
-		txt04.setBounds(130, 100, 500, 30);
-		txt04.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		txt04.setColumns(40);
-		contentPane.add(txt04);
-
-		txt05 = new JTextField(sOwnerData.get(4));
-		txt05.setBounds(130, 130, 500, 30);
-		txt05.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		txt05.setColumns(40);
-		contentPane.add(txt05);
-
-		txt06 = new JTextField(sOwnerData.get(5));
-		txt06.setBounds(130, 160, 500, 30);
-		txt06.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		txt06.setColumns(40);
-		contentPane.add(txt06);
-
-		txt07 = new JTextField(sOwnerData.get(6));
-		txt07.setBounds(130, 190, 500, 30);
-		txt07.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		txt07.setColumns(40);
-		contentPane.add(txt07);
-
-		txt08 = new JTextField(sOwnerData.get(7));
-		txt08.setBounds(130, 220, 500, 30);
-		txt08.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		txt08.setColumns(40);
-		contentPane.add(txt08);
-
-		txt09 = new JTextField(sOwnerData.get(8));
-		txt09.setBounds(130, 250, 500, 30);
-		txt09.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		txt09.setColumns(40);
-		contentPane.add(txt09);
-
-		txt10 = new JTextField(sOwnerData.get(9));
-		txt10.setBounds(130, 280, 500, 30);
-		txt10.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		txt10.setColumns(40);
-		contentPane.add(txt10);
-
 	}
-
+	
 	//###################################################################################################################################################
+	// Getter und Setter für Felder
 	//###################################################################################################################################################
 
 	public static void setsConn(String sConn) {

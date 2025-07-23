@@ -1,4 +1,4 @@
-package org.andy.code.main.overview.panels;
+package org.andy.gui.main.overview_panels;
 
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
@@ -14,7 +14,7 @@ public class UStPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
     // Felder als Instanzvariablen
-    private JFormattedTextField[][] txtFields = new JFormattedTextField[6][5]; // [row][col]
+    private JFormattedTextField[][] txtFields = new JFormattedTextField[4][5]; // [row][col]
     private JFormattedTextField[] txtZahllast = new JFormattedTextField[5];    // Zahllast Q1-Q4, Jahr
     
     // Layout-Konstanten
@@ -37,12 +37,10 @@ public class UStPanel extends JPanel {
     	
     	// Überschriften und Feldbeschriftungen
 	    String[] rowLabels = {
-	        "000 - Umsätze zum Normalsteuersatz (20%)",
-	        "010 - Steuer davon (20%)",
-	        "021 - Innergemeinschaftliche sonstige Leistungen (steuerfrei, z.B. DE B2B)",
-	        "066 - Vorsteuer aus Rechnungen mit 20%",
-	        "067 - Vorsteuer aus Rechnungen mit 10%",
-	        "068 - Vorsteuer aus Rechnungen mit 13%"
+	        "Kz.000 - Gesamtbetrag der Bemessungsgrundlage (ohne USt.)",
+	        "Kz.021 - Innergemeinschaftliche sonstige Leistungen (z.B. DE B2B)",
+	        "Kz.022 - zu versteuern mit Normalsteuersatz 20%",
+	        "Kz.060 - Gesamtbetrag der Vorsteuern"
 	    };
 	    String[] colLabels = {"Q1", "Q2", "Q3", "Q4", "U1"};
 
@@ -83,9 +81,9 @@ public class UStPanel extends JPanel {
 	    }
 	    
 	    // Zahllast-Label und Textfelder
-	    JLabel lblZahllast = new JLabel("Zahllast - USt. (010) minus Summe Vorsteuern (066, 067, 068)");
+	    JLabel lblZahllast = new JLabel("ermittelte Zahllast (neg. Beträge bedeuten eine Gutschrift)");
 	    lblZahllast.setFont(new Font("Tahoma", Font.BOLD, 11));
-	    lblZahllast.setForeground(Color.BLUE);
+	    lblZahllast.setForeground(Color.BLACK);
 	    lblZahllast.setBounds(labelStartX, 215, labelWidth, cellHeight);
 	    add(lblZahllast);
 
@@ -99,7 +97,7 @@ public class UStPanel extends JPanel {
 
         for (int c = 0; c < txtZahllast.length; c++) {
             txtZahllast[c] = makeField(iLeft + 400 + c * 160, iTop + 6 * iHeight + 10, 150, iHeight, true, null);
-            txtZahllast[c].setForeground(Color.BLUE);
+            txtZahllast[c].setForeground(Color.BLACK);
             add(txtZahllast[c]);
         }
         
@@ -150,6 +148,11 @@ public class UStPanel extends JPanel {
     
     public void setZahllast(int col, double value) {
         txtZahllast[col].setValue(value);
+        if (value < 0) {
+        	txtZahllast[col].setBackground(new Color(192, 255, 192));
+        } else {
+			txtZahllast[col].setBackground(new Color(255, 182, 193));
+		}
     }
 
 }

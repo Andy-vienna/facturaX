@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -38,7 +37,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -61,9 +59,6 @@ import org.andy.code.main.overview.LoadSvTax;
 import org.andy.code.main.overview.LoadBillOut;
 import org.andy.code.main.overview.LoadExpenses;
 import org.andy.code.main.overview.LoadBillIn;
-import org.andy.code.main.overview.panels.UStPanel;
-import org.andy.code.main.overview.panels.TaxPanel;
-import org.andy.code.main.overview.panels.TextPanel;
 import org.andy.code.misc.Wrapper;
 import org.andy.code.sql.SQLmasterData;
 import org.andy.gui.bill.in.JFeditRe;
@@ -73,6 +68,10 @@ import org.andy.gui.bill.out.JFstatusRa;
 import org.andy.gui.expenses.JFeditEx;
 import org.andy.gui.expenses.JFnewEx;
 import org.andy.gui.file.JFfileView;
+import org.andy.gui.main.overview_panels.SumPanel;
+import org.andy.gui.main.overview_panels.TaxPanel;
+import org.andy.gui.main.overview_panels.TextPanel;
+import org.andy.gui.main.overview_panels.UStPanel;
 import org.andy.gui.misc.RoundedBorder;
 import org.andy.gui.offer.JFconfirmA;
 import org.andy.gui.offer.JFnewA;
@@ -124,33 +123,24 @@ public class JFoverview extends JFrame {
 	private static int AnzYearOffer, AnzYearBillOut, AnzYearBillIn, AnzExpenses, AnzSvTax;
 
 	private static JFoverview frame;
-	private static JPanel contentPane;
-
 	private static JTabbedPane tabPanel;
-	private static JPanel pageA, pageRa, pageRe, pageE, pageSvTax, pageOv, pageText;
-	
+	private static JPanel contentPane, pageA, pageRa, pageRe, pageE, pageSvTax, pageOv, pageText;
+	private static JTable tableA, tableRa, tableRe, tableE, tableSvTax;
+	private static SumPanel infoA, infoRa, infoRe, infoEx, infoSvTax;
 	private static UStPanel panelUSt;
 	private static TaxPanel panelP109a;
-	private static JScrollPane sPaneUSt, sPaneP109a;
+	private static JScrollPane sPaneUSt, sPaneP109a, sPaneA, sPaneRa, sPaneRe, sPaneE, sPaneSvTax, sPaneText;
 	
+	private static JMenuBar menuBar;
 	private static JMenu menu1, menu2, menu3, menu5, menu6, menu9;
 	private static JMenuItem logoff, backup, exit, newAN, editAN, printAN, stateAN, printAB, newREa, editREa, printREa, stateREa, printRErem,
 	userMgmt, pathMgmt, qrCodeSetup, dbSettings, editArtikel, editBank, editKunde, editOwner, editTax, editGwb, aktualisieren, info;
 
-	private static JMenuBar menuBar;
-	private static JTable tableA, tableRa, tableRe, tableE, tableSvTax;
-	private static JScrollPane sPaneA, sPaneRa, sPaneRe, sPaneE, sPaneSvTax, sPaneText;
-
 	public static JButton btnNewAN, btnPrintAN, btnStateAN, btnPrintAB, btnNewREa, btnPrintREa, btnStateREa, btnPrintRem,
 		btnNewREe, btnStateREe, btnNewEx, btnEditEx, btnNewSvTax, btnEditSvTax;
-
-	private static JLabel lblState, lblANopen, lblANclosed, lblREaOpen, lblREaClosed, lblREeOpen, lblREeClosed, lblExNetto, lblExBrutto, lblSvTaxOpen, lblSvTaxClosed;
 	
-	private static JTextField txtANopen, txtANclosed, txtREaOpen, txtREaClosed, txtREeOpen, txtREeClosed, txtExNetto, txtExBrutto, txtSvTaxOpen, txtSvTaxClosed;
+	private static JLabel lblState;
 	private static JTextField txtWirtschaftsjahr;
-	
-	private static JProgressBar progBarA, progBarRa, progBarRe;
-	private static JLabel lblProgBarA, lblProgBarRa, lblProgBarRe;
 
 	private static String sLic = null, vZelleRa = null, vZelleRe = null, vZelleA = null, vZelleSvTax = null;
 	private static Wrapper<String> vZelleE = new Wrapper<>("");
@@ -417,10 +407,13 @@ public class JFoverview extends JFrame {
 			btnNewAN.setEnabled(true);
 		}
 		
+		infoA = new SumPanel(new String[] {"Summe offen:", "Summe best.:"}, true);
+		
 		pageA.add(btnNewAN);
 		pageA.add(btnPrintAN);
 		pageA.add(btnStateAN);
 		pageA.add(btnPrintAB);
+		pageA.add(infoA);
 
 		//------------------------------------------------------------------------------
 		// TAB 2 - Ausgangsechnungen
@@ -456,11 +449,14 @@ public class JFoverview extends JFrame {
 		if(iUserRights != 5) { // FinancialUser
 			btnNewREa.setEnabled(true);
 		}
+		
+		infoRa = new SumPanel(new String[] {"Summe offen:", "Summe bez.:"}, true);
 
 		pageRa.add(btnNewREa);
 		pageRa.add(btnPrintREa);
 		pageRa.add(btnStateREa);
 		pageRa.add(btnPrintRem);
+		pageRa.add(infoRa);
 
 		//------------------------------------------------------------------------------
 		// TAB 3 - Eingangsechnungen
@@ -492,9 +488,12 @@ public class JFoverview extends JFrame {
 			logger.error("error creating button - " + e1);
 		}
 		btnNewREe.setEnabled(true);
+		
+		infoRe = new SumPanel(new String[] {"Netto:", "Brutto:"}, false);
 
 		pageRe.add(btnNewREe);
 		pageRe.add(btnStateREe);
+		pageRe.add(infoRe);
 
 		//------------------------------------------------------------------------------
 		// TAB 4 - Ausgaben
@@ -526,9 +525,12 @@ public class JFoverview extends JFrame {
 			logger.error("error creating button - " + e1);
 		}
 		btnNewEx.setEnabled(true);
+		
+		infoEx = new SumPanel(new String[] {"Netto:", "Brutto:"}, false);
 
 		pageE.add(btnNewEx);
 		pageE.add(btnEditEx);
+		pageE.add(infoEx);
 
 		//------------------------------------------------------------------------------
 		// TAB 5 - SVS und Steuern
@@ -560,9 +562,12 @@ public class JFoverview extends JFrame {
 			logger.error("error creating button - " + e1);
 		}
 		btnNewSvTax.setEnabled(true);
+		
+		infoSvTax = new SumPanel(new String[] {"SV:", "Steuer:"}, false);
 
 		pageSvTax.add(btnNewSvTax);
 		pageSvTax.add(btnEditSvTax);
+		pageSvTax.add(infoSvTax);
 		
 		//------------------------------------------------------------------------------
 		// TAB 6 - Jahresergebnis
@@ -605,9 +610,6 @@ public class JFoverview extends JFrame {
 			
 			tabPanel.setIconAt(0, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/offer.png")));
 			tabPanel.setIconAt(1, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/invoice.png")));
-			
-			createSumInfoA(); // Summen-Infos Angebote
-			createSumInfoRa(); // Summen-Infos Ausgangsrechnungen
 		}
 		if(iUserRights > 1) { // SuperUser oder FinancialUser oder Admin
 			tabPanel.addTab("Eingangsrechnungen", pageRe);
@@ -615,9 +617,6 @@ public class JFoverview extends JFrame {
 			
 			tabPanel.setIconAt(2, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/cost.png")));
 			tabPanel.setIconAt(3, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/expenses.png")));
-			
-			createSumInfoRe(); // Summen-Infos Eingangsrechnungen
-			createSumInfoE(); // Summen-Infos Ausgaben
 		}
 		if(iUserRights > 4) { // FinancialUser oder Admin
 			tabPanel.addTab("SV und Steuer", pageSvTax);
@@ -625,8 +624,6 @@ public class JFoverview extends JFrame {
 			
 			tabPanel.setIconAt(4, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/tax.png")));
 			tabPanel.setIconAt(5, new ImageIcon(JFeditAnRe.class.getResource("/org/resources/icons/result.png")));
-			
-			createSumInfoSvTax(); // Summen-Infos SV und Steuern
 		}
 		if(iUserRights > 8) { // Admin
 			tabPanel.addTab("Textbausteine", sPaneText);
@@ -670,10 +667,12 @@ public class JFoverview extends JFrame {
 					menu2.setEnabled(false);
 					menu3.setEnabled(false);
 					
-					setSumEX(); // Summen-Infos Ausgaben
+					BigDecimal bdExNetto = setSumEX(); // Summen-Infos Ausgaben
+					BigDecimal bdReNetto = setSumREe(); // Summen-Infos Eingangsrechnungen
 					LoadSvTax.loadSvTax(false, panelP109a);
 					CalcUStData.setValuesUVA(panelUSt, AnzYearBillIn, AnzYearBillOut, AnzExpenses, arrYearBillIn, arrYearBillOut, arrExpenses);
-					CalcTaxData.setValuesTax(panelP109a, AnzYearBillOut, arrYearBillOut);
+					CalcTaxData.setValuesTax(panelP109a, AnzYearBillOut, arrYearBillOut, bdExNetto, bdReNetto);
+					
 				}
 				if(selectedIndex == 6) {
 					menu2.setEnabled(false);
@@ -1011,15 +1010,8 @@ public class JFoverview extends JFrame {
 			btnPrintAN.setBounds( 1 * BUTTONX, iButtonATop, BUTTONX, BUTTONY);
 			btnStateAN.setBounds( 2 * BUTTONX, iButtonATop, BUTTONX, BUTTONY);
 			btnPrintAB.setBounds( 3 * BUTTONX, iButtonATop, BUTTONX, BUTTONY);
-
-			lblANopen.setBounds(  4 * BUTTONX, iButtonRaTop + 5, 90, STATEY - 10);
-			lblANclosed.setBounds(4 * BUTTONX, iButtonRaTop + 25, 90, STATEY - 10);
-
-			txtANopen.setBounds(  BASEX + (4 * BUTTONX) + 95, iButtonRaTop + 5, 110, STATEY - 10);
-			txtANclosed.setBounds(BASEX + (4 * BUTTONX) + 95, iButtonRaTop + 25, 110, STATEY - 10);
-
-			progBarA.setBounds(BASEX + (4 * BUTTONX) + 210, iButtonRaTop, BUTTONX / 2, BUTTONY);
-			lblProgBarA.setBounds((BASEX + (4 * BUTTONX) + 210) + (BUTTONX / 2), iButtonRaTop, BUTTONX - 50, BUTTONY);
+			
+			infoA.setBounds(  4 * BUTTONX+10, iButtonATop, 320, 100);
 		}
 
 		//#############################################################################################################
@@ -1037,14 +1029,7 @@ public class JFoverview extends JFrame {
 			btnStateREa.setBounds( 2 * BUTTONX, iButtonRaTop, BUTTONX, BUTTONY);
 			btnPrintRem.setBounds( 3 * BUTTONX, iButtonRaTop, BUTTONX, BUTTONY);
 
-			lblREaOpen.setBounds(  4 * BUTTONX, iButtonRaTop + 5, 90, STATEY - 10);
-			lblREaClosed.setBounds(4 * BUTTONX, iButtonRaTop + 25, 90, STATEY - 10);
-
-			txtREaOpen.setBounds(  BASEX + (4 * BUTTONX) + 95, iButtonRaTop + 5, 110, STATEY - 10);
-			txtREaClosed.setBounds(BASEX + (4 * BUTTONX) + 95, iButtonRaTop + 25, 110, STATEY - 10);
-
-			progBarRa.setBounds(BASEX + (4 * BUTTONX) + 210, iButtonRaTop, BUTTONX / 2, BUTTONY);
-			lblProgBarRa.setBounds((BASEX + (4 * BUTTONX) + 210) + (BUTTONX / 2), iButtonRaTop, BUTTONX - 50, BUTTONY);
+			infoRa.setBounds(  4 * BUTTONX+10, iButtonATop, 320, 100);
 		}
 
 		//#############################################################################################################
@@ -1060,14 +1045,7 @@ public class JFoverview extends JFrame {
 			btnNewREe.setBounds( 0 * BUTTONX, iButtonReTop, BUTTONX, BUTTONY);
 			btnStateREe.setBounds( 1 * BUTTONX, iButtonReTop, BUTTONX, BUTTONY);
 
-			lblREeOpen.setBounds(  2 * BUTTONX, iButtonReTop + 5, 90, STATEY - 10);
-			lblREeClosed.setBounds(2 * BUTTONX, iButtonReTop + 25, 90, STATEY - 10);
-
-			txtREeOpen.setBounds(  BASEX + (2 * BUTTONX) + 95, iButtonReTop + 5, 110, STATEY - 10);
-			txtREeClosed.setBounds(BASEX + (2 * BUTTONX) + 95, iButtonReTop + 25, 110, STATEY - 10);
-
-			progBarRe.setBounds(BASEX + (2 * BUTTONX) + 210, iButtonReTop, BUTTONX / 2, BUTTONY);
-			lblProgBarRe.setBounds((BASEX + (2 * BUTTONX) + 210) + (BUTTONX / 2), iButtonReTop, BUTTONX - 50, BUTTONY);
+			infoRe.setBounds(  2 * BUTTONX+10, iButtonATop, 320, 100);
 		}
 
 		//#############################################################################################################
@@ -1083,11 +1061,7 @@ public class JFoverview extends JFrame {
 			btnNewEx.setBounds( 0 * BUTTONX, iButtonETop, BUTTONX, BUTTONY);
 			btnEditEx.setBounds( 1 * BUTTONX, iButtonETop, BUTTONX, BUTTONY);
 
-			lblExNetto.setBounds(  2 * BUTTONX, iButtonETop + 5, 90, STATEY - 10);
-			lblExBrutto.setBounds(2 * BUTTONX, iButtonETop + 25, 90, STATEY - 10);
-
-			txtExNetto.setBounds(  BASEX + (2 * BUTTONX) + 95, iButtonETop + 5, 110, STATEY - 10);
-			txtExBrutto.setBounds(BASEX + (2 * BUTTONX) + 95, iButtonETop + 25, 110, STATEY - 10);
+			infoEx.setBounds(  2 * BUTTONX+10, iButtonATop, 320, 100);
 		}
 
 		//#############################################################################################################
@@ -1103,11 +1077,7 @@ public class JFoverview extends JFrame {
 			btnNewSvTax.setBounds( 0 * BUTTONX, iButtonSvTaxTop, BUTTONX, BUTTONY);
 			btnEditSvTax.setBounds( 1 * BUTTONX, iButtonSvTaxTop, BUTTONX, BUTTONY);
 
-			lblSvTaxOpen.setBounds(  2 * BUTTONX, iButtonSvTaxTop + 5, 90, STATEY - 10);
-			lblSvTaxClosed.setBounds(2 * BUTTONX, iButtonSvTaxTop + 25, 90, STATEY - 10);
-
-			txtSvTaxOpen.setBounds(  BASEX + (2 * BUTTONX) + 95, iButtonSvTaxTop + 5, 110, STATEY - 10);
-			txtSvTaxClosed.setBounds(BASEX + (2 * BUTTONX) + 95, iButtonSvTaxTop + 25, 110, STATEY - 10);
+			infoSvTax.setBounds(  2 * BUTTONX+10, iButtonATop, 320, 100);
 		}
 
 		//#############################################################################################################
@@ -1140,6 +1110,8 @@ public class JFoverview extends JFrame {
 	//###################################################################################################################################################
 
 	private static void actionAct() {
+		
+		BigDecimal bdReNetto = BigDecimal.ZERO, bdExNetto = BigDecimal.ZERO;
 
 		try {
 			SQLmasterData.loadBaseData();
@@ -1155,15 +1127,20 @@ public class JFoverview extends JFrame {
 		if(iUserRights > 0) { // User oder SuperUser oder FinancialUser oder Admin
 			LoadOffer.loadAngebot(false);
 			LoadBillOut.loadAusgangsRechnung(false);
+			setSumAN(); // Summen-Infos Angebote
+			setSumREa(); // Summen-Infos Ausgangsrechnungen
 		}
 		if(iUserRights > 1) { // SuperUser oder FinancialUser oder Admin
 			LoadBillIn.loadEingangsRechnung(false);
 			LoadExpenses.loadAusgaben(false);
+			setSumREe(); // Summen-Infos Eingangsrechnungen
+			bdReNetto = setSumREe(); // Summen-Infos Eingangsrechnungen
+			bdExNetto = setSumEX(); // Summen-Infos Ausgaben
 		}
 		if(iUserRights > 4) { // FinancialUser oder Admin
 			LoadSvTax.loadSvTax(false, panelP109a);
 			CalcUStData.setValuesUVA(panelUSt, AnzYearBillIn, AnzYearBillOut, AnzExpenses, arrYearBillIn, arrYearBillOut, arrExpenses);
-			CalcTaxData.setValuesTax(panelP109a, AnzYearBillOut, arrYearBillOut);
+			CalcTaxData.setValuesTax(panelP109a, AnzYearBillOut, arrYearBillOut, bdExNetto, bdReNetto);
 		}
 		if(iUserRights > 8) { // Admin
 			TextPanel.loadTexte();
@@ -1185,16 +1162,8 @@ public class JFoverview extends JFrame {
 
 	static void setSumAN() {
 
-		BigDecimal bdOpenA = new BigDecimal("0.00"), bdClosedA = new BigDecimal("0.00");
+		BigDecimal bdOpen = new BigDecimal("0.00"), bdClosed = new BigDecimal("0.00");
 		BigDecimal bdTmpOpen, bdTmpClosed;
-		BigDecimal bdSumA;
-		BigDecimal bdTmpA;
-		BigDecimal bdTmpA1;
-		BigDecimal bdProzA;
-
-		String sOpenA = null, sClosedA = null;
-
-		DecimalFormat decimalFormat = new DecimalFormat("#,###.00");
 
 		try {
 			if(AnzYearOffer > 0) {
@@ -1203,74 +1172,30 @@ public class JFoverview extends JFrame {
 					String sValue = arrYearOffer[x][10].trim();
 					if(sTmp.equals(JFstatusA.getWritten()) || sTmp.equals(JFstatusA.getPrinted())) {
 						bdTmpOpen = new BigDecimal(sValue);
-						bdOpenA = bdOpenA.add(bdTmpOpen);
+						bdOpen = bdOpen.add(bdTmpOpen);
 					}
 					if(sTmp.equals(JFstatusA.getOrdered()) || sTmp.equals(JFstatusA.getConfirmed())) {
 						bdTmpClosed = new BigDecimal(sValue);
-						bdClosedA = bdClosedA.add(bdTmpClosed);
+						bdClosed = bdClosed.add(bdTmpClosed);
 					}
 				}
 			}
-
-			sOpenA = decimalFormat.format(bdOpenA);
-			sClosedA = decimalFormat.format(bdClosedA);
+			Double dOpen = bdOpen.doubleValue();
+			Double dClosed = bdClosed.doubleValue();
+			infoA.setTxtSum(0, dOpen);
+			infoA.setTxtSum(1, dClosed);
 
 		} catch (NullPointerException e1){
 			logger.error("error in calculating offer sum - " + e1);
 		}
-
-
-		try {
-			txtANopen.setText(sOpenA + "  EUR");
-			txtANclosed.setText(sClosedA + "  EUR");
-
-			bdSumA = bdOpenA.add(bdClosedA);
-			bdTmpA = new BigDecimal("100.00");
-			if(bdSumA.intValue() > 0) {
-				bdTmpA1 = bdTmpA.divide(bdSumA, 8, RoundingMode.HALF_UP);
-				bdProzA = bdTmpA1.multiply(bdOpenA);
-			}else {
-				bdTmpA1 = new BigDecimal("0.00");
-				bdProzA = new BigDecimal("0.00");
-			}
-
-			int iProzA = bdProzA.intValue();
-
-			progBarA.setValue(iProzA);
-
-			if(iProzA > 30) {
-				progBarA.setForeground(Color.RED);
-				lblProgBarA.setForeground(Color.RED);
-			}else {
-				progBarA.setForeground(Color.PINK);
-				lblProgBarA.setForeground(Color.BLACK);
-			}
-
-			if(iProzA > 0) {
-				lblProgBarA.setText("<html>" + decimalFormat.format(bdProzA) + " %<br>offen</html>");
-			}else {
-				lblProgBarA.setText("<html>nichts<br>offen</html>");
-			}
-
-		}catch (Exception e2){
-			logger.error("error in calculating offer sum - " + e2);
-		}
-
+		infoA.setProgressBar(prozent(bdOpen, bdClosed));
 	}
 
 	static void setSumREa() {
 
-		BigDecimal bdOpenR = new BigDecimal("0.00"), bdClosedR = new BigDecimal("0.00");
+		BigDecimal bdOpen = new BigDecimal("0.00"), bdClosed = new BigDecimal("0.00");
 		BigDecimal bdTmpOpen, bdTmpClosed;
-		BigDecimal bdSumR;
-		BigDecimal bdTmpR;
-		BigDecimal bdTmpR1;
-		BigDecimal bdProzR;
-
-		String sOpenR = null, sClosedR = null;
-
-		DecimalFormat decimalFormat = new DecimalFormat("#,###.00");
-
+		
 		try {
 			if(AnzYearBillOut > 0) {
 				for(int x = 1; (x - 1) < AnzYearBillOut; x++) {
@@ -1278,342 +1203,77 @@ public class JFoverview extends JFrame {
 					String sValue = arrYearBillOut[x][12].trim();
 					if(sTmp.equals(JFstatusRa.getWritten()) || sTmp.equals(JFstatusRa.getPrinted()) || sTmp.equals(JFstatusRa.getRemprinted())) {
 						bdTmpOpen = new BigDecimal(sValue);
-						bdOpenR = bdOpenR.add(bdTmpOpen);
+						bdOpen = bdOpen.add(bdTmpOpen);
 					}
 					if(sTmp.equals(JFstatusRa.getPayed())) {
 						bdTmpClosed = new BigDecimal(sValue);
-						bdClosedR = bdClosedR.add(bdTmpClosed);
+						bdClosed = bdClosed.add(bdTmpClosed);
 					}
 				}
 			}
-
-			sOpenR = decimalFormat.format(bdOpenR);
-			sClosedR = decimalFormat.format(bdClosedR);
-
+			Double dOpen = bdOpen.doubleValue();
+			Double dClosed = bdClosed.doubleValue();
+			infoRa.setTxtSum(0, dOpen);
+			infoRa.setTxtSum(1, dClosed);
 		} catch (NullPointerException e1){
 			logger.error("error in calculating revenue sum - " + e1);
 		}
-
-
-		try {
-			txtREaOpen.setText(sOpenR + "  EUR");
-			txtREaClosed.setText(sClosedR + "  EUR");
-
-			bdSumR = bdOpenR.add(bdClosedR);
-			bdTmpR = new BigDecimal("100.00");
-			if(bdSumR.intValue() > 0) {
-				bdTmpR1 = bdTmpR.divide(bdSumR, 8, RoundingMode.HALF_UP);
-				bdProzR = bdTmpR1.multiply(bdOpenR);
-			}else {
-				bdTmpR1 = new BigDecimal("0.00");
-				bdProzR = new BigDecimal("0.00");
-			}
-
-			int iProzR = bdProzR.intValue();
-
-			progBarRa.setValue(iProzR);
-
-			if(iProzR > 30) {
-				progBarRa.setForeground(Color.RED);
-				lblProgBarRa.setForeground(Color.RED);
-			}else {
-				progBarRa.setForeground(Color.PINK);
-				lblProgBarRa.setForeground(Color.BLACK);
-			}
-
-			if(iProzR > 0) {
-				lblProgBarRa.setText("<html>" + decimalFormat.format(bdProzR) + " %<br>offen</html>");
-			}else {
-				lblProgBarRa.setText("<html>nichts<br>offen</html>");
-			}
-
-		}catch (Exception e){
-			logger.error("error in calculating revenue sum - " + e);
-		}
-
+		infoRa.setProgressBar(prozent(bdOpen, bdClosed));
 	}
 
-	static void setSumREe() {
+	static BigDecimal setSumREe() {
 
-		BigDecimal bdOpenR = new BigDecimal("0.00"), bdClosedR = new BigDecimal("0.00");
-		BigDecimal bdTmpOpen, bdTmpClosed;
-		BigDecimal bdSumR;
-		BigDecimal bdTmpR;
-		BigDecimal bdTmpR1;
-		BigDecimal bdProzR;
-
-		String sOpenR = null, sClosedR = null;
-
-		DecimalFormat decimalFormat = new DecimalFormat("#,###.00");
+		BigDecimal bdNetto = new BigDecimal("0.00"), bdBrutto = new BigDecimal("0.00");
 
 		try {
 			if(AnzYearBillIn >0) {
 				for(int x = 1; (x - 1) < AnzYearBillIn; x++) {
-					int iTmp = Integer.parseInt(arrYearBillIn[x][19]);
-					String sValue = arrYearBillIn[x][14].trim();
-					if(iTmp == 0) {
-						bdTmpOpen = new BigDecimal(sValue);
-						bdOpenR = bdOpenR.add(bdTmpOpen);
-					}
-					if(iTmp == 1) {
-						bdTmpClosed = new BigDecimal(sValue);
-						bdClosedR = bdClosedR.add(bdTmpClosed);
-					}
+					String sNetto = arrYearBillIn[x][11].trim();
+					String sBrutto = arrYearBillIn[x][14].trim();
+
+					bdNetto = bdNetto.add(new BigDecimal(sNetto));
+					bdBrutto = bdBrutto.add(new BigDecimal(sBrutto));
 				}
 			}
-
-			sOpenR = decimalFormat.format(bdOpenR);
-			sClosedR = decimalFormat.format(bdClosedR);
-
+			Double dOpen = bdNetto.doubleValue();
+			Double dClosed = bdBrutto.doubleValue();
+			infoRe.setTxtSum(0, dOpen);
+			infoRe.setTxtSum(1, dClosed);
 		} catch (NullPointerException e1){
 			logger.error("error in calculating revenue sum - " + e1);
 		}
-
-
-		try {
-			txtREeOpen.setText(sOpenR + "  EUR");
-			txtREeClosed.setText(sClosedR + "  EUR");
-
-			bdSumR = bdOpenR.add(bdClosedR);
-			bdTmpR = new BigDecimal("100.00");
-			if(bdSumR.intValue() > 0) {
-				bdTmpR1 = bdTmpR.divide(bdSumR, 8, RoundingMode.HALF_UP);
-				bdProzR = bdTmpR1.multiply(bdOpenR);
-			}else {
-				bdTmpR1 = new BigDecimal("0.00");
-				bdProzR = new BigDecimal("0.00");
-			}
-
-			int iProzR = bdProzR.intValue();
-
-			progBarRe.setValue(iProzR);
-
-			if(iProzR > 30) {
-				progBarRe.setForeground(Color.RED);
-				lblProgBarRe.setForeground(Color.RED);
-			}else {
-				progBarRe.setForeground(Color.PINK);
-				lblProgBarRe.setForeground(Color.BLACK);
-			}
-
-			if(iProzR > 0) {
-				lblProgBarRe.setText("<html>" + decimalFormat.format(bdProzR) + " %<br>offen</html>");
-			}else {
-				lblProgBarRe.setText("<html>nichts<br>offen</html>");
-			}
-
-		}catch (Exception e){
-			logger.error("error in calculating revenue sum - " + e);
-		}
-
+		infoRe.setProgressBar(prozent(bdNetto, bdBrutto));
+		return bdNetto;
 	}
 
-	static void setSumEX() {
+	static BigDecimal setSumEX() {
 
 		BigDecimal bdNetto = new BigDecimal("0.00"), bdBrutto = new BigDecimal("0.00");
-		BigDecimal bdTmpNetto, bdTmpBrutto;
-
-		String sNetto = null, sBrutto = null;
-
-		DecimalFormat decimalFormat = new DecimalFormat("#,###.00");
 
 		try {
 			if(AnzExpenses > 0) {
 				for(int x = 1; (x - 1) < AnzExpenses; x++) {
-					String sValueNetto = arrExpenses[x][3].trim();
-					String sValueBrutto = arrExpenses[x][6].trim();
+					String sNetto = arrExpenses[x][3].trim();
+					String sBrutto = arrExpenses[x][6].trim();
 
-					bdTmpNetto = new BigDecimal(sValueNetto);
-					bdNetto = bdNetto.add(bdTmpNetto);
-
-					bdTmpBrutto = new BigDecimal(sValueBrutto);
-					bdBrutto = bdBrutto.add(bdTmpBrutto);
+					bdNetto = bdNetto.add(new BigDecimal(sNetto));
+					bdBrutto = bdBrutto.add(new BigDecimal(sBrutto));
 				}
 			}
-
-			sNetto = decimalFormat.format(bdNetto);
-			sBrutto = decimalFormat.format(bdBrutto);
-			
-			CalcTaxData.setBdExpNetto(bdNetto);
-
+			Double dOpen = bdNetto.doubleValue();
+			Double dClosed = bdBrutto.doubleValue();
+			infoEx.setTxtSum(0, dOpen);
+			infoEx.setTxtSum(1, dClosed);
 		} catch (NullPointerException e1){
 			logger.error("error in calculatin expenses sum - " + e1);
 		}
-
-		try {
-			txtExNetto.setText(sNetto + "  EUR");
-			txtExBrutto.setText(sBrutto + "  EUR");
-
-		}catch (Exception e){
-			logger.error("error in calculatin expenses sum - " + e);
-		}
-
-
+		infoEx.setProgressBar(prozent(bdNetto, bdBrutto));
+		return bdNetto;
 	}
 	
 	//###################################################################################################################################################
 	//###################################################################################################################################################
 
-	static void createSumInfoA() {
-		lblANopen = new JLabel("Summe offen:");
-		lblANopen.setHorizontalAlignment(SwingConstants.RIGHT);
-		pageA.add(lblANopen);
-
-		lblANclosed = new JLabel("Summe best.:");
-		lblANclosed.setHorizontalAlignment(SwingConstants.RIGHT);
-		pageA.add(lblANclosed);
-
-		txtANopen = new JTextField("--");
-		txtANopen.setEditable(false);
-		txtANopen.setFont(new Font("Tahoma", Font.BOLD, 11));
-		txtANopen.setForeground(Color.BLUE);
-		txtANopen.setHorizontalAlignment(SwingConstants.RIGHT);
-		pageA.add(txtANopen);
-		txtANopen.setColumns(10);
-
-		txtANclosed = new JTextField("--");
-		txtANclosed.setEditable(false);
-		txtANclosed.setFont(new Font("Tahoma", Font.BOLD, 11));
-		txtANclosed.setForeground(Color.BLUE);
-		txtANclosed.setHorizontalAlignment(SwingConstants.RIGHT);
-		pageA.add(txtANclosed);
-		txtANclosed.setColumns(10);
-
-		progBarA = new JProgressBar();
-		progBarA.setOrientation(SwingConstants.VERTICAL);
-		progBarA.setOpaque(true);
-		pageA.add(progBarA);
-
-		lblProgBarA = new JLabel();
-		lblProgBarA.setFont(new Font("Tahoma", Font.BOLD, 11));
-		lblProgBarA.setHorizontalAlignment(SwingConstants.CENTER);
-		pageA.add(lblProgBarA);
-	}
-
-	static void createSumInfoRa() {
-		lblREaOpen = new JLabel("Summe offen:");
-		lblREaOpen.setHorizontalAlignment(SwingConstants.RIGHT);
-		pageRa.add(lblREaOpen);
-
-		lblREaClosed = new JLabel("Summe bez.:");
-		lblREaClosed.setHorizontalAlignment(SwingConstants.RIGHT);
-		pageRa.add(lblREaClosed);
-
-		txtREaOpen = new JTextField("--");
-		txtREaOpen.setEditable(false);
-		txtREaOpen.setFont(new Font("Tahoma", Font.BOLD, 11));
-		txtREaOpen.setForeground(Color.BLUE);
-		txtREaOpen.setHorizontalAlignment(SwingConstants.RIGHT);
-		pageRa.add(txtREaOpen);
-		txtREaOpen.setColumns(10);
-
-		txtREaClosed = new JTextField("--");
-		txtREaClosed.setEditable(false);
-		txtREaClosed.setFont(new Font("Tahoma", Font.BOLD, 11));
-		txtREaClosed.setForeground(Color.BLUE);
-		txtREaClosed.setHorizontalAlignment(SwingConstants.RIGHT);
-		pageRa.add(txtREaClosed);
-		txtREaClosed.setColumns(10);
-
-		progBarRa = new JProgressBar();
-		progBarRa.setOrientation(SwingConstants.VERTICAL);
-		progBarRa.setOpaque(true);
-		pageRa.add(progBarRa);
-
-		lblProgBarRa = new JLabel();
-		lblProgBarRa.setFont(new Font("Tahoma", Font.BOLD, 11));
-		lblProgBarRa.setHorizontalAlignment(SwingConstants.CENTER);
-		pageRa.add(lblProgBarRa);
-	}
-
-	static void createSumInfoRe() {
-		lblREeOpen = new JLabel("Summe offen:");
-		lblREeOpen.setHorizontalAlignment(SwingConstants.RIGHT);
-		pageRe.add(lblREeOpen);
-
-		lblREeClosed = new JLabel("Summe bez.:");
-		lblREeClosed.setHorizontalAlignment(SwingConstants.RIGHT);
-		pageRe.add(lblREeClosed);
-
-		txtREeOpen = new JTextField("--");
-		txtREeOpen.setEditable(false);
-		txtREeOpen.setFont(new Font("Tahoma", Font.BOLD, 11));
-		txtREeOpen.setForeground(Color.BLUE);
-		txtREeOpen.setHorizontalAlignment(SwingConstants.RIGHT);
-		pageRe.add(txtREeOpen);
-		txtREeOpen.setColumns(10);
-
-		txtREeClosed = new JTextField("--");
-		txtREeClosed.setEditable(false);
-		txtREeClosed.setFont(new Font("Tahoma", Font.BOLD, 11));
-		txtREeClosed.setForeground(Color.BLUE);
-		txtREeClosed.setHorizontalAlignment(SwingConstants.RIGHT);
-		pageRe.add(txtREeClosed);
-		txtREeClosed.setColumns(10);
-
-		progBarRe = new JProgressBar();
-		progBarRe.setOrientation(SwingConstants.VERTICAL);
-		progBarRe.setOpaque(true);
-		pageRe.add(progBarRe);
-
-		lblProgBarRe = new JLabel();
-		lblProgBarRe.setFont(new Font("Tahoma", Font.BOLD, 11));
-		lblProgBarRe.setHorizontalAlignment(SwingConstants.CENTER);
-		pageRe.add(lblProgBarRe);
-	}
-
-	static void createSumInfoE() {
-		lblExNetto = new JLabel("Summe netto:");
-		lblExNetto.setHorizontalAlignment(SwingConstants.RIGHT);
-		pageE.add(lblExNetto);
-
-		lblExBrutto = new JLabel("Summe brutto:");
-		lblExBrutto.setHorizontalAlignment(SwingConstants.RIGHT);
-		pageE.add(lblExBrutto);
-
-		txtExNetto = new JTextField("--");
-		txtExNetto.setEditable(false);
-		txtExNetto.setFont(new Font("Tahoma", Font.BOLD, 11));
-		txtExNetto.setForeground(Color.BLUE);
-		txtExNetto.setHorizontalAlignment(SwingConstants.RIGHT);
-		pageE.add(txtExNetto);
-		txtExNetto.setColumns(10);
-
-		txtExBrutto = new JTextField("--");
-		txtExBrutto.setEditable(false);
-		txtExBrutto.setFont(new Font("Tahoma", Font.BOLD, 11));
-		txtExBrutto.setForeground(Color.BLUE);
-		txtExBrutto.setHorizontalAlignment(SwingConstants.RIGHT);
-		pageE.add(txtExBrutto);
-		txtExBrutto.setColumns(10);
-	}
-
-	static void createSumInfoSvTax() {
-		lblSvTaxOpen = new JLabel("Summe offen:");
-		lblSvTaxOpen.setHorizontalAlignment(SwingConstants.RIGHT);
-		pageSvTax.add(lblSvTaxOpen);
-
-		lblSvTaxClosed = new JLabel("Summe erledigt:");
-		lblSvTaxClosed.setHorizontalAlignment(SwingConstants.RIGHT);
-		pageSvTax.add(lblSvTaxClosed);
-
-		txtSvTaxOpen = new JTextField("--");
-		txtSvTaxOpen.setEditable(false);
-		txtSvTaxOpen.setFont(new Font("Tahoma", Font.BOLD, 11));
-		txtSvTaxOpen.setForeground(Color.BLUE);
-		txtSvTaxOpen.setHorizontalAlignment(SwingConstants.RIGHT);
-		pageSvTax.add(txtSvTaxOpen);
-		txtSvTaxOpen.setColumns(10);
-
-		txtSvTaxClosed = new JTextField("--");
-		txtSvTaxClosed.setEditable(false);
-		txtSvTaxClosed.setFont(new Font("Tahoma", Font.BOLD, 11));
-		txtSvTaxClosed.setForeground(Color.BLUE);
-		txtSvTaxClosed.setHorizontalAlignment(SwingConstants.RIGHT);
-		pageSvTax.add(txtSvTaxClosed);
-		txtSvTaxClosed.setColumns(10);
-	}
-	
 	static void createStatus() {
 
 		String sStatus = "<html>"
@@ -2426,6 +2086,31 @@ public class JFoverview extends JFrame {
 	private void actionEditSvTax(String sId) {
 		JFeditSvTax.loadGUI(sId);
 	}
+	
+	//###################################################################################################################################################
+	
+	private static int prozent(BigDecimal open, BigDecimal closed) {
+		BigDecimal bdSumA = BigDecimal.ZERO, bdTmpA = BigDecimal.ZERO, bdTmpA1 = BigDecimal.ZERO, bdProzA = BigDecimal.ZERO;
+		int iProzA = 0;
+		bdSumA = open.add(closed);
+		try {
+			bdSumA = open.add(closed);
+			bdTmpA = new BigDecimal("100.00");
+			if(bdSumA.intValue() > 0) {
+				bdTmpA1 = bdTmpA.divide(bdSumA, 8, RoundingMode.HALF_UP);
+				bdProzA = bdTmpA1.multiply(open);
+			}else {
+				bdTmpA1 = new BigDecimal("0.00");
+				bdProzA = new BigDecimal("0.00");
+			}
+		}catch (Exception e2){
+			logger.error("error in calculating percentage - " + e2);
+			iProzA = -99; // Fehlerwert
+		}finally {
+			iProzA = bdProzA.intValue();
+		}
+		return iProzA;
+	}
 
 	//###################################################################################################################################################
 	// Getter und Setter für Felder
@@ -2534,5 +2219,4 @@ public class JFoverview extends JFrame {
 	public static void setAnzSvTax(int anzSvTax) {
 		AnzSvTax = anzSvTax;
 	}
-
 }

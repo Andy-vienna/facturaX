@@ -58,7 +58,7 @@ public class JFpathMgmt extends JFrame {
 		setResizable(false);
 		setTitle("Speicherort-Verwaltung");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 922, 236);
+		setBounds(100, 100, 922, 260);
 		setLocationRelativeTo(null);
 
 		contentPane = new JPanel();
@@ -87,14 +87,16 @@ public class JFpathMgmt extends JFrame {
 		JLabel lbl03 = new JLabel("Rechnung Vorlage (Excel-Vorlage *.xlsx)");
 		JLabel lbl04 = new JLabel("Zahlungserinnerung Vorlage (Excel-Vorlage *.xlsx)");
 		JLabel lbl05 = new JLabel("Mahnung Vorlage (Excel-Vorlage *.xlsx");
-		JLabel lbl06 = new JLabel("Arbeitsverzeichnis");
-		JLabel lbl07 = new JLabel("Sicherungsverzeichnis");
+		JLabel lbl06 = new JLabel("§109a (E/A-Rechnung) Vorlage (Excel-Vorlage *.xlsx");
+		JLabel lbl07 = new JLabel("Arbeitsverzeichnis");
+		JLabel lbl08 = new JLabel("Sicherungsverzeichnis");
 
 		JTextField txtPathTplOf = new JTextField(LoadData.getTplOffer());
 		JTextField txtPathTplConf = new JTextField(LoadData.getTplConfirmation());
 		JTextField txtPathTplBi = new JTextField(LoadData.getTplBill());
 		JTextField txtPathTplRem = new JTextField(LoadData.getTplReminder());
 		JTextField txtPathTplMahnung = new JTextField(LoadData.getTplMahnung());
+		JTextField txtPathP109a = new JTextField(LoadData.getTplP109a());
 		JTextField txtPathWork = new JTextField(LoadData.getWorkPath());
 		JTextField txtPathBackup = new JTextField(LoadData.getBackupPath());
 
@@ -105,14 +107,16 @@ public class JFpathMgmt extends JFrame {
 		lbl05.setBounds(10, 110, 300, 25);
 		lbl06.setBounds(10, 135, 300, 25);
 		lbl07.setBounds(10, 160, 300, 25);
+		lbl08.setBounds(10, 185, 300, 25);
 
 		txtPathTplOf.setBounds(310, 10, 585, 25);
 		txtPathTplConf.setBounds(310, 35, 585, 25);
 		txtPathTplBi.setBounds(310, 60, 585, 25);
 		txtPathTplRem.setBounds(310, 85, 585, 25);
 		txtPathTplMahnung.setBounds(310, 110, 585, 25);
-		txtPathWork.setBounds(310, 135, 585, 25);
-		txtPathBackup.setBounds(310, 160, 585, 25);
+		txtPathP109a.setBounds(310, 135, 585, 25);
+		txtPathWork.setBounds(310, 160, 585, 25);
+		txtPathBackup.setBounds(310, 185, 585, 25);
 
 		contentPane.add(lbl01);
 		contentPane.add(lbl02);
@@ -121,6 +125,7 @@ public class JFpathMgmt extends JFrame {
 		contentPane.add(lbl05);
 		contentPane.add(lbl06);
 		contentPane.add(lbl07);
+		contentPane.add(lbl08);
 
 		contentPane.add(txtPathTplOf);
 		contentPane.add(txtPathTplConf);
@@ -130,14 +135,17 @@ public class JFpathMgmt extends JFrame {
 		contentPane.add(txtPathWork);
 		contentPane.add(txtPathBackup);
 
-		txtPathTplOf.setEditable(false);
-		txtPathTplConf.setEditable(false);
-		txtPathTplBi.setEditable(false);
-		txtPathTplRem.setEditable(false);
-		txtPathTplMahnung.setEditable(false);
-		txtPathWork.setEditable(false);
-		txtPathBackup.setEditable(false);
-
+		txtPathTplOf.setFocusable(false);
+		txtPathTplConf.setFocusable(false);
+		txtPathTplBi.setFocusable(false);
+		txtPathTplRem.setFocusable(false);
+		txtPathTplMahnung.setFocusable(false);
+		txtPathP109a.setFocusable(false);
+		txtPathWork.setFocusable(false);
+		txtPathBackup.setFocusable(false);
+		
+		contentPane.add(txtPathP109a);
+		
 		txtPathTplOf.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -202,6 +210,19 @@ public class JFpathMgmt extends JFrame {
 				txtPathTplMahnung.setText(LoadData.getTplMahnung());
 			}
 		});
+		
+		txtPathP109a.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (txtPathP109a.getText().isEmpty()) {
+					LoadData.setTplP109a(SelectFile.chooseFile("C:\\"));
+				} else {
+					LoadData.setTplP109a(SelectFile.chooseFile(LoadData.getTplP109a()));
+				}
+				LoadData.setPrpAppSettings("templatep109a", LoadData.getTplP109a());
+				txtPathP109a.setText(LoadData.getTplP109a());
+			}
+		});
 
 		txtPathWork.addMouseListener(new MouseAdapter() {
 			@Override
@@ -231,8 +252,4 @@ public class JFpathMgmt extends JFrame {
 		});
 
 	}
-
-	//###################################################################################################################################################
-	//###################################################################################################################################################
-
 }

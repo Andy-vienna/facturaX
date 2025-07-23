@@ -23,7 +23,6 @@ import org.andy.code.dataExport.ExcelReminder;
 import org.andy.code.main.overview.CalcTaxData;
 import org.andy.code.main.overview.LoadOffer;
 import org.andy.code.main.overview.LoadSvTax;
-import org.andy.code.main.overview.panels.TextPanel;
 import org.andy.code.main.overview.LoadBillOut;
 import org.andy.code.main.overview.LoadExpenses;
 import org.andy.code.main.overview.LoadBillIn;
@@ -38,6 +37,7 @@ import org.andy.gui.expenses.JFnewEx;
 import org.andy.gui.file.JFfileView;
 import org.andy.gui.main.JFmainLogIn;
 import org.andy.gui.main.JFoverview;
+import org.andy.gui.main.overview_panels.TextPanel;
 import org.andy.gui.offer.JFconfirmA;
 import org.andy.gui.offer.JFnewA;
 import org.andy.gui.offer.JFstatusA;
@@ -73,6 +73,7 @@ public class LoadData {
 	private static String tplBill;
 	private static String tplReminder;
 	private static String tplMahnung;
+	private static String tplP109a;
 	private static String workPath;
 	private static String backupPath;
 
@@ -120,6 +121,7 @@ public class LoadData {
 			tplBill = prpAppSettings.getProperty("templatebill");
 			tplReminder = prpAppSettings.getProperty("templatereminder");
 			tplMahnung = prpAppSettings.getProperty("templatemahnung");
+			tplP109a = prpAppSettings.getProperty("templatep109a");
 			workPath = prpAppSettings.getProperty("work");
 			backupPath = prpAppSettings.getProperty("backup");
 		} catch (FileNotFoundException e) {
@@ -354,6 +356,14 @@ public class LoadData {
 	public static String getTplReminder() {
 		return tplReminder;
 	}
+	
+	public static String getTplMahnung() {
+		return tplMahnung;
+	}
+	
+	public static String getTplP109a() {
+		return tplP109a;
+	}
 
 	public static String getWorkPath() {
 		return workPath;
@@ -445,17 +455,17 @@ public class LoadData {
 	public static void setTplReminder(String tplReminder) {
 		LoadData.tplReminder = tplReminder;
 	}
+	
+	public static void setTplMahnung(String tplMahnung) {
+		LoadData.tplMahnung = tplMahnung;
+	}
+	
+	public static void setTplP109a(String tplP109a) {
+		LoadData.tplP109a = tplP109a;
+	}
 
 	public static void setWorkPath(String workPath) {
 		LoadData.workPath = workPath;
-	}
-
-	public static String getTplMahnung() {
-		return tplMahnung;
-	}
-
-	public static void setTplMahnung(String tplMahnung) {
-		LoadData.tplMahnung = tplMahnung;
 	}
 
 	public static void setbFinished(boolean bFinished) {

@@ -148,3 +148,78 @@
 2025-07-21 14:12:55 [AWT-EventQueue-0] ERROR org.andy.gui.main.JFoverview - error in calculating revenue sum - java.lang.NullPointerException: Cannot invoke "javax.swing.JTextField.setText(String)" because "org.andy.gui.main.JFoverview.txtREeOpen" is null
 2025-07-21 14:12:55 [AWT-EventQueue-0] ERROR org.andy.gui.main.JFoverview - error in calculatin expenses sum - java.lang.NullPointerException: Cannot invoke "javax.swing.JTextField.setText(String)" because "org.andy.gui.main.JFoverview.txtExNetto" is null
 2025-07-21 14:19:29 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 07:49:41 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 08:04:18 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 08:04:32 [AWT-EventQueue-0] ERROR org.andy.gui.main.JFoverview - error in calculating offer sum - java.lang.NullPointerException: Cannot invoke "javax.swing.JTextField.setText(String)" because "org.andy.gui.main.JFoverview.txtANopen" is null
+2025-07-22 08:05:11 [AWT-EventQueue-0] ERROR org.andy.gui.main.JFoverview - error in calculating offer sum - java.lang.NullPointerException: Cannot invoke "javax.swing.JTextField.setText(String)" because "org.andy.gui.main.JFoverview.txtANopen" is null
+2025-07-22 08:07:46 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 08:07:59 [AWT-EventQueue-0] ERROR org.andy.gui.main.JFoverview - error in calculating offer sum - java.lang.NullPointerException: Cannot invoke "javax.swing.JTextField.setText(String)" because "org.andy.gui.main.JFoverview.txtANopen" is null
+2025-07-22 08:08:04 [AWT-EventQueue-0] ERROR org.andy.gui.main.JFoverview - error in calculating offer sum - java.lang.NullPointerException: Cannot invoke "javax.swing.JTextField.setText(String)" because "org.andy.gui.main.JFoverview.txtANopen" is null
+2025-07-22 08:12:33 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 08:12:48 [AWT-EventQueue-0] ERROR org.andy.gui.main.JFoverview - error in calculating offer sum - java.lang.NullPointerException: Cannot invoke "javax.swing.JTextField.setText(String)" because "org.andy.gui.main.JFoverview.txtANopen" is null
+2025-07-22 08:14:38 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 08:14:52 [AWT-EventQueue-0] ERROR org.andy.gui.main.JFoverview - error in calculating offer sum - java.lang.NullPointerException: Cannot invoke "javax.swing.JTextField.setText(String)" because "org.andy.gui.main.JFoverview.txtANopen" is null
+2025-07-22 08:15:57 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 08:16:09 [AWT-EventQueue-0] ERROR org.andy.gui.main.JFoverview - error in calculating offer sum - java.lang.NullPointerException: Cannot invoke "javax.swing.JTextField.setText(String)" because "org.andy.gui.main.JFoverview.txtANopen" is null
+2025-07-22 08:31:37 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 08:36:45 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 08:40:26 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 08:52:30 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 08:46:20 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 08:53:32 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 08:56:04 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 08:57:28 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 08:59:07 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 09:01:18 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 09:02:12 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 09:13:08 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 09:14:55 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 09:16:49 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 09:50:41 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 10:01:19 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 10:08:09 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 10:09:34 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 10:11:56 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 10:14:38 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 10:16:38 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 10:19:13 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 10:21:26 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 10:31:20 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 10:45:53 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 10:55:05 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 10:56:46 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 10:57:32 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 11:12:48 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 11:15:24 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.621
+2025-07-22 11:21:41 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.633
+2025-07-22 11:33:37 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.633
+2025-07-22 12:34:45 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.633
+2025-07-22 12:42:13 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.633
+2025-07-22 12:51:42 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.633
+2025-07-22 12:59:02 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.633
+2025-07-22 13:10:40 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.633
+2025-07-22 13:26:02 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.633
+2025-07-22 13:31:15 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.636
+2025-07-23 09:39:05 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.636
+2025-07-23 09:39:44 [AWT-EventQueue-0] FATAL org.andy.gui.settings.JFowner - fatal error loading gui for editing data - java.lang.ArrayIndexOutOfBoundsException: Index 10 out of bounds for length 10
+2025-07-23 09:40:13 [AWT-EventQueue-0] FATAL org.andy.gui.settings.JFowner - fatal error loading gui for editing data - java.lang.ArrayIndexOutOfBoundsException: Index 10 out of bounds for length 10
+2025-07-23 09:44:29 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.636
+2025-07-23 09:44:47 [AWT-EventQueue-0] FATAL org.andy.gui.settings.JFowner - fatal error loading gui for editing data - java.lang.NullPointerException: Cannot invoke "javax.swing.JTextField.setBounds(int, int, int, int)" because "this.txt[r]" is null
+2025-07-23 09:52:40 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.636
+2025-07-23 10:07:12 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.636
+2025-07-23 12:11:05 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.638
+2025-07-23 12:16:06 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.638
+2025-07-23 12:31:58 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.638
+2025-07-23 12:32:58 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.638
+2025-07-23 13:21:08 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.638
+2025-07-23 13:23:03 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.638
+2025-07-23 13:26:18 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.638
+2025-07-23 13:37:05 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.638
+2025-07-23 13:28:19 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.638
+2025-07-23 13:40:24 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.638
+2025-07-23 13:41:31 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.638
+2025-07-23 13:42:07 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.638
+2025-07-23 13:48:07 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.638
+2025-07-23 13:49:01 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.638
+2025-07-23 13:50:36 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.638
+2025-07-23 13:51:47 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 1.8.638

@@ -1,14 +1,19 @@
-package org.andy.code.main.overview.panels;
+package org.andy.gui.main.overview_panels;
 
 import static org.andy.toolbox.misc.CreateObject.createButton;
 
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 
+import org.andy.code.dataExport.ExcelP109a;
 import org.andy.code.main.LoadData;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 
 public class TaxPanel extends JPanel {
 
@@ -33,6 +38,8 @@ public class TaxPanel extends JPanel {
 
     // Layout-Konstanten
     private final int iLeft = 10, iTop = 50, iWidth = 400, iHeight = 25;
+    
+    private ArrayList<BigDecimal> dataExcel = new ArrayList<>();
     
 	//###################################################################################################################################################
 	// public Teil
@@ -179,7 +186,7 @@ public class TaxPanel extends JPanel {
             txtE1Stufen[i] = makeField(left6, iTop + (i + 2) * iHeight, fieldWidth, iHeight, false, null); add(txtE1Stufen[i]);
             txtE1Tax[i]    = makeField(left7, iTop + (i + 2) * iHeight, fieldWidth, iHeight, false, null); add(txtE1Tax[i]);
         }
-        txtE1Summe = makeField(left7, 290, fieldWidth, iHeight, true, new Color(255, 182, 193)); add(txtE1Summe);
+        txtE1Summe = makeField(left7, 290, fieldWidth, iHeight, true, null); add(txtE1Summe);
 
         // Separatoren
         int[] vertSepX = {iLeft + 395, left2 + fieldWidth + 5, left4 + fieldWidth + 5, left7 + fieldWidth + 5};
@@ -206,9 +213,19 @@ public class TaxPanel extends JPanel {
             // logger.error("error creating button - " + e1);
             btnExportP109a = new JButton("Export §109a");
         }
-        btnExportP109a.setEnabled(false);
+        btnExportP109a.setEnabled(true);
         btnExportP109a.setBounds(4 * 130 + 60, 320, 130, 50);
         add(btnExportP109a);
+        
+        btnExportP109a.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				btnExportP109a.setEnabled(false);
+				ExcelP109a.ExportP109a(dataExcel); // Daten an ExcelP109a übergeben
+				JOptionPane.showMessageDialog(TaxPanel.this, "Erzeugen der §109a Mitteilung erfolgreich", "Info", JOptionPane.INFORMATION_MESSAGE);
+				btnExportP109a.setEnabled(true);
+			}
+		});
 
         setPreferredSize(new Dimension(left7 + fieldWidth + 30, 385));
     }
@@ -279,6 +296,11 @@ public class TaxPanel extends JPanel {
 
 	public void setTxtE1Summe(Double value) {
 		txtE1Summe.setValue(value);
+		if (value >= 0) {
+			txtE1Summe.setBackground(new Color(192, 255, 192));
+        } else {
+        	txtE1Summe.setBackground(new Color(255, 182, 193));
+		}
 	}
 
 	public void setTxtE1Stufen(int idx, Double value) {
@@ -303,6 +325,10 @@ public class TaxPanel extends JPanel {
 
 	public void setLblE1Stufen(int idx, String text) {
 		lblE1Stufen[idx].setText(text);
+	}
+
+	public void setDataExcel(ArrayList<BigDecimal> dataExcel) {
+		this.dataExcel = dataExcel;
 	}
     
 }
