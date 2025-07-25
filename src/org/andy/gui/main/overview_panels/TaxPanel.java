@@ -47,14 +47,14 @@ public class TaxPanel extends JPanel {
 
     public TaxPanel() {
         setLayout(null);
-        buildP109aPanel();
+        buildPanel();
     }
     
 	//###################################################################################################################################################
 	// private Teil
 	//###################################################################################################################################################
 
-    private void buildP109aPanel() {
+    private void buildPanel() {
     	
     	int fieldWidth = 150;
 	    int left1 = iLeft + 400;

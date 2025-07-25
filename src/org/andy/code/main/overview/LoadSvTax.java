@@ -25,8 +25,8 @@ public class LoadSvTax {
 	private static final String dataTbl = "tbl_svtax";
 	private static String sConn;
 	
-	private static String[][] tmpArray = new String[100][9];
-	private static String[][] sTemp = new String [100][6];
+	private static String[][] tmpArray = new String[30][9];
+	private static String[][] sTemp = new String [30][6];
 	
 	private static int tmpAnz;
 	

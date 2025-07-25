@@ -40,28 +40,30 @@ public class SumPanel extends JPanel {
 		// Labels und Textfelder erstellen
 		for (int i = 0; i < lblSum.length; i++) {
 			lblSum[i] = new JLabel(labels[i]);
-			lblSum[i].setBounds(0, 0 + (i * 25), 80, 25);
+			lblSum[i].setBounds(5, 0 + (i * 25), 80, 25);
 			add(lblSum[i]);
 			
-			txtSum[i] = makeField(80, 0 + (i * 25), 110, 25, true, Color.LIGHT_GRAY);
+			txtSum[i] = makeField(85, 0 + (i * 25), 110, 25, true, Color.LIGHT_GRAY);
 			add(txtSum[i]);
 		}
 		
 		// Fortschrittsbalken
 		if (showBar) {
-			progressBar.setBounds(190, 2, 80, 46);
+			progressBar.setBounds(195, 2, 80, 46);
 			progressBar.setStringPainted(false);
 			progressBar.setOpaque(true);
 			add(progressBar);
 			
-			lblInfo.setBounds(270, 0, 50, 50);
+			lblInfo.setBounds(275, 0, 50, 50);
 			lblInfo.setFont(new Font("Tahoma", Font.BOLD, 11));
 			lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
 			lblInfo.setVerticalAlignment(SwingConstants.CENTER);
 			add(lblInfo);
+			
+			setPreferredSize(new Dimension(325, 50));
+		} else {
+			setPreferredSize(new Dimension(195, 50));
 		}
-		
-		setPreferredSize(new Dimension(320, 100));
 		
 	}
     

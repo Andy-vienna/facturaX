@@ -23,6 +23,7 @@ import org.andy.code.dataExport.ExcelReminder;
 import org.andy.code.main.overview.CalcTaxData;
 import org.andy.code.main.overview.LoadOffer;
 import org.andy.code.main.overview.LoadSvTax;
+import org.andy.code.main.overview.WriteExpenses;
 import org.andy.code.main.overview.LoadBillOut;
 import org.andy.code.main.overview.LoadExpenses;
 import org.andy.code.main.overview.LoadBillIn;
@@ -33,7 +34,6 @@ import org.andy.gui.bill.in.JFnewRe;
 import org.andy.gui.bill.out.JFnewRa;
 import org.andy.gui.bill.out.JFstatusRa;
 import org.andy.gui.expenses.JFeditEx;
-import org.andy.gui.expenses.JFnewEx;
 import org.andy.gui.file.JFfileView;
 import org.andy.gui.main.JFmainLogIn;
 import org.andy.gui.main.JFoverview;
@@ -232,7 +232,6 @@ public class LoadData {
 		ExcelMahnung.setsConn(tmpConnB);
 		JFnewRe.setsConn(tmpConnB);
 		JFeditRe.setsConn(tmpConnB);
-		JFnewEx.setsConn(tmpConnB);
 		JFeditEx.setsConn(tmpConnB);
 		JFnewSvTax.setsConn(tmpConnB);
 		JFeditSvTax.setsConn(tmpConnB);
@@ -240,6 +239,7 @@ public class LoadData {
 		LoadBillOut.setsConn(tmpConnB);
 		LoadBillIn.setsConn(tmpConnB);
 		LoadExpenses.setsConn(tmpConnB);
+		WriteExpenses.setsConn(tmpConnB);
 		LoadSvTax.setsConn(tmpConnB);
 
 		StartUp.setSERVICE_NAME("\"SQL Server (" + strDBservice + ")\"");

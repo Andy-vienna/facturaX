@@ -119,6 +119,7 @@ public class LoadBillOut {
 				//setSumREa();
 			}
 		}
+		
 		return sTemp;
 	}
 	
