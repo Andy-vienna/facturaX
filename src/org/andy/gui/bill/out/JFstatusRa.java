@@ -33,7 +33,7 @@ import org.apache.logging.log4j.Logger;
 
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
-import org.andy.code.main.overview.LoadBillOut;
+import org.andy.code.main.overview.table.LoadBillOut;
 
 public class JFstatusRa extends JFrame {
 

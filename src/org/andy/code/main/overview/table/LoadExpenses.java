@@ -1,4 +1,4 @@
-package org.andy.code.main.overview;
+package org.andy.code.main.overview.table;
 
 import static org.andy.toolbox.sql.Read.sqlReadArray;
 
@@ -54,14 +54,14 @@ public class LoadExpenses {
 			String sSQLStatement = "SELECT * FROM " + sTblName + " ORDER BY [Datum]";
 
 			tmpArray = sqlReadArray(sConn, sSQLStatement);
-			JFoverview.setArrExpenses(tmpArray);
+			JFoverview.setArrYearEX(tmpArray);
 
 			if(tmpArray[0][0] != null) {
 				tmpAnz = Integer.parseInt(tmpArray[0][0]);
-				JFoverview.setAnzExpenses(tmpAnz);
+				JFoverview.setAnzYearEX(tmpAnz);
 			}else {
 				tmpAnz = 0;
-				JFoverview.setAnzExpenses(tmpAnz);
+				JFoverview.setAnzYearEX(tmpAnz);
 			}
 
 			if(tmpAnz == 0) {

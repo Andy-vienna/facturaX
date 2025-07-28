@@ -1,4 +1,4 @@
-package org.andy.gui.main.overview_panels;
+package org.andy.gui.main.overview_panels.edit_panels;
 
 import java.awt.Color;
 import java.awt.Font;

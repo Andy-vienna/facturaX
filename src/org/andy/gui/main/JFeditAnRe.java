@@ -41,8 +41,8 @@ import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
 import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
 import org.andy.code.main.StartUp;
-import org.andy.code.main.overview.LoadOffer;
-import org.andy.code.main.overview.LoadBillOut;
+import org.andy.code.main.overview.table.LoadBillOut;
+import org.andy.code.main.overview.table.LoadOffer;
 import org.andy.code.sql.SQLmasterData;
 import org.andy.code.sql.SQLproductiveData;
 import org.andy.gui.misc.RoundedBorder;

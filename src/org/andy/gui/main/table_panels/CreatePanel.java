@@ -1,4 +1,4 @@
-package org.andy.gui.main.overview_panels;
+package org.andy.gui.main.table_panels;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -7,6 +7,9 @@ import java.awt.Insets;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+
+import org.andy.gui.main.overview_panels.SumPanel;
+import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 
 public class CreatePanel extends JPanel {
 	

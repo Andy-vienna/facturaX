@@ -1,23 +1,30 @@
-package org.andy.gui.main.overview_panels;
+package org.andy.gui.main.result_panels;
 
 import javax.swing.*;
+import javax.swing.text.NumberFormatter;
+
 import org.andy.code.main.LoadData;
 
 import java.awt.*;
+import java.text.NumberFormat;
 
-public class RecStatePanel extends JPanel {
+public class UStPanel extends JPanel {
 
 	// Serialisierungs-ID für die Klasse
 	private static final long serialVersionUID = 1L;
 
     // Felder als Instanzvariablen
-	private JTextField[][] txtFields = new JTextField[5][8]; // [row][col]
+    private JFormattedTextField[][] txtFields = new JFormattedTextField[4][5]; // [row][col]
+    private JFormattedTextField[] txtZahllast = new JFormattedTextField[5];    // Zahllast Q1-Q4, Jahr
+    
+    // Layout-Konstanten
+    private final int iLeft = 10, iTop = 50, iWidth = 400, iHeight = 25;
     
 	//###################################################################################################################################################
 	// public Teil
 	//###################################################################################################################################################
 
-    public RecStatePanel() {
+    public UStPanel() {
         setLayout(null);
         buildPanel();
     }
@@ -29,28 +36,37 @@ public class RecStatePanel extends JPanel {
     private void buildPanel() {
     	
     	// Überschriften und Feldbeschriftungen
-	    String[] rowLabels = {"Zusammenfassende Meldung Zeile 1", "Zusammenfassende Meldung Zeile 2",
-	    		"Zusammenfassende Meldung Zeile 3", "Zusammenfassende Meldung Zeile 4", "Zusammenfassende Meldung Zeile 5"};
-	    String[] colLabels = {"Q1", "Q2", "Q3", "Q4"};
-	    String[] reasonLabels = {"USt.-ID", "Betrag", "USt.-ID", "Betrag", "USt.-ID", "Betrag", "USt.-ID", "Betrag"};
+	    String[] rowLabels = {
+	        "Kz.000 - Gesamtbetrag der Bemessungsgrundlage (ohne USt.)",
+	        "Kz.021 - Innergemeinschaftliche sonstige Leistungen (z.B. DE B2B)",
+	        "Kz.022 - zu versteuern mit Normalsteuersatz 20%",
+	        "Kz.060 - Gesamtbetrag der Vorsteuern"
+	    };
+	    String[] colLabels = {"Q1", "Q2", "Q3", "Q4", "U1"};
 
 	    // Label Arrays
 	    JLabel[] lblRows = new JLabel[rowLabels.length];
 	    JLabel[] lblCols = new JLabel[colLabels.length];
-	    JLabel[] lblReasons = new JLabel[reasonLabels.length];
 
+	    // Positionierung
+	    int left = iLeft, top = iTop;
+	    int labelWidth = iWidth;
+	    int cellWidth = 150, cellHeight = iHeight;
+	    int labelStartX = left;
+	    int cellStartX = left + 400;
+	    int cellStepX = 160; // (cellWidth + 10)
 	    int rows = rowLabels.length, cols = colLabels.length;
 
 	    // Überschrift
-	    JLabel lblTitle = new JLabel("Zusammenfassende Meldung ans Finanzamt");
+	    JLabel lblTitle = new JLabel("Umsatzsteuer-Voranmeldung (UVA)");
 	    lblTitle.setFont(new Font("Tahoma", Font.BOLD, 11));
-	    lblTitle.setBounds(10, 20, 400, 25);
+	    lblTitle.setBounds(labelStartX, 20, labelWidth, cellHeight);
 	    add(lblTitle);
 
 	    // Zeilenlabels
 	    for (int r = 0; r < rows; r++) {
 	        lblRows[r] = new JLabel(rowLabels[r]);
-	        lblRows[r].setBounds(10, 75 + r * 25, 400, 25);
+	        lblRows[r].setBounds(labelStartX, top + r * cellHeight, labelWidth, cellHeight);
 	        add(lblRows[r]);
 	    }
 
@@ -60,61 +76,60 @@ public class RecStatePanel extends JPanel {
 	        lblCols[c] = new JLabel(colLabel);
 	        lblCols[c].setFont(new Font("Tahoma", Font.BOLD, 11));
 	        lblCols[c].setHorizontalAlignment(SwingConstants.CENTER);
-	        lblCols[c].setBounds(405 + c * 320, 20, 320, 25);
+	        lblCols[c].setBounds(cellStartX + c * cellStepX, 20, cellWidth, cellHeight);
 	        add(lblCols[c]);
 	    }
 	    
-	    // Feld-Legende
-	    for (int c = 0; c < reasonLabels.length; c++) {
-	    	lblReasons[c] = new JLabel(reasonLabels[c]);
-	    	lblReasons[c].setFont(new Font("Tahoma", Font.BOLD, 11));
-	    	lblReasons[c].setHorizontalAlignment(SwingConstants.CENTER);
-            lblReasons[c].setBounds(410 + c * 160, 50, 150, 25);
-            add(lblReasons[c]);
-	    }
-	    
+	    // Zahllast-Label und Textfelder
+	    JLabel lblZahllast = new JLabel("ermittelte Zahllast (neg. Beträge bedeuten eine Gutschrift)");
+	    lblZahllast.setFont(new Font("Tahoma", Font.BOLD, 11));
+	    lblZahllast.setForeground(Color.BLACK);
+	    lblZahllast.setBounds(labelStartX, 215, labelWidth, cellHeight);
+	    add(lblZahllast);
+
         // Textfelder pro Zelle
         for (int r = 0; r < txtFields.length; r++) {
             for (int c = 0; c < txtFields[r].length; c++) {
-            	txtFields[r][c] = makeTextField(410 + c * 160, 75 + r * 25, 150, 25, false, null);
-            	if (c % 2 == 0) {
-					// USt.-ID-Felder
-					txtFields[r][c].setFocusable(true);
-					txtFields[r][c].setFont(new Font("Tahoma", Font.BOLD, 11));
-					txtFields[r][c].setHorizontalAlignment(SwingConstants.CENTER);
-				} else {
-					
-				}
+                txtFields[r][c] = makeField(iLeft + 400 + c * 160, iTop + r * iHeight, 150, iHeight, false, null);
                 add(txtFields[r][c]);
             }
         }
+
+        for (int c = 0; c < txtZahllast.length; c++) {
+            txtZahllast[c] = makeField(iLeft + 400 + c * 160, iTop + 6 * iHeight + 10, 150, iHeight, true, null);
+            txtZahllast[c].setForeground(Color.BLACK);
+            add(txtZahllast[c]);
+        }
         
      // Separatoren
-        int[] vertSepX = {405, 725, 1045, 1365};
+        int[] vertSepX = {iLeft + 395, iLeft + 400 + 150 + 5, iLeft + 560 + 150 + 5, iLeft + 720 + 150 + 5, iLeft + 880 + 150 + 5};
         for (int v = 0; v < vertSepX.length; v++) {
         	JSeparator sep = new JSeparator();
         	sep.setForeground(Color.DARK_GRAY);
-            sep.setBounds(vertSepX[v], 25, 3, 7 * 25);
+            sep.setBounds(vertSepX[v], 25, 3, 6 * iHeight + 60);
             sep.setOrientation(SwingConstants.VERTICAL);
             add(sep);
         }
-        int[] horSepY = {45};
+        int[] horSepY = {iTop - 5, iTop + 5 + (6 * iHeight)};
         for (int h = 0; h < horSepY.length; h++) {
         	JSeparator sep = new JSeparator();
         	sep.setForeground(Color.DARK_GRAY);
-            sep.setBounds(10, horSepY[h], 1685, 3);
+            sep.setBounds(iLeft, horSepY[h], iLeft + 1040 + 150 - 5, 3);
             sep.setOrientation(SwingConstants.HORIZONTAL);
             add(sep);
         }
 
-        setPreferredSize(new Dimension(1400, 260));
+        setPreferredSize(new Dimension(iLeft + 1040 + 150 + 10, iTop + 6 * iHeight + 80));
     }
     
 	//###################################################################################################################################################
 
     // Hilfsfunktion für Textfelder
-    private JTextField makeTextField(int x, int y, int w, int h, boolean bold, Color bg) {
-        JTextField t = new JTextField();
+    private JFormattedTextField makeField(int x, int y, int w, int h, boolean bold, Color bg) {
+        NumberFormatter formatter = new NumberFormatter(NumberFormat.getCurrencyInstance());
+        formatter.setValueClass(Double.class);
+        formatter.setAllowsInvalid(false);
+        JFormattedTextField t = new JFormattedTextField(formatter);
         t.setBounds(x, y, w, h);
         t.setHorizontalAlignment(SwingConstants.RIGHT);
         t.setFocusable(false);
@@ -127,9 +142,18 @@ public class RecStatePanel extends JPanel {
 	// Getter und Setter für Felder
 	//###################################################################################################################################################
 
-    public void setTxtFields(int row, int col, String value) {
-		txtFields[row][col].setText(value);
-	}
+    public void setFieldValue(int row, int col, double value) {
+        txtFields[row][col].setValue(value);
+    }
+    
+    public void setZahllast(int col, double value) {
+        txtZahllast[col].setValue(value);
+        if (value < 0) {
+        	txtZahllast[col].setBackground(new Color(192, 255, 192));
+        } else {
+			txtZahllast[col].setBackground(new Color(255, 182, 193));
+		}
+    }
 
 }
 

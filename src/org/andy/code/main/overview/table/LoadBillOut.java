@@ -1,4 +1,4 @@
-package org.andy.code.main.overview;
+package org.andy.code.main.overview.table;
 
 import static org.andy.toolbox.sql.Read.sqlReadArray;
 import java.sql.SQLException;
@@ -54,14 +54,14 @@ public class LoadBillOut {
 			String sSQLStatement = "SELECT * FROM " + sTblName + " ORDER BY [IdNummer]";
 
 			tmpArray = sqlReadArray(sConn, sSQLStatement);
-			JFoverview.setArrYearBillOut(tmpArray);
+			JFoverview.setArrYearRE(tmpArray);
 
 			if(tmpArray[0][0] != null) {
 				tmpAnz = Integer.parseInt(tmpArray[0][0]);
-				JFoverview.setAnzYearBillOut(tmpAnz);
+				JFoverview.setAnzYearRE(tmpAnz);
 			}else {
 				tmpAnz = 0;
-				JFoverview.setAnzYearBillOut(tmpAnz);
+				JFoverview.setAnzYearRE(tmpAnz);
 			}
 
 			if(tmpAnz == 0) {
@@ -69,32 +69,32 @@ public class LoadBillOut {
 			}
 
 			for(int i = 0; i < 100; i++) {
-				JFoverview.setbActiveRa(i, true);
+				JFoverview.setbActiveRE(i, true);
 			}
 
 			for(int x = 1; (x - 1) < tmpAnz; x++) {
 				switch(tmpArray[x][2]) {
 				case "0":
-					JFoverview.setbActiveRa(x-1, false);
+					JFoverview.setbActiveRE(x-1, false);
 					break;
 				case "1":
-					JFoverview.setbActiveRa(x-1, true);
+					JFoverview.setbActiveRE(x-1, true);
 					break;
 				}
 				switch(tmpArray[x][3]) {
 				case "0":
-					JFoverview.setbPrintRa(x-1, false);
+					JFoverview.setbPrintRE(x-1, false);
 					break;
 				case "1":
-					JFoverview.setbPrintRa(x-1, true);
+					JFoverview.setbPrintRE(x-1, true);
 					break;
 				}
 				switch(tmpArray[x][4]) {
 				case "0":
-					JFoverview.setbMoneyRa(x-1, false);
+					JFoverview.setbMoneyRE(x-1, false);
 					break;
 				case "1":
-					JFoverview.setbMoneyRa(x-1, true);
+					JFoverview.setbMoneyRE(x-1, true);
 					break;
 				}
 				sTemp[x-1][0] = tmpArray[x][1]; // Spalte 0 - RE-Nummer

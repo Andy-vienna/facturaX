@@ -1,4 +1,4 @@
-package org.andy.code.main.overview;
+package org.andy.code.main.overview.result;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -6,13 +6,13 @@ import java.time.format.DateTimeFormatter;
 import javax.swing.JFormattedTextField;
 
 import org.andy.code.misc.parseBigDecimal;
-import org.andy.gui.main.overview_panels.UStPanel;
+import org.andy.gui.main.result_panels.UStPanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public final class CalcUStData {
+public final class UStData {
 
-	private static final Logger logger = LogManager.getLogger(CalcUStData.class);
+	private static final Logger logger = LogManager.getLogger(UStData.class);
 	
 	public static JFormattedTextField[][] txtFields;     // [zeile][spalte] → z.B. [0][0] = txt000Q1
 	public static JFormattedTextField[] txtZahllast;     // [spalte]        → z.B. [0] = Q1, [4] = Jahr
@@ -21,17 +21,15 @@ public final class CalcUStData {
 	// public Teil
 	//###################################################################################################################################################
 	
-	public static void setValuesUVA(UStPanel panel, int AnzYearBillIn, int AnzYearBillOut, int AnzExpenses, String[][] arrYearBillIn,
-			String[][] arrYearBillOut, String[][] arrExpenses) {
-		setValues(panel, AnzYearBillIn, AnzYearBillOut, AnzExpenses, arrYearBillIn, arrYearBillOut, arrExpenses);
+	public static void setValuesUVA(UStPanel panel, int anzYearPU, int anzYearRE, int anzYearEX, String[][] arrYearPU, String[][] arrYearRE, String[][] arrYearEX) {
+		setValues(panel, anzYearPU, anzYearRE, anzYearEX, arrYearPU, arrYearRE, arrYearEX);
 	}
 	
 	//###################################################################################################################################################
 	// private Teil
 	//###################################################################################################################################################
 	
-	private static void setValues(UStPanel panel, int AnzYearBillIn, int AnzYearBillOut, int AnzExpenses, String[][] arrYearBillIn,
-			String[][] arrYearBillOut, String[][] arrExpenses) {
+	private static void setValues(UStPanel panel, int anzYearPU, int anzYearRE, int anzYearEX, String[][] arrYearPU, String[][] arrYearRE, String[][] arrYearEX) {
 
 		// Pro Quartal: 0=Q1, 1=Q2, 2=Q3, 3=Q4
 		BigDecimal[] bdKz000 = new BigDecimal[4], bdKz021 = new BigDecimal[4], bdKz022 = new BigDecimal[4], bdKz060 = new BigDecimal[4];
@@ -52,10 +50,10 @@ public final class CalcUStData {
 
 		// Berechnung Bemessungsgrundlage (Ausgangsrechnungen Inland | Ausgangsrechnungen Ausland)
 		try {
-			for (int x = 1; (x - 1) < AnzYearBillOut; x++) {
-				int quartal = getQuartalFromString(arrYearBillOut[x][6].trim(), "dd.MM.yyyy") - 1;
-				String sValue = arrYearBillOut[x][13].trim();
-				BigDecimal bdVal = parseBigDecimal.fromArray(arrYearBillOut, x, 12);
+			for (int x = 1; (x - 1) < anzYearRE; x++) {
+				int quartal = getQuartalFromString(arrYearRE[x][6].trim(), "dd.MM.yyyy") - 1;
+				String sValue = arrYearRE[x][13].trim();
+				BigDecimal bdVal = parseBigDecimal.fromArray(arrYearRE, x, 12);
 				if (quartal >= 0 && quartal < 4) {
 					if (sValue.equals("0.00")) {
 						tmpKz021[quartal] = tmpKz021[quartal].add(bdVal);
@@ -77,10 +75,10 @@ public final class CalcUStData {
 		
 		// Berechnung der abziehbaren Vorsteuer (Eingangsrechnungen Inland mit Steuersatz 20%, 10% und 13%)
 		try {
-			for (int x = 1; (x - 1) < AnzYearBillIn; x++) {
-				int quartal = getQuartalFromString(arrYearBillIn[x][2].trim(), "yyyy-MM-dd") - 1;
-				String sValue = arrYearBillIn[x][10].trim();
-				BigDecimal bdVal = parseBigDecimal.fromArray(arrYearBillIn, x, 11);
+			for (int x = 1; (x - 1) < anzYearPU; x++) {
+				int quartal = getQuartalFromString(arrYearPU[x][1].trim(), "yyyy-MM-dd") - 1;
+				String sValue = arrYearPU[x][10].trim();
+				BigDecimal bdVal = parseBigDecimal.fromArray(arrYearPU, x, 12);
 				if (quartal >= 0 && quartal < 4) {
 					switch (sValue) {
 					case "20":
@@ -101,10 +99,10 @@ public final class CalcUStData {
 
 		// Berechnung der abziehbaren Vorsteuer (Betriebsausgaben Inland mit Steuersatz 20%, 10% und 13%)
 		try {
-			for (int x = 1; (x - 1) < AnzExpenses; x++) {
-				int quartal = getQuartalFromString(arrExpenses[x][1].trim(), "yyyy-MM-dd") - 1;
-				String sValue = arrExpenses[x][4].trim();
-				BigDecimal bdVal = parseBigDecimal.fromArray(arrExpenses, x, 5);
+			for (int x = 1; (x - 1) < anzYearEX; x++) {
+				int quartal = getQuartalFromString(arrYearEX[x][1].trim(), "yyyy-MM-dd") - 1;
+				String sValue = arrYearEX[x][4].trim();
+				BigDecimal bdVal = parseBigDecimal.fromArray(arrYearEX, x, 5);
 				if (quartal >= 0 && quartal < 4) {
 					switch (sValue) {
 					case "20":

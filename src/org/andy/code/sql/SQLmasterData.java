@@ -10,7 +10,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 
 import org.andy.code.main.LoadData;
-import org.andy.code.main.overview.WriteRecState;
+import org.andy.code.main.overview.result.RecStateData;
 
 public class SQLmasterData {
 
@@ -94,7 +94,7 @@ public class SQLmasterData {
 			sArrText = copyList(arrListText);
 		}
 		
-		WriteRecState.setKunde(arrListKunde); // Kundendaten übergeben für Zusammenfassende Meldung
+		RecStateData.setKunde(arrListKunde); // Kundendaten übergeben für Zusammenfassende Meldung
 
 	}
 

@@ -20,24 +20,23 @@ import org.andy.code.dataExport.ExcelConfirmation;
 import org.andy.code.dataExport.ExcelMahnung;
 import org.andy.code.dataExport.ExcelOffer;
 import org.andy.code.dataExport.ExcelReminder;
-import org.andy.code.main.overview.CalcTaxData;
-import org.andy.code.main.overview.LoadOffer;
-import org.andy.code.main.overview.LoadSvTax;
-import org.andy.code.main.overview.WriteExpenses;
-import org.andy.code.main.overview.LoadBillOut;
-import org.andy.code.main.overview.LoadExpenses;
-import org.andy.code.main.overview.LoadBillIn;
+import org.andy.code.main.overview.edit.Expenses;
+import org.andy.code.main.overview.edit.Purchase;
+import org.andy.code.main.overview.edit.SvTax;
+import org.andy.code.main.overview.result.TaxData;
+import org.andy.code.main.overview.table.LoadPurchase;
+import org.andy.code.main.overview.table.LoadBillOut;
+import org.andy.code.main.overview.table.LoadExpenses;
+import org.andy.code.main.overview.table.LoadOffer;
+import org.andy.code.main.overview.table.LoadSvTax;
 import org.andy.code.sql.SQLmasterData;
 import org.andy.code.sql.SQLproductiveData;
-import org.andy.gui.bill.in.JFeditRe;
-import org.andy.gui.bill.in.JFnewRe;
 import org.andy.gui.bill.out.JFnewRa;
 import org.andy.gui.bill.out.JFstatusRa;
-import org.andy.gui.expenses.JFeditEx;
 import org.andy.gui.file.JFfileView;
 import org.andy.gui.main.JFmainLogIn;
 import org.andy.gui.main.JFoverview;
-import org.andy.gui.main.overview_panels.TextPanel;
+import org.andy.gui.main.settings_panels.TextPanel;
 import org.andy.gui.offer.JFconfirmA;
 import org.andy.gui.offer.JFnewA;
 import org.andy.gui.offer.JFstatusA;
@@ -52,8 +51,6 @@ import org.andy.gui.settings.JFpathMgmt;
 import org.andy.gui.settings.JFsepaQR;
 import org.andy.gui.settings.JFtaxValues;
 import org.andy.gui.settings.JFuserMgmt;
-import org.andy.gui.svtax.JFeditSvTax;
-import org.andy.gui.svtax.JFnewSvTax;
 
 public class LoadData {
 
@@ -209,7 +206,7 @@ public class LoadData {
 		JFowner.setsConn(tmpConnA);
 		JFtaxValues.setsConn(tmpConnA);
 		JFgwbValues.setsConn(tmpConnA);
-		CalcTaxData.setsConn(tmpConnA);
+		TaxData.setsConn(tmpConnA);
 
 		String tmpConnB = "jdbc:sqlserver://" + LoadData.strDBComputer + ":" + LoadData.strDBPort + ";database="
 				+ LoadData.strDBNameDest + ";user=" + LoadData.strDBUser + ";password=" + LoadData.strDBPass
@@ -230,17 +227,14 @@ public class LoadData {
 		ExcelOffer.setsConn(tmpConnB);
 		ExcelReminder.setsConn(tmpConnB);
 		ExcelMahnung.setsConn(tmpConnB);
-		JFnewRe.setsConn(tmpConnB);
-		JFeditRe.setsConn(tmpConnB);
-		JFeditEx.setsConn(tmpConnB);
-		JFnewSvTax.setsConn(tmpConnB);
-		JFeditSvTax.setsConn(tmpConnB);
 		LoadOffer.setsConn(tmpConnB);
 		LoadBillOut.setsConn(tmpConnB);
-		LoadBillIn.setsConn(tmpConnB);
+		LoadPurchase.setsConn(tmpConnB);
+		Purchase.setsConn(tmpConnB);
 		LoadExpenses.setsConn(tmpConnB);
-		WriteExpenses.setsConn(tmpConnB);
+		Expenses.setsConn(tmpConnB);
 		LoadSvTax.setsConn(tmpConnB);
+		SvTax.setsConn(tmpConnB);
 
 		StartUp.setSERVICE_NAME("\"SQL Server (" + strDBservice + ")\"");
 

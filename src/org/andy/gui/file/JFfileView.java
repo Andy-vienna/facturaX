@@ -854,7 +854,8 @@ public class JFfileView extends JFrame {
 	}
 
 	public static int setFileIcon(JLabel lbl, String fileName) throws IOException {
-		if(fileName.equals(getNotSelected()) || fileName == null) {
+		if(fileName.equals(getNotSelected()) || fileName == null || fileName.isEmpty()) {
+			lbl.setIcon(null);
 			return 0;
 		}
 		String typ = cutFromRight(fileName, '.');

@@ -1,4 +1,4 @@
-package org.andy.code.main.overview;
+package org.andy.code.main.overview.table;
 
 import static org.andy.toolbox.sql.Read.sqlReadArray;
 
@@ -14,19 +14,18 @@ import java.util.Locale;
 
 import org.andy.code.main.LoadData;
 import org.andy.gui.main.JFoverview;
-import org.andy.gui.main.overview_panels.TaxPanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class LoadSvTax {
+public class LoadPurchase {
 	
-	private static final Logger logger = LogManager.getLogger(LoadOffer.class);
+	private static final Logger logger = LogManager.getLogger(LoadPurchase.class);
 	
-	private static final String dataTbl = "tbl_svtax";
+	private static final String dataTbl = "tbl_pu";
 	private static String sConn;
 	
-	private static String[][] tmpArray = new String[30][9];
-	private static String[][] sTemp = new String [30][6];
+	private static String[][] tmpArray = new String[100][20];
+	private static String[][] sTemp = new String [100][17];
 	
 	private static int tmpAnz;
 	
@@ -34,26 +33,21 @@ public class LoadSvTax {
 	// public Teil
 	//###################################################################################################################################################
 	
-	public static String[][] loadSvTax(boolean reRun, TaxPanel panelP109a) {
-		return loadData(reRun, panelP109a);
+	public static String[][] loadEinkaufsRechnung(boolean reRun) {
+		return loadData(reRun);
 	}
 	
 	//###################################################################################################################################################
 	// private Teil
 	//###################################################################################################################################################
 	
-	private static String[][] loadData(boolean reRun, TaxPanel panelP109a) {
+	private static String[][] loadData(boolean reRun) {
 
 		DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 		NumberFormat nf = NumberFormat.getNumberInstance(Locale.GERMANY);
 		DecimalFormat df = (DecimalFormat) nf;
 		df.applyPattern("###,###.00");
-		
-		BigDecimal bdSvQ1 = BigDecimal.ZERO, 
-				bdSvQ2 = BigDecimal.ZERO, 
-				bdSvQ3 = BigDecimal.ZERO, 
-				bdSvQ4 = BigDecimal.ZERO;
 
 		Arrays.stream(sTemp).forEach(a -> Arrays.fill(a, null));
 
@@ -61,17 +55,17 @@ public class LoadSvTax {
 
 			Arrays.stream(tmpArray).forEach(a -> Arrays.fill(a, null));
 			String sTblName = dataTbl.replace("_", LoadData.getStrAktGJ());
-			String sSQLStatement = "SELECT * FROM " + sTblName + " ORDER BY [datum]";
+			String sSQLStatement = "SELECT * FROM " + sTblName + " ORDER BY [re_datum]";
 
 			tmpArray = sqlReadArray(sConn, sSQLStatement);
-			JFoverview.setArrSvTax(tmpArray);
+			JFoverview.setArrYearPU(tmpArray);
 
 			if(tmpArray[0][0] != null) {
 				tmpAnz = Integer.parseInt(tmpArray[0][0]);
-				JFoverview.setAnzSvTax(tmpAnz);
+				JFoverview.setAnzYearPU(tmpAnz);
 			}else {
 				tmpAnz = 0;
-				JFoverview.setAnzSvTax(tmpAnz);
+				JFoverview.setAnzYearPU(tmpAnz);
 			}
 
 			if(tmpAnz == 0) {
@@ -79,57 +73,58 @@ public class LoadSvTax {
 			}
 
 			for(int x = 1; (x - 1) < tmpAnz; x++) {
-				switch(Integer.parseInt(tmpArray[x][9])) {
+				switch(Integer.parseInt(tmpArray[x][19])) {
 				case 0:
-					JFoverview.setbPayedSvTax(x-1, false);
+					JFoverview.setbPayedPU(x-1, false);
 					break;
 				case 1:
-					JFoverview.setbPayedSvTax(x-1, true);
+					JFoverview.setbPayedPU(x-1, true);
 					break;
 				}
 			}
 
 			for(int x = 1; (x - 1) < tmpAnz; x++) {
 
-				LocalDate datum1 = LocalDate.parse(tmpArray[x][2], inputFormat);
+				LocalDate datum1 = LocalDate.parse(tmpArray[x][1], inputFormat);
 				String stmpA = datum1.format(formatter);
-				sTemp[x-1][0] = stmpA; // Spalte 1 - Datum
+				sTemp[x-1][0] = stmpA;
+				
+				sTemp[x-1][1] = tmpArray[x][2];
 
-				sTemp[x-1][1] = tmpArray[x][3]; // Spalte 2 - Empfänger
-				sTemp[x-1][2] = tmpArray[x][4]; // Spalte 3 - Bezeichnung
+				sTemp[x-1][2] = tmpArray[x][3];
+				sTemp[x-1][3] = tmpArray[x][4];
+				sTemp[x-1][4] = tmpArray[x][5];
+				sTemp[x-1][5] = tmpArray[x][6];
+				sTemp[x-1][6] = tmpArray[x][7];
+				sTemp[x-1][7] = tmpArray[x][8];
+				sTemp[x-1][8] = tmpArray[x][9];
 
-				BigDecimal bdtmpN1 = new BigDecimal(tmpArray[x][5]).setScale(2, RoundingMode.HALF_UP);
+				BigDecimal bdtmpN1 = new BigDecimal(tmpArray[x][10]).setScale(0);
 				String stmpN1 = df.format(bdtmpN1);
-				sTemp[x-1][3] = stmpN1 + "  EUR"; // Spalte 4 - Zahllast
+				sTemp[x-1][9] = stmpN1;
 
-				LocalDate datum2 = LocalDate.parse(tmpArray[x][6], inputFormat);
-				String stmpB = datum2.format(formatter);
-				sTemp[x-1][4] = stmpB; // Spalte 5 - Fälligkeit
+				BigDecimal bdtmpN2 = new BigDecimal(tmpArray[x][11]).setScale(2, RoundingMode.HALF_UP);
+				String stmpN2 = df.format(bdtmpN2);
+				sTemp[x-1][10] = stmpN2;
 
-				sTemp[x-1][5] = tmpArray[x][7]; // Spalte 6 - Dateiname
-				
-				if(tmpArray[x][3].contains("Sozialversicherung")) {
-					if(tmpArray[x][4].contains("Q1")){
-						BigDecimal tmpQ1 = new BigDecimal(tmpArray[x][5]).setScale(2, RoundingMode.HALF_UP);
-						bdSvQ1 = bdSvQ1.add(tmpQ1);
-					}
-					if(tmpArray[x][4].contains("Q2")){
-						BigDecimal tmpQ2 = new BigDecimal(tmpArray[x][5]).setScale(2, RoundingMode.HALF_UP);
-						bdSvQ2 = bdSvQ2.add(tmpQ2);
-					}
-					if(tmpArray[x][4].contains("Q3")){
-						BigDecimal tmpQ3 = new BigDecimal(tmpArray[x][5]).setScale(2, RoundingMode.HALF_UP);
-						bdSvQ3 = bdSvQ3.add(tmpQ3);
-					}
-					if(tmpArray[x][4].contains("Q4")){
-						BigDecimal tmpQ4 = new BigDecimal(tmpArray[x][5]).setScale(2, RoundingMode.HALF_UP);
-						bdSvQ4 = bdSvQ4.add(tmpQ4);
-					}
-					if(panelP109a != null) {
-						CalcTaxData.getSVData(panelP109a, bdSvQ1, bdSvQ2, bdSvQ3, bdSvQ4);
-					}
-				}
-				
+				BigDecimal bdtmpN3 = new BigDecimal(tmpArray[x][12]).setScale(2, RoundingMode.HALF_UP);
+				String stmpN3 = df.format(bdtmpN3);
+				sTemp[x-1][11] = stmpN3;
+
+				BigDecimal bdtmpN4 = new BigDecimal(tmpArray[x][13]).setScale(2, RoundingMode.HALF_UP);
+				String stmpN4 = df.format(bdtmpN4);
+				sTemp[x-1][12] = stmpN4;
+
+				BigDecimal bdtmpN5 = new BigDecimal(tmpArray[x][14]).setScale(2, RoundingMode.HALF_UP);
+				String stmpN5 = df.format(bdtmpN5);
+				sTemp[x-1][13] = stmpN5;
+
+				LocalDate datum2 = LocalDate.parse(tmpArray[x][15], inputFormat);
+				String stmpG = datum2.format(formatter);
+				sTemp[x-1][14] = stmpG;
+
+				sTemp[x-1][15] = tmpArray[x][16];
+				sTemp[x-1][16] = tmpArray[x][17];
 
 			}
 		} catch (SQLException e) {
@@ -138,9 +133,10 @@ public class LoadSvTax {
 			logger.error("error cause class for database connection is not found - " + e);
 		} finally {
 			if(!reRun) {
-				//setSumEX();
+				//setSumREe();
 			}
 		}
+		
 		return sTemp;
 
 	}
@@ -150,9 +146,9 @@ public class LoadSvTax {
 	//###################################################################################################################################################
 
 	public static void setsConn(String sConn) {
-		LoadSvTax.sConn = sConn;
+		LoadPurchase.sConn = sConn;
 	}
-	
+
 	public static String getDatatbl() {
 		return dataTbl;
 	}

@@ -1,4 +1,4 @@
-package org.andy.code.main.overview;
+package org.andy.code.main.overview.table;
 
 import static org.andy.toolbox.sql.Read.sqlReadArray;
 import static org.andy.toolbox.sql.TableHandling.sqlCreateTable;
@@ -60,14 +60,14 @@ public class LoadOffer {
 			String sSQLStatement = "SELECT * FROM " + sTblName + " ORDER BY [IdNummer]";
 
 			tmpArray = sqlReadArray(sConn, sSQLStatement);
-			JFoverview.setArrYearOffer(tmpArray);
+			JFoverview.setArrYearAN(tmpArray);
 
 			if(tmpArray[0][0] != null) {
 				tmpAnz = Integer.parseInt(tmpArray[0][0]);
-				JFoverview.setAnzYearOffer(tmpAnz);
+				JFoverview.setAnzYearAN(tmpAnz);
 			}else {
 				tmpAnz = 0;
-				JFoverview.setAnzYearOffer(tmpAnz);
+				JFoverview.setAnzYearAN(tmpAnz);
 			}
 
 			if(tmpAnz == 0) {
@@ -75,32 +75,32 @@ public class LoadOffer {
 			}
 
 			for(int i = 0; i < 100; i++) {
-				JFoverview.setbActiveA(i, true);
+				JFoverview.setbActiveAN(i, true);
 			}
 
 			for(int x = 1; (x - 1) < tmpAnz; x++) {
 				switch(tmpArray[x][2]) {
 				case "0":
-					JFoverview.setbActiveA(x-1, false);
+					JFoverview.setbActiveAN(x-1, false);
 					break;
 				case "1":
-					JFoverview.setbActiveA(x-1, true);
+					JFoverview.setbActiveAN(x-1, true);
 					break;
 				}
 				switch(tmpArray[x][3]) {
 				case "0":
-					JFoverview.setbPrintA(x-1, false);
+					JFoverview.setbPrintAN(x-1, false);
 					break;
 				case "1":
-					JFoverview.setbPrintA(x-1, true);
+					JFoverview.setbPrintAN(x-1, true);
 					break;
 				}
 				switch(tmpArray[x][4]) {
 				case "0":
-					JFoverview.setbOrderA(x-1, false);
+					JFoverview.setbOrderAN(x-1, false);
 					break;
 				case "1":
-					JFoverview.setbOrderA(x-1, true);
+					JFoverview.setbOrderAN(x-1, true);
 					break;
 				}
 				sTemp[x-1][0] = tmpArray[x][1]; // Spalte 0 - AN-Nummer

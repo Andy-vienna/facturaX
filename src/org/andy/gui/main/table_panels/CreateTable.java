@@ -1,4 +1,4 @@
-package org.andy.gui.main.overview_panels;
+package org.andy.gui.main.table_panels;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTable;

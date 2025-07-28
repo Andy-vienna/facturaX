@@ -101,7 +101,7 @@ public class ExcelOffer{
 		int n = 0;
 		int m = 0;
 
-		arrYearOffer = JFoverview.getArrYearOffer();
+		arrYearOffer = JFoverview.getArrYearAN();
 
 		n = 1;
 		for(n = 1; (n-1) < Integer.valueOf(arrYearOffer[0][0]); n++) {

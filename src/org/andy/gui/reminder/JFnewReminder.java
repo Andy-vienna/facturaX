@@ -26,7 +26,7 @@ import org.apache.logging.log4j.Logger;
 import org.andy.code.dataExport.ExcelMahnung;
 import org.andy.code.dataExport.ExcelReminder;
 import org.andy.code.main.LoadData;
-import org.andy.code.main.overview.LoadBillOut;
+import org.andy.code.main.overview.table.LoadBillOut;
 import org.andy.toolbox.misc.SetFrameIcon;
 
 public class JFnewReminder extends JFrame {

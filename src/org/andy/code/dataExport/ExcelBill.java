@@ -109,7 +109,7 @@ public class ExcelBill{
 		int n = 0;
 		int m = 0;
 
-		arrYearBillOut = JFoverview.getArrYearBillOut();
+		arrYearBillOut = JFoverview.getArrYearRE();
 
 		n = 1;
 		for(n = 1; (n-1) < Integer.valueOf(arrYearBillOut[0][0]); n++) {

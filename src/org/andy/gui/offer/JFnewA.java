@@ -54,7 +54,7 @@ import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
-import org.andy.code.main.overview.LoadOffer;
+import org.andy.code.main.overview.table.LoadOffer;
 import org.andy.code.sql.SQLmasterData;
 import org.andy.gui.misc.RoundedBorder;
 import org.andy.org.eclipse.wb.swing.FocusTraversalOnArray;

@@ -1,4 +1,4 @@
-package org.andy.gui.main.overview_panels;
+package org.andy.gui.main.result_panels;
 
 import static org.andy.toolbox.misc.CreateObject.createButton;
 

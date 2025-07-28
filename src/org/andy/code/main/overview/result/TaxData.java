@@ -1,4 +1,4 @@
-package org.andy.code.main.overview;
+package org.andy.code.main.overview.result;
 
 import static org.andy.toolbox.sql.Read.sqlReadArray;
 
@@ -12,13 +12,13 @@ import java.util.List;
 import java.util.Locale;
 
 import org.andy.code.main.LoadData;
-import org.andy.gui.main.overview_panels.TaxPanel;
+import org.andy.gui.main.result_panels.TaxPanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class CalcTaxData {
+public class TaxData {
 	
-	private static final Logger logger = LogManager.getLogger(CalcTaxData.class);
+	private static final Logger logger = LogManager.getLogger(TaxData.class);
 	
 	private static NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.GERMANY);
 	
@@ -428,7 +428,7 @@ public class CalcTaxData {
 	//###################################################################################################################################################
 	
 	public static void setsConn(String sConn) {
-		CalcTaxData.sConn = sConn;
+		TaxData.sConn = sConn;
 	}
 
 }

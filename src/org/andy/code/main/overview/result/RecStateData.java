@@ -1,4 +1,4 @@
-package org.andy.code.main.overview;
+package org.andy.code.main.overview.result;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -11,13 +11,13 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.andy.code.misc.parseBigDecimal;
-import org.andy.gui.main.overview_panels.RecStatePanel;
+import org.andy.gui.main.result_panels.RecStatePanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class WriteRecState {
+public class RecStateData {
 	
-private static final Logger logger = LogManager.getLogger(CalcUStData.class);
+private static final Logger logger = LogManager.getLogger(UStData.class);
 	
 	private static ArrayList<ArrayList<String>> kunde = new ArrayList<>(); // ArrayList für Kunden
 	
@@ -87,7 +87,7 @@ private static final Logger logger = LogManager.getLogger(CalcUStData.class);
     }
 
 	public static void setKunde(ArrayList<ArrayList<String>> kunde) {
-		WriteRecState.kunde = kunde;
+		RecStateData.kunde = kunde;
 	}
 	
 	//###################################################################################################################################################
