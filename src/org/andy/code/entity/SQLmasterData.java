@@ -1,4 +1,4 @@
-package org.andy.code.sql;
+package org.andy.code.entity;
 
 import static org.andy.toolbox.sql.Read.sqlReadArrayList;
 import static org.andy.toolbox.misc.Tools.cutBack;

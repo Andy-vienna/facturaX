@@ -35,9 +35,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.google.zxing.WriterException;
 
+import org.andy.code.entity.SQLmasterData;
 import org.andy.code.main.LoadData;
 import org.andy.code.qr.ZxingQR;
-import org.andy.code.sql.SQLmasterData;
 import org.andy.gui.main.JFoverview;
 
 public class ExcelOffer{

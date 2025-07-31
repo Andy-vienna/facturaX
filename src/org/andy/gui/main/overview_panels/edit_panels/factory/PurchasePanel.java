@@ -1,4 +1,4 @@
-package org.andy.gui.main.overview_panels.edit_panels;
+package org.andy.gui.main.overview_panels.edit_panels.factory;
 
 import static org.andy.toolbox.misc.CreateObject.createButton;
 import java.awt.Color;
@@ -25,6 +25,7 @@ import org.andy.code.main.StartUp;
 import org.andy.code.main.overview.edit.Purchase;
 import org.andy.gui.file.JFfileView;
 import org.andy.gui.main.JFoverview;
+import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.gui.misc.RoundedBorder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

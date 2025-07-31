@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import org.andy.code.entity.SQLmasterData;
 import org.andy.code.main.LoadData;
-import org.andy.code.sql.SQLmasterData;
 import org.andy.gui.main.JFoverview;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

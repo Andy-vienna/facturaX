@@ -10,8 +10,8 @@ import com.spire.pdf.PdfDocument;
 import com.spire.pdf.PdfDocumentInformation;
 import com.spire.pdf.conversion.PdfStandardsConverter;
 
+import org.andy.code.entity.SQLmasterData;
 import org.andy.code.main.StartUp;
-import org.andy.code.sql.SQLmasterData;
 
 public class SaveAsPdf {
 

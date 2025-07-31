@@ -52,10 +52,11 @@ import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
 import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
 import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
+import org.andy.code.entity.SQLmasterData;
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
 import org.andy.code.main.overview.table.LoadOffer;
-import org.andy.code.sql.SQLmasterData;
+import org.andy.gui.main.JFoverview;
 import org.andy.gui.misc.RoundedBorder;
 import org.andy.org.eclipse.wb.swing.FocusTraversalOnArray;
 
@@ -919,6 +920,7 @@ public class JFnewA extends JFrame {
 							}
 
 							LoadOffer.loadAngebot(false);
+							JFoverview.actScreen();
 							dispose();
 							Runtime.getRuntime().gc();
 						}else {

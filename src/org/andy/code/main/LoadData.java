@@ -20,6 +20,8 @@ import org.andy.code.dataExport.ExcelConfirmation;
 import org.andy.code.dataExport.ExcelMahnung;
 import org.andy.code.dataExport.ExcelOffer;
 import org.andy.code.dataExport.ExcelReminder;
+import org.andy.code.entity.SQLmasterData;
+import org.andy.code.entity.SQLproductiveData;
 import org.andy.code.main.overview.edit.Expenses;
 import org.andy.code.main.overview.edit.Purchase;
 import org.andy.code.main.overview.edit.SvTax;
@@ -29,28 +31,16 @@ import org.andy.code.main.overview.table.LoadBillOut;
 import org.andy.code.main.overview.table.LoadExpenses;
 import org.andy.code.main.overview.table.LoadOffer;
 import org.andy.code.main.overview.table.LoadSvTax;
-import org.andy.code.sql.SQLmasterData;
-import org.andy.code.sql.SQLproductiveData;
 import org.andy.gui.bill.out.JFnewRa;
 import org.andy.gui.bill.out.JFstatusRa;
 import org.andy.gui.file.JFfileView;
-import org.andy.gui.main.JFmainLogIn;
 import org.andy.gui.main.JFoverview;
 import org.andy.gui.main.settings_panels.TextPanel;
 import org.andy.gui.offer.JFconfirmA;
 import org.andy.gui.offer.JFnewA;
 import org.andy.gui.offer.JFstatusA;
 import org.andy.gui.reminder.JFnewReminder;
-import org.andy.gui.settings.JFartikel;
-import org.andy.gui.settings.JFbank;
 import org.andy.gui.settings.JFdbSettings;
-import org.andy.gui.settings.JFgwbValues;
-import org.andy.gui.settings.JFkunde;
-import org.andy.gui.settings.JFowner;
-import org.andy.gui.settings.JFpathMgmt;
-import org.andy.gui.settings.JFsepaQR;
-import org.andy.gui.settings.JFtaxValues;
-import org.andy.gui.settings.JFuserMgmt;
 
 public class LoadData {
 
@@ -125,7 +115,6 @@ public class LoadData {
 			logger.error("Error loading app.properties", e);
 			JOptionPane.showMessageDialog(null, "Die Datei app.properties wurde nicht gefunden, starte mit Standardwerten.", "Fehler", JOptionPane.INFORMATION_MESSAGE);
 			strAktGJ = askFinacialYear();
-			JFsepaQR.loadGUI(true);
 			while (!bFinished) {
 				try {
 					Thread.sleep(100);
@@ -135,7 +124,6 @@ public class LoadData {
 				}
 			}
 			bFinished = false;
-			JFpathMgmt.loadGUI();
 			while (!bFinished) {
 				try {
 					Thread.sleep(100);
@@ -195,17 +183,10 @@ public class LoadData {
 				+ ";loginTimeout=30;";
 
 		SQLmasterData.setsConn(tmpConnA);
-		JFmainLogIn.setsConn(tmpConnA);
+		//JFmainLogIn.setsConn(tmpConnA);
 		TextPanel.setsConnMaster(tmpConnA);
 		JFnewA.setsConnSource(tmpConnA);
 		JFnewRa.setsConnSource(tmpConnA);
-		JFuserMgmt.setsConn(tmpConnA);
-		JFartikel.setsConn(tmpConnA);
-		JFbank.setsConn(tmpConnA);
-		JFkunde.setsConn(tmpConnA);
-		JFowner.setsConn(tmpConnA);
-		JFtaxValues.setsConn(tmpConnA);
-		JFgwbValues.setsConn(tmpConnA);
 		TaxData.setsConn(tmpConnA);
 
 		String tmpConnB = "jdbc:sqlserver://" + LoadData.strDBComputer + ":" + LoadData.strDBPort + ";database="
@@ -372,6 +353,12 @@ public class LoadData {
 
 	public static final void setPrpAppSettings(String sKey, String sEntry) {
 		LoadData.prpAppSettings.setProperty(sKey, sEntry);
+		try {
+			saveSettingsApp(LoadData.getPrpAppSettings());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public static void setPrpDBSettings(String sKey, String sEntry) {

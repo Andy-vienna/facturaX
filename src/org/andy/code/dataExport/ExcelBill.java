@@ -18,9 +18,9 @@ import java.util.List;
 
 import org.andy.code.eRechnung.CreateXRechnungXML;
 import org.andy.code.eRechnung.CreateZUGFeRDpdf;
+import org.andy.code.entity.SQLmasterData;
 import org.andy.code.main.LoadData;
 import org.andy.code.qr.ZxingQR;
-import org.andy.code.sql.SQLmasterData;
 import org.andy.gui.main.JFoverview;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;

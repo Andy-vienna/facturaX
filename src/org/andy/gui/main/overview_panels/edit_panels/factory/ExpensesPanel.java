@@ -1,4 +1,4 @@
-package org.andy.gui.main.overview_panels.edit_panels;
+package org.andy.gui.main.overview_panels.edit_panels.factory;
 
 import static org.andy.toolbox.misc.CreateObject.createButton;
 import java.awt.Color;
@@ -22,9 +22,10 @@ import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
 import org.andy.code.main.StartUp;
-import org.andy.code.main.overview.edit.SvTax;
+import org.andy.code.main.overview.edit.Expenses;
 import org.andy.gui.file.JFfileView;
 import org.andy.gui.main.JFoverview;
+import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.gui.misc.RoundedBorder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,27 +36,24 @@ import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
 import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
 import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
-public class SvTaxPanel extends EditPanel {
+public class ExpensesPanel extends EditPanel {
 
 	// Serialisierungs-ID für die Klasse
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = LogManager.getLogger(SvTaxPanel.class);
+	private static final Logger logger = LogManager.getLogger(ExpensesPanel.class);
 	
 	JPanel panel = new JPanel();
 	private Border b;
 	
 	private static final String OK = "OK";
 	private TitledBorder border;
-	private DemoPanel[] panelDate = new DemoPanel[2];
-	private DatePickerSettings[] dateSettings = new DatePickerSettings[2];
-	private DatePicker[] datePicker = new DatePicker[2];
-	private JTextField[] txtFields = new JTextField[3];
-	private JTextField txtFile = new JTextField();
+	private DatePicker datePicker = new DatePicker();
+	private JTextField[] txtFields = new JTextField[6];
 	private JLabel lblFileTyp = new JLabel();
 	private JButton[] btnFields = new JButton[3];
 	
-	private String[] sDatum = new String[2];
+	private String sDatum;
 	private int id = 0;
 	private boolean file = false;
 	
@@ -63,8 +61,8 @@ public class SvTaxPanel extends EditPanel {
 	// public Teil
 	//###################################################################################################################################################
 	
-    public SvTaxPanel() {
-        super("Steuer und Sozialversicherung");
+    public ExpensesPanel() {
+        super("Betriebsausgaben");
         initContent();
     }
 
@@ -89,11 +87,12 @@ public class SvTaxPanel extends EditPanel {
 		
 		// Überschriften und Feldbeschriftungen
 	    String[] labels = {
-	        "Eingangsdatum:",
-	        "Organisation:",
-	        "Bezeichnung:",
-	        "Zahllast:",
-	        "Zahlungsziel:",
+	        "Belegdatum:",
+	        "Buchungstext des Beleges:",
+	        "Betrag netto (EUR):",
+	        "Steuersatz (%):",
+	        "Betrag Steuer (EUR):",
+	        "Betrag brutto (EUR):",
 	        "Dateianhang:"};
 		
 	    // Label Arrays
@@ -106,42 +105,33 @@ public class SvTaxPanel extends EditPanel {
 	    	add(lblFields[r]);
 	    }
 		
-	 // Datepicker für Belegdatum
-	    for (int i = 0; i < panelDate.length; i++) {
-	    	final int ii = i; // final für Lambda-Ausdruck
-	    	panelDate[ii] = new DemoPanel();
-		    dateSettings[ii] = new DatePickerSettings();
-		    datePicker[ii] = new DatePicker(new DatePickerSettings());
-			panelDate[ii].scrollPaneForButtons.setEnabled(false);
-			dateSettings[ii].setWeekNumbersDisplayed(true, true);
-			dateSettings[ii].setFormatForDatesCommonEra("dd.MM.yyyy");
-			datePicker[ii] = new DatePicker(dateSettings[i]);
-			datePicker[ii].getComponentDateTextField().setBorder(new RoundedBorder(10));
-			datePicker[ii].addDateChangeListener(new DateChangeListener() {
-				@Override
-				public void dateChanged(DateChangeEvent arg0) {
-					LocalDate selectedDate = datePicker[ii].getDate();
-					if (selectedDate != null) {
-						sDatum[ii] = selectedDate.format(StartUp.getDfdate());
-					} else {
-						sDatum[ii] = null;
-					}
+	    // Datepicker für Belegdatum
+	    DemoPanel panelDate = new DemoPanel();
+		panelDate.scrollPaneForButtons.setEnabled(false);
+		DatePickerSettings dateSettings = new DatePickerSettings();
+		dateSettings.setWeekNumbersDisplayed(true, true);
+		dateSettings.setFormatForDatesCommonEra("dd.MM.yyyy");
+		datePicker = new DatePicker(dateSettings);
+		datePicker.getComponentDateTextField().setBorder(new RoundedBorder(10));
+		datePicker.addDateChangeListener(new DateChangeListener() {
+			@Override
+			public void dateChanged(DateChangeEvent arg0) {
+				LocalDate selectedDate = datePicker.getDate();
+				if (selectedDate != null) {
+					sDatum = selectedDate.format(StartUp.getDfdate());
+				} else {
+					sDatum = null;
 				}
-			});
-			add(datePicker[ii]);
-	    }
-		datePicker[0].setBounds(212, 20, 180, 25);
+			}
+		});
+		datePicker.setBounds(212, 20, 180, 25);
+		add(datePicker);
 		
 		// Textfelder
 	    for (int r = 0; r < txtFields.length; r++) {
 	    	txtFields[r] = makeField(210, 45 + r * 25, 400, 25, false, null);
 	    	add(txtFields[r]);
 	    }
-	    datePicker[1].setBounds(212, 120, 180, 25);
-	    
-	    txtFile = makeField(210, 145, 400, 25, false, null);
-	    txtFile.setFocusable(false);
-	    add(txtFile);
 	    
 	    // Anzeige Filetyp
 	    lblFileTyp.setHorizontalAlignment(SwingConstants.CENTER);
@@ -150,7 +140,7 @@ public class SvTaxPanel extends EditPanel {
 	    
 	    btnFields[0] = new JButton();
 	    btnFields[0].setToolTipText("");
-	    btnFields[0].setBounds(145, 145, 65, 25);
+	    btnFields[0].setBounds(145, 170, 65, 25);
 	    add(btnFields[0]);
 
 		try {
@@ -159,10 +149,10 @@ public class SvTaxPanel extends EditPanel {
 			logger.error("error creating button - " + e1);
 		}
 		btnFields[1].setEnabled(true);
-		btnFields[1].setBounds(660, 120, JFoverview.getButtonx(), JFoverview.getButtony());
+		btnFields[1].setBounds(660, 145, JFoverview.getButtonx(), JFoverview.getButtony());
 		add(btnFields[1]);
 		
-		setPreferredSize(new Dimension(1000, 20 + 5 * 25 + 50));
+		setPreferredSize(new Dimension(1000, 20 + 6 * 25 + 50));
 	    
 	    // ------------------------------------------------------------------------------
  		// Action Listener für Buttons
@@ -171,7 +161,7 @@ public class SvTaxPanel extends EditPanel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(lblFileTyp.getIcon() != null) {
-					SvTax.actionMouseClick(e, String.valueOf(id));
+					Expenses.actionMouseClick(e, String.valueOf(id));
 				}
 			}
 		});
@@ -179,8 +169,8 @@ public class SvTaxPanel extends EditPanel {
 	    btnFields[0].addActionListener(new ActionListener() {
  			@Override
  			public void actionPerformed(ActionEvent e) {
- 				String fName = SvTax.selectFile();
- 				txtFile.setText(fName);
+ 				String fName = Expenses.selectFile();
+ 				txtFields[5].setText(fName);
  				file = true;
  			}
  		});
@@ -189,18 +179,19 @@ public class SvTaxPanel extends EditPanel {
  			@Override
  			public void actionPerformed(ActionEvent e) {
  				
- 				String[] arrTmp = new String[7];
+ 				String[] arrTmp = new String[8];
  				Arrays.fill(arrTmp, null);
  				
- 				arrTmp[0] = sDatum[0]; // Belegdatum
- 				arrTmp[1] = txtFields[0].getText(); // Organisation
- 				arrTmp[2] = txtFields[1].getText(); // Bezeichnung
- 				arrTmp[3] = txtFields[2].getText().replace(",", "."); // Zahllast
- 				arrTmp[4] = sDatum[1]; // Zahlungsziel
- 				arrTmp[5] = txtFile.getText(); // Dateiname
- 				arrTmp[6] = SvTax.getFilePath(); // Dateipfad
+ 				arrTmp[0] = sDatum; //txt01.getText();
+ 				arrTmp[1] = txtFields[0].getText(); // Buchungstext
+ 				arrTmp[2] = txtFields[1].getText().replace(",", "."); // Betrag netto
+ 				arrTmp[3] = txtFields[2].getText().replace(",", "."); // Steuersatz
+ 				arrTmp[4] = txtFields[3].getText().replace(",", "."); // Steuer
+ 				arrTmp[5] = txtFields[4].getText().replace(",", "."); // Betrag brutto
+ 				arrTmp[6] = txtFields[5].getText(); // Dateiname
+ 				arrTmp[7] = Expenses.getFilePath(); // Dateipfad
  				
- 				String sResult = SvTax.writeData(arrTmp, id, file);
+ 				String sResult = Expenses.writeExpense(arrTmp, id, file);
  				if(sResult.equals(OK)) {
  					JFoverview.actScreen();
  					setIcon();
@@ -242,27 +233,22 @@ public class SvTaxPanel extends EditPanel {
 			this.id = id;
 		} 
     	if (value[0] == null || value[0].isEmpty()) {
-    		this.datePicker[0].setDate(null);
+    		this.datePicker.setDate(null);
     		for (int i = 0; i < this.txtFields.length; i++) {
 				this.txtFields[i].setText("");
 			}
-    		this.datePicker[1].setDate(null);
-    		this.txtFile.setText("");
 			return;
 		}
     	DateTimeFormatter dfDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    	LocalDate datumA = LocalDate.parse(value[0], dfDate);
-    	this.datePicker[0].setDate(datumA);
+    	LocalDate datum = LocalDate.parse(value[0], dfDate);
+    	this.datePicker.setDate(datum);
     	for (int i = 0; i < this.txtFields.length; i++) {
-    		if (i == 2) {
+    		if (i == 1 || i == 3 || i == 4) {
     			this.txtFields[i].setText(value[i + 1].replace(".", ","));
     		} else {
     			this.txtFields[i].setText(value[i + 1]);
     		}
     	}
-    	LocalDate datumB = LocalDate.parse(value[4], dfDate);
-    	this.datePicker[1].setDate(datumB);
-    	txtFile.setText(value[5]);
     }
 
 	public void setBtnText(int col, String value) {
@@ -271,7 +257,7 @@ public class SvTaxPanel extends EditPanel {
 	
 	public void setIcon() {
 		try {
-			JFfileView.setFileIcon(lblFileTyp, txtFile.getText());
+			JFfileView.setFileIcon(lblFileTyp, txtFields[5].getText());
 			lblFileTyp.setHorizontalAlignment(SwingConstants.CENTER);
 		} catch (IOException e) {
 			logger.error("setIcon() - " + e);

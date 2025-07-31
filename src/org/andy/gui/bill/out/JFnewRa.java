@@ -54,10 +54,10 @@ import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
 import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
 import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
+import org.andy.code.entity.SQLmasterData;
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
 import org.andy.code.main.overview.table.LoadBillOut;
-import org.andy.code.sql.SQLmasterData;
 import org.andy.gui.main.JFoverview;
 import org.andy.gui.misc.RoundedBorder;
 
@@ -974,7 +974,7 @@ public class JFnewRa extends JFrame {
 							LoadBillOut.loadAusgangsRechnung(false);
 							JFoverview.btnPrintREa.setEnabled(false);
 							JFoverview.btnStateREa.setEnabled(false);
-
+							JFoverview.actScreen();
 							dispose();
 							Runtime.getRuntime().gc();
 						}else {

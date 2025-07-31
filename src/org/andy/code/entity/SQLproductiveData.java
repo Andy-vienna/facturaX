@@ -1,4 +1,4 @@
-package org.andy.code.sql;
+package org.andy.code.entity;
 
 import static org.andy.toolbox.sql.Update.sqlUpdate;
 
@@ -49,8 +49,8 @@ public class SQLproductiveData {
 		arrWriteA[9] = String.valueOf(numPos);
 
 		int m = 10;
-		int n = 1;
-		while(n < (numPos + 1)) {
+		int n = 0;
+		while(n < numPos) {
 			arrWriteA[m] = sPos[n];
 			arrWriteA[m + 1] = bdAnz[n].toPlainString();
 			arrWriteA[m + 2] = bdEinzel[n].toPlainString();
@@ -101,8 +101,8 @@ public class SQLproductiveData {
 		arrWriteR[14] = String.valueOf(numPos);
 
 		int m = 15;
-		int n = 1;
-		while(n < (numPos + 1)) {
+		int n = 0;
+		while(n < numPos) {
 			arrWriteR[m] = sPos[n];
 			arrWriteR[m + 1] = bdAnz[n].toPlainString();
 			arrWriteR[m + 2] = bdEinzel[n].toPlainString();

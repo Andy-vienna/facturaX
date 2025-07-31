@@ -2,8 +2,6 @@ package org.andy.gui.main;
 
 import static org.andy.toolbox.crypto.Password.verifyPwd;
 import static org.andy.toolbox.misc.CreateObject.createButton;
-import static org.andy.toolbox.sql.Read.sqlReadArrayList;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -19,6 +17,7 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -36,9 +35,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
+
+import org.andy.code.entity.SQLmasterData;
+import org.andy.code.entity.User;
+import org.andy.code.entity.UserRepository;
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
-import org.andy.code.sql.SQLmasterData;
 import org.andy.gui.misc.ImagePanel;
 import org.andy.gui.misc.MyFlatTabbedPaneUI;
 
@@ -46,13 +48,10 @@ public class JFmainLogIn {
 
 	private static final Logger logger = LogManager.getLogger(JFmainLogIn.class);
 
-	private static final String TBL_USER = "tblUser";
-	private static final String SORT_ID = "Id";
-
-	private static String sConn;
-
 	private static JFrame frame;
 	
+	private UserRepository userRepository = new UserRepository();
+	private List<User> userListe = new ArrayList<>();
 	private static String userRights = null; // user rights for the current user
 
 	// ###################################################################################################################################################
@@ -214,29 +213,20 @@ public class JFmainLogIn {
 				// Anmeldedaten erfassen und auswerten
 				//------------------------------------------------------------------------------
 				LoadData.setStrAktUser(textLIUser.getText());
-				/*if(LoadData.getStrAktUser().equals("admin")){
-					JOptionPane.showMessageDialog(null, "user nicht zur Anmeldung freigegeben", "Anmeldefehler", JOptionPane.ERROR_MESSAGE);
-					LoadData.setStrAktUser(null);
-					textLIUser.setText("");
-					pwdLIPasswort.setText("");
-					return;
-				}*/
-				ArrayList<String> User = new ArrayList<String>();
-				String storedUser;
+
+				String storedUser; String pwHash = null; String rights = null;
 				boolean bCheckUser = false, bLogIn = false;
 				try {
-					ArrayList<ArrayList<String>> arrUser = sqlReadArrayList(sConn, TBL_USER, SORT_ID, "*");
+					userListe.clear();
+					userListe.addAll(userRepository.findAll());
 
-					int AnzUser = arrUser.size();
+					int AnzUser = userListe.size();
 					for(int x = 0; x < AnzUser; x++) {
-						User = arrUser.get(x);
-						storedUser = User.get(0).toString();
+
+						storedUser = userListe.get(x).getId().trim();
 						if(storedUser.equals(LoadData.getStrAktUser())) {
-							/*if(!(LoadData.getStrAktUser().equals("admin"))) {
-								bCheckUser = true;
-								storedUser = null;
-								break;
-							}*/
+							pwHash = userListe.get(x).getHash().trim();
+							rights = userListe.get(x).getRoles().trim();
 							bCheckUser = true; // user exists
 							break;
 						}
@@ -244,7 +234,7 @@ public class JFmainLogIn {
 					if(bCheckUser) {
 						char[] passwordChars = pwdLIPasswort.getPassword();
 						pwdLIPasswort.setText("");
-						bLogIn = verifyPwd(passwordChars, User.get(1).toString());
+						bLogIn = verifyPwd(passwordChars, pwHash);
 						Arrays.fill(passwordChars, '\0');
 					}
 				} catch (Exception e1) {
@@ -252,7 +242,7 @@ public class JFmainLogIn {
 				}
 
 				if(bLogIn) {
-					userRights = User.get(2).toString(); // user rights for the current user
+					userRights = rights; // user rights for the current user
 					try {
 						SQLmasterData.loadBaseData();
 					} catch (SQLException | ParseException | ClassNotFoundException e1) {
@@ -294,10 +284,6 @@ public class JFmainLogIn {
 
 	// ###################################################################################################################################################
 	// ###################################################################################################################################################
-
-	public static void setsConn(String sConn) {
-		JFmainLogIn.sConn = sConn;
-	}
 	
 	public static String getUserRights() {
 		return userRights;

@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -57,6 +58,7 @@ import org.apache.logging.log4j.Logger;
 
 import org.andy.code.dataExport.ExcelBill;
 import org.andy.code.dataExport.ExcelOffer;
+import org.andy.code.entity.SQLmasterData;
 import org.andy.code.main.*;
 import org.andy.code.main.overview.result.TaxData;
 import org.andy.code.main.overview.result.UStData;
@@ -66,38 +68,34 @@ import org.andy.code.main.overview.table.LoadBillOut;
 import org.andy.code.main.overview.table.LoadExpenses;
 import org.andy.code.main.overview.table.LoadOffer;
 import org.andy.code.main.overview.table.LoadSvTax;
-import org.andy.code.sql.SQLmasterData;
 import org.andy.gui.bill.out.JFnewRa;
 import org.andy.gui.bill.out.JFstatusRa;
 import org.andy.gui.file.JFfileView;
 import org.andy.gui.main.overview_panels.SumPanel;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanelFactory;
-import org.andy.gui.main.overview_panels.edit_panels.ExpensesPanel;
-import org.andy.gui.main.overview_panels.edit_panels.OfferPanel;
-import org.andy.gui.main.overview_panels.edit_panels.PurchasePanel;
-import org.andy.gui.main.overview_panels.edit_panels.SvTaxPanel;
+import org.andy.gui.main.overview_panels.edit_panels.factory.BillPanel;
+import org.andy.gui.main.overview_panels.edit_panels.factory.ExpensesPanel;
+import org.andy.gui.main.overview_panels.edit_panels.factory.OfferPanel;
+import org.andy.gui.main.overview_panels.edit_panels.factory.PurchasePanel;
+import org.andy.gui.main.overview_panels.edit_panels.factory.SvTaxPanel;
 import org.andy.gui.main.result_panels.RecStatePanel;
 import org.andy.gui.main.result_panels.TaxPanel;
 import org.andy.gui.main.result_panels.UStPanel;
+import org.andy.gui.main.settings_panels.BankPanel;
+import org.andy.gui.main.settings_panels.ItemPanel;
+import org.andy.gui.main.settings_panels.KundePanel;
+import org.andy.gui.main.settings_panels.OwnerPanel;
+import org.andy.gui.main.settings_panels.PathPanel;
 import org.andy.gui.main.settings_panels.TextPanel;
 import org.andy.gui.main.table_panels.CreatePanel;
 import org.andy.gui.main.table_panels.CreateTable;
 import org.andy.gui.misc.RoundedBorder;
+import org.andy.gui.misc.WrapLayout;
 import org.andy.gui.offer.JFconfirmA;
 import org.andy.gui.offer.JFnewA;
 import org.andy.gui.offer.JFstatusA;
 import org.andy.gui.reminder.JFnewReminder;
-import org.andy.gui.settings.JFartikel;
-import org.andy.gui.settings.JFbank;
-import org.andy.gui.settings.JFdbSettings;
-import org.andy.gui.settings.JFgwbValues;
-import org.andy.gui.settings.JFkunde;
-import org.andy.gui.settings.JFowner;
-import org.andy.gui.settings.JFpathMgmt;
-import org.andy.gui.settings.JFsepaQR;
-import org.andy.gui.settings.JFtaxValues;
-import org.andy.gui.settings.JFuserMgmt;
 import org.andy.toolbox.misc.*;
 
 public class JFoverview extends JFrame {
@@ -133,18 +131,17 @@ public class JFoverview extends JFrame {
 	private static JFoverview frame;
 	private static JTabbedPane tabPanel;
 	private static JPanel contentPane, pageAN, pageRE, pagePU, pageEX, pageST, pageOv, pageText, pageErg, pageSetting;
-	private static EditPanel offerPanel, billOutPanel, purchasePanel, svTaxPanel, expensesPanel;
+	private static EditPanel offerPanel, billPanel, purchasePanel, svTaxPanel, expensesPanel;
 	private static SumPanel infoAN, infoRE, infoPU, infoEX, infoST;
 	private static UStPanel panelUSt;
 	private static RecStatePanel panelZM;
 	private static TaxPanel panelP109a;
-	private static JScrollPane sPaneText, sPaneErg, sPaneSetting;
+	private static JScrollPane sPaneText, sPaneErg; //, sPaneSetting;
 	private static CreateTable<Object> sPaneAN, sPaneRE, sPanePU, sPaneEX, sPaneST;
 	
 	private static JMenuBar menuBar;
-	private static JMenu menu1, menu2, menu3, menu5, menu6, menu9;
-	private static JMenuItem logoff, backup, exit, newAN, editAN, printAN, stateAN, printAB, newREa, editREa, printREa, stateREa, printRErem,
-	userMgmt, pathMgmt, qrCodeSetup, dbSettings, editArtikel, editBank, editKunde, editOwner, editTax, editGwb, aktualisieren, info;
+	private static JMenu menu1, menu2, menu3, menu6, menu9;
+	private static JMenuItem logoff, backup, exit, newAN, printAN, stateAN, printAB, newREa, printREa, stateREa, printRErem, aktualisieren, info;
 
 	public static JButton btnNewAN, btnPrintAN, btnStateAN, btnPrintAB, btnNewREa, btnPrintREa, btnStateREa, btnPrintRem;
 	
@@ -220,7 +217,6 @@ public class JFoverview extends JFrame {
 		menu1 = new JMenu("Datei");
 		menu2 = new JMenu("Angebot");
 		menu3 = new JMenu("Ausgangsrechnung");
-		menu5 = new JMenu("Einstellungen");
 		menu6 = new JMenu("Ansicht");
 		menu9 = new JMenu("Info");
 
@@ -229,27 +225,14 @@ public class JFoverview extends JFrame {
 		exit = new JMenuItem("Exit");
 
 		newAN = new JMenuItem("neu");
-		editAN = new JMenuItem("bearbeiten");
 		printAN = new JMenuItem("drucken");
 		stateAN = new JMenuItem("Status ändern");
 		printAB = new JMenuItem("Auftragsbestätiung");
 
 		newREa = new JMenuItem("neu");
-		editREa = new JMenuItem("bearbeiten");
 		printREa = new JMenuItem("drucken");
 		stateREa = new JMenuItem("Status ändern");
 		printRErem = new JMenuItem("Mahnverfahren");
-
-		userMgmt = new JMenuItem("Benutzerverwaltung");
-		pathMgmt = new JMenuItem("Pfadverwaltung");
-		qrCodeSetup = new JMenuItem("SEPA QR Setup");
-		dbSettings = new JMenuItem("Datenbank Einstellungen");
-		editArtikel = new JMenuItem("Artikel bearbeiten");
-		editBank = new JMenuItem("Bank bearbeiten");
-		editKunde = new JMenuItem("Kunde bearbeiten");
-		editOwner = new JMenuItem("Eigene Daten bearbeiten");
-		editTax = new JMenuItem("Steuertabelle bearbeiten");
-		editGwb = new JMenuItem("Gewinnfreibetragstabelle bearbeiten");
 
 		aktualisieren = new JMenuItem("Aktualisieren");
 		info = new JMenuItem("Info");
@@ -261,27 +244,14 @@ public class JFoverview extends JFrame {
 			exit.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("exit.png")));
 
 			newAN.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("new.png")));
-			editAN.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("edit.png")));
 			printAN.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("print.png")));
 			stateAN.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("state.png")));
 			printAB.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("print.png")));
 
 			newREa.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("new.png")));
-			editREa.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("edit.png")));
 			printREa.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("print.png")));
 			stateREa.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("state.png")));
 			printRErem.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("print.png")));
-
-			userMgmt.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("team.png")));
-			pathMgmt.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("folder.png")));
-			qrCodeSetup.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("qrcode.png")));
-			dbSettings.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("database.png")));
-			editArtikel.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("edit.png")));
-			editBank.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("edit.png")));
-			editKunde.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("edit.png")));
-			editOwner.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("edit.png")));
-			editTax.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("edit.png")));
-			editGwb.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("edit.png")));
 
 			aktualisieren.setIcon(new ImageIcon(SetMenuIcon.getMenuIcon("actualize.png")));
 
@@ -300,36 +270,14 @@ public class JFoverview extends JFrame {
 		menu1.add(exit);
 
 		menu2.add(newAN);
-		menu2.add(editAN);
 		menu2.add(printAN);
 		menu2.add(stateAN);
 		menu2.add(printAB);
 
 		menu3.add(newREa);
-		menu3.add(editREa);
 		menu3.add(printREa);
 		menu3.add(stateREa);
 		menu3.add(printRErem);
-
-		if(iUserRights > 8) {
-			menu5.add(userMgmt);
-			menu5.add(pathMgmt);
-			menu5.add(qrCodeSetup);
-			menu5.add(dbSettings);
-			menu5.addSeparator();
-		}
-		if(iUserRights > 1){
-			menu5.add(editArtikel);
-			menu5.add(editBank);
-			menu5.add(editKunde);
-		}
-		if(iUserRights > 8) {
-			menu5.addSeparator();
-			menu5.add(editOwner);
-			menu5.addSeparator();
-			menu5.add(editTax);
-			menu5.add(editGwb);
-		}
 		
 		menu6.add(aktualisieren);
 
@@ -341,7 +289,6 @@ public class JFoverview extends JFrame {
 		menuBar.add(menu1);
 		menuBar.add(menu2);
 		menuBar.add(menu3);
-		menuBar.add(menu5);
 		menuBar.add(menu6);
 		menuBar.add(menu9);
 
@@ -354,23 +301,18 @@ public class JFoverview extends JFrame {
 			backup.setEnabled(false);
 			menu2.setEnabled(false);
 			menu3.setEnabled(false);
-			menu5.setEnabled(false);
 		}else if(iLic == 1) { // Demo-Lizenz
 			backup.setEnabled(false);
-			menu5.setEnabled(false);
 			aktualisieren.setEnabled(false);
 		}else {
 			menu1.setEnabled(true);
 			menu2.setEnabled(true);
 			menu3.setEnabled(false);
-			menu5.setEnabled(true);
 		}
 
-		editAN.setEnabled(false);
 		printAN.setEnabled(false);
 		stateAN.setEnabled(false);
 		printAB.setEnabled(false);
-		editREa.setEnabled(false);
 		printREa.setEnabled(false);
 		stateREa.setEnabled(false);
 		printRErem.setEnabled(false);
@@ -386,13 +328,12 @@ public class JFoverview extends JFrame {
 		sTempAN = LoadOffer.loadAngebot(false);
 		
 		offerPanel = EditPanelFactory.create("AN");
-		//offerPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		
 		// Tabelle mit ScrollPane anlegen
 		sPaneAN = new CreateTable<>(sTempAN, HEADER_AN, new TableANCellRenderer());
 		sPaneAN.getTable().addMouseListener(new MouseAdapter() {
 		    @Override
-		    public void mouseClicked(MouseEvent e) { actionDblClickOfferBill(sPaneAN.getTable(), e); } });
+		    public void mouseClicked(MouseEvent e) { actionClickOffer(sPaneAN.getTable(), e); } });
 		sPaneAN.setColumnWidths(new int[] {200,200,200,750,200,200});
 
 		// Buttons anlegen
@@ -418,14 +359,13 @@ public class JFoverview extends JFrame {
 		//------------------------------------------------------------------------------
 		sTempRE = LoadBillOut.loadAusgangsRechnung(false);
 		
-		billOutPanel = EditPanelFactory.create("REa");
-		//billOutPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		billPanel = EditPanelFactory.create("RE");
 		
 		// Tabelle mit ScrollPane anlegen
 		sPaneRE = new CreateTable<>(sTempRE, HEADER_RE, new TableRECellRenderer());
 		sPaneRE.getTable().addMouseListener(new MouseAdapter() {
 		    @Override
-		    public void mouseClicked(MouseEvent e) { actionDblClickOfferBill(sPaneRE.getTable(), e); } });
+		    public void mouseClicked(MouseEvent e) { actionClickBill(sPaneRE.getTable(), e); } });
 		sPaneRE.setColumnWidths(new int[] {120,120,120,200,650,200,150,150,150});
 
 		// Buttons anlegen
@@ -444,7 +384,7 @@ public class JFoverview extends JFrame {
 		// InfoPanel anlegen
 		infoRE = new SumPanel(new String[] {"Summe offen:", "Summe bez.:"}, true);
 		
-		pageRE = new CreatePanel(sPaneRE, billOutPanel, new JButton[] {btnNewREa, btnPrintREa, btnStateREa, btnPrintRem},	infoRE);
+		pageRE = new CreatePanel(sPaneRE, billPanel, new JButton[] {btnNewREa, btnPrintREa, btnStateREa, btnPrintRem},	infoRE);
 
 		//------------------------------------------------------------------------------
 		// TAB 3 - Einkaufsrechnungen
@@ -558,9 +498,34 @@ public class JFoverview extends JFrame {
 		//------------------------------------------------------------------------------
 		// TAB 7 - Einstellungen
 		//------------------------------------------------------------------------------
-		pageSetting = new JPanel();
+		pageSetting = new JPanel(new WrapLayout(FlowLayout.LEFT, 10, 10));
+
+		OwnerPanel ownerPanel = new OwnerPanel();
+		ownerPanel.setPreferredSize(ownerPanel.getPreferredSize());
 		
-		sPaneSetting = new JScrollPane(pageSetting);
+		KundePanel kundePanel = new KundePanel();
+		kundePanel.setPreferredSize(kundePanel.getPreferredSize());
+		
+		BankPanel bankPanel = new BankPanel();
+		bankPanel.setPreferredSize(bankPanel.getPreferredSize());
+		
+		ItemPanel itemPanel = new ItemPanel();
+		itemPanel.setPreferredSize(itemPanel.getPreferredSize());
+		
+		
+		
+		PathPanel pathPanel = new PathPanel();
+		pathPanel.setPreferredSize(pathPanel.getPreferredSize());
+
+		
+		pageSetting.add(ownerPanel);
+		pageSetting.add(kundePanel);
+		pageSetting.add(itemPanel);
+		pageSetting.add(bankPanel);
+		pageSetting.add(pathPanel);
+		
+
+		//sPaneSetting = new JScrollPane(pageSetting);
 		
 		//------------------------------------------------------------------------------
 		// TAB 8 - Textbausteine
@@ -597,7 +562,7 @@ public class JFoverview extends JFrame {
 			tabPanel.setIconAt(5, new ImageIcon(JFoverview.class.getResource("/org/resources/icons/result.png")));
 		}
 		if(iUserRights > 8) { // Admin
-			tabPanel.addTab("Einstellungen", sPaneSetting);
+			tabPanel.addTab("Einstellungen", pageSetting);
 			tabPanel.addTab("Textbausteine", sPaneText);
 			
 			tabPanel.setIconAt(6, new ImageIcon(JFoverview.class.getResource("/org/resources/icons/config.png")));
@@ -778,12 +743,6 @@ public class JFoverview extends JFrame {
 				actionAN1();
 			}
 		});
-		editAN.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				actionAN2();
-			}
-		});
 		printAN.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -809,12 +768,6 @@ public class JFoverview extends JFrame {
 				actionRE1();
 			}
 		});
-		editREa.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				actionRE2();
-			}
-		});
 		printREa.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -831,67 +784,6 @@ public class JFoverview extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				actionRE5();
-			}
-		});
-
-		userMgmt.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JFuserMgmt.loadGUI();
-			}
-		});
-		pathMgmt.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JFpathMgmt.loadGUI();
-			}
-		});
-		qrCodeSetup.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JFsepaQR.loadGUI(false);
-			}
-		});
-		dbSettings.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JFdbSettings.loadGUI(false);
-			}
-		});
-		editArtikel.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JFartikel.loadGUI();
-			}
-		});
-		editBank.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JFbank.loadGUI();
-			}
-		});
-		editKunde.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JFkunde.loadGUI();
-			}
-		});
-		editOwner.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JFowner.loadGUI();
-			}
-		});
-		editTax.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JFtaxValues.loadGUI();
-			}
-		});
-		editGwb.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JFgwbValues.loadGUI();
 			}
 		});
 
@@ -1232,7 +1124,6 @@ public class JFoverview extends JFrame {
 							btnPrintAN.setEnabled(false);
 							btnStateAN.setEnabled(false);
 							btnPrintAB.setEnabled(false);
-							editAN.setEnabled(false);
 							printAN.setEnabled(false);
 							stateAN.setEnabled(false);
 							printAB.setEnabled(false);
@@ -1241,7 +1132,6 @@ public class JFoverview extends JFrame {
 							btnPrintAN.setEnabled(true);
 							btnStateAN.setEnabled(false);
 							btnPrintAB.setEnabled(false);
-							editAN.setEnabled(true);
 							printAN.setEnabled(true);
 							stateAN.setEnabled(false);
 							printAB.setEnabled(false);
@@ -1250,7 +1140,6 @@ public class JFoverview extends JFrame {
 							btnPrintAN.setEnabled(false);
 							btnStateAN.setEnabled(true);
 							btnPrintAB.setEnabled(false);
-							editAN.setEnabled(false);
 							printAN.setEnabled(false);
 							stateAN.setEnabled(true);
 							printAB.setEnabled(false);
@@ -1259,7 +1148,6 @@ public class JFoverview extends JFrame {
 							btnPrintAN.setEnabled(false);
 							btnStateAN.setEnabled(false);
 							btnPrintAB.setEnabled(true);
-							editAN.setEnabled(false);
 							printAN.setEnabled(false);
 							stateAN.setEnabled(false);
 							printAB.setEnabled(true);
@@ -1268,14 +1156,12 @@ public class JFoverview extends JFrame {
 							btnPrintAN.setEnabled(false);
 							btnStateAN.setEnabled(false);
 							btnPrintAB.setEnabled(false);
-							editAN.setEnabled(false);
 							printAN.setEnabled(false);
 							stateAN.setEnabled(false);
 							printAB.setEnabled(false);
 						}
 						btnPrintREa.setEnabled(false);
 						btnStateREa.setEnabled(false);
-						editREa.setEnabled(false);
 						printREa.setEnabled(false);
 						stateREa.setEnabled(false);
 						printRErem.setEnabled(false);
@@ -1287,7 +1173,6 @@ public class JFoverview extends JFrame {
 					btnPrintAN.setEnabled(false);
 					btnStateAN.setEnabled(false);
 					btnPrintAB.setEnabled(false);
-					editAN.setEnabled(false);
 					printAN.setEnabled(false);
 					stateAN.setEnabled(false);
 					printAB.setEnabled(false);
@@ -1298,7 +1183,6 @@ public class JFoverview extends JFrame {
 				btnPrintAN.setEnabled(false);
 				btnStateAN.setEnabled(false);
 				btnPrintAB.setEnabled(false);
-				editAN.setEnabled(false);
 				printAN.setEnabled(false);
 				stateAN.setEnabled(false);
 				printAB.setEnabled(false);
@@ -1351,7 +1235,6 @@ public class JFoverview extends JFrame {
 							btnPrintREa.setEnabled(false);
 							btnStateREa.setEnabled(false);
 							btnPrintRem.setEnabled(false);
-							editREa.setEnabled(false);
 							printREa.setEnabled(false);
 							stateREa.setEnabled(false);
 							printRErem.setEnabled(false);
@@ -1360,7 +1243,6 @@ public class JFoverview extends JFrame {
 							btnPrintREa.setEnabled(true);
 							btnStateREa.setEnabled(false);
 							btnPrintRem.setEnabled(false);
-							editREa.setEnabled(true);
 							printREa.setEnabled(true);
 							stateREa.setEnabled(false);
 							printRErem.setEnabled(false);
@@ -1369,7 +1251,6 @@ public class JFoverview extends JFrame {
 							btnPrintREa.setEnabled(false);
 							btnStateREa.setEnabled(true);
 							btnPrintRem.setEnabled(true);
-							editREa.setEnabled(false);
 							printREa.setEnabled(false);
 							stateREa.setEnabled(true);
 							printRErem.setEnabled(true);
@@ -1378,7 +1259,6 @@ public class JFoverview extends JFrame {
 							btnPrintREa.setEnabled(false);
 							btnStateREa.setEnabled(true);
 							btnPrintRem.setEnabled(true);
-							editREa.setEnabled(false);
 							printREa.setEnabled(false);
 							stateREa.setEnabled(true);
 							printRErem.setEnabled(true);
@@ -1387,7 +1267,6 @@ public class JFoverview extends JFrame {
 							btnPrintREa.setEnabled(false);
 							btnStateREa.setEnabled(true);
 							btnPrintRem.setEnabled(true);
-							editREa.setEnabled(false);
 							printREa.setEnabled(false);
 							stateREa.setEnabled(true);
 							printRErem.setEnabled(true);
@@ -1396,7 +1275,6 @@ public class JFoverview extends JFrame {
 							btnPrintREa.setEnabled(false);
 							btnStateREa.setEnabled(true);
 							btnPrintRem.setEnabled(false);
-							editREa.setEnabled(false);
 							printREa.setEnabled(false);
 							stateREa.setEnabled(true);
 							printRErem.setEnabled(false);
@@ -1405,7 +1283,6 @@ public class JFoverview extends JFrame {
 							btnPrintREa.setEnabled(false);
 							btnStateREa.setEnabled(false);
 							btnPrintRem.setEnabled(false);
-							editREa.setEnabled(false);
 							printREa.setEnabled(false);
 							stateREa.setEnabled(false);
 							printRErem.setEnabled(false);
@@ -1421,7 +1298,6 @@ public class JFoverview extends JFrame {
 					btnPrintREa.setEnabled(false);
 					btnStateREa.setEnabled(false);
 					btnPrintRem.setEnabled(false);
-					editREa.setEnabled(false);
 					printREa.setEnabled(false);
 					stateREa.setEnabled(false);
 					printRErem.setEnabled(false);
@@ -1432,7 +1308,6 @@ public class JFoverview extends JFrame {
 				btnPrintREa.setEnabled(false);
 				btnStateREa.setEnabled(false);
 				btnPrintRem.setEnabled(false);
-				editREa.setEnabled(false);
 				printREa.setEnabled(false);
 				stateREa.setEnabled(false);
 				printRErem.setEnabled(false);
@@ -1612,7 +1487,7 @@ public class JFoverview extends JFrame {
 	//###################################################################################################################################################
 	//###################################################################################################################################################
 
-	private void actionDblClickOfferBill(JTable table, MouseEvent e) {
+	private void actionClickOffer(JTable table, MouseEvent e) {
 		String[] arrTmp = new String[51];
 		if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1 && !e.isConsumed()) {
 			e.consume(); // Event verbrauchen, um weitere Verarbeitung zu verhindern
@@ -1624,17 +1499,79 @@ public class JFoverview extends JFrame {
 				if (table.getValueAt(row, column) == null) {
 					if (offerPanel instanceof OfferPanel anp) {
 						anp.setsTitel("Angebotspositionen");
-						anp.setTxtFields(arrTmp, null);
+						anp.setTxtFields(arrTmp, null, null);
 					}
 					return;
 				} else {
 					if (offerPanel instanceof OfferPanel anp) {
-						anp.setsTitel("Angebotspositionen (Angebots-Nr. = " + table.getValueAt(row, 0).toString() + ")");
-						for (int i = 0; i < arrTmp.length; i++) {
-							arrTmp[i] = arrYearAN[row + 1][i + 1];
+						if (AnzYearAN > 0) {
+							ArrayList<String>kunde = getKunde(arrYearAN[row + 1][8]);
+							BigDecimal bdTaxRate = new BigDecimal(kunde.get(9));
+							anp.setsTitel("Angebotspositionen (Angebots-Nr. = " + table.getValueAt(row, 0).toString() + ")");
+							for (int i = 0; i < Integer.valueOf(arrYearAN[0][1]); i++) {
+								arrTmp[i] = arrYearAN[row + 1][i + 1];
+							}
+							anp.setTxtFields(arrTmp, table.getValueAt(row, 0).toString(), bdTaxRate);
 						}
-						anp.setTxtFields(arrTmp, table.getValueAt(row, 0).toString());
 					}
+				}
+			}
+		}
+		if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1 && !e.isConsumed()) {
+			e.consume(); // Event verbrauchen, um weitere Verarbeitung zu verhindern
+			int row = table.rowAtPoint(e.getPoint());
+			int column = table.columnAtPoint(e.getPoint());
+			// Hier die gewünschte Aktion bei Klick ausführen
+			if (row != -1 && column != -1) {
+				if (table.getValueAt(row, column) != null) {
+					String nr = table.getValueAt(row, 0).toString();
+					ArrayList<String>kunde = getKunde(arrYearAN[row + 1][8]);
+					actionFile(nr, kunde);
+				}
+			}
+		}
+	}
+	
+	private void actionClickBill(JTable table, MouseEvent e) {
+		String[] arrTmp = new String[51];
+		if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1 && !e.isConsumed()) {
+			e.consume(); // Event verbrauchen, um weitere Verarbeitung zu verhindern
+			int row = table.rowAtPoint(e.getPoint());
+			int column = table.columnAtPoint(e.getPoint());
+			// Hier die gewünschte Aktion bei Klick ausführen
+			if (row != -1 && column != -1) {
+				Arrays.fill(arrTmp, null);
+				if (table.getValueAt(row, column) == null) {
+					if (billPanel instanceof BillPanel rep) {
+						rep.setsTitel("Rechnungspositionen");
+						rep.setTxtFields(arrTmp, null, null);
+					}
+					return;
+				} else {
+					if (billPanel instanceof BillPanel rep) {
+						if (AnzYearRE > 0) {
+							ArrayList<String>kunde = getKunde(arrYearRE[row + 1][9]);
+							BigDecimal bdTaxRate = new BigDecimal(kunde.get(9));
+							rep.setsTitel("Rechnungspositionen (Rechnung-Nr. = " + table.getValueAt(row, 0).toString() + ")");
+							for (int i = 0; i < Integer.valueOf(arrYearRE[0][1]); i++) {
+								arrTmp[i] = arrYearRE[row + 1][i + 1];
+							}
+							rep.setTxtFields(arrTmp, table.getValueAt(row, 0).toString(), bdTaxRate);
+						}
+					}
+				}
+			}
+		}
+		if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1 && !e.isConsumed()) {
+			e.consume(); // Event verbrauchen, um weitere Verarbeitung zu verhindern
+			int row = table.rowAtPoint(e.getPoint());
+			int column = table.columnAtPoint(e.getPoint());
+			// Hier die gewünschte Aktion bei Klick ausführen
+			if (row != -1 && column != -1) {
+				if (table.getValueAt(row, column) != null) {
+					String nr = table.getValueAt(row, 0).toString();
+					ArrayList<String>kunde = getKunde(arrYearRE[row + 1][9]);
+					actionFile(nr, kunde);
 				}
 			}
 		}
@@ -1762,32 +1699,6 @@ public class JFoverview extends JFrame {
 
 	}
 
-	private void actionAN2() {
-		if(vZelleA == null) {
-			return;
-		}
-		try {
-			if(!vZelleA.isEmpty() && iRowA >= 0) {
-				String[] tmpArray = new String[47];
-				for(int x = 1; (x - 1) < AnzYearAN; x++) {
-					if(arrYearAN[x][1].equals(vZelleA)) {
-						for(int y = 1; y < 48; y++) {
-							tmpArray[y-1] = arrYearAN[x][y];
-						}
-					}
-				}
-				JFeditAnRe.showDialog(tmpArray, "Angebot");
-				btnPrintAN.setEnabled(false);
-				btnStateAN.setEnabled(false);
-				btnPrintAB.setEnabled(false);
-			}
-			Runtime.getRuntime().gc();
-		}catch (Exception e) {
-			logger.error("actionAN2() - " + e);
-		}
-
-	}
-
 	private void actionAN3() {
 		try {
 			ExcelOffer.anExport(vZelleA);
@@ -1847,31 +1758,6 @@ public class JFoverview extends JFrame {
 			JFnewRa.showGUI(StartUp.getDtNow(), SQLmasterData.getStrAktReNr());
 		}catch (Exception e) {
 			logger.error("actionRE1() - " + e);
-		}
-
-	}
-
-	private void actionRE2() {
-		if(vZelleRa == null) {
-			return;
-		}
-		try {
-			if(!vZelleRa.isEmpty() && iRowRa >= 0) {
-				String[] tmpArray = new String[51];
-				for(int x = 1; (x - 1) < AnzYearRE; x++) {
-					if(arrYearRE[x][1].equals(vZelleRa)) {
-						for(int y = 1; y < 52; y++) {
-							tmpArray[y-1] = arrYearRE[x][y];
-						}
-					}
-				}
-				JFeditAnRe.showDialog(tmpArray, "Rechnung");
-				btnPrintREa.setEnabled(false);
-				btnStateREa.setEnabled(false);
-			}
-			Runtime.getRuntime().gc();
-		}catch (Exception e) {
-			logger.error("actionRE2() - " + e);
 		}
 
 	}
@@ -1961,6 +1847,10 @@ public class JFoverview extends JFrame {
 
 	public static int getButtony() {
 		return BUTTONY;
+	}
+	
+	public static ArrayList<String> getKunde(String sKdNr) {
+		return searchKundeAll(sKdNr);
 	}
 
 	public static String[][] getArrYearAN() {

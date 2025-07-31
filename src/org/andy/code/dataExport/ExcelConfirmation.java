@@ -14,9 +14,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.andy.code.entity.SQLmasterData;
 import org.andy.code.main.LoadData;
 import org.andy.code.qr.ZxingQR;
-import org.andy.code.sql.SQLmasterData;
 import org.andy.gui.main.JFoverview;
 import org.andy.gui.offer.JFconfirmA;
 import org.apache.commons.io.IOUtils;

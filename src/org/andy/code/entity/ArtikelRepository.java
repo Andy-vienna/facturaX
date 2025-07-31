@@ -1,0 +1,41 @@
+package org.andy.code.entity;
+
+import java.util.List;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.andy.code.misc.HibernateUtil;
+
+public class ArtikelRepository {
+
+    public List<Artikel> findAll() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM Artikel", Artikel.class).list();
+        }
+    }
+
+    public void insert(Artikel artikel) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction tx = session.beginTransaction();
+            session.persist(artikel);
+            tx.commit();
+        }
+    }
+
+    public void update(Artikel artikel) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction tx = session.beginTransaction();
+            session.merge(artikel);
+            tx.commit();
+        }
+    }
+
+    public void delete(String id) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction tx = session.beginTransaction();
+            Artikel artikel = session.find(Artikel.class, id);
+            if (artikel != null) session.remove(artikel);
+            tx.commit();
+        }
+    }
+}
+
