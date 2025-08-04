@@ -1,16 +1,17 @@
 package org.andy.code.main.overview.result;
 
-import static org.andy.toolbox.sql.Read.sqlReadArray;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import org.andy.code.entityMaster.Gwb;
+import org.andy.code.entityMaster.GwbRepository;
+import org.andy.code.entityMaster.Tax;
+import org.andy.code.entityMaster.TaxRepository;
 import org.andy.code.main.LoadData;
 import org.andy.gui.main.result_panels.TaxPanel;
 import org.apache.logging.log4j.LogManager;
@@ -27,7 +28,6 @@ public class TaxData {
 	
 	private static String[][] arrTaxValues = new String[2][25];
 	private static String[][] arrGwbValues = new String[2][10];
-	private static String sConn = null;
 	
 	//###################################################################################################################################################
 	// public Teil
@@ -383,28 +383,62 @@ public class TaxData {
 	
 	private static void getDBData() {
 		
-		String sSQLStatement = null;
+		TaxRepository taxRepository = new TaxRepository();
+		GwbRepository gwbRepository = new GwbRepository();
+	    List<Tax> taxListe = new ArrayList<>();
+	    List<Gwb> gwbListe = new ArrayList<>();
+	    
+	    taxListe.addAll(taxRepository.findAll());
+	    gwbListe.addAll(gwbRepository.findAll());
+	    
+	    Arrays.stream(arrTaxValues).forEach(a -> Arrays.fill(a, null));
+		Arrays.stream(arrGwbValues).forEach(a -> Arrays.fill(a, null));
 		
-		try {
-
-			Arrays.stream(arrTaxValues).forEach(a -> Arrays.fill(a, null));
-			Arrays.stream(arrGwbValues).forEach(a -> Arrays.fill(a, null));
-			
-			sSQLStatement = "SELECT * FROM [tblTaxValue] WHERE [id_year]=" + LoadData.getStrAktGJ();
-			arrTaxValues = sqlReadArray(sConn, sSQLStatement);
-			
-			sSQLStatement = "SELECT * FROM [tblGwbValue] WHERE [id_year]=" + LoadData.getStrAktGJ();
-			arrGwbValues = sqlReadArray(sConn, sSQLStatement);
-		
-		} catch (SQLException e) {
-			logger.error("error in getting DB data - " + e);
-		} catch (NullPointerException e) {
-			logger.error("error in getting DB data - " + e);
-		} catch (Exception e) {
-			logger.error("error in getting DB data - " + e);
+		for (int x = 0; x < taxListe.size(); x++) {
+			Tax tax = taxListe.get(x);
+			if (String.valueOf(tax.getYear()).equals(LoadData.getStrAktGJ())) {
+				arrTaxValues[1][2] = tax.getVon_1().toString();
+				arrTaxValues[1][3] = tax.getBis_1().toString();
+				arrTaxValues[1][4] = tax.getTax_1().toString();
+				arrTaxValues[1][5] = tax.getVon_2().toString();
+				arrTaxValues[1][6] = tax.getBis_2().toString();
+				arrTaxValues[1][7] = tax.getTax_2().toString();
+				arrTaxValues[1][8] = tax.getVon_3().toString();
+				arrTaxValues[1][9] = tax.getBis_3().toString();
+				arrTaxValues[1][10] = tax.getTax_3().toString();
+				arrTaxValues[1][11] = tax.getVon_4().toString();
+				arrTaxValues[1][12] = tax.getBis_4().toString();
+				arrTaxValues[1][13] = tax.getTax_4().toString();
+				arrTaxValues[1][14] = tax.getVon_5().toString();
+				arrTaxValues[1][15] = tax.getBis_5().toString();
+				arrTaxValues[1][16] = tax.getTax_5().toString();
+				arrTaxValues[1][17] = tax.getVon_6().toString();
+				arrTaxValues[1][18] = tax.getBis_6().toString();
+				arrTaxValues[1][19] = tax.getTax_6().toString();
+				arrTaxValues[1][20] = tax.getVon_7().toString();
+				arrTaxValues[1][21] = tax.getBis_7().toString();
+				arrTaxValues[1][22] = tax.getTax_7().toString();
+				arrTaxValues[1][23] = tax.getOeP().toString();
+				arrTaxValues[1][24] = tax.getApP().toString();
+			}
 		}
 		
+		for ( int x = 0; x < gwbListe.size(); x++) {
+			Gwb gwb = gwbListe.get(x);
+			if (String.valueOf(gwb.getYear()).equals(LoadData.getStrAktGJ())) {
+				arrGwbValues[1][2] = gwb.getBis_1().toString();
+				arrGwbValues[1][3] = gwb.getVal_1().toString();
+				arrGwbValues[1][4] = gwb.getWeitere_2().toString();
+				arrGwbValues[1][5] = gwb.getVal_2().toString();
+				arrGwbValues[1][6] = gwb.getWeitere_3().toString();
+				arrGwbValues[1][7] = gwb.getVal_3().toString();
+				arrGwbValues[1][8] = gwb.getWeitere_4().toString();
+				arrGwbValues[1][9] = gwb.getVal_4().toString();
+			}
+		}
 	}
+	
+	//###################################################################################################################################################
 	
 	public static void getSVData(TaxPanel panel, BigDecimal bdSVQx1, BigDecimal bdSVQx2, BigDecimal bdSVQx3, BigDecimal bdSVQx4) {
 		
@@ -427,8 +461,4 @@ public class TaxData {
 	// Getter und Setter für Felder
 	//###################################################################################################################################################
 	
-	public static void setsConn(String sConn) {
-		TaxData.sConn = sConn;
-	}
-
 }

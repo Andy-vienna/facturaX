@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.andy.code.entityMaster.Kunde;
 import org.andy.code.misc.parseBigDecimal;
 import org.andy.gui.main.result_panels.RecStatePanel;
 import org.apache.logging.log4j.LogManager;
@@ -17,9 +18,9 @@ import org.apache.logging.log4j.Logger;
 
 public class RecStateData {
 	
-private static final Logger logger = LogManager.getLogger(UStData.class);
+	private static final Logger logger = LogManager.getLogger(UStData.class);
 	
-	private static ArrayList<ArrayList<String>> kunde = new ArrayList<>(); // ArrayList für Kunden
+	private static List<Kunde> kundeListe = new ArrayList<>(); // Kundenliste
 	
 	//###################################################################################################################################################
 	// public Teil
@@ -48,10 +49,10 @@ private static final Logger logger = LogManager.getLogger(UStData.class);
 	            int quartal = getQuartalFromString(array[x][6].trim(), "dd.MM.yyyy") - 1;
 	            String sKunde = array[x][9].trim();
 
-	            for (int i = 0; i < kunde.size(); i++) {
-	                if (kunde.get(i).get(0).trim().equals(sKunde)) {
-	                    if (!kunde.get(i).get(5).trim().equals("ÖSTERREICH")) {
-	                        String ustId = kunde.get(i).get(8).trim();
+	            for (int i = 0; i < kundeListe.size(); i++) {
+	                if (kundeListe.get(i).getName().trim().equals(sKunde)) {
+	                    if (!kundeListe.get(i).getLand().trim().equals("ÖSTERREICH")) {
+	                        String ustId = kundeListe.get(i).getUstid().trim();
 	                        BigDecimal betrag = parseBigDecimal.fromArray(array, x, 12);
 
 	                        mapProQuartal.get(quartal)
@@ -86,8 +87,8 @@ private static final Logger logger = LogManager.getLogger(UStData.class);
         return (datum.getMonthValue() - 1) / 3 + 1;
     }
 
-	public static void setKunde(ArrayList<ArrayList<String>> kunde) {
-		RecStateData.kunde = kunde;
+	public static void setKundeListe(List<Kunde> kundeListe2) {
+		RecStateData.kundeListe = kundeListe2;
 	}
 	
 	//###################################################################################################################################################

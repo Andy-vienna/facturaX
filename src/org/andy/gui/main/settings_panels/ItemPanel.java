@@ -22,8 +22,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
-import org.andy.code.entity.Artikel;
-import org.andy.code.entity.ArtikelRepository;
+import org.andy.code.entityMaster.Artikel;
+import org.andy.code.entityMaster.ArtikelRepository;
 import org.andy.gui.main.JFoverview;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -247,4 +247,8 @@ public class ItemPanel extends JPanel {
 
         return new Consumer[] { insert, update, delete };
     }
+
+	public List<Artikel> getArtikelListe() {
+		return artikelListe;
+	}
 }

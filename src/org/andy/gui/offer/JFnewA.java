@@ -2,7 +2,8 @@ package org.andy.gui.offer;
 
 import static org.andy.toolbox.misc.CreateObject.createButton;
 import static org.andy.toolbox.misc.Tools.FormatIBAN;
-import static org.andy.toolbox.misc.Tools.cutBack2;
+import static org.andy.toolbox.misc.Tools.cutBack;
+import static org.andy.toolbox.misc.Tools.cutFront;
 import static org.andy.toolbox.sql.Insert.sqlInsert;
 
 import java.awt.BorderLayout;
@@ -22,6 +23,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -52,7 +55,14 @@ import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
 import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
 import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
-import org.andy.code.entity.SQLmasterData;
+import org.andy.code.entityMaster.AnNr;
+import org.andy.code.entityMaster.AnNrRepository;
+import org.andy.code.entityMaster.Artikel;
+import org.andy.code.entityMaster.ArtikelRepository;
+import org.andy.code.entityMaster.Bank;
+import org.andy.code.entityMaster.BankRepository;
+import org.andy.code.entityMaster.Kunde;
+import org.andy.code.entityMaster.KundeRepository;
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
 import org.andy.code.main.overview.table.LoadOffer;
@@ -65,7 +75,6 @@ public class JFnewA extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = LogManager.getLogger(JFnewA.class);
 
-	private static String sConnSource;
 	private static String sConnDest;
 	private static final String TBL_OFFER = "tbl_an";
 
@@ -82,43 +91,42 @@ public class JFnewA extends JFrame {
 	private static String sAnDatum = StartUp.getDtNow();
 	private static String sAnReferenz = null;
 
-	private static String[][] arrArtikel = new String[100][5];
-	private static String[][] arrBank = new String[20][6];
-	private static String[][] arrKunde = new String[100][16];
-
-	private static List<String> ARdata = new ArrayList<>();
-	private static List<String> BKdata = new ArrayList<>();
-	private static List<String> KDdata = new ArrayList<>();
-
-	private static double[] dAnzahl = new double[13];
-	private static double[] dEinzel = new double[13];
-	private static double[] dSumme = new double[13];
+	private static BigDecimal[] bdAnzahl = new BigDecimal[13];
+	private static BigDecimal[] bdEinzel = new BigDecimal[13];
+	private static BigDecimal[] bdSumme = new BigDecimal[13];
 	private static String[] sPosText = new String[13];
 	private static String sOptional1 = "false";
 	private static String[] arrWriteA = new String[48];
 
-	private static int iSelKunde;
-	private static int iSelBank;
 	private static int iNumFrame;
-	private static double dRabatt;
-	private static double dNetto = 0;
+	private static BigDecimal bdNetto = BigDecimal.ZERO;
 	private static boolean bKundeSel = false;
 	private static boolean bBankSel = false;
 	private static boolean bArtSel = false;
-
-	private static String sTsTp;
-	private static String sTsRk;
+	
+	private static KundeRepository kundeRepository = new KundeRepository();
+	private static List<Kunde> kundeListe = new ArrayList<>();
+    private static Kunde kundeLeer = new Kunde();
+    private static Kunde kunde;
+    private static BankRepository bankRepository = new BankRepository();
+	private static List<Bank> bankListe = new ArrayList<>();
+	private static Bank bankLeer = new Bank();
+	private static Bank bank;
+	private static ArtikelRepository artikelRepository = new ArtikelRepository();
+	private static List<Artikel> artikelListe = new ArrayList<>();
+    private static Artikel artikelLeer = new Artikel();
+    private static Artikel artikel;
 
 	//###################################################################################################################################################
 	//###################################################################################################################################################
 
-	public static void showGUI(String sDate, String sAN) {
+	public static void showGUI() {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				try {
 					fillVector();
-					JFnewA frame = new JFnewA(sDate, sAN);
+					JFnewA frame = new JFnewA();
 					frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 					frame.setVisible(true);
 				} catch (Exception e1) {
@@ -128,7 +136,7 @@ public class JFnewA extends JFrame {
 		});
 	}
 
-	public JFnewA(String sDate, String sAN) {
+	public JFnewA() {
 
 		try (InputStream is = JFnewA.class.getResourceAsStream("/icons/edit_color.png")) {
 			if (is == null) {
@@ -176,7 +184,17 @@ public class JFnewA extends JFrame {
 		JLabel lbl26 = new JLabel("Angebotsdatum:");
 		JLabel lbl29 = new JLabel("Referenz");
 
-		JComboBox<String> cmbKunde = new JComboBox<>(KDdata.toArray(new String[0]));
+		String[] kundeTexte = kundeListe.stream()
+                .map(Kunde::getName)   // oder .getId(), oder beliebiges Feld
+                .toArray(String[]::new);
+		String[] bankTexte = bankListe.stream()
+                .map(Bank::getBankName)   // oder .getId(), oder beliebiges Feld
+                .toArray(String[]::new);
+		String[] artikelTexte = artikelListe.stream()
+                .map(Artikel::getText)   // oder .getId(), oder beliebiges Feld
+                .toArray(String[]::new);
+		
+		JComboBox<String> cmbKunde = new JComboBox<>(kundeTexte);
 		JTextField textKdNr = new JTextField();
 		JTextField textKdName = new JTextField();
 		JTextField textKdStrasse = new JTextField();
@@ -190,11 +208,11 @@ public class JFnewA extends JFrame {
 		JTextField textKdRabatt = new JTextField();
 		JTextField textKdZahlZiel = new JTextField();
 		JCheckBox chkRevCharge = new JCheckBox("ReverseCharge");
-		JComboBox<String> cmbBank = new JComboBox<>(BKdata.toArray(new String[0]));
+		JComboBox<String> cmbBank = new JComboBox<>(bankTexte);
 		JTextField textBank = new JTextField();
 		JTextField textIBAN = new JTextField();
 		JTextField textBIC = new JTextField();
-		JTextField textNummer = new JTextField(sAN);
+		JTextField textNummer = new JTextField(setAnNummer());
 		JCheckBox chkOptional1 = new JCheckBox("Angebot mit Anlage (Beschreibung)");
 		JTextField textReferenz = new JTextField();
 		JButton btnDoExport = null;
@@ -359,7 +377,7 @@ public class JFnewA extends JFrame {
 			lblPos[x].setHorizontalAlignment(SwingConstants.CENTER);
 			lblPos[x].setBounds(320, 30 + ((x - 1) * 20), 20, 20);
 			contentPanel.add(lblPos[x]);
-			cbPos[x] = new JComboBox<>(ARdata.toArray(new String[0]));
+			cbPos[x] = new JComboBox<>(artikelTexte);
 			cbPos[x].setBounds(345,  30 + ((x - 1) * 20), 440, 20);
 			cbPos[x].setSelectedIndex(0);
 			contentPanel.add(cbPos[x]);
@@ -449,17 +467,14 @@ public class JFnewA extends JFrame {
 				sAnNummer = null;
 				sAnDatum = null;
 				sAnReferenz = null;
-				iSelKunde = 0;
-				iSelBank = 0;
 				iNumFrame = 0;
-				dRabatt = 0.0;
 				bKundeSel = false;
 				bBankSel = false;
 				bArtSel = false;
-				for (int x = 0; x < dAnzahl.length; x++) {
-					dAnzahl[x] = 0.0;
-					dEinzel[x] = 0.0;
-					dSumme[x] = 0.0;
+				for (int x = 0; x < bdAnzahl.length; x++) {
+					bdAnzahl[x]  = BigDecimal.ZERO;
+					bdEinzel[x]  = BigDecimal.ZERO;
+					bdSumme[x]  = BigDecimal.ZERO;
 					sPosText[x] = null;
 				}
 
@@ -499,28 +514,27 @@ public class JFnewA extends JFrame {
 					textKdRabatt.setText("");
 					textKdZahlZiel.setText("");
 					chkRevCharge.setVisible(false);
-					iSelKunde = cmbKunde.getSelectedIndex();
 					bKundeSel = false;
 				} else {
-					textKdNr.setText(arrKunde[cmbKunde.getSelectedIndex()][1]);
-					textKdName.setText(arrKunde[cmbKunde.getSelectedIndex()][2]);
-					textKdStrasse.setText(arrKunde[cmbKunde.getSelectedIndex()][3]);
-					textKdPLZ.setText(arrKunde[cmbKunde.getSelectedIndex()][4]);
-					textKdOrt.setText(arrKunde[cmbKunde.getSelectedIndex()][5]);
-					textKdLand.setText(arrKunde[cmbKunde.getSelectedIndex()][6]);
-					textKdPronom.setText(arrKunde[cmbKunde.getSelectedIndex()][7]);
-					textKdDuty.setText(arrKunde[cmbKunde.getSelectedIndex()][8]);
-					textKdUID.setText(arrKunde[cmbKunde.getSelectedIndex()][9]);
-					textKdUSt.setText(arrKunde[cmbKunde.getSelectedIndex()][10]);
-					textKdRabatt.setText(arrKunde[cmbKunde.getSelectedIndex()][11]);
-					dRabatt = Double.parseDouble(arrKunde[cmbKunde.getSelectedIndex()][11]);
-					textKdZahlZiel.setText(arrKunde[cmbKunde.getSelectedIndex()][12]);
+					int idx = cmbKunde.getSelectedIndex();
+		            kunde = kundeListe.get(idx);
+					textKdNr.setText(kunde.getId());
+					textKdName.setText(kunde.getName());
+					textKdStrasse.setText(kunde.getStrasse());
+					textKdPLZ.setText(kunde.getPlz());
+					textKdOrt.setText(kunde.getOrt());
+					textKdLand.setText(kunde.getLand());
+					textKdPronom.setText(kunde.getPronomen());
+					textKdDuty.setText(kunde.getPerson());
+					textKdUID.setText(kunde.getUstid());
+					textKdUSt.setText(kunde.getTaxvalue());
+					textKdRabatt.setText(kunde.getDeposit());
+					textKdZahlZiel.setText(kunde.getZahlungsziel());
 					if(textKdUSt.getText().equals("0")) {
 						chkRevCharge.setVisible(true);
 					}else {
 						chkRevCharge.setVisible(false);
 					}
-					iSelKunde = cmbKunde.getSelectedIndex();
 					bKundeSel = true;
 				}
 			}
@@ -540,13 +554,13 @@ public class JFnewA extends JFrame {
 					textBank.setText("");
 					textIBAN.setText("");
 					textBIC.setText("");
-					iSelBank = cmbBank.getSelectedIndex();
 					bBankSel = false;
 				} else {
-					textBank.setText(arrBank[cmbBank.getSelectedIndex()][2]);
-					textIBAN.setText(FormatIBAN(arrBank[cmbBank.getSelectedIndex()][3]));
-					textBIC.setText(arrBank[cmbBank.getSelectedIndex()][4]);
-					iSelBank = cmbBank.getSelectedIndex();
+					int idx = cmbBank.getSelectedIndex();
+		            bank = bankListe.get(idx);
+					textBank.setText(bank.getBankName());
+					textIBAN.setText(FormatIBAN(bank.getIban()));
+					textBIC.setText(bank.getBic());
 					bBankSel = true;
 				}
 			}
@@ -904,19 +918,17 @@ public class JFnewA extends JFrame {
 								String sSQLStatementA = "INSERT INTO " + tblName + " VALUES ('" + sValues + ")"; //SQL Befehlszeile
 
 								sqlInsert(sConnDest, sSQLStatementA);
-
-								String sSQLStatementB = "INSERT INTO [tblAN] VALUES ('" + tmpArrA[0] + "')";
-
-								sqlInsert(sConnSource, sSQLStatementB);
+								
+								AnNrRepository anNrRepository = new AnNrRepository();
+							    							    
+							    AnNr anNr = new AnNr();
+							    anNr.setAnNr(tmpArrA[0]);
+							    
+							    anNrRepository.insert(anNr);
+							    
 
 							} catch (SQLException | ClassNotFoundException e1) {
 								logger.error("error creating new offer - " + e1);
-							}
-
-							try {
-								SQLmasterData.loadNummernkreis();
-							} catch (ClassNotFoundException | SQLException | IOException e2) {
-								logger.error("error creating new offer - " + e2);
 							}
 
 							LoadOffer.loadAngebot(false);
@@ -943,35 +955,24 @@ public class JFnewA extends JFrame {
 	//###################################################################################################################################################
 
 	private static void fillVector() {
-
-		arrArtikel = SQLmasterData.getsArrArtikel();
-		arrBank = SQLmasterData.getsArrBank();
-		arrKunde = SQLmasterData.getsArrKunde();
-
-		ARdata.clear();
-		BKdata.clear();
-		KDdata.clear();
-		ARdata.add(" ");
-		for (int x = 1; (x - 1) < SQLmasterData.getAnzArtikel(); x++) {
-			ARdata.add(arrArtikel[x][2]);
-		}
-		BKdata.add(" ");
-		for (int x = 1; (x - 1) < SQLmasterData.getAnzBank(); x++) {
-			BKdata.add(arrBank[x][2]);
-		}
-		KDdata.add(" ");
-		for (int x = 1; (x - 1) < SQLmasterData.getAnzKunde(); x++) {
-			KDdata.add(arrKunde[x][2]);
-		}
-	}
-
-	private static double multi(double a, double b) {
-		return (a * b); // Ergebnis zurückliefern
+		
+		kundeListe.clear();
+        kundeListe.add(kundeLeer); // falls du immer einen Dummy-Eintrag vorne willst        
+        kundeListe.addAll(kundeRepository.findAll());
+		
+		bankListe.clear();
+        bankListe.add(bankLeer); // falls du immer einen Dummy-Eintrag vorne willst        
+        bankListe.addAll(bankRepository.findAll());
+        
+        artikelListe.clear();
+        artikelListe.add(artikelLeer); // falls du immer einen Dummy-Eintrag vorne willst        
+        artikelListe.addAll(artikelRepository.findAll());
+        
 	}
 
 	public static String[] writeAN() {
 		Arrays.fill(arrWriteA, "");
-		dNetto = 0;
+		bdNetto  = BigDecimal.ZERO;
 		int x = 1;
 		int y = 1;
 
@@ -982,19 +983,19 @@ public class JFnewA extends JFrame {
 		arrWriteA[4] = JFstatusA.getWritten();
 		arrWriteA[5] = sAnDatum; // Angebotsdatum
 		arrWriteA[6] = sAnReferenz; // Kundenreferenz
-		arrWriteA[7] = arrKunde[iSelKunde][1];
-		arrWriteA[8] = arrBank[iSelBank][1]; // Index der Bankverbindung
+		arrWriteA[7] = kunde.getId();
+		arrWriteA[8] = String.valueOf(bank.getId()); // Index der Bankverbindung
 
 		while(y < (JFnewA.getiNumFrame() * 3)){
 			arrWriteA[y + 10] = sPosText[x];
-			arrWriteA[y + 11] = Double.toString(dAnzahl[x]);
-			arrWriteA[y + 12] = Double.toString(dEinzel[x]);
-			dNetto = dNetto + multi(dAnzahl[x], dEinzel[x]);
+			arrWriteA[y + 11] = bdAnzahl[x].toString();
+			arrWriteA[y + 12] = bdEinzel[x].toString();
+			bdNetto = bdNetto.add(bdAnzahl[x].multiply(bdEinzel[x]));
 			x = x + 1;
 			y = y + 3;
 		}
 
-		arrWriteA[9] = String.valueOf(dNetto); // Netto
+		arrWriteA[9] = bdNetto.toString(); // Netto
 		arrWriteA[10] = String.valueOf(iNumFrame);
 
 		arrWriteA[47] = sOptional1;
@@ -1016,46 +1017,11 @@ public class JFnewA extends JFrame {
 					txtEP.setBackground(Color.WHITE);
 					bArtSel = false;
 				} else {
-					if(bKundeSel && bBankSel) {
-
-					}else {
-						JOptionPane.showMessageDialog(null, "Kunde oder Bank nicht ausgewählt ...", "Angebot erstellen", JOptionPane.INFORMATION_MESSAGE);
-						cbPos.setSelectedIndex(0);
-						return;
-					}
-					sPosText[iNr] = arrArtikel[cbPos.getSelectedIndex()][2];
-					if(cbPos.getSelectedItem().toString().length() > 14) {
-						sTsTp = arrArtikel[cbPos.getSelectedIndex()][2].substring(arrArtikel[cbPos.getSelectedIndex()][2].length() - 14);
-						boolean bSpace = arrArtikel[cbPos.getSelectedIndex()][2].indexOf(" ", arrArtikel[cbPos.getSelectedIndex()][2].indexOf(" ")) != -1;
-						if(bSpace) {
-							try {
-								sTsRk = cutBack2(arrArtikel[cbPos.getSelectedIndex()][2], " ", 1);
-							} catch (IOException e1) {
-								logger.error("cbPosListenerA(final int iNr, final JComboBox<?> cbPos, final JTextField txtAnz, final JTextField txtEP, final JTextField txtGP)" + e1);
-							}
-							if(sTsRk.contains("Reisekosten")) {
-								txtEP.setEditable(true);
-								txtEP.setToolTipText("Eingaben mit ENTER abschließen");
-							}else {
-								txtEP.setEditable(false);
-								txtEP.setToolTipText(null);
-							}
-							if(sTsTp.contains("Tagespauschale")) {
-								dEinzel[iNr] = Double.parseDouble(arrArtikel[cbPos.getSelectedIndex()][3]) * (1 - (dRabatt / 100));
-								txtEP.setText(String.format(Locale.GERMANY, "%.2f", dEinzel[iNr]));
-								txtEP.setBackground(new Color(152,251,152));
-								txtEP.setToolTipText("Rabattierter Preis");
-							}else {
-								dEinzel[iNr] = Double.parseDouble(arrArtikel[cbPos.getSelectedIndex()][3]);
-								txtEP.setText(String.format(Locale.GERMANY, "%.2f", dEinzel[iNr]));
-								txtEP.setBackground(Color.WHITE);
-								txtEP.setToolTipText(null);
-							}
-						}
-					}else {
-						dEinzel[iNr] = Double.parseDouble(arrArtikel[cbPos.getSelectedIndex()][3]);
-						txtEP.setText(String.format(Locale.GERMANY, "%.2f", dEinzel[iNr]));
-					}
+					int idx = cbPos.getSelectedIndex();
+		            artikel = artikelListe.get(idx);
+					sPosText[iNr] = artikel.getText();
+					bdEinzel[iNr] = artikel.getWert();
+					txtEP.setText(bdEinzel[iNr].toPlainString());
 					txtAnz.setEnabled(true);
 					txtAnz.setBackground(Color.PINK);
 					bArtSel = true;
@@ -1071,32 +1037,55 @@ public class JFnewA extends JFrame {
 			return;
 		}
 		try {
-			dAnzahl[iNr] = Double.parseDouble(txtAnz.getText().replace(',', '.'));
-			dSumme[iNr] = dEinzel[iNr] * dAnzahl[iNr];
-			txtGP.setText(String.format(Locale.GERMANY, "%.2f", dSumme[iNr]));
+			bdAnzahl[iNr] = new BigDecimal(txtAnz.getText().replace(',', '.')).setScale(2, RoundingMode.HALF_UP);
+			bdEinzel[iNr] = new BigDecimal(txtEP.getText().replace(',', '.')).setScale(2, RoundingMode.HALF_UP);
+			bdSumme[iNr] = bdEinzel[iNr].multiply(bdAnzahl[iNr]).setScale(2, RoundingMode.HALF_UP);
+			txtGP.setText(String.format(Locale.GERMANY, "%.2f", JFnewA.bdSumme[iNr]));
 			txtAnz.setBackground(Color.WHITE);
 		}catch (NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, "Eingabe inkorrekt ...", "Angebot erstellen", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Eingabe inkorrekt ...", "Rechnung erstellen", JOptionPane.ERROR_MESSAGE);
 			txtAnz.setText("");
 		}
-
+	
 	}
-
+	
 	public static void EPActionA(final int iNr, final JComboBox<?> cbPos, final JTextField txtAnz, final JTextField txtEP, final JTextField txtGP) {
 		if(txtEP.getText().isEmpty()) {
 			return;
 		}
 		try {
-			dEinzel[iNr] = Double.parseDouble(txtEP.getText().replace(',', '.'));
+			bdEinzel[iNr] = new BigDecimal(txtEP.getText().replace(',', '.')).setScale(2, RoundingMode.HALF_UP);
 		}catch (NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, "Eingabe inkorrekt ...", "Angebot erstellen", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Eingabe inkorrekt ...", "Rechnung erstellen", JOptionPane.ERROR_MESSAGE);
 			txtEP.setText("");
 		}
-
+	
 	}
 
 	//###################################################################################################################################################
 	//###################################################################################################################################################
+	
+	private static String setAnNummer() {
+		AnNrRepository anNrRepository = new AnNrRepository();
+	    List<AnNr> anNrListe = new ArrayList<>();
+	    anNrListe = anNrRepository.findAll();
+	    
+	    if(anNrListe.size() > 0) {
+			
+			String sCutNrAn, sCutAn;
+			try {
+				sCutNrAn = cutFront(anNrListe.get(anNrListe.size()-1).getAnNr().trim(), "-", 2);
+				sCutAn = cutBack(anNrListe.get(anNrListe.size()-1).getAnNr().trim(), "-", 1);
+				int iIncAn = Integer.parseInt(sCutNrAn) + 1;
+				return sCutAn + "-" + String.format("%04d", iIncAn);
+			} catch (IOException e) {
+				logger.error("Fehler beim erzeugen der Angebotsnummer: " + e);
+				return "Angebotsnummer";
+			}
+		}else {
+			return "AN-" + LoadData.getStrAktGJ() + "-0001";
+		}
+	}
 
 	private static int setNum() {
 		int Num = 1;
@@ -1112,10 +1101,6 @@ public class JFnewA extends JFrame {
 
 	public static void setsConnDest(String sConnDest) {
 		JFnewA.sConnDest = sConnDest;
-	}
-
-	public static void setsConnSource(String sConnSource) {
-		JFnewA.sConnSource = sConnSource;
 	}
 
 }

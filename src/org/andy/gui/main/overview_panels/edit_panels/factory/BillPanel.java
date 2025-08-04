@@ -24,7 +24,7 @@ import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.NumberFormatter;
 
-import org.andy.code.entity.SQLproductiveData;
+import org.andy.code.entityMaster.SQLproductiveData;
 import org.andy.code.main.StartUp;
 import org.andy.gui.main.JFoverview;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;

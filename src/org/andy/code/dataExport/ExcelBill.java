@@ -14,11 +14,8 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.List;
-
 import org.andy.code.eRechnung.CreateXRechnungXML;
 import org.andy.code.eRechnung.CreateZUGFeRDpdf;
-import org.andy.code.entity.SQLmasterData;
 import org.andy.code.main.LoadData;
 import org.andy.code.qr.ZxingQR;
 import org.andy.gui.main.JFoverview;
@@ -46,7 +43,7 @@ public class ExcelBill{
 
 	private static final Logger logger = LogManager.getLogger(ExcelBill.class);
 
-	private static String[][] arrYearBillOut;
+	private static String[][] arrYearBill;
 	private static int iNumData;
 	public static int iNumKunde;
 	private static String[][] arrReContent = new String[30][16];
@@ -104,58 +101,34 @@ public class ExcelBill{
 
 	private static void reCollectData(String sNr) throws Exception {
 
-		int x = 0;
-		int y = 0;
-		int n = 0;
-		int m = 0;
+		int x = 0; int y = 0; int n = 0;
 
-		arrYearBillOut = JFoverview.getArrYearRE();
+		arrYearBill = JFoverview.getArrYearRE();
 
 		n = 1;
-		for(n = 1; (n-1) < Integer.valueOf(arrYearBillOut[0][0]); n++) {
-			if(arrYearBillOut[n][1].equals(sNr)) {
+		for(n = 1; (n-1) < Integer.valueOf(arrYearBill[0][0]); n++) {
+			if(arrYearBill[n][1].equals(sNr)) {
 				iNumData = n; // Datensatznummer der angeforderten Rechnung
 			}
 		}
-		arrReContent[0][0] = arrYearBillOut[iNumData][15]; //Anzahl Zeilen für Rechnung
-		String tmp = arrYearBillOut[iNumData][9];
+		arrReContent[0][0] = arrYearBill[iNumData][15]; //Anzahl Zeilen für Rechnung
+		String tmp = arrYearBill[iNumData][9];
 
-		for (m = 0; m < SQLmasterData.getAnzKunde(); m++) {
-			List<String> kunde = SQLmasterData.getArrListKunde().get(m);
-
-			if (kunde != null && !kunde.isEmpty() && kunde.get(0) != null && kunde.get(0).equals(tmp)) {
-				iNumKunde = m;
-				break;
-			}
-		}
-		if (m >= SQLmasterData.getAnzKunde()) {
-			System.out.println("Fehler: Kunde nicht gefunden.");
-			return; // Verhindert, dass ein ungültiger Index verwendet wird
+		String[] kundeTmp = DataExportHelper.kundeData(tmp);
+		for (int i = 0; i < 16; i++) {
+			arrReContent[1][i + 1] = kundeTmp[i];
 		}
 
-		List<String> kunde = SQLmasterData.getArrListKunde().get(m);
-
-		// Sicherheitsprüfung, ob Kunde null oder zu klein ist
-		if (kunde == null || kunde.size() < 15) {
-			System.out.println("Fehler: Kundendaten unvollständig.");
-			return;
-		}
-
-		// Kopiere die Kundendaten sicher in arrReContent
-		for (x = 0; x < 15; x++) {
-			arrReContent[1][x] = kunde.get(x) != null ? kunde.get(x) : ""; // Falls null, ersetze mit leerem String
-		}
-
-		arrReContent[2][1] = arrYearBillOut[iNumData][6]; //Rechnungsdatum
+		arrReContent[2][1] = arrYearBill[iNumData][6]; //Rechnungsdatum
 		arrReContent[2][2] = sNr; //Rechnungsnummer
-		arrReContent[2][3] = arrYearBillOut[iNumData][7]; //Leistungszeitraum
-		arrReContent[2][4] = arrYearBillOut[iNumData][8]; //Kundenreferenz
+		arrReContent[2][3] = arrYearBill[iNumData][7]; //Leistungszeitraum
+		arrReContent[2][4] = arrYearBill[iNumData][8]; //Kundenreferenz
 		x = 1;
 		y = 16;
 		while(x < (Integer.valueOf(arrReContent[0][0]) + 1)) {
-			arrReContent[x + 9][1] = arrYearBillOut[iNumData][y];
-			arrReContent[x + 9][2] = arrYearBillOut[iNumData][y + 1];
-			arrReContent[x + 9][3] = arrYearBillOut[iNumData][y + 2];
+			arrReContent[x + 9][1] = arrYearBill[iNumData][y];
+			arrReContent[x + 9][2] = arrYearBill[iNumData][y + 1];
+			arrReContent[x + 9][3] = arrYearBill[iNumData][y + 2];
 			double anz = Double.parseDouble(arrReContent[x + 9][2]);
 			double ep = Double.parseDouble(arrReContent[x + 9][3]);
 			double gp = anz * ep;
@@ -164,11 +137,11 @@ public class ExcelBill{
 			y = y + 3;
 		}
 
-		if (kunde != null && kunde.size() > 9 && "0".equals(kunde.get(9))) { // Steuerhinweis prüfen
-			if (arrYearBillOut != null && arrYearBillOut[iNumData] != null &&
-					arrYearBillOut[iNumData].length > 10 && "true".equals(arrYearBillOut[iNumData][10])) {
+		if (kundeTmp[9].equals("0")) { // Steuerhinweis prüfen
+			if (arrYearBill != null && arrYearBill[iNumData] != null &&
+					arrYearBill[iNumData].length > 10 && "true".equals(arrYearBill[iNumData][10])) { // Reverse Charge
 
-				ArrayList<ArrayList<String>> textList = SQLmasterData.getArrListText();
+				ArrayList<ArrayList<String>> textList = DataExportHelper.textData();
 
 				if (textList != null && textList.size() > 1) {
 					ArrayList<String> text = textList.get(1);
@@ -179,7 +152,7 @@ public class ExcelBill{
 					}
 				}
 			} else {
-				ArrayList<ArrayList<String>> textList = SQLmasterData.getArrListText();
+				ArrayList<ArrayList<String>> textList = DataExportHelper.textData();
 
 				if (textList != null && textList.size() > 0) {
 					ArrayList<String> text = textList.get(0);
@@ -194,57 +167,34 @@ public class ExcelBill{
 			arrReContent[3][1] = " ";
 		}
 
-		if (kunde != null && kunde.size() > 11 && kunde.get(11) != null) { // Stelle sicher, dass Kunde[11] existiert
-			String zahlungsziel = kunde.get(11).toString();
+		String zahlungsziel = kundeTmp[11]; // Zahlungsziel
 
-			ArrayList<ArrayList<String>> textList = SQLmasterData.getArrListText();
-			if (textList != null && textList.size() > 1) { // Sicherstellen, dass genug Texte vorhanden sind
-				if ("0".equals(zahlungsziel)) {
-					ArrayList<String> text = textList.get(0);
-					if (text != null && text.size() > 2) {
-						arrReContent[3][2] = text.get(2);
-					} else {
-						arrReContent[3][2] = "Fehlender Text"; // Fallback für fehlende Einträge
-					}
+		ArrayList<ArrayList<String>> textList = DataExportHelper.textData();
+		if (textList != null && textList.size() > 1) { // Sicherstellen, dass genug Texte vorhanden sind
+			if ("0".equals(zahlungsziel)) {
+				ArrayList<String> text = textList.get(0);
+				if (text != null && text.size() > 2) {
+					arrReContent[3][2] = text.get(2);
 				} else {
-					ArrayList<String> text = textList.get(1);
-					if (text != null && text.size() > 2) {
-						arrReContent[3][2] = ReplaceText.doReplace(text.get(2), "none", "none", "none", "none", zahlungsziel, "none", "none", "none", "none", "none");
-					} else {
-						arrReContent[3][2] = "Fehlender Text"; // Fallback für fehlende Einträge
-					}
+					arrReContent[3][2] = "Fehlender Text"; // Fallback für fehlende Einträge
 				}
 			} else {
-				arrReContent[3][2] = "Fehlende Textdaten"; // Fallback für fehlende Text-Liste
+				ArrayList<String> text = textList.get(1);
+				if (text != null && text.size() > 2) {
+					arrReContent[3][2] = ReplaceText.doReplace(text.get(2), "none", "none", "none", "none", zahlungsziel, "none", "none", "none", "none", "none");
+				} else {
+					arrReContent[3][2] = "Fehlender Text"; // Fallback für fehlende Einträge
+				}
 			}
 		} else {
-			arrReContent[3][2] = " ";
+			arrReContent[3][2] = "Fehlende Textdaten"; // Fallback für fehlende Text-Liste
 		}
 
-		if (arrYearBillOut != null && arrYearBillOut.length > iNumData && arrYearBillOut[iNumData] != null &&
-				arrYearBillOut[iNumData].length > 11 && arrYearBillOut[iNumData][11] != null) {
+		int tmpBank = Integer.parseInt(arrYearBill[iNumData][11]); // Datensatz-Id der ausgewählten Bankverbindung
 
-			String tmpBank = arrYearBillOut[iNumData][11];
-
-			ArrayList<ArrayList<String>> bankList = SQLmasterData.getArrListBank();
-			if (bankList != null && bankList.size() >= SQLmasterData.getAnzBank()) {
-
-				for (m = 0; m < SQLmasterData.getAnzBank(); m++) {
-					ArrayList<String> bank = bankList.get(m);
-
-					if (bank != null && bank.size() > 4 && bank.get(0) != null && bank.get(0).equals(tmpBank)) {
-						arrReContent[4][1] = bank.get(1) != null ? bank.get(1) : "";
-						arrReContent[4][2] = bank.get(2) != null ? bank.get(2) : "";
-						arrReContent[4][3] = bank.get(3) != null ? bank.get(3) : "";
-						arrReContent[4][4] = bank.get(4) != null ? bank.get(4) : "";
-						break; // Sobald die passende Bank gefunden ist, die Schleife beenden
-					}
-				}
-			} else {
-				System.out.println("Fehler: Bankliste ist null oder hat weniger Einträge als erwartet.");
-			}
-		} else {
-			System.out.println("Fehler: arrYearBillOut ist ungültig oder enthält keine Bankdaten.");
+	    String[] bankTmp = DataExportHelper.bankData(tmpBank);
+		for (int i = 0; i < 4; i++) {
+			arrReContent[4][i + 1] = bankTmp[i];
 		}
 
 	}
@@ -287,23 +237,17 @@ public class ExcelBill{
 			// Owner-Informationen in die Excel-Datei schreiben
 			//#######################################################################
 
-			Footer footer = ws.getFooter();
-			ArrayList<String> Owner = SQLmasterData.getOwner();
-			ArrayList<String> editOwner = new ArrayList<>();
+		    ArrayList<String> editOwner = new ArrayList<>();
+		    Footer footer = ws.getFooter();
 
-			editOwner.add(Owner.get(0) + "\n");
-			editOwner.add(Owner.get(1) + " | ");
-			editOwner.add(Owner.get(2) + " ");
-			editOwner.add(Owner.get(3) + " | ");
-			editOwner.add(Owner.get(4).toUpperCase() + "\n");
-			editOwner.add(Owner.get(5));
-			String senderOwner = Owner.get(0) + ", " + Owner.get(1) + ", " + Owner.get(2) + " " + Owner.get(3);
+			editOwner = DataExportHelper.ownerData();
+			String senderOwner = DataExportHelper.getSenderOwner();
 
 			// Schrift: Arial 9, Farbe: Grau 50% (#7F7F7F)
 			String style = "&\"Arial,Regular\"&9&K7F7F7F";
 
-			footer.setLeft(style + Owner.get(0) + " | Bearbeiter: " + LoadData.getStrAktUser());
-			footer.setCenter(style + Owner.get(7) + " | " + Owner.get(8));
+			footer.setLeft(style + DataExportHelper.getFooterLeft());
+			footer.setCenter(style + DataExportHelper.getFooterCenter());
 
 			Cell anOwner = ws.getRow(0).getCell(COLUMN_A); //Angebotsinhaber
 			Cell anOwnerSender = ws.getRow(3).getCell(COLUMN_B); //Absender über Adressfeld

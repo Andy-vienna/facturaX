@@ -1,4 +1,4 @@
-package org.andy.code.entity;
+package org.andy.code.entityMaster;
 
 import static org.andy.toolbox.sql.Update.sqlUpdate;
 
@@ -70,7 +70,7 @@ public class SQLproductiveData {
 				"', [IdArt03] = '" + arrWriteA[16] + "', [Menge03] = '" + arrWriteA[17] + "', [EPreis03] = '" + arrWriteA[18] +
 				"', [IdArt04] = '" + arrWriteA[19] + "', [Menge04] = '" + arrWriteA[20] + "', [EPreis04] = '" + arrWriteA[21] +
 				"', [IdArt05] = '" + arrWriteA[22] + "', [Menge05] = '" + arrWriteA[23] + "', [EPreis05] = '" + arrWriteA[24] +
-				"', [IdArt06] = '" + arrWriteA[25] + "', [Menge06] = '" + arrWriteA[26] + "', [EPreis06] = '" + arrWriteA[37] +
+				"', [IdArt06] = '" + arrWriteA[25] + "', [Menge06] = '" + arrWriteA[26] + "', [EPreis06] = '" + arrWriteA[27] +
 				"', [IdArt07] = '" + arrWriteA[28] + "', [Menge07] = '" + arrWriteA[29] + "', [EPreis07] = '" + arrWriteA[30] +
 				"', [IdArt08] = '" + arrWriteA[31] + "', [Menge08] = '" + arrWriteA[32] + "', [EPreis08] = '" + arrWriteA[33] +
 				"', [IdArt09] = '" + arrWriteA[34] + "', [Menge09] = '" + arrWriteA[35] + "', [EPreis09] = '" + arrWriteA[36] +

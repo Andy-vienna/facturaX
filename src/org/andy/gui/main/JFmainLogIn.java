@@ -13,8 +13,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,9 +34,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
 
-import org.andy.code.entity.SQLmasterData;
-import org.andy.code.entity.User;
-import org.andy.code.entity.UserRepository;
+import org.andy.code.entityMaster.User;
+import org.andy.code.entityMaster.UserRepository;
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
 import org.andy.gui.misc.ImagePanel;
@@ -243,11 +240,11 @@ public class JFmainLogIn {
 
 				if(bLogIn) {
 					userRights = rights; // user rights for the current user
-					try {
-						SQLmasterData.loadBaseData();
-					} catch (SQLException | ParseException | ClassNotFoundException e1) {
-						logger.error("createMainPanel() - " + e1);
-					}
+					//try {
+					//	SQLmasterData.loadBaseData();
+					//} catch (SQLException | ParseException | ClassNotFoundException e1) {
+					//	logger.error("createMainPanel() - " + e1);
+					//}
 					mainPanel.setVisible(false);
 				} else {
 					JOptionPane.showMessageDialog(null, "User oder Passwort falsch ...", "Anmeldefehler", JOptionPane.ERROR_MESSAGE);

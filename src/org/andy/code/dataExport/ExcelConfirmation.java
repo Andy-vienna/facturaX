@@ -12,9 +12,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
-
-import org.andy.code.entity.SQLmasterData;
 import org.andy.code.main.LoadData;
 import org.andy.code.qr.ZxingQR;
 import org.andy.gui.main.JFoverview;
@@ -97,7 +94,6 @@ public class ExcelConfirmation{
 		int x = 0;
 		int y = 0;
 		int n = 0;
-		int m = 0;
 
 		arrYearOffer = JFoverview.getArrYearAN();
 
@@ -110,30 +106,9 @@ public class ExcelConfirmation{
 		arrAbContent[0][0] = arrYearOffer[iNumData][11]; // Anzahl Zeilen für Angebot
 		String tmp = arrYearOffer[iNumData][8];
 
-		for (m = 0; m < SQLmasterData.getAnzKunde(); m++) {
-			List<String> kunde = SQLmasterData.getArrListKunde().get(m);
-
-			if (kunde != null && !kunde.isEmpty() && kunde.get(0) != null && kunde.get(0).equals(tmp)) {
-				iNumKunde = m;
-				break;
-			}
-		}
-		if (m >= SQLmasterData.getAnzKunde()) {
-			System.out.println("Fehler: Kunde nicht gefunden.");
-			return; // Verhindert, dass ein ungültiger Index verwendet wird
-		}
-
-		List<String> kunde = SQLmasterData.getArrListKunde().get(m);
-
-		// Sicherheitsprüfung, ob Kunde null oder zu klein ist
-		if (kunde == null || kunde.size() < 15) {
-			System.out.println("Fehler: Kundendaten unvollständig.");
-			return;
-		}
-
-		// Kopiere die Kundendaten sicher in arrReContent
-		for (x = 0; x < 15; x++) {
-			arrAbContent[1][x] = kunde.get(x) != null ? kunde.get(x) : ""; // Falls null, ersetze mit leerem String
+		String[] kundeTmp = DataExportHelper.kundeData(tmp);
+		for (int i = 0; i < 16; i++) {
+			arrAbContent[1][i + 1] = kundeTmp[i];
 		}
 
 		arrAbContent[2][1] = arrYearOffer[iNumData][6]; // Datum
@@ -154,7 +129,7 @@ public class ExcelConfirmation{
 			y = y + 3;
 		}
 
-		ArrayList<ArrayList<String>> textList = SQLmasterData.getArrListText();
+		ArrayList<ArrayList<String>> textList = DataExportHelper.textData();
 		if (textList != null && textList.size() >= 5) {
 			for (x = 0; x < 5; x++) { // Texte
 				ArrayList<String> text = textList.get(x);
@@ -168,31 +143,11 @@ public class ExcelConfirmation{
 			System.out.println("Fehler: Textliste ist null oder hat zu wenige Einträge.");
 		}
 
-		// Sicherstellen, dass arrYearOffer gültige Daten enthält
-		if (arrYearOffer != null && arrYearOffer.length > iNumData && arrYearOffer[iNumData] != null &&
-				arrYearOffer[iNumData].length > 9 && arrYearOffer[iNumData][9] != null) {
+		int tmpBank = Integer.parseInt(arrYearOffer[iNumData][9]); // Datensatz-Id der ausgewählten Bankverbindung
 
-			String tmpBank = arrYearOffer[iNumData][9];
-
-			ArrayList<ArrayList<String>> bankList = SQLmasterData.getArrListBank();
-			if (bankList != null && bankList.size() >= SQLmasterData.getAnzBank()) {
-
-				for (m = 0; m < SQLmasterData.getAnzBank(); m++) {
-					ArrayList<String> bank = bankList.get(m);
-
-					if (bank != null && bank.size() > 4 && bank.get(0) != null && bank.get(0).equals(tmpBank)) {
-						arrAbContent[4][1] = bank.get(1) != null ? bank.get(1) : "";
-						arrAbContent[4][2] = bank.get(2) != null ? bank.get(2) : "";
-						arrAbContent[4][3] = bank.get(3) != null ? bank.get(3) : "";
-						arrAbContent[4][4] = bank.get(4) != null ? bank.get(4) : "";
-						break; // Beende die Schleife, wenn die Bank gefunden wurde
-					}
-				}
-			} else {
-				System.out.println("Fehler: Bankliste ist null oder hat weniger Einträge als erwartet.");
-			}
-		} else {
-			System.out.println("Fehler: arrYearOffer ist ungültig oder enthält keine Bankdaten.");
+	    String[] bankTmp = DataExportHelper.bankData(tmpBank);
+		for (int i = 0; i < 4; i++) {
+			arrAbContent[4][i + 1] = bankTmp[i];
 		}
 
 	}
@@ -230,23 +185,17 @@ public class ExcelConfirmation{
 			// Owner-Informationen in die Excel-Datei schreiben
 			//#######################################################################
 
-			Footer footer = ws.getFooter();
-			ArrayList<String> Owner = SQLmasterData.getOwner();
 			ArrayList<String> editOwner = new ArrayList<>();
+		    Footer footer = ws.getFooter();
 
-			editOwner.add(Owner.get(0) + "\n");
-			editOwner.add(Owner.get(1) + " | ");
-			editOwner.add(Owner.get(2) + " ");
-			editOwner.add(Owner.get(3) + " | ");
-			editOwner.add(Owner.get(4).toUpperCase() + "\n");
-			editOwner.add(Owner.get(5));
-			String senderOwner = Owner.get(0) + ", " + Owner.get(1) + ", " + Owner.get(2) + " " + Owner.get(3);
+			editOwner = DataExportHelper.ownerData();
+			String senderOwner = DataExportHelper.getSenderOwner();
 
 			// Schrift: Arial 9, Farbe: Grau 50% (#7F7F7F)
 			String style = "&\"Arial,Regular\"&9&K7F7F7F";
 
-			footer.setLeft(style + Owner.get(0) + " | Bearbeiter: " + LoadData.getStrAktUser());
-			footer.setCenter(style + Owner.get(7) + " | " + Owner.get(8));
+			footer.setLeft(style + DataExportHelper.getFooterLeft());
+			footer.setCenter(style + DataExportHelper.getFooterCenter());
 
 			Cell anOwner = ws.getRow(0).getCell(COLUMN_A); //Angebotsinhaber
 			Cell anOwnerSender = ws.getRow(3).getCell(COLUMN_B); //Absender über Adressfeld

@@ -20,12 +20,10 @@ import org.andy.code.dataExport.ExcelConfirmation;
 import org.andy.code.dataExport.ExcelMahnung;
 import org.andy.code.dataExport.ExcelOffer;
 import org.andy.code.dataExport.ExcelReminder;
-import org.andy.code.entity.SQLmasterData;
-import org.andy.code.entity.SQLproductiveData;
+import org.andy.code.entityMaster.SQLproductiveData;
 import org.andy.code.main.overview.edit.Expenses;
 import org.andy.code.main.overview.edit.Purchase;
 import org.andy.code.main.overview.edit.SvTax;
-import org.andy.code.main.overview.result.TaxData;
 import org.andy.code.main.overview.table.LoadPurchase;
 import org.andy.code.main.overview.table.LoadBillOut;
 import org.andy.code.main.overview.table.LoadExpenses;
@@ -35,7 +33,6 @@ import org.andy.gui.bill.out.JFnewRa;
 import org.andy.gui.bill.out.JFstatusRa;
 import org.andy.gui.file.JFfileView;
 import org.andy.gui.main.JFoverview;
-import org.andy.gui.main.settings_panels.TextPanel;
 import org.andy.gui.offer.JFconfirmA;
 import org.andy.gui.offer.JFnewA;
 import org.andy.gui.offer.JFstatusA;
@@ -176,18 +173,6 @@ public class LoadData {
 		// ------------------------------------------------------------------------------
 		// Datenbank-String zusammenbauen
 		// ------------------------------------------------------------------------------
-
-		String tmpConnA = "jdbc:sqlserver://" + LoadData.strDBComputer + ":" + LoadData.strDBPort + ";database="
-				+ LoadData.strDBNameSource + ";user=" + LoadData.strDBUser + ";password=" + LoadData.strDBPass
-				+ ";encrypt=" + LoadData.strDBencrypted + ";trustServerCertificate=" + LoadData.strDBServerCert
-				+ ";loginTimeout=30;";
-
-		SQLmasterData.setsConn(tmpConnA);
-		//JFmainLogIn.setsConn(tmpConnA);
-		TextPanel.setsConnMaster(tmpConnA);
-		JFnewA.setsConnSource(tmpConnA);
-		JFnewRa.setsConnSource(tmpConnA);
-		TaxData.setsConn(tmpConnA);
 
 		String tmpConnB = "jdbc:sqlserver://" + LoadData.strDBComputer + ":" + LoadData.strDBPort + ";database="
 				+ LoadData.strDBNameDest + ";user=" + LoadData.strDBUser + ";password=" + LoadData.strDBPass

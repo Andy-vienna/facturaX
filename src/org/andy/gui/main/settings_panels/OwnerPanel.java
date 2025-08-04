@@ -18,8 +18,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
-import org.andy.code.entity.Owner;
-import org.andy.code.entity.OwnerRepository;
+import org.andy.code.entityMaster.Owner;
+import org.andy.code.entityMaster.OwnerRepository;
 import org.andy.gui.main.JFoverview;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -210,4 +210,8 @@ public class OwnerPanel extends JPanel {
 
         return new Consumer[] { insert, update };
     }
+
+	public List<Owner> getOwnerListe() {
+		return ownerListe;
+	}
 }

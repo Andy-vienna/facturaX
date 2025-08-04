@@ -9,7 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import org.andy.code.entity.SQLmasterData;
+import org.andy.code.entityMaster.Kunde;
+import org.andy.code.entityMaster.KundeRepository;
 import org.andy.code.main.LoadData;
 import org.andy.gui.main.JFoverview;
 import org.apache.logging.log4j.LogManager;
@@ -126,23 +127,25 @@ public class LoadBillOut {
 	//###################################################################################################################################################
 	
 	static String searchKunde(String sKdNr) {
-		List<ArrayList<String>> kundenListe = SQLmasterData.getArrListKunde();
+		KundeRepository kundeRepository = new KundeRepository();
+	    List<Kunde> kundeListe = new ArrayList<>();
+	    kundeListe.addAll(kundeRepository.findAll());
 
 		// Prüfen, ob die Kundenliste null ist
-		if (kundenListe == null || kundenListe.isEmpty()) {
+		if (kundeListe.size() == 0) {
 			return sKdNr; // Falls die Liste leer oder null ist, gib die ursprüngliche Kundennummer zurück.
 		}
 
-		for (int kd = 0; kd < kundenListe.size(); kd++) {
-			ArrayList<String> kunde = kundenListe.get(kd);
+		for (int kd = 0; kd < kundeListe.size(); kd++) {
+			Kunde kunde = kundeListe.get(kd);
 
 			// Prüfen, ob die Kunde-Liste null oder zu kurz ist
-			if (kunde == null || kunde.size() < 2 || kunde.get(0) == null) {
+			if (kunde.getId() == null) {
 				continue; // Überspringe ungültige Einträge
 			}
 
-			if (kunde.get(0).equals(sKdNr)) {
-				return kunde.get(1); // Gib den Kundennamen zurück
+			if (kunde.getId().equals(sKdNr)) {
+				return kunde.getName(); // Gib den Kundennamen zurück
 			}
 		}
 		return sKdNr; // Falls keine Übereinstimmung gefunden wurde, gib die Nummer zurück

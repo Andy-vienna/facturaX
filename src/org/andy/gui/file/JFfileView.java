@@ -22,8 +22,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -39,6 +37,7 @@ import org.apache.logging.log4j.Logger;
 import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.Dispatch;
 
+import org.andy.code.entityMaster.Kunde;
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
 import org.andy.toolbox.misc.SetFrameIcon;
@@ -74,13 +73,13 @@ public class JFfileView extends JFrame {
 	private static JButton btnSendMail1, btnSendMail2, btnSendMail3, btnSendMail4, btnSendMail5, btnSendMail6, btnSendMail7;
 
 	private static String sNummer = null;
-	private static ArrayList<String> lKunde = null;
+	private static Kunde lKunde = null;
 	private static int isFile = 0;
 
 	//###################################################################################################################################################
 	//###################################################################################################################################################
 
-	public static void loadGUI(String sID, ArrayList<String> kunde) {
+	public static void loadGUI(String sID, Kunde kunde) {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -488,7 +487,7 @@ public class JFfileView extends JFrame {
 					logger.error("error cutting filename from path - " + CompleteFileName + " - " + e1);
 				}
 
-				String[] zeilen = {"Sehr geehrte(r) " + lKunde.get(6) + " " + lKunde.get(7) + ","
+				String[] zeilen = {"Sehr geehrte(r) " + lKunde.getPronomen() + " " + lKunde.getPerson() + ","
 						, "gerne sende ich Ihnen das Angebot (" + FileName + ") zu Ihrer Anfrage."
 						, ""
 						, "Mit freundlichen Grüßen"
@@ -496,7 +495,7 @@ public class JFfileView extends JFrame {
 						, "Andreas Fischer"};
 				String sText = String.join(System.lineSeparator(), zeilen);
 
-				sendMail(lKunde.get(14), FileName, sText);
+				sendMail(lKunde.geteBillMail(), FileName, sText);
 			}
 		});
 		btnSendMail2.addActionListener(new ActionListener() {
@@ -511,7 +510,7 @@ public class JFfileView extends JFrame {
 					logger.error("error cutting filename from path - " + CompleteFileName + " - " + e1);
 				}
 
-				String[] zeilen = {"Sehr geehrte(r) " + lKunde.get(6) + " " + lKunde.get(7) + ","
+				String[] zeilen = {"Sehr geehrte(r) " + lKunde.getPronomen() + " " + lKunde.getPerson() + ","
 						, "gerne sende ich Ihnen die Auftragsbestätigung (" + FileName + ") zu Ihrer Bestellung."
 						, ""
 						, "Mit freundlichen Grüßen"
@@ -519,7 +518,7 @@ public class JFfileView extends JFrame {
 						, "Andreas Fischer"};
 				String sText = String.join(System.lineSeparator(), zeilen);
 
-				sendMail(lKunde.get(14), FileName, sText);
+				sendMail(lKunde.geteBillMail(), FileName, sText);
 			}
 		});
 		btnSendMail3.addActionListener(new ActionListener() {
@@ -540,7 +539,7 @@ public class JFfileView extends JFrame {
 					logger.error("error cutting filename from path - " + CompleteFileName + " - " + e1);
 				}
 
-				String[] zeilen = {"Sehr geehrte(r) " + lKunde.get(6) + " " + lKunde.get(7) + ","
+				String[] zeilen = {"Sehr geehrte(r) " + lKunde.getPronomen() + " " + lKunde.getPerson() + ","
 						, "in der Anlage sende ich Ihnen meine Rechung (" + FileName + ") zur erfolgten Dienstleistung."
 						, ""
 						, "Mit freundlichen Grüßen"
@@ -548,7 +547,7 @@ public class JFfileView extends JFrame {
 						, "Andreas Fischer"};
 				String sText = String.join(System.lineSeparator(), zeilen);
 
-				sendMail(lKunde.get(14), FileName, sText);
+				sendMail(lKunde.geteBillMail(), FileName, sText);
 			}
 		});
 		btnSendMail5.addActionListener(new ActionListener() {
@@ -563,7 +562,7 @@ public class JFfileView extends JFrame {
 					logger.error("error cutting filename from path - " + CompleteFileName + " - " + e1);
 				}
 
-				String[] zeilen = {"Sehr geehrte(r) " + lKunde.get(6) + " " + lKunde.get(7) + ","
+				String[] zeilen = {"Sehr geehrte(r) " + lKunde.getPronomen() + " " + lKunde.getPerson() + ","
 						, ""
 						, "in der Hektik des Geschäftsalltags kann es schon mal passieren, dass etwas untergeht."
 						, "Ich sende Ihnen meine Zahlungserinnerung (" + FileName + "), da die zugehörige Rechnung noch offen ist."
@@ -573,7 +572,7 @@ public class JFfileView extends JFrame {
 						, "Andreas Fischer"};
 				String sText = String.join(System.lineSeparator(), zeilen);
 
-				sendMail(lKunde.get(14), FileName, sText);
+				sendMail(lKunde.geteBillMail(), FileName, sText);
 			}
 		});
 		btnSendMail6.addActionListener(new ActionListener() {
@@ -588,7 +587,7 @@ public class JFfileView extends JFrame {
 					logger.error("error cutting filename from path - " + CompleteFileName + " - " + e1);
 				}
 
-				String[] zeilen = {"Sehr geehrte(r) " + lKunde.get(6) + " " + lKunde.get(7) + ","
+				String[] zeilen = {"Sehr geehrte(r) " + lKunde.getPronomen() + " " + lKunde.getPerson() + ","
 						, ""
 						, "leider konnte ich trotz bereits zugesendeter Zahlungserinnerung keinen Zahlungseingang auf meinem Konto feststellen."
 						, "In der Anlage sende ich Ihnen die 1. Mahnung (" + FileName + ") zur Begleichung der offenen Rechnung."
@@ -598,7 +597,7 @@ public class JFfileView extends JFrame {
 						, "Andreas Fischer"};
 				String sText = String.join(System.lineSeparator(), zeilen);
 
-				sendMail(lKunde.get(14), FileName, sText);
+				sendMail(lKunde.geteBillMail(), FileName, sText);
 			}
 		});
 		btnSendMail7.addActionListener(new ActionListener() {
@@ -613,7 +612,7 @@ public class JFfileView extends JFrame {
 					logger.error("error cutting filename from path - " + CompleteFileName + " - " + e1);
 				}
 
-				String[] zeilen = {"Sehr geehrte(r) " + lKunde.get(6) + " " + lKunde.get(7) + ","
+				String[] zeilen = {"Sehr geehrte(r) " + lKunde.getPronomen() + " " + lKunde.getPerson() + ","
 						, ""
 						, "leider konnte ich trotz bereits zugesendeter 1. Mahnung keinen Zahlungseingang auf meinem Konto feststellen."
 						, "In der Anlage sende ich Ihnen die 2. Mahung (" + FileName + ") zur Begleichung der offenen Rechnung."
@@ -623,7 +622,7 @@ public class JFfileView extends JFrame {
 						, "Andreas Fischer"};
 				String sText = String.join(System.lineSeparator(), zeilen);
 
-				sendMail(lKunde.get(14), FileName, sText);
+				sendMail(lKunde.geteBillMail(), FileName, sText);
 			}
 		});
 

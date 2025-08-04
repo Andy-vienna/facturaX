@@ -11,7 +11,6 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-import org.andy.code.entity.SQLmasterData;
 import org.andy.code.main.LoadData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,8 +50,6 @@ public class ExcelP109a {
 		sExcelOut = LoadData.getWorkPath() + "\\Mitteilung_nach_P109a_" + LoadData.getStrAktGJ() + ".xlsx";
 		sPdfOut = LoadData.getWorkPath() + "\\Mitteilung_nach_P109a_" + LoadData.getStrAktGJ() + ".pdf";
 		
-		ArrayList<String> Owner = SQLmasterData.getOwner();
-		
 		//#######################################################################
 		// Rechnungs-Excel erzeugen
 		//#######################################################################
@@ -89,19 +86,16 @@ public class ExcelP109a {
 			// Owner-Informationen in die Excel-Datei schreiben
 			//#######################################################################
 
-			Footer footer = ws.getFooter();
 			ArrayList<String> editOwner = new ArrayList<>();
+		    Footer footer = ws.getFooter();
 
-			editOwner.add(Owner.get(6) + "\n");
-			editOwner.add(Owner.get(1) + " | ");
-			editOwner.add(Owner.get(2) + " ");
-			editOwner.add(Owner.get(3));
-			
-			// Schrift: Arial 7, Farbe: Grau 50% (#7F7F7F)
-			String style = "&\"Arial,Regular\"&7&K7F7F7F";
+			editOwner = DataExportHelper.ownerData();
 
-			footer.setLeft(style + Owner.get(6));
-			footer.setCenter(style + Owner.get(7) + " | " + Owner.get(8));
+			// Schrift: Arial 9, Farbe: Grau 50% (#7F7F7F)
+			String style = "&\"Arial,Regular\"&9&K7F7F7F";
+
+			footer.setLeft(style + DataExportHelper.getFooterLeft());
+			footer.setCenter(style + DataExportHelper.getFooterCenter());
 
 			XSSFRichTextString OwnerText = new XSSFRichTextString();
 
@@ -125,7 +119,7 @@ public class ExcelP109a {
 			// Zellwerte beschreiben
 			//#######################################################################
 			owner.setCellValue(OwnerText); //Name
-			taxID.setCellValue("Steuernummer: " + Owner.get(10)); //Steuernummer
+			taxID.setCellValue("Steuernummer: " + DataExportHelper.getSteuerNummer()); //Steuernummer
 			year.setCellValue(LoadData.getStrAktGJ()); //Wirtschaftsjahr
 			
 			P109In.setCellValue(listContent.get(0).doubleValue()); //Einkünfte aus selbstständiger Arbeit

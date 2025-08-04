@@ -2,7 +2,8 @@ package org.andy.gui.bill.out;
 
 import static org.andy.toolbox.misc.CreateObject.createButton;
 import static org.andy.toolbox.misc.Tools.FormatIBAN;
-import static org.andy.toolbox.misc.Tools.cutBack2;
+import static org.andy.toolbox.misc.Tools.cutBack;
+import static org.andy.toolbox.misc.Tools.cutFront;
 import static org.andy.toolbox.sql.Insert.sqlInsert;
 
 import java.awt.BorderLayout;
@@ -54,7 +55,14 @@ import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
 import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
 import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
-import org.andy.code.entity.SQLmasterData;
+import org.andy.code.entityMaster.Artikel;
+import org.andy.code.entityMaster.ArtikelRepository;
+import org.andy.code.entityMaster.Bank;
+import org.andy.code.entityMaster.BankRepository;
+import org.andy.code.entityMaster.Kunde;
+import org.andy.code.entityMaster.KundeRepository;
+import org.andy.code.entityMaster.ReNr;
+import org.andy.code.entityMaster.ReNrRepository;
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
 import org.andy.code.main.overview.table.LoadBillOut;
@@ -67,7 +75,6 @@ public class JFnewRa extends JFrame {
 
 	private static final Logger logger = LogManager.getLogger(JFnewRa.class);
 
-	private static String sConnSource;
 	private static String sConnDest;
 	private static final String TBL_BILL_OUT = "tbl_reOUT";
 
@@ -88,14 +95,6 @@ public class JFnewRa extends JFrame {
 	private static String sDatumVon = null;
 	private static String sDatumBis = null;
 
-	private static String[][] arrArtikel = new String[100][5];
-	private static String[][] arrBank = new String[20][6];
-	private static String[][] arrKunde = new String[100][16];
-
-	private static List<String> ARdata = new ArrayList<>();
-	private static List<String> BKdata = new ArrayList<>();
-	private static List<String> KDdata = new ArrayList<>();
-
 	private static BigDecimal bdNetto;
 	private static BigDecimal bdUstSatz;
 	private static BigDecimal bdUSt;
@@ -108,28 +107,41 @@ public class JFnewRa extends JFrame {
 	private static String[] sPosText = new String[13];
 	private static String[] arrWriteR = new String[51];
 
-	private static int iSelKunde;
-	private static int iSelBank;
 	private static int iNumFrame;
-	private static BigDecimal bdRabatt;
 	private static boolean bKundeSel = false;
 	private static boolean bBankSel = false;
 	private static boolean bArtSel = false;
 	private static boolean bRevCharge = false;
 
-	private static String sTsTp;
-	private static String sTsRk;
+	private static KundeRepository kundeRepository = new KundeRepository();
+	private static List<Kunde> kundeListe = new ArrayList<>();
+    private static Kunde kundeLeer = new Kunde();
+    private static Kunde kunde;
+    private static BankRepository bankRepository = new BankRepository();
+	private static List<Bank> bankListe = new ArrayList<>();
+	private static Bank bankLeer = new Bank();
+	private static Bank bank;
+	private static ArtikelRepository artikelRepository = new ArtikelRepository();
+	private static List<Artikel> artikelListe = new ArrayList<>();
+    private static Artikel artikelLeer = new Artikel();
+    private static Artikel artikel;
 
 	//###################################################################################################################################################
 	//###################################################################################################################################################
 
-	public static void showGUI(String sDate, String sRE) {
+	public static void showGUI() {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				try {
+					kundeLeer.setId(""); kundeLeer.setName(""); kundeLeer.setStrasse(""); kundeLeer.setPlz(""); kundeLeer.setOrt("");
+					kundeLeer.setLand(""); kundeLeer.setPronomen(""); kundeLeer.setPerson("");kundeLeer.setUstid(""); kundeLeer.setTaxvalue("");
+					kundeLeer.setDeposit(""); kundeLeer.setZahlungsziel(""); kundeLeer.setLeitwegId(""); kundeLeer.seteBillTyp("");
+					kundeLeer.seteBillMail(""); kundeLeer.seteBillPhone(""); // Leeren Listeneintrag Kunde erzeugen
+					bankLeer.setBankName(""); bankLeer.setIban(""); bankLeer.setBic(""); bankLeer.setKtoName(""); // Leeren Listeneintrag Bank erzeugen
+					artikelLeer.setId(""); artikelLeer.setText(""); artikelLeer.setWert(null); // Leeren Listeneintrag Artikel erzeugen
 					fillVector();
-					JFnewRa frame = new JFnewRa(sDate, sRE);
+					JFnewRa frame = new JFnewRa();
 					frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 					frame.setVisible(true);
 				} catch (Exception e1) {
@@ -139,7 +151,7 @@ public class JFnewRa extends JFrame {
 		});
 	}
 
-	public JFnewRa(String sDate, String sRE) {
+	public JFnewRa() {
 
 		try (InputStream is = JFnewRa.class.getResourceAsStream("/icons/edit_color.png")) {
 			if (is == null) {
@@ -189,7 +201,17 @@ public class JFnewRa extends JFrame {
 		JLabel lbl28 = new JLabel(BIS);
 		JLabel lbl29 = new JLabel("Referenz");
 
-		JComboBox<String> cmbKunde = new JComboBox<>(KDdata.toArray(new String[0]));
+		String[] kundeTexte = kundeListe.stream()
+                .map(Kunde::getName)   // oder .getId(), oder beliebiges Feld
+                .toArray(String[]::new);
+		String[] bankTexte = bankListe.stream()
+                .map(Bank::getBankName)   // oder .getId(), oder beliebiges Feld
+                .toArray(String[]::new);
+		String[] artikelTexte = artikelListe.stream()
+                .map(Artikel::getText)   // oder .getId(), oder beliebiges Feld
+                .toArray(String[]::new);
+		
+		JComboBox<String> cmbKunde = new JComboBox<>(kundeTexte);
 		JTextField textKdNr = new JTextField();
 		JTextField textKdName = new JTextField();
 		JTextField textKdStrasse = new JTextField();
@@ -203,11 +225,11 @@ public class JFnewRa extends JFrame {
 		JTextField textKdRabatt = new JTextField();
 		JTextField textKdZahlZiel = new JTextField();
 		JCheckBox chkRevCharge = new JCheckBox("ReverseCharge");
-		JComboBox<String> cmbBank = new JComboBox<>(BKdata.toArray(new String[0]));
+		JComboBox<String> cmbBank = new JComboBox<>(bankTexte);
 		JTextField textBank = new JTextField();
 		JTextField textIBAN = new JTextField();
 		JTextField textBIC = new JTextField();
-		JTextField textNummer = new JTextField(sRE);
+		JTextField textNummer = new JTextField(setReNummer());
 		JTextField textReferenz = new JTextField();
 		JButton btnDoExport = null;
 		try {
@@ -420,7 +442,7 @@ public class JFnewRa extends JFrame {
 			lblPos[x].setHorizontalAlignment(SwingConstants.CENTER);
 			lblPos[x].setBounds(320, 30 + ((x - 1) * 20), 20, 20);
 			contentPanel.add(lblPos[x]);
-			cbPos[x] = new JComboBox<>(ARdata.toArray(new String[0]));
+			cbPos[x] = new JComboBox<>(artikelTexte);
 			cbPos[x].setBounds(345,  30 + ((x - 1) * 20), 440, 20);
 			cbPos[x].setSelectedIndex(0);
 			contentPanel.add(cbPos[x]);
@@ -513,8 +535,6 @@ public class JFnewRa extends JFrame {
 				sReNummer = null;
 				sReDatum = null;
 				sReReferenz = null;
-				iSelKunde = 0;
-				iSelBank = 0;
 				iNumFrame = 0;
 				bKundeSel = false;
 				bBankSel = false;
@@ -562,28 +582,27 @@ public class JFnewRa extends JFrame {
 					textKdRabatt.setText("");
 					textKdZahlZiel.setText("");
 					chkRevCharge.setVisible(false);
-					iSelKunde = cmbKunde.getSelectedIndex();
 					bKundeSel = false;
 				} else {
-					textKdNr.setText(arrKunde[cmbKunde.getSelectedIndex()][1]);
-					textKdName.setText(arrKunde[cmbKunde.getSelectedIndex()][2]);
-					textKdStrasse.setText(arrKunde[cmbKunde.getSelectedIndex()][3]);
-					textKdPLZ.setText(arrKunde[cmbKunde.getSelectedIndex()][4]);
-					textKdOrt.setText(arrKunde[cmbKunde.getSelectedIndex()][5]);
-					textKdLand.setText(arrKunde[cmbKunde.getSelectedIndex()][6]);
-					textKdPronom.setText(arrKunde[cmbKunde.getSelectedIndex()][7]);
-					textKdDuty.setText(arrKunde[cmbKunde.getSelectedIndex()][8]);
-					textKdUID.setText(arrKunde[cmbKunde.getSelectedIndex()][9]);
-					textKdUSt.setText(arrKunde[cmbKunde.getSelectedIndex()][10]);
-					textKdRabatt.setText(arrKunde[cmbKunde.getSelectedIndex()][11]);
-					bdRabatt = new BigDecimal(arrKunde[cmbKunde.getSelectedIndex()][11]);
-					textKdZahlZiel.setText(arrKunde[cmbKunde.getSelectedIndex()][12]);
+					int idx = cmbKunde.getSelectedIndex();
+		            kunde = kundeListe.get(idx);
+					textKdNr.setText(kunde.getId());
+					textKdName.setText(kunde.getName());
+					textKdStrasse.setText(kunde.getStrasse());
+					textKdPLZ.setText(kunde.getPlz());
+					textKdOrt.setText(kunde.getOrt());
+					textKdLand.setText(kunde.getLand());
+					textKdPronom.setText(kunde.getPronomen());
+					textKdDuty.setText(kunde.getPerson());
+					textKdUID.setText(kunde.getUstid());
+					textKdUSt.setText(kunde.getTaxvalue());
+					textKdRabatt.setText(kunde.getDeposit());
+					textKdZahlZiel.setText(kunde.getZahlungsziel());
 					if(textKdUSt.getText().equals("0")) {
 						chkRevCharge.setVisible(true);
 					}else {
 						chkRevCharge.setVisible(false);
 					}
-					iSelKunde = cmbKunde.getSelectedIndex();
 					bKundeSel = true;
 				}
 			}
@@ -605,13 +624,13 @@ public class JFnewRa extends JFrame {
 					textBank.setText("");
 					textIBAN.setText("");
 					textBIC.setText("");
-					iSelBank = cmbBank.getSelectedIndex();
 					bBankSel = false;
 				} else {
-					textBank.setText(arrBank[cmbBank.getSelectedIndex()][2]);
-					textIBAN.setText(FormatIBAN(arrBank[cmbBank.getSelectedIndex()][3]));
-					textBIC.setText(arrBank[cmbBank.getSelectedIndex()][4]);
-					iSelBank = cmbBank.getSelectedIndex();
+					int idx = cmbBank.getSelectedIndex();
+		            bank = bankListe.get(idx);
+					textBank.setText(bank.getBankName());
+					textIBAN.setText(FormatIBAN(bank.getIban()));
+					textBIC.setText(bank.getBic());
 					bBankSel = true;
 				}
 			}
@@ -957,23 +976,19 @@ public class JFnewRa extends JFrame {
 								String sSQLStatementA = "INSERT INTO " + tblName + " VALUES ('" + sValues + ")";
 
 								sqlInsert(sConnDest, sSQLStatementA);
-
-								String sSQLStatementB = "INSERT INTO [tblRE] VALUES ('" + tmpArrR[0] + "')";
-
-								sqlInsert(sConnSource, sSQLStatementB);
+								
+								ReNrRepository reNrRepository = new ReNrRepository();
+							    
+							    ReNr reNr = new ReNr();
+							    reNr.setReNr(tmpArrR[0]);
+							    
+							    reNrRepository.insert(reNr);
 
 							} catch (SQLException | ClassNotFoundException e1) {
 								logger.error("error creating new outgoing bill - " + e1);
 							}
 
-							try {
-								SQLmasterData.loadNummernkreis();
-							} catch (ClassNotFoundException | SQLException | IOException e2) {
-								logger.error("error creating new outgoing bill - " + e2);
-							}
 							LoadBillOut.loadAusgangsRechnung(false);
-							JFoverview.btnPrintREa.setEnabled(false);
-							JFoverview.btnStateREa.setEnabled(false);
 							JFoverview.actScreen();
 							dispose();
 							Runtime.getRuntime().gc();
@@ -997,26 +1012,19 @@ public class JFnewRa extends JFrame {
 	//###################################################################################################################################################
 
 	private static void fillVector() {
-
-		arrArtikel = SQLmasterData.getsArrArtikel();
-		arrBank = SQLmasterData.getsArrBank();
-		arrKunde = SQLmasterData.getsArrKunde();
-
-		ARdata.clear();
-		BKdata.clear();
-		KDdata.clear();
-		ARdata.add(" ");
-		for (int x = 1; (x - 1) < SQLmasterData.getAnzArtikel(); x++) {
-			ARdata.add(arrArtikel[x][2]);
-		}
-		BKdata.add(" ");
-		for (int x = 1; (x - 1) < SQLmasterData.getAnzBank(); x++) {
-			BKdata.add(arrBank[x][2]);
-		}
-		KDdata.add(" ");
-		for (int x = 1; (x - 1) < SQLmasterData.getAnzKunde(); x++) {
-			KDdata.add(arrKunde[x][2]);
-		}
+		
+		kundeListe.clear();
+        kundeListe.add(kundeLeer); // falls du immer einen Dummy-Eintrag vorne willst        
+        kundeListe.addAll(kundeRepository.findAll());
+		
+		bankListe.clear();
+        bankListe.add(bankLeer); // falls du immer einen Dummy-Eintrag vorne willst        
+        bankListe.addAll(bankRepository.findAll());
+        
+        artikelListe.clear();
+        artikelListe.add(artikelLeer); // falls du immer einen Dummy-Eintrag vorne willst        
+        artikelListe.addAll(artikelRepository.findAll());
+        
 	}
 
 	private static BigDecimal multi(BigDecimal a, BigDecimal b) {
@@ -1038,9 +1046,9 @@ public class JFnewRa extends JFrame {
 		arrWriteR[5] = sReDatum; // Rechnungsdatum
 		arrWriteR[6] = sDatumVon + "-" + sDatumBis; // Leistungszeitraum
 		arrWriteR[7] = sReReferenz; // Kundenreferenz
-		arrWriteR[8] = arrKunde[iSelKunde][1];
+		arrWriteR[8] = kunde.getId();
 		arrWriteR[9] = String.valueOf(JFnewRa.bRevCharge);
-		arrWriteR[10] = arrBank[iSelBank][1]; // Index der Bankverbindung
+		arrWriteR[10] = String.valueOf(bank.getId()); // Index der Bankverbindung
 
 		while(y < (JFnewRa.getiNumFrame() * 3)){
 			arrWriteR[y + 14] = JFnewRa.sPosText[x];
@@ -1052,7 +1060,7 @@ public class JFnewRa extends JFrame {
 			y = y + 3;
 		}
 
-		String sTmp = arrKunde[iSelKunde][10];
+		String sTmp = kunde.getTaxvalue();
 		BigDecimal bdTmpA = new BigDecimal(sTmp).setScale(2, RoundingMode.HALF_UP);
 		BigDecimal bdA = new BigDecimal("100").setScale(2, RoundingMode.HALF_UP);
 		BigDecimal bdTmpB = bdTmpA.divide(bdA).setScale(2, RoundingMode.HALF_UP);
@@ -1082,56 +1090,12 @@ public class JFnewRa extends JFrame {
 					txtEP.setBackground(Color.WHITE);
 					bArtSel = false;
 				} else {
-					if(bKundeSel && bBankSel) {
-
-					}else {
-						JOptionPane.showMessageDialog(null, "Kunde oder Bank nicht ausgewählt ...", "Rechnung erstellen", JOptionPane.INFORMATION_MESSAGE);
-						cbPos.setSelectedIndex(0);
-						return;
-					}
-					JFnewRa.sPosText[iNr] = arrArtikel[cbPos.getSelectedIndex()][2];
-					if(cbPos.getSelectedItem().toString().length() > 14) {
-						sTsTp = arrArtikel[cbPos.getSelectedIndex()][2].substring(arrArtikel[cbPos.getSelectedIndex()][2].length() - 14);
-						boolean bSpace = arrArtikel[cbPos.getSelectedIndex()][2].indexOf(" ", arrArtikel[cbPos.getSelectedIndex()][2].indexOf(" ")) != -1;
-						if(bSpace) {
-							try {
-								sTsRk = cutBack2(arrArtikel[cbPos.getSelectedIndex()][2], " ", 1);
-							} catch (IOException e1) {
-								logger.error("cbPosListenerR(final int iNr, final JComboBox<?> cbPos, final JTextField txtAnz, final JTextField txtEP, final JTextField txtGP)" + e1);
-							}
-							if(sTsRk.equals("Reisekosten")) {
-								txtEP.setEditable(true);
-								txtEP.setToolTipText("Eingaben mit ENTER abschließen");
-							}else {
-								txtEP.setEditable(false);
-								txtEP.setToolTipText(null);
-							}
-							if(sTsTp.equals("Tagespauschale")) {
-								String sTmp = arrArtikel[cbPos.getSelectedIndex()][3];
-								BigDecimal bdTmpA = new BigDecimal(sTmp).setScale(2, RoundingMode.HALF_UP);
-								BigDecimal bdA = new BigDecimal("1");
-								BigDecimal bdB = new BigDecimal("100");
-								BigDecimal bdTmpB = JFnewRa.bdRabatt.divide(bdB);
-								bdTmpB = bdA.subtract(bdTmpB);
-								bdEinzel[iNr] = bdTmpA.multiply(bdTmpB).setScale(2, RoundingMode.HALF_UP);
-								txtEP.setText(JFnewRa.bdEinzel[iNr].toPlainString());
-								txtEP.setBackground(new Color(152,251,152));
-								txtEP.setToolTipText("Rabattierter Preis");
-							}else {
-								String sTmp = arrArtikel[cbPos.getSelectedIndex()][3];
-								BigDecimal bdTmpA = new BigDecimal(sTmp).setScale(2, RoundingMode.HALF_UP);
-								bdEinzel[iNr] = bdTmpA;
-								txtEP.setText(JFnewRa.bdEinzel[iNr].toPlainString());
-								txtEP.setBackground(Color.WHITE);
-								txtEP.setToolTipText(null);
-							}
-						}
-					}else {
-						String sTmp = arrArtikel[cbPos.getSelectedIndex()][3];
-						BigDecimal bdTmpA = new BigDecimal(sTmp).setScale(2, RoundingMode.HALF_UP);
-						bdEinzel[iNr] = bdTmpA;
-						txtEP.setText(bdEinzel[iNr].toPlainString());
-					}
+					int idx = cbPos.getSelectedIndex();
+		            artikel = artikelListe.get(idx);
+					sPosText[iNr] = artikel.getText();
+					BigDecimal bdTmpA = artikel.getWert().setScale(2, RoundingMode.HALF_UP);
+					bdEinzel[iNr] = bdTmpA;
+					txtEP.setText(bdEinzel[iNr].toPlainString());
 					txtAnz.setEnabled(true);
 					txtAnz.setBackground(Color.PINK);
 					bArtSel = true;
@@ -1175,6 +1139,28 @@ public class JFnewRa extends JFrame {
 	//###################################################################################################################################################
 	//###################################################################################################################################################
 
+	private static String setReNummer() {
+		ReNrRepository reNrRepository = new ReNrRepository();
+	    List<ReNr> reNrListe = new ArrayList<>();
+	    reNrListe = reNrRepository.findAll();
+			
+    	if(reNrListe.size() > 0) {
+			
+			String sCutNrRe;
+			try {
+				sCutNrRe = cutFront(reNrListe.get(reNrListe.size()-1).getReNr().trim(), "-", 2);
+				String sCutRe = cutBack(reNrListe.get(reNrListe.size()-1).getReNr().trim(), "-", 1);
+				int iIncRe = Integer.parseInt(sCutNrRe) + 1;
+				return sCutRe + "-" + String.format("%04d", iIncRe);
+			} catch (IOException e) {
+				logger.error("Fehler beim erzeugen der Rechnungsnummer: " + e);
+				return "Rechnungsnummer";
+			}
+		}else {
+			return "RE-" + LoadData.getStrAktGJ() + "-0001";
+		}
+	}
+	
 	private static int setNum() {
 		int Num = 1;
 		while(cbPos[Num].getSelectedIndex() > 0) {
@@ -1189,10 +1175,6 @@ public class JFnewRa extends JFrame {
 
 	public static void setsConnDest(String sConnDest) {
 		JFnewRa.sConnDest = sConnDest;
-	}
-
-	public static void setsConnSource(String sConnSource) {
-		JFnewRa.sConnSource = sConnSource;
 	}
 
 }

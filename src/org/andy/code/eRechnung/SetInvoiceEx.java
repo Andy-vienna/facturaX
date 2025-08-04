@@ -7,11 +7,12 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.andy.code.entity.SQLmasterData;
+import org.andy.code.dataExport.DataExportHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mustangproject.BankDetails;
@@ -29,7 +30,10 @@ public class SetInvoiceEx {
 
 	private static Invoice setInvoice(String[][] sArray) throws ParseException, IOException {
 
-		SENDER = SQLmasterData.getsArrOwner();
+		ArrayList<String> owner = DataExportHelper.ownerData();
+		for (int i = 0; i < owner.size(); i++) {
+			SENDER[i] = owner.get(i);
+		}
 
 		long issue = 0;
 		long due = 0;

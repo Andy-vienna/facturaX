@@ -21,8 +21,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
-import org.andy.code.entity.Bank;
-import org.andy.code.entity.BankRepository;
+import org.andy.code.entityMaster.Bank;
+import org.andy.code.entityMaster.BankRepository;
 import org.andy.gui.main.JFoverview;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -175,7 +175,7 @@ public class BankPanel extends JPanel {
         repaint();
     }
     
-  //###################################################################################################################################################
+    //###################################################################################################################################################
 
     private JTextField makeField(int x, int y, int w, int h, boolean bold, Color bg) {
         JTextField t = new JTextField();
@@ -187,7 +187,7 @@ public class BankPanel extends JPanel {
         return t;
     }
     
-  //###################################################################################################################################################
+    //###################################################################################################################################################
 
     private Bank fromFields(JTextField[] fields) {
         Bank a = new Bank();
@@ -198,7 +198,7 @@ public class BankPanel extends JPanel {
         return a;
     }
     
-  //###################################################################################################################################################
+    //###################################################################################################################################################
 
     private boolean isValid(Bank a) {
         if (a.getBankName().isEmpty() || a.getIban().isEmpty() || a.getBic().isEmpty() || a.getKtoName().isEmpty()) {
@@ -208,7 +208,7 @@ public class BankPanel extends JPanel {
         return true;
     }
     
-  //###################################################################################################################################################
+    //###################################################################################################################################################
 
     private void clearFields(JTextField[] fields) {
         for (JTextField f : fields) f.setText("");
@@ -241,4 +241,8 @@ public class BankPanel extends JPanel {
 
         return new Consumer[] { insert, update, delete };
     }
+
+	public List<Bank> getBankListe() {
+		return bankListe;
+	}
 }

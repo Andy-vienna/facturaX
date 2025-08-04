@@ -10,7 +10,6 @@ import com.spire.pdf.PdfDocument;
 import com.spire.pdf.PdfDocumentInformation;
 import com.spire.pdf.conversion.PdfStandardsConverter;
 
-import org.andy.code.entity.SQLmasterData;
 import org.andy.code.main.StartUp;
 
 public class SaveAsPdf {
@@ -51,7 +50,7 @@ public class SaveAsPdf {
 	}
 
 	public static void setPdfMetadata(String sNr, String sTyp, String sPdf) throws Exception {
-		String[] tmp = SQLmasterData.getsArrOwner();
+		//String[] tmp = SQLmasterData.getsArrOwner();
 
 		String sTitel = decodeTyp(sTyp); // Titel festlegen
 
@@ -61,10 +60,10 @@ public class SaveAsPdf {
 		PdfDocumentInformation info = document.getDocumentInformation(); // Zugriff auf die Dokumentinformationen
 
 		// Metadaten festlegen
-		info.setAuthor(tmp[1]);
+		info.setAuthor(DataExportHelper.getKontaktName());
 		info.setTitle(sTitel + " " + sNr);
 		info.setSubject(sTitel);
-		info.setKeywords(sTitel + "," + sNr + "," + tmp[1]);
+		info.setKeywords(sTitel + "," + sNr + "," + DataExportHelper.getKontaktName());
 		info.setCreator(StartUp.APP_NAME + StartUp.APP_VERSION);
 
 		// PDF speichern
