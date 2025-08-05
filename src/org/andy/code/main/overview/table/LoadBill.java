@@ -10,23 +10,23 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
 
-import org.andy.code.entityProductive.Angebot;
-import org.andy.code.entityProductive.AngebotRepository;
+import org.andy.code.entityProductive.Rechnung;
+import org.andy.code.entityProductive.RechnungRepository;
 import org.andy.code.main.LoadData;
 
-public class LoadOffer {
+public class LoadBill {
 	
-	private static AngebotRepository angebotRepository = new AngebotRepository();
-    private static List<Angebot> angebotListe = new ArrayList<>();
+	private static RechnungRepository rechnungRepository = new RechnungRepository();
+    private static List<Rechnung> rechnungListe = new ArrayList<>();
     
     private static BigDecimal sumOpen = BigDecimal.ZERO;
-    private static BigDecimal sumOrdered = BigDecimal.ZERO;
+    private static BigDecimal sumPayed = BigDecimal.ZERO;
 	
 	//###################################################################################################################################################
 	// public Teil
 	//###################################################################################################################################################
 	
-	public static String[][] loadAngebot(boolean reRun) {
+	public static String[][] loadRechnung(boolean reRun) {
 		return loadData(reRun);
 	}
 	
@@ -35,47 +35,54 @@ public class LoadOffer {
 	//###################################################################################################################################################
 	
 	private static String[][] loadData(boolean reRun) {
-
+		
 		Currency currency = Currency.getInstance("EUR");
 		DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Locale.GERMANY);
 		DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
 		
-		sumOpen = BigDecimal.ZERO; sumOrdered = BigDecimal.ZERO;
+		sumOpen = BigDecimal.ZERO; sumPayed = BigDecimal.ZERO;
 		
-		angebotListe.clear();
-		angebotListe.addAll(angebotRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ())));
+		rechnungListe.clear();
+		rechnungListe.addAll(rechnungRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ())));
 		
-		String[][] sTemp = new String [angebotListe.size()][6];
-		
-		for (int i = 0; i < angebotListe.size(); i++){
-			Angebot angebot = angebotListe.get(i);
+		String[][] sTemp = new String [rechnungListe.size()][9];
+
+		for (int i = 0; i < rechnungListe.size(); i++){
+			Rechnung rechnung = rechnungListe.get(i);
 			
-			String status = switch(angebot.getState()) {
+			String status = switch(rechnung.getState()) {
 				case 0 -> "storniert";
 				case 1 -> "erstellt";
 				case 11 -> "gedruckt";
-				case 111 -> "bestellt";
-				case 1111 -> "bestätigt";
+				case 111 -> "bezahlt";
+				case 211 -> "Zahlungserinnerung";
+				case 311 -> "Mahnstufe 1";
+				case 411 -> "Mahnstufe 2";
 				default -> "-----";
-				};
+			};
 			
-			LocalDate date = LocalDate.parse(angebot.getDatum().toString(), DateTimeFormatter.ISO_LOCAL_DATE);
+			LocalDate date = LocalDate.parse(rechnung.getDatum().toString(), DateTimeFormatter.ISO_LOCAL_DATE);
 	        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 	        String datum = date.format(outputFormatter);
 	        
-	        String netto = df.format(angebot.getNetto()) + " " + currency.getCurrencyCode();
-			
-			sTemp[i][0] = angebot.getIdNummer();
+	        String netto = df.format(rechnung.getNetto()) + " " + currency.getCurrencyCode();
+	        String ust = df.format(rechnung.getUst()) + " " + currency.getCurrencyCode();
+	        String brutto = df.format(rechnung.getBrutto()) + " " + currency.getCurrencyCode();
+	        
+			sTemp[i][0] = rechnung.getIdNummer();
 			sTemp[i][1] = status;
 			sTemp[i][2] = datum;
-			sTemp[i][3] = angebot.getRef();
-			sTemp[i][4] = LoadDataHelper.searchKunde(angebot.getIdKunde());
-			sTemp[i][5] = netto;
+			sTemp[i][3] = rechnung.getlZeitr();
+			sTemp[i][4] = rechnung.getRef();
+			sTemp[i][5] = LoadDataHelper.searchKunde(rechnung.getIdKunde());
+			sTemp[i][6] = netto;
+			sTemp[i][7] = ust;
+			sTemp[i][8] = brutto;
 			
-			if (angebot.getState() > 0) { // nicht storniert
-				switch (angebot.getState()) {
-				case 11 -> sumOpen = sumOpen.add(angebot.getNetto());
-				case 111 -> sumOrdered = sumOrdered.add(angebot.getNetto());
+			if (rechnung.getState() > 0) { // nicht storniert
+				switch (rechnung.getState()) {
+				case 11 -> sumOpen = sumOpen.add(rechnung.getBrutto());
+				case 111 -> sumPayed = sumPayed.add(rechnung.getBrutto());
 				}
 			}
 		}
@@ -90,8 +97,8 @@ public class LoadOffer {
 		return sumOpen;
 	}
 
-	public static BigDecimal getSumOrdered() {
-		return sumOrdered;
+	public static BigDecimal getSumPayed() {
+		return sumPayed;
 	}
 	
 }

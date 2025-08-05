@@ -33,7 +33,7 @@ import org.apache.logging.log4j.Logger;
 
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
-import org.andy.code.main.overview.table.LoadBillOut;
+import org.andy.code.main.overview.table.LoadBill;
 
 public class JFstatusRa extends JFrame {
 
@@ -93,7 +93,7 @@ public class JFstatusRa extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosed(WindowEvent e) {
-				LoadBillOut.loadAusgangsRechnung(false);
+				LoadBill.loadAusgangsRechnung(false);
 			}
 		});
 		setBounds(100, 100, 401, 141);

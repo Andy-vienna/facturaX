@@ -26,7 +26,7 @@ import org.apache.logging.log4j.Logger;
 import org.andy.code.dataExport.ExcelMahnung;
 import org.andy.code.dataExport.ExcelReminder;
 import org.andy.code.main.LoadData;
-import org.andy.code.main.overview.table.LoadBillOut;
+import org.andy.code.main.overview.table.LoadBill;
 import org.andy.toolbox.misc.SetFrameIcon;
 
 public class JFnewReminder extends JFrame {
@@ -185,7 +185,7 @@ public class JFnewReminder extends JFrame {
 					}
 				}
 
-				LoadBillOut.loadAusgangsRechnung(false);
+				LoadBill.loadAusgangsRechnung(false);
 				dispose();
 			}
 		});

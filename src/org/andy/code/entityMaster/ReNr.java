@@ -9,7 +9,7 @@ import jakarta.persistence.Table;
 @Table(name = "tblRE")
 public class ReNr {
 	@Id
-	@Column(name = "Id")
+	@Column(name = "Id", length = 12, nullable = false)
 	private String reNr;
 	
 	//###################################################################################################################################################

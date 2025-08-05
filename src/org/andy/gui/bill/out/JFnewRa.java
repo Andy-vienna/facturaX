@@ -65,7 +65,7 @@ import org.andy.code.entityMaster.ReNr;
 import org.andy.code.entityMaster.ReNrRepository;
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
-import org.andy.code.main.overview.table.LoadBillOut;
+import org.andy.code.main.overview.table.LoadBill;
 import org.andy.gui.main.JFoverview;
 import org.andy.gui.misc.RoundedBorder;
 
@@ -988,7 +988,7 @@ public class JFnewRa extends JFrame {
 								logger.error("error creating new outgoing bill - " + e1);
 							}
 
-							LoadBillOut.loadAusgangsRechnung(false);
+							LoadBill.loadAusgangsRechnung(false);
 							JFoverview.actScreen();
 							dispose();
 							Runtime.getRuntime().gc();

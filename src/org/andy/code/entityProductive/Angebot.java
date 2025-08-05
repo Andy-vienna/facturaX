@@ -6,8 +6,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "tblRe")
-public class Rechnung {
+@Table(name = "tblAn")
+public class Angebot {
 
 	@Id
 	@Column(name = "IdNummer", length = 12, nullable = false)
@@ -33,6 +33,9 @@ public class Rechnung {
 
 	@Column(name = "RevCharge", nullable = false)
 	private int revCharge;
+	
+	@Column(name = "Page2", nullable = false)
+	private int page2;
 
 	@Column(name = "IdBank", nullable = false)
 	private int idBank;
@@ -199,6 +202,14 @@ public class Rechnung {
 
 	public void setRevCharge(int revCharge) {
 		this.revCharge = revCharge;
+	}
+	
+	public int getPage2() {
+		return page2;
+	}
+
+	public void setPage2(int page2) {
+		this.page2 = page2;
 	}
 
 	public int getIdBank() {

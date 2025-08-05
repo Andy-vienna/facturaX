@@ -4,8 +4,6 @@ import static org.andy.toolbox.misc.CreateObject.createButton;
 import static org.andy.toolbox.misc.Tools.FormatIBAN;
 import static org.andy.toolbox.misc.Tools.cutBack;
 import static org.andy.toolbox.misc.Tools.cutFront;
-import static org.andy.toolbox.sql.Insert.sqlInsert;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -15,8 +13,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -25,10 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -51,8 +44,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
-import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
-import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
 import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
 import org.andy.code.entityMaster.AnNr;
@@ -63,9 +54,10 @@ import org.andy.code.entityMaster.Bank;
 import org.andy.code.entityMaster.BankRepository;
 import org.andy.code.entityMaster.Kunde;
 import org.andy.code.entityMaster.KundeRepository;
+import org.andy.code.entityProductive.Angebot;
+import org.andy.code.entityProductive.AngebotRepository;
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
-import org.andy.code.main.overview.table.LoadOffer;
 import org.andy.gui.main.JFoverview;
 import org.andy.gui.misc.RoundedBorder;
 import org.andy.org.eclipse.wb.swing.FocusTraversalOnArray;
@@ -74,9 +66,6 @@ public class JFnewA extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = LogManager.getLogger(JFnewA.class);
-
-	private static String sConnDest;
-	private static final String TBL_OFFER = "tbl_an";
 
 	private JPanel contentPanel = new JPanel();
 
@@ -87,19 +76,12 @@ public class JFnewA extends JFrame {
 	private static JTextField[] txtEP = new JTextField[13];
 	private static JTextField[] txtGP = new JTextField[13];
 
-	private static String sAnNummer = null;
-	private static String sAnDatum = StartUp.getDtNow();
-	private static String sAnReferenz = null;
-
 	private static BigDecimal[] bdAnzahl = new BigDecimal[13];
 	private static BigDecimal[] bdEinzel = new BigDecimal[13];
 	private static BigDecimal[] bdSumme = new BigDecimal[13];
 	private static String[] sPosText = new String[13];
-	private static String sOptional1 = "false";
-	private static String[] arrWriteA = new String[48];
 
 	private static int iNumFrame;
-	private static BigDecimal bdNetto = BigDecimal.ZERO;
 	private static boolean bKundeSel = false;
 	private static boolean bBankSel = false;
 	private static boolean bArtSel = false;
@@ -213,7 +195,7 @@ public class JFnewA extends JFrame {
 		JTextField textIBAN = new JTextField();
 		JTextField textBIC = new JTextField();
 		JTextField textNummer = new JTextField(setAnNummer());
-		JCheckBox chkOptional1 = new JCheckBox("Angebot mit Anlage (Beschreibung)");
+		JCheckBox chkPage2 = new JCheckBox("Angebot mit Anlage (Beschreibung)");
 		JTextField textReferenz = new JTextField();
 		JButton btnDoExport = null;
 		try {
@@ -234,17 +216,6 @@ public class JFnewA extends JFrame {
 		datePicker.getComponentDateTextField().setFont(new Font("Tahoma", Font.BOLD, 14));
 		datePicker.getComponentDateTextField().setForeground(Color.BLUE);
 		datePicker.getComponentDateTextField().setHorizontalAlignment(SwingConstants.CENTER);
-		datePicker.addDateChangeListener(new DateChangeListener() {
-			@Override
-			public void dateChanged(DateChangeEvent arg0) {
-				LocalDate selectedDate = datePicker.getDate();
-				if (selectedDate != null) {
-					sAnDatum = selectedDate.format(StartUp.getDfdate());
-				} else {
-					sAnDatum = null;
-				}
-			}
-		});
 
 		JSeparator separator1 = new JSeparator();
 		JSeparator separator2 = new JSeparator();
@@ -296,7 +267,7 @@ public class JFnewA extends JFrame {
 		textIBAN.setBounds(110, 330, 200, 20);
 		textBIC.setBounds(110, 350, 200, 20);
 		textNummer.setBounds(450, 290, 140, 25);
-		chkOptional1.setBounds(600, 320, 230, 23);
+		chkPage2.setBounds(600, 320, 230, 23);
 		textReferenz.setBounds(450, 350, 385, 25);
 		btnDoExport.setBounds(850, 305, 120, 50);
 
@@ -449,7 +420,7 @@ public class JFnewA extends JFrame {
 		contentPanel.add(textIBAN);
 		contentPanel.add(textBIC);
 		contentPanel.add(textNummer);
-		contentPanel.add(chkOptional1);
+		contentPanel.add(chkPage2);
 		contentPanel.add(textReferenz);
 		contentPanel.add(btnDoExport);
 
@@ -464,9 +435,6 @@ public class JFnewA extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent e) {
 
-				sAnNummer = null;
-				sAnDatum = null;
-				sAnReferenz = null;
 				iNumFrame = 0;
 				bKundeSel = false;
 				bBankSel = false;
@@ -537,14 +505,6 @@ public class JFnewA extends JFrame {
 					}
 					bKundeSel = true;
 				}
-			}
-		});
-		chkRevCharge.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if(e.getStateChange() == ItemEvent.SELECTED){
-				}else{
-				};
 			}
 		});
 		cmbBank.addActionListener(new ActionListener() {
@@ -876,22 +836,12 @@ public class JFnewA extends JFrame {
 			}
 		});
 
-		chkOptional1.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					sOptional1 = "true";
-				} else {
-					sOptional1 = "false";
-				}
-				;
-			}
-		});
-
 		btnDoExport.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				StringBuilder sb = new StringBuilder();
+				AngebotRepository angebotRepository = new AngebotRepository();
+				Angebot angebot = new Angebot();
+				BigDecimal summe = BigDecimal.ZERO;
 
 				if(bKundeSel) {
 					if(bBankSel) {
@@ -900,38 +850,44 @@ public class JFnewA extends JFrame {
 								JOptionPane.showMessageDialog(null, "Kundenreferenz fehlt ...", "Angebot erstellen", JOptionPane.INFORMATION_MESSAGE);
 								return;
 							}
-							sAnNummer = textNummer.getText();
-							sAnReferenz = textReferenz.getText();
-							iNumFrame = setNum();
-
-							String[] tmpArrA = new String[48];
-							tmpArrA = writeAN();
-
-							for (String str : tmpArrA) {
-								sb.append(str).append("','");
+							
+							angebot.setIdNummer(setAnNummer());
+							angebot.setJahr(Integer.valueOf(LoadData.getStrAktGJ()));
+							angebot.setDatum(datePicker.getDate());
+							angebot.setIdKunde(kunde.getId());
+							angebot.setIdBank(bank.getId());
+							angebot.setRef(textReferenz.getText());
+							angebot.setRevCharge(chkRevCharge.isSelected() ? 1 : 0);
+							angebot.setPage2(chkPage2.isSelected() ? 1 : 0);
+							
+							angebot.setAnzPos(BigDecimal.valueOf(setNum()));
+							
+							angebot.setArt01(sPosText[1]); angebot.setMenge01(bdAnzahl[1]); angebot.setePreis01(bdEinzel[1]);
+							angebot.setArt02(sPosText[2]); angebot.setMenge02(bdAnzahl[2]); angebot.setePreis02(bdEinzel[2]);
+							angebot.setArt03(sPosText[3]); angebot.setMenge03(bdAnzahl[3]); angebot.setePreis03(bdEinzel[3]);
+							angebot.setArt04(sPosText[4]); angebot.setMenge04(bdAnzahl[4]); angebot.setePreis04(bdEinzel[4]);
+							angebot.setArt05(sPosText[5]); angebot.setMenge05(bdAnzahl[5]); angebot.setePreis05(bdEinzel[5]);
+							angebot.setArt06(sPosText[6]); angebot.setMenge06(bdAnzahl[6]); angebot.setePreis06(bdEinzel[6]);
+							angebot.setArt07(sPosText[7]); angebot.setMenge07(bdAnzahl[7]); angebot.setePreis07(bdEinzel[7]);
+							angebot.setArt08(sPosText[8]); angebot.setMenge08(bdAnzahl[8]); angebot.setePreis08(bdEinzel[8]);
+							angebot.setArt09(sPosText[9]); angebot.setMenge09(bdAnzahl[9]); angebot.setePreis09(bdEinzel[9]);
+							angebot.setArt10(sPosText[10]); angebot.setMenge10(bdAnzahl[10]); angebot.setePreis10(bdEinzel[10]);
+							angebot.setArt11(sPosText[11]); angebot.setMenge11(bdAnzahl[11]); angebot.setePreis11(bdEinzel[11]);
+							angebot.setArt12(sPosText[12]); angebot.setMenge12(bdAnzahl[12]); angebot.setePreis12(bdEinzel[12]);
+							
+							for (int i = 0; i < setNum(); i++) {
+								summe = summe.add(bdSumme[i + 1]);
 							}
-							String sValues= sb.substring(0, sb.length() - 2);
+							angebot.setNetto(summe);
+							
+							angebot.setUst(new BigDecimal("0.00")); // nicht benötigt
+							angebot.setBrutto(new BigDecimal("0.00")); // nicht benötigt
+							angebot.setlZeitr(" "); // nicht benötigt
+							
+							angebot.setState(1); // Status: erstellt
+							
+							angebotRepository.save(angebot); // Angebot in DB schreiben
 
-							try {
-
-								String tblName = TBL_OFFER.replace("_", LoadData.getStrAktGJ());
-								String sSQLStatementA = "INSERT INTO " + tblName + " VALUES ('" + sValues + ")"; //SQL Befehlszeile
-
-								sqlInsert(sConnDest, sSQLStatementA);
-								
-								AnNrRepository anNrRepository = new AnNrRepository();
-							    							    
-							    AnNr anNr = new AnNr();
-							    anNr.setAnNr(tmpArrA[0]);
-							    
-							    anNrRepository.insert(anNr);
-							    
-
-							} catch (SQLException | ClassNotFoundException e1) {
-								logger.error("error creating new offer - " + e1);
-							}
-
-							LoadOffer.loadAngebot(false);
 							JFoverview.actScreen();
 							dispose();
 							Runtime.getRuntime().gc();
@@ -968,39 +924,6 @@ public class JFnewA extends JFrame {
         artikelListe.add(artikelLeer); // falls du immer einen Dummy-Eintrag vorne willst        
         artikelListe.addAll(artikelRepository.findAll());
         
-	}
-
-	public static String[] writeAN() {
-		Arrays.fill(arrWriteA, "");
-		bdNetto  = BigDecimal.ZERO;
-		int x = 1;
-		int y = 1;
-
-		arrWriteA[0] = sAnNummer; // Angebotsnummer
-		arrWriteA[1] = "1"; // active
-		arrWriteA[2] = "0"; // printed
-		arrWriteA[3] = "0"; // ordered
-		arrWriteA[4] = JFstatusA.getWritten();
-		arrWriteA[5] = sAnDatum; // Angebotsdatum
-		arrWriteA[6] = sAnReferenz; // Kundenreferenz
-		arrWriteA[7] = kunde.getId();
-		arrWriteA[8] = String.valueOf(bank.getId()); // Index der Bankverbindung
-
-		while(y < (JFnewA.getiNumFrame() * 3)){
-			arrWriteA[y + 10] = sPosText[x];
-			arrWriteA[y + 11] = bdAnzahl[x].toString();
-			arrWriteA[y + 12] = bdEinzel[x].toString();
-			bdNetto = bdNetto.add(bdAnzahl[x].multiply(bdEinzel[x]));
-			x = x + 1;
-			y = y + 3;
-		}
-
-		arrWriteA[9] = bdNetto.toString(); // Netto
-		arrWriteA[10] = String.valueOf(iNumFrame);
-
-		arrWriteA[47] = sOptional1;
-
-		return arrWriteA;
 	}
 
 	public static ActionListener cbPosListenerA(final int iNr, final JComboBox<?> cbPos, final JTextField txtAnz, final JTextField txtEP, final JTextField txtGP) {
@@ -1097,10 +1020,6 @@ public class JFnewA extends JFrame {
 
 	public static int getiNumFrame() {
 		return iNumFrame;
-	}
-
-	public static void setsConnDest(String sConnDest) {
-		JFnewA.sConnDest = sConnDest;
 	}
 
 }

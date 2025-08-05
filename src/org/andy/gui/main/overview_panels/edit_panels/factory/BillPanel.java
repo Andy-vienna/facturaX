@@ -8,11 +8,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -24,7 +23,8 @@ import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.NumberFormatter;
 
-import org.andy.code.entityMaster.SQLproductiveData;
+import org.andy.code.entityProductive.Rechnung;
+import org.andy.code.entityProductive.RechnungRepository;
 import org.andy.code.main.StartUp;
 import org.andy.gui.main.JFoverview;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
@@ -232,7 +232,7 @@ public class BillPanel extends EditPanel {
 	    btnFields[1].addActionListener(new ActionListener() {
  			@Override
  			public void actionPerformed(ActionEvent e) {
- 				updateOffer();
+ 				updateTable();
  			}
  		});
 	    
@@ -314,36 +314,57 @@ public class BillPanel extends EditPanel {
     	txtFieldsSum[2].setValue(Double.parseDouble(bdBrutto.toString()));	
     }
     
-    private void updateOffer() {
-    	int iAnzPos = 0;
+    private void updateTable() {
+    	
+    	BigDecimal anzPos = BigDecimal.ZERO;
     	String[] sPosText = new String[13];
     	BigDecimal[] bdAnzahl = new BigDecimal[this.txtFieldsPos.length];
     	BigDecimal[] bdEinzel = new BigDecimal[this.txtFieldsPos.length];
+    	
+    	RechnungRepository rechnungRepository = new RechnungRepository();
+        Rechnung rechnung = rechnungRepository.findById(id);
     	
     	for (int i = 0; i < this.txtFieldsPos.length; i++) {
     		if (!this.txtFieldsPos[i].getText().isEmpty()) {
 				sPosText[i] = this.txtFieldsPos[i].getText();
 				bdAnzahl[i] = new BigDecimal(this.txtFieldsAnz[i].getText().replace(",", ".")).setScale(2, RoundingMode.HALF_UP);
 				bdEinzel[i] = new BigDecimal(this.txtFieldsEP[i].getText().replace(",", ".")).setScale(2, RoundingMode.HALF_UP);
-				iAnzPos = i + 1; // Anzahl der Positionen
+				anzPos = anzPos.add(BigDecimal.ONE); // Anzahl der Positionen
     		}
 		}
-    	Number numberA = (Number) this.txtFieldsSum[0].getValue();
-    	double doubleWertA = numberA.doubleValue();
-    	String sNetto = String.valueOf(doubleWertA);
-    	Number numberB = (Number) this.txtFieldsSum[1].getValue();
-    	double doubleWertB = numberB.doubleValue();
-    	String sUSt = String.valueOf(doubleWertB);
-    	Number numberC = (Number) this.txtFieldsSum[2].getValue();
-    	double doubleWertC = numberC.doubleValue();
-    	String sBrutto = String.valueOf(doubleWertC);
     	
-    	try {
-			SQLproductiveData.updateReToDB(id, sDatum[0], txtFieldsHead[0].getText(), txtFieldsHead[1].getText(), iAnzPos, sPosText,
-					bdAnzahl, bdEinzel, sNetto, sUSt, sBrutto);
-		} catch (ClassNotFoundException | SQLException e1) {
-			logger.error("error updating bill to database - " + e1);
-		}
+    	rechnung.setDatum(datePicker[0].getDate());
+    	rechnung.setRef(txtFieldsHead[0].getText()); rechnung.setlZeitr(txtFieldsHead[1].getText());
+    	
+    	rechnung.setAnzPos(anzPos);
+    	rechnung.setArt01(sPosText[0]); rechnung.setMenge01(bdAnzahl[0]); rechnung.setePreis01(bdEinzel[0]);
+    	rechnung.setArt02(sPosText[1]); rechnung.setMenge02(bdAnzahl[1]); rechnung.setePreis02(bdEinzel[1]);
+    	rechnung.setArt03(sPosText[2]); rechnung.setMenge03(bdAnzahl[2]); rechnung.setePreis03(bdEinzel[2]);
+    	rechnung.setArt04(sPosText[3]); rechnung.setMenge04(bdAnzahl[3]); rechnung.setePreis04(bdEinzel[3]);
+    	rechnung.setArt05(sPosText[4]); rechnung.setMenge05(bdAnzahl[4]); rechnung.setePreis05(bdEinzel[4]);
+    	rechnung.setArt06(sPosText[5]); rechnung.setMenge06(bdAnzahl[5]); rechnung.setePreis06(bdEinzel[5]);
+    	rechnung.setArt07(sPosText[6]); rechnung.setMenge07(bdAnzahl[6]); rechnung.setePreis07(bdEinzel[6]);
+    	rechnung.setArt08(sPosText[7]); rechnung.setMenge08(bdAnzahl[7]); rechnung.setePreis08(bdEinzel[7]);
+    	rechnung.setArt09(sPosText[8]); rechnung.setMenge09(bdAnzahl[8]); rechnung.setePreis09(bdEinzel[8]);
+    	rechnung.setArt10(sPosText[9]); rechnung.setMenge10(bdAnzahl[9]); rechnung.setePreis10(bdEinzel[9]);
+    	rechnung.setArt11(sPosText[10]); rechnung.setMenge11(bdAnzahl[10]); rechnung.setePreis11(bdEinzel[10]);
+    	rechnung.setArt12(sPosText[11]); rechnung.setMenge12(bdAnzahl[11]); rechnung.setePreis12(bdEinzel[11]);
+    	
+    	Number numberN = (Number) this.txtFieldsSum[0].getValue();
+    	double netto = numberN.doubleValue();
+    	rechnung.setNetto(BigDecimal.valueOf(netto));
+    	
+    	Number numberT = (Number) this.txtFieldsSum[1].getValue();
+    	double tax = numberT.doubleValue();
+    	rechnung.setUst(BigDecimal.valueOf(tax));
+    	
+    	Number numberB = (Number) this.txtFieldsSum[2].getValue();
+    	double brutto = numberB.doubleValue();
+    	rechnung.setBrutto(BigDecimal.valueOf(brutto));
+    	
+    	rechnungRepository.update(rechnung);
+    	
+    	JFoverview.actScreen();
     	JFoverview.actScreen();
     }
     
@@ -361,12 +382,36 @@ public class BillPanel extends EditPanel {
 	    }
 	}
     
-    public void setTxtFields(String[] value, String id, BigDecimal bdTaxRate) {
+    public void setTxtFields(String id, String TaxVal) {
+    	
+    	ArrayList<String> pos = new ArrayList<>();
+    	ArrayList<BigDecimal> anz = new ArrayList<>();
+    	ArrayList<BigDecimal> ep = new ArrayList<>();
+    	    	
+    	RechnungRepository rechnungRepository = new RechnungRepository();
+        Rechnung rechnung = rechnungRepository.findById(id);
+        
+        if (id.isEmpty() || id == null) {
+    		return;
+    	}
+        
+        pos.add(rechnung.getArt01()); pos.add(rechnung.getArt02()); pos.add(rechnung.getArt03()); pos.add(rechnung.getArt04());
+    	pos.add(rechnung.getArt05()); pos.add(rechnung.getArt06()); pos.add(rechnung.getArt07()); pos.add(rechnung.getArt08());
+    	pos.add(rechnung.getArt09()); pos.add(rechnung.getArt10()); pos.add(rechnung.getArt11()); pos.add(rechnung.getArt12());
+    	
+    	anz.add(rechnung.getMenge01()); anz.add(rechnung.getMenge02()); anz.add(rechnung.getMenge03()); anz.add(rechnung.getMenge04());
+    	anz.add(rechnung.getMenge05()); anz.add(rechnung.getMenge06()); anz.add(rechnung.getMenge07()); anz.add(rechnung.getMenge08());
+    	anz.add(rechnung.getMenge09()); anz.add(rechnung.getMenge10()); anz.add(rechnung.getMenge11()); anz.add(rechnung.getMenge12());
+    	
+    	ep.add(rechnung.getePreis01()); ep.add(rechnung.getePreis02()); ep.add(rechnung.getePreis03()); ep.add(rechnung.getePreis04());
+    	ep.add(rechnung.getePreis05()); ep.add(rechnung.getePreis06()); ep.add(rechnung.getePreis07()); ep.add(rechnung.getePreis08());
+    	ep.add(rechnung.getePreis09()); ep.add(rechnung.getePreis10()); ep.add(rechnung.getePreis11()); ep.add(rechnung.getePreis12());
+    	
+    	
     	this.id = null; this.bdTaxRate = BigDecimal.ZERO;
     	bdNetto = BigDecimal.ZERO;
-    	if (bdTaxRate != null) {
-    		this.bdTaxRate = bdTaxRate;
-    	}
+    	bdTaxRate = new BigDecimal(TaxVal.trim());
+
     	if (id != null && !id.isEmpty()) {
 			this.id = id;
 		}
@@ -385,34 +430,27 @@ public class BillPanel extends EditPanel {
 		}
 		btnFields[0].setEnabled(false);
 		txtFieldsFocusable(false);
-		if (value[0] == null || value[0].isEmpty()) {
-			return; // Abbruch, wenn kein Wert übergeben wurde
-		}
-    	DateTimeFormatter dfDate = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-    	LocalDate datum = LocalDate.parse(value[5], dfDate);
-    	this.datePicker[0].setDate(datum);
-    	for (int i = 0; i < this.txtFieldsHead.length; i++) {
-    		this.txtFieldsHead[i].setText(value[i + 6]);
-    	}
-    	for (int i = 0; i < Integer.parseInt(value[14]); i++) {
-    		BigDecimal bdAnz = new BigDecimal(value[16 + (i * 3)].trim().replace(",", "."));
-    		BigDecimal bdEP = new BigDecimal(value[17 + (i * 3)].trim().replace(",", "."));
+		
+		this.datePicker[0].setDate(rechnung.getDatum());
+		this.txtFieldsHead[0].setText(rechnung.getRef());
+		this.txtFieldsHead[1].setText(rechnung.getlZeitr());
+		for (int i = 0; i < rechnung.getAnzPos().intValue(); i++) {
+    		BigDecimal bdAnz = anz.get(i);
+    		BigDecimal bdEP = ep.get(i);
     		BigDecimal bdGP = bdAnz.multiply(bdEP).setScale(2, RoundingMode.HALF_UP);
     		bdNetto = bdNetto.add(bdGP).setScale(2, RoundingMode.HALF_UP);
 			
-			this.txtFieldsPos[i].setText(value[15 + (i * 3)]);
-			this.txtFieldsAnz[i].setText(value[16 + (i * 3)].replace(".", ","));
+			this.txtFieldsPos[i].setText(pos.get(i));
+			this.txtFieldsAnz[i].setText(bdAnz.toString());
 			this.txtFieldsEP[i].setText(bdEP.toString());
 			this.txtFieldsGP[i].setText(bdGP.toString());
 			
 		}
-    	txtFieldsSum[0].setValue(Double.parseDouble(bdNetto.toString()));
+		txtFieldsSum[0].setValue(Double.parseDouble(bdNetto.toString()));
     	bdTax = bdNetto.multiply(bdTaxRate.divide(new BigDecimal("100"))).setScale(2, RoundingMode.HALF_UP);
     	txtFieldsSum[1].setValue(Double.parseDouble(bdTax.toString()));
     	bdBrutto = bdNetto.add(bdTax).setScale(2, RoundingMode.HALF_UP);
     	txtFieldsSum[2].setValue(Double.parseDouble(bdBrutto.toString()));
-    	if (value[1].equals("1") && value[2].equals("0")) {
-    		txtFieldsFocusable(true);
-		}
+    	if (rechnung.getState() == 1) { txtFieldsFocusable(true); } // Bearbeitungsmöglichkeit setzen
     }
 }

@@ -1,0 +1,47 @@
+package org.andy.code.entityProductive;
+
+import org.andy.code.misc.HibernateUtil;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
+import java.util.List;
+
+public class RechnungRepository {
+
+    public List<Rechnung> findAllByJahr(int jahr) {
+        try (Session session = HibernateUtil.getSessionFactoryDb2().openSession()) {
+            return session.createQuery(
+                    "FROM Rechnung r WHERE r.jahr = :jahr ORDER BY r.idNummer", Rechnung.class)
+                    .setParameter("jahr", jahr)
+                    .getResultList();
+        }
+    }
+    
+    public Rechnung findById(String id){
+    	try (Session session = HibernateUtil.getSessionFactoryDb2().openSession()) {
+            return session.createQuery(
+                    "FROM Rechnung r WHERE r.idNummer = :id", Rechnung.class)
+                    .setParameter("id", id)
+                    .getSingleResult();
+        }
+    }
+
+    public void save(Rechnung rechnung) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactoryDb2().openSession()) {
+            tx = session.beginTransaction();
+            session.persist(rechnung);
+            tx.commit();
+        }
+    }
+
+    public void update(Rechnung rechnung) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactoryDb2().openSession()) {
+            tx = session.beginTransaction();
+            session.merge(rechnung);
+            tx.commit();
+        }
+    }
+}
+

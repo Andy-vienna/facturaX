@@ -8,11 +8,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -24,7 +23,8 @@ import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.NumberFormatter;
 
-import org.andy.code.entityMaster.SQLproductiveData;
+import org.andy.code.entityProductive.Angebot;
+import org.andy.code.entityProductive.AngebotRepository;
 import org.andy.code.main.StartUp;
 import org.andy.gui.main.JFoverview;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
@@ -230,7 +230,7 @@ public class OfferPanel extends EditPanel {
 	    btnFields[1].addActionListener(new ActionListener() {
  			@Override
  			public void actionPerformed(ActionEvent e) {
- 				updateOffer();
+ 				updateTable();
  			}
  		});
 	    
@@ -312,28 +312,48 @@ public class OfferPanel extends EditPanel {
     	txtFieldsSum[2].setValue(Double.parseDouble(bdBrutto.toString()));	
     }
     
-    private void updateOffer() {
-    	int iAnzPos = 0;
+    private void updateTable() {
+    	
+    	BigDecimal anzPos = BigDecimal.ZERO;
     	String[] sPosText = new String[13];
     	BigDecimal[] bdAnzahl = new BigDecimal[this.txtFieldsPos.length];
     	BigDecimal[] bdEinzel = new BigDecimal[this.txtFieldsPos.length];
+    	
+    	AngebotRepository angebotRepository = new AngebotRepository();
+        Angebot angebot = angebotRepository.findById(id);
     	
     	for (int i = 0; i < this.txtFieldsPos.length; i++) {
     		if (!this.txtFieldsPos[i].getText().isEmpty()) {
 				sPosText[i] = this.txtFieldsPos[i].getText();
 				bdAnzahl[i] = new BigDecimal(this.txtFieldsAnz[i].getText().replace(",", ".")).setScale(2, RoundingMode.HALF_UP);
 				bdEinzel[i] = new BigDecimal(this.txtFieldsEP[i].getText().replace(",", ".")).setScale(2, RoundingMode.HALF_UP);
-				iAnzPos = i + 1; // Anzahl der Positionen
+				anzPos = anzPos.add(BigDecimal.ONE); // Anzahl der Positionen
     		}
 		}
-    	Number number = (Number) this.txtFieldsSum[0].getValue();
-    	double doubleWert = number.doubleValue();
-    	String sNetto = String.valueOf(doubleWert);
-    	try {
-			SQLproductiveData.updateAnToDB(id, sDatum[0], txtFieldsHead[0].getText(), iAnzPos, sPosText, bdAnzahl, bdEinzel, sNetto);
-		} catch (ClassNotFoundException | SQLException e1) {
-			logger.error("error updating offer to database - " + e1);
-		}
+    	
+    	angebot.setDatum(datePicker[0].getDate());
+    	angebot.setRef(txtFieldsHead[0].getText());
+    	
+    	angebot.setAnzPos(anzPos);
+    	angebot.setArt01(sPosText[0]); angebot.setMenge01(bdAnzahl[0]); angebot.setePreis01(bdEinzel[0]);
+    	angebot.setArt02(sPosText[1]); angebot.setMenge02(bdAnzahl[1]); angebot.setePreis02(bdEinzel[1]);
+    	angebot.setArt03(sPosText[2]); angebot.setMenge03(bdAnzahl[2]); angebot.setePreis03(bdEinzel[2]);
+    	angebot.setArt04(sPosText[3]); angebot.setMenge04(bdAnzahl[3]); angebot.setePreis04(bdEinzel[3]);
+    	angebot.setArt05(sPosText[4]); angebot.setMenge05(bdAnzahl[4]); angebot.setePreis05(bdEinzel[4]);
+    	angebot.setArt06(sPosText[5]); angebot.setMenge06(bdAnzahl[5]); angebot.setePreis06(bdEinzel[5]);
+    	angebot.setArt07(sPosText[6]); angebot.setMenge07(bdAnzahl[6]); angebot.setePreis07(bdEinzel[6]);
+    	angebot.setArt08(sPosText[7]); angebot.setMenge08(bdAnzahl[7]); angebot.setePreis08(bdEinzel[7]);
+    	angebot.setArt09(sPosText[8]); angebot.setMenge09(bdAnzahl[8]); angebot.setePreis09(bdEinzel[8]);
+    	angebot.setArt10(sPosText[9]); angebot.setMenge10(bdAnzahl[9]); angebot.setePreis10(bdEinzel[9]);
+    	angebot.setArt11(sPosText[10]); angebot.setMenge11(bdAnzahl[10]); angebot.setePreis11(bdEinzel[10]);
+    	angebot.setArt12(sPosText[11]); angebot.setMenge12(bdAnzahl[11]); angebot.setePreis12(bdEinzel[11]);
+    	
+    	Number numberN = (Number) this.txtFieldsSum[0].getValue();
+    	double netto = numberN.doubleValue();
+    	angebot.setNetto(BigDecimal.valueOf(netto));
+    	
+    	angebotRepository.update(angebot);
+    	
     	JFoverview.actScreen();
     }
     
@@ -351,12 +371,35 @@ public class OfferPanel extends EditPanel {
 	    }
 	}
     
-    public void setTxtFields(String[] value, String id, BigDecimal bdTaxRate) {
+    public void setTxtFields(String id, String TaxVal) {
+    	
+    	ArrayList<String> pos = new ArrayList<>();
+    	ArrayList<BigDecimal> anz = new ArrayList<>();
+    	ArrayList<BigDecimal> ep = new ArrayList<>();
+    	
+    	AngebotRepository angebotRepository = new AngebotRepository();
+        Angebot angebot = angebotRepository.findById(id);
+        
+    	if (id.isEmpty() || id == null) {
+    		return;
+    	}
+    	
+    	pos.add(angebot.getArt01()); pos.add(angebot.getArt02()); pos.add(angebot.getArt03()); pos.add(angebot.getArt04());
+    	pos.add(angebot.getArt05()); pos.add(angebot.getArt06()); pos.add(angebot.getArt07()); pos.add(angebot.getArt08());
+    	pos.add(angebot.getArt09()); pos.add(angebot.getArt10()); pos.add(angebot.getArt11()); pos.add(angebot.getArt12());
+    	
+    	anz.add(angebot.getMenge01()); anz.add(angebot.getMenge02()); anz.add(angebot.getMenge03()); anz.add(angebot.getMenge04());
+    	anz.add(angebot.getMenge05()); anz.add(angebot.getMenge06()); anz.add(angebot.getMenge07()); anz.add(angebot.getMenge08());
+    	anz.add(angebot.getMenge09()); anz.add(angebot.getMenge10()); anz.add(angebot.getMenge11()); anz.add(angebot.getMenge12());
+    	
+    	ep.add(angebot.getePreis01()); ep.add(angebot.getePreis02()); ep.add(angebot.getePreis03()); ep.add(angebot.getePreis04());
+    	ep.add(angebot.getePreis05()); ep.add(angebot.getePreis06()); ep.add(angebot.getePreis07()); ep.add(angebot.getePreis08());
+    	ep.add(angebot.getePreis09()); ep.add(angebot.getePreis10()); ep.add(angebot.getePreis11()); ep.add(angebot.getePreis12());
+    	
     	this.id = null; this.bdTaxRate = BigDecimal.ZERO;
     	bdNetto = BigDecimal.ZERO;
-    	if (bdTaxRate != null) {
-    		this.bdTaxRate = bdTaxRate;
-    	}
+    	bdTaxRate = new BigDecimal(TaxVal.trim());
+
     	if (id != null && !id.isEmpty()) {
 			this.id = id;
 		}
@@ -375,23 +418,19 @@ public class OfferPanel extends EditPanel {
 		}
 		btnFields[0].setEnabled(false);
 		txtFieldsFocusable(false);
-		if (value[0] == null || value[0].isEmpty()) {
-			return; // Abbruch, wenn kein Wert übergeben wurde
-		}
-    	DateTimeFormatter dfDate = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-    	LocalDate datum = LocalDate.parse(value[5], dfDate);
-    	this.datePicker[0].setDate(datum);
+		
+    	this.datePicker[0].setDate(angebot.getDatum());
     	for (int i = 0; i < this.txtFieldsHead.length; i++) {
-    		this.txtFieldsHead[i].setText(value[6]);
+    		this.txtFieldsHead[i].setText(angebot.getRef());
     	}
-    	for (int i = 0; i < Integer.parseInt(value[10]); i++) {
-    		BigDecimal bdAnz = new BigDecimal(value[12 + (i * 3)].trim().replace(",", "."));
-    		BigDecimal bdEP = new BigDecimal(value[13 + (i * 3)].trim().replace(",", "."));
+    	for (int i = 0; i < angebot.getAnzPos().intValue(); i++) {
+    		BigDecimal bdAnz = anz.get(i);
+    		BigDecimal bdEP = ep.get(i);
     		BigDecimal bdGP = bdAnz.multiply(bdEP).setScale(2, RoundingMode.HALF_UP);
     		bdNetto = bdNetto.add(bdGP).setScale(2, RoundingMode.HALF_UP);
 			
-			this.txtFieldsPos[i].setText(value[11 + (i * 3)]);
-			this.txtFieldsAnz[i].setText(value[12 + (i * 3)].replace(".", ","));
+			this.txtFieldsPos[i].setText(pos.get(i));
+			this.txtFieldsAnz[i].setText(bdAnz.toString());
 			this.txtFieldsEP[i].setText(bdEP.toString());
 			this.txtFieldsGP[i].setText(bdGP.toString());
 			
@@ -401,8 +440,6 @@ public class OfferPanel extends EditPanel {
     	txtFieldsSum[1].setValue(Double.parseDouble(bdTax.toString()));
     	bdBrutto = bdNetto.add(bdTax).setScale(2, RoundingMode.HALF_UP);
     	txtFieldsSum[2].setValue(Double.parseDouble(bdBrutto.toString()));
-    	if (value[1].equals("1") && value[2].equals("0")) {
-    		txtFieldsFocusable(true);
-		}
+    	if (angebot.getState() == 1) { txtFieldsFocusable(true); } // Bearbeitungsmöglichkeit setzen
     }
 }

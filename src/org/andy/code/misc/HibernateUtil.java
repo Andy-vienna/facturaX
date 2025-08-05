@@ -10,6 +10,7 @@ import org.andy.code.entityMaster.ReNr;
 import org.andy.code.entityMaster.Tax;
 import org.andy.code.entityMaster.Text;
 import org.andy.code.entityMaster.User;
+import org.andy.code.entityProductive.Angebot;
 import org.andy.code.entityProductive.Rechnung;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
@@ -81,7 +82,8 @@ public class HibernateUtil {
                 .build();
 
         MetadataSources metadataSources = new MetadataSources(serviceRegistry);
-        metadataSources.addAnnotatedClass(Rechnung.class); // nur Entitäten von DB2
+        metadataSources.addAnnotatedClass(Angebot.class); // nur Entitäten von DB2
+        metadataSources.addAnnotatedClass(Rechnung.class);
 
         Metadata metadata = metadataSources.getMetadataBuilder().build();
         return metadata.getSessionFactoryBuilder().build();

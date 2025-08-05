@@ -21,14 +21,6 @@ import org.andy.code.dataExport.ExcelMahnung;
 import org.andy.code.dataExport.ExcelOffer;
 import org.andy.code.dataExport.ExcelReminder;
 import org.andy.code.entityMaster.SQLproductiveData;
-import org.andy.code.main.overview.edit.Expenses;
-import org.andy.code.main.overview.edit.Purchase;
-import org.andy.code.main.overview.edit.SvTax;
-import org.andy.code.main.overview.table.LoadPurchase;
-import org.andy.code.main.overview.table.LoadBillOut;
-import org.andy.code.main.overview.table.LoadExpenses;
-import org.andy.code.main.overview.table.LoadOffer;
-import org.andy.code.main.overview.table.LoadSvTax;
 import org.andy.gui.bill.out.JFnewRa;
 import org.andy.gui.bill.out.JFstatusRa;
 import org.andy.gui.file.JFfileView;
@@ -182,25 +174,16 @@ public class LoadData {
 		SQLproductiveData.setsConn(tmpConnB);
 		JFoverview.setsConn(tmpConnB);
 		JFfileView.setsConn(tmpConnB);
-		JFnewA.setsConnDest(tmpConnB);
-		JFstatusA.setsConn(tmpConnB);
-		JFconfirmA.setsConn(tmpConnB);
-		JFnewRa.setsConnDest(tmpConnB);
-		JFstatusRa.setsConn(tmpConnB);
+
+
+
+
 		JFnewReminder.setsConn(tmpConnB);
 		ExcelBill.setsConn(tmpConnB);
 		ExcelConfirmation.setsConn(tmpConnB);
 		ExcelOffer.setsConn(tmpConnB);
 		ExcelReminder.setsConn(tmpConnB);
 		ExcelMahnung.setsConn(tmpConnB);
-		LoadOffer.setsConn(tmpConnB);
-		LoadBillOut.setsConn(tmpConnB);
-		LoadPurchase.setsConn(tmpConnB);
-		Purchase.setsConn(tmpConnB);
-		LoadExpenses.setsConn(tmpConnB);
-		Expenses.setsConn(tmpConnB);
-		LoadSvTax.setsConn(tmpConnB);
-		SvTax.setsConn(tmpConnB);
 
 		StartUp.setSERVICE_NAME("\"SQL Server (" + strDBservice + ")\"");
 
