@@ -2,8 +2,6 @@ package org.andy.code.dataExport;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import org.andy.code.entityMaster.Bank;
 import org.andy.code.entityMaster.BankRepository;
 import org.andy.code.entityMaster.Kunde;
@@ -12,6 +10,10 @@ import org.andy.code.entityMaster.Owner;
 import org.andy.code.entityMaster.OwnerRepository;
 import org.andy.code.entityMaster.Text;
 import org.andy.code.entityMaster.TextRepository;
+import org.andy.code.entityProductive.Angebot;
+import org.andy.code.entityProductive.AngebotRepository;
+import org.andy.code.entityProductive.Rechnung;
+import org.andy.code.entityProductive.RechnungRepository;
 import org.andy.code.main.LoadData;
 
 public class DataExportHelper {
@@ -22,106 +24,102 @@ public class DataExportHelper {
 	private static String kontaktName;
 	private static String steuerNummer;
 	
+	private static ArrayList<String> TextUSt = new ArrayList<>();
+	private static ArrayList<String> TextZahlZiel = new ArrayList<>();
+	private static ArrayList<String> TextAngebot = new ArrayList<>();
+	private static ArrayList<String> TextZahlErin = new ArrayList<>();
+	private static ArrayList<String> TextOrderConfirm = new ArrayList<>();
+	private static ArrayList<String> TextMahnung = new ArrayList<>();
+	
+	private static Owner owner = new Owner();
+	
 	//###################################################################################################################################################
 	// public Teil
 	//###################################################################################################################################################
 
-	public static String[] kundeData(String tmp) {
-		return getKunde(tmp);
+	public static Angebot loadAngebot(String AnNr) {
+		return readAngebot(AnNr);
 	}
 	
-	public static String[] bankData(int id) {
-		return getBank(id);
+	public static Rechnung loadRechnung(String ReNr) {
+		return readRechnung(ReNr);
+	}
+	
+	public static Kunde kundeData(String KdNr) {
+		return readKunde(KdNr);
+	}
+	
+	public static Bank bankData(int id) {
+		return readBank(id);
 	}
 	
 	public static ArrayList<String> ownerData(){
-		return getOwner();
+		return readOwner();
 	}
 	
-	public static ArrayList<ArrayList<String>> textData(){
-		return getText();
+	public static void textData(){
+		readText();
 	}
 	
 	//###################################################################################################################################################
 	// private Teil
 	//###################################################################################################################################################
 	
-	private static String[] getKunde(String tmp){
-		int m = 0; int iNumKunde = 0;
-		String[] kdTmp = new String[16];
+	private static Angebot readAngebot(String AnNr) {
+		AngebotRepository angebotRepository = new AngebotRepository();
+		return angebotRepository.findById(AnNr);
+	}
+	
+	//###################################################################################################################################################
+	
+	private static Rechnung readRechnung(String ReNr) {
+		RechnungRepository rechnungRepository = new RechnungRepository();
+		return rechnungRepository.findById(ReNr);
+	}
+	
+	//###################################################################################################################################################
+	
+	private static Kunde readKunde(String tmp){
 		KundeRepository kundeRepository = new KundeRepository();
 		List<Kunde> kundeListe = new ArrayList<>();
 		kundeListe.addAll(kundeRepository.findAll());
 		
-		for (m = 0; m < kundeListe.size(); m++) {
+		for (int m = 0; m < kundeListe.size(); m++) {
 			
 			Kunde kunde = kundeListe.get(m);
 			
 			if (kunde.getId() != null && !kunde.getId().isEmpty() && kunde.getId().equals(tmp)) {
-				iNumKunde = m;
-				break;
+				return kunde;
 			}
 		}
-		
-		Kunde kunde = kundeListe.get(iNumKunde);
-
-		// Kopiere die Kundendaten sicher in ein String-Array
-		kdTmp[0] = kunde.getId();
-		kdTmp[1] = kunde.getName();
-		kdTmp[2] = kunde.getStrasse();
-		kdTmp[3] = kunde.getPlz();
-		kdTmp[4] = kunde.getOrt();
-		kdTmp[5] = kunde.getLand();
-		kdTmp[6] = kunde.getPronomen();
-		kdTmp[7] = kunde.getPerson();
-		kdTmp[8] = kunde.getUstid();
-		kdTmp[9] = kunde.getTaxvalue();
-		kdTmp[10] = kunde.getDeposit();
-		kdTmp[11] = kunde.getZahlungsziel();
-		kdTmp[12] = kunde.getLeitwegId();
-		kdTmp[13] = kunde.geteBillTyp();
-		kdTmp[14] = kunde.geteBillMail();
-		kdTmp[15] = kunde.geteBillPhone();
-		
-		return kdTmp;
+		return null;
 	}
 	
 	//###################################################################################################################################################
 	
-	private static String[] getBank(int id) {
-		int m = 0; int iNumBank = 0;
-		String[] bkTmp = new String[4];
+	private static Bank readBank(int id) {
 		BankRepository bankRepository = new BankRepository();
 	    List<Bank> bankListe = new ArrayList<>();
 	    bankListe.addAll(bankRepository.findAll());
 
-		for (m = 0; m < bankListe.size(); m++) {
+		for (int m = 0; m < bankListe.size(); m++) {
 			
 			Bank bank = bankListe.get(m);
 
-			if (bank.getBankName() != null && bank.getIban() != null && bank.getId() == id) {
-				iNumBank = m;
-				break; // Sobald die passende Bank gefunden ist, die Schleife beenden
+			if (bank.getId() != 0 && bank.getId() == id) {
+				return bank;
 			}
 		}
-		
-		Bank bank = bankListe.get(iNumBank);
-		
-		bkTmp[0] = bank.getBankName() != null ? bank.getBankName() : "";
-		bkTmp[1] = bank.getIban() != null ? bank.getIban() : "";
-		bkTmp[2] = bank.getBic() != null ? bank.getBic() : "";
-		bkTmp[3] = bank.getKtoName() != null ? bank.getKtoName() : "";
-		
-		return bkTmp;
+		return null;
 	}
 	
 	//###################################################################################################################################################
 	
-	private static ArrayList<String> getOwner(){
+	private static ArrayList<String> readOwner(){
 		OwnerRepository ownerRepository = new OwnerRepository();
 	    List<Owner> ownerListe = new ArrayList<>();
 	    ownerListe.addAll(ownerRepository.findAll());
-	    Owner owner = ownerListe.get(0);
+	    owner = ownerListe.get(0);
 	    
 	    ArrayList<String> owTmp = new ArrayList<>();
 
@@ -143,32 +141,29 @@ public class DataExportHelper {
 	
 	//###################################################################################################################################################
 	
-	private static ArrayList<ArrayList<String>> getText(){
+	private static void readText(){
 		TextRepository textRepository = new TextRepository();
 		List<Text> textListe = new ArrayList<>();
 	    textListe.addAll(textRepository.findAll());
 	    
-		ArrayList<ArrayList<String>> result = textListe.stream()
-			    .map(t -> {
-			        ArrayList<String> row = new ArrayList<>();
-			        row.add(String.valueOf(t.getId()));
-			        row.add(t.getTextUst());
-			        row.add(t.getTextZahlZiel());
-			        row.add(t.getTextAngebot());
-			        row.add(t.getTextZahlErin());
-			        row.add(t.getTextOrderConfirm());
-			        row.add(t.getTextMahnung());
-			        return row;
-			    })
-			    .collect(Collectors.toCollection(ArrayList::new));
-		
-		return result;
+		for(int i = 0; i < textListe.size(); i++) {
+			TextUSt.add(textListe.get(i).getTextUst());
+			TextZahlZiel.add(textListe.get(i).getTextZahlZiel());
+			TextAngebot.add(textListe.get(i).getTextAngebot());
+			TextZahlErin.add(textListe.get(i).getTextZahlErin());
+			TextOrderConfirm.add(textListe.get(i).getTextOrderConfirm());
+			TextMahnung.add(textListe.get(i).getTextMahnung());
+		}
 	}
 	
 	//###################################################################################################################################################
-	// Getter und Setter für Felder
+	// Getter und Setter
 	//###################################################################################################################################################
 
+	public static Owner getOwner() {
+		return owner;
+	}
+	
 	public static String getSenderOwner() {
 		return senderOwner;
 	}
@@ -187,6 +182,30 @@ public class DataExportHelper {
 
 	public static String getSteuerNummer() {
 		return steuerNummer;
+	}
+
+	public static ArrayList<String> getTextUSt() {
+		return TextUSt;
+	}
+
+	public static ArrayList<String> getTextZahlZiel() {
+		return TextZahlZiel;
+	}
+
+	public static ArrayList<String> getTextAngebot() {
+		return TextAngebot;
+	}
+
+	public static ArrayList<String> getTextZahlErin() {
+		return TextZahlErin;
+	}
+
+	public static ArrayList<String> getTextOrderConfirm() {
+		return TextOrderConfirm;
+	}
+
+	public static ArrayList<String> getTextMahnung() {
+		return TextMahnung;
 	}
 	
 }

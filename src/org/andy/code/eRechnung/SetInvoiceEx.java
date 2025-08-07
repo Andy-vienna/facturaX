@@ -7,12 +7,15 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.andy.code.dataExport.DataExportHelper;
+import org.andy.code.dataExport.ExcelBill;
+import org.andy.code.entityMaster.Bank;
+import org.andy.code.entityMaster.Kunde;
+import org.andy.code.entityMaster.Owner;
+import org.andy.code.entityProductive.Rechnung;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mustangproject.BankDetails;
@@ -27,12 +30,46 @@ public class SetInvoiceEx {
 	private static final Logger logger = LogManager.getLogger(SetInvoiceEx.class);
 
 	private static String[] SENDER = new String[11];
+	
+	//###################################################################################################################################################
+	// public Teil
+	//###################################################################################################################################################
+	
+	public static Invoice doInvoice(Rechnung rechnung, Bank bank, Kunde kunde, Owner owner) {
+		try {
+			return setInvoice(rechnung, bank, kunde, owner);
+		} catch (ParseException | IOException e) {
+			logger.error("doInvoice(...) - " + e);
+		}
+		return null;
+	}
+	
+	//###################################################################################################################################################
+	// private Teil
+	//###################################################################################################################################################
 
-	private static Invoice setInvoice(String[][] sArray) throws ParseException, IOException {
+	private static Invoice setInvoice(Rechnung rechnung, Bank bank, Kunde kunde, Owner owner) throws ParseException, IOException {
 
-		ArrayList<String> owner = DataExportHelper.ownerData();
-		for (int i = 0; i < owner.size(); i++) {
-			SENDER[i] = owner.get(i);
+		SENDER[0] = owner.getName();
+		SENDER[1] = owner.getAdresse();
+		SENDER[2] = owner.getPlz();
+		SENDER[3] = owner.getOrt();
+		SENDER[4] = owner.getLand();
+		SENDER[5] = owner.getUstid();
+		SENDER[6] = owner.getKontaktName();
+		SENDER[7] = owner.getKontaktTel();
+		SENDER[8] = owner.getKontaktMail();
+		SENDER[9] = owner.getCurrency();
+		SENDER[10] = owner.getTaxid();
+		
+		String SEND_COUNTRY = null;
+		switch(SENDER[4].toUpperCase()) {
+		case "DEUTSCHLAND":
+			SEND_COUNTRY = "DE";
+			break;
+		case "ÖSTERREICH":
+			SEND_COUNTRY = "AT";
+			break;
 		}
 
 		long issue = 0;
@@ -41,11 +78,11 @@ public class SetInvoiceEx {
 		long end = 0;
 		Item[] position = new Item[12];
 		String RECV_COUNTRY = null;
-		String RECV_NAME = sArray[1][1];
-		String RECV_ADRESS = sArray[1][2];
-		String RECV_ZIP = sArray[1][3];
-		String RECV_TOWN = sArray[1][4];
-		switch(sArray[1][5]) {
+		String RECV_NAME = kunde.getName();
+		String RECV_ADRESS = kunde.getStrasse();
+		String RECV_ZIP = kunde.getPlz();
+		String RECV_TOWN = kunde.getOrt();
+		switch(kunde.getLand().toUpperCase()) {
 		case "DEUTSCHLAND":
 			RECV_COUNTRY = "DE";
 			break;
@@ -53,49 +90,54 @@ public class SetInvoiceEx {
 			RECV_COUNTRY = "AT";
 			break;
 		}
-		String RECV_DUTY = sArray[1][7];
-		String RECV_VAT = sArray[1][8];
-		String RECV_TAX = sArray[1][9];
-		String LEITWEG_ID = sArray[1][12];
-		String RECV_MAIL = sArray[1][14];
-		String RECV_PHONE = sArray[1][15];
-		String RE_NR = sArray[2][2];
-		String TAX_NOTE = sArray[3][1];
-		String BANK_IBAN = sArray[4][2];
-		String BANK_BIC = sArray[4][3];
-		String BANK_HOLDER = sArray[4][4];
+		String RECV_DUTY = kunde.getPerson();
+		String RECV_VAT = kunde.getUstid();
+		String RECV_TAX = kunde.getTaxvalue();
+		String LEITWEG_ID = kunde.getLeitwegId();
+		String RECV_MAIL = kunde.geteBillMail();
+		String RECV_PHONE = kunde.geteBillPhone();
+		String RE_NR = rechnung.getIdNummer();
+		String TAX_NOTE = ExcelBill.getTaxNote();
+		String BANK_IBAN = bank.getIban();
+		String BANK_BIC = bank.getBic();
+		String BANK_HOLDER = bank.getKtoName();
 
 		BankDetails bDetail = new BankDetails(BANK_IBAN, BANK_BIC).setAccountName(BANK_HOLDER);
-		Contact cSend = new Contact(SENDER[7], SENDER[8], SENDER[9]);
+		Contact cSend = new Contact(SENDER[6], SENDER[7], SENDER[8]);
 		Contact cRecv = new Contact(RECV_DUTY, RECV_PHONE, RECV_MAIL);
-		TradeParty sender = new TradeParty(SENDER[1], SENDER[2], SENDER[3], SENDER[4], SENDER[5]).setVATID(SENDER[6])
-				.setContact(cSend).addBankDetails(bDetail).setEmail(SENDER[9]);
+		TradeParty sender = new TradeParty(SENDER[0], SENDER[1], SENDER[2], SENDER[3], SEND_COUNTRY).setVATID(SENDER[5])
+				.setContact(cSend).addBankDetails(bDetail).setEmail(SENDER[8]);
 		TradeParty recipient = new TradeParty(RECV_NAME, RECV_ADRESS, RECV_ZIP, RECV_TOWN, RECV_COUNTRY).setVATID(RECV_VAT)
 				.setContact(cRecv).setEmail(RECV_MAIL);
 
-		int ziel = Integer.valueOf(sArray[1][11]);
-		issue = dateInMilis(sArray[2][1]); // Rechnungsdatum
-		due = addDaysInMilis(sArray[2][1], ziel); // Fälligkeit
-
 		// Leisutngszeitraum zerlegen
-		String LZvon = cutBack(sArray[2][3], "-", 1);
-		String LZbis = cutFront(sArray[2][3], "-", 1);
+		String LZvon = cutBack(rechnung.getlZeitr(), "-", 1);
+		String LZbis = cutFront(rechnung.getlZeitr(), "-", 1);
+		// Konvertierung von Datums
+		Date reDate = new SimpleDateFormat("yyyy-MM-dd").parse(rechnung.getDatum().toString());
+		Date vonDate = new SimpleDateFormat("dd.MM.yyyy").parse(LZvon);
+		Date bisDate = new SimpleDateFormat("dd.MM.yyyy").parse(LZbis);
+		
+		int ziel = Integer.valueOf(kunde.getZahlungsziel());
+		issue = dateInMilis(reDate); // Rechnungsdatum
+		due = addDaysInMilis(reDate, ziel); // Fälligkeit
 
-		start = dateInMilis(LZvon); // Lieferdatum (aus Leistungszeitraum von)
-		end = dateInMilis(LZbis); // Lieferdatum (aus Leistungszeitraum von)
+		start = dateInMilis(vonDate); // Lieferdatum (aus Leistungszeitraum von)
+		end = dateInMilis(bisDate); // Lieferdatum (aus Leistungszeitraum von)
 
-		int iAnz = Integer.valueOf(sArray[0][0]);
+		int iAnz = rechnung.getAnzPos().intValue();
+		String[] posText = ExcelBill.getsReTxt(); double[] posAnz = ExcelBill.getdAnz(); double[] posEp = ExcelBill.getdEp();
 		for(int x = 0; x < iAnz; x++) {
 			//new Item(new Product("Artikeltext", "Artikelbeschreibung", "C62", new BigDecimal(Steuersatz), new BigDecimal(E-Preis),  new BigDecimal(Menge))
-			position[x] = new Item(new Product(sArray[x + 10][1], "", "C62", new BigDecimal(RECV_TAX)), new BigDecimal(sArray[x + 10][3]), new BigDecimal(sArray[x + 10][2]));
+			position[x] = new Item(new Product(posText[x], "", "C62", new BigDecimal(RECV_TAX)), BigDecimal.valueOf(posEp[x]), BigDecimal.valueOf(posAnz[x]));
 		}
 		Invoice iInv = new Invoice()
 				.setDueDate(new Date(due)) // Fälligkeit
 				.setIssueDate(new Date(issue)) // Rechnungsdatum
-				.setBuyerOrderReferencedDocumentID(sArray[2][4]) // Kundenreferenz
+				.setBuyerOrderReferencedDocumentID(rechnung.getRef()) // Kundenreferenz
 				.setDetailedDeliveryPeriod(new Date(start), new Date(end)) // Leistungszeitraum
 				.setDeliveryDate(new Date(start)) // Liefertermin od. Leistungszeitraum
-				.setCurrency(SENDER[10])
+				.setCurrency(SENDER[9])
 				.setSender(sender)
 				.setRecipient(recipient)
 				.setReferenceNumber(LEITWEG_ID)
@@ -109,15 +151,17 @@ public class SetInvoiceEx {
 		}
 		return iInv;
 	}
+	
+	//###################################################################################################################################################
 
-	private static long dateInMilis(String date) throws ParseException {
-		Date d = new SimpleDateFormat("dd.MM.yyyy").parse(date);
+	private static long dateInMilis(Date d) throws ParseException {
 		long timestamp = d.getTime();
 		return timestamp;
 	}
+	
+	//###################################################################################################################################################
 
-	private static long addDaysInMilis(String date, int add) throws ParseException {
-		Date d = new SimpleDateFormat("dd.MM.yyyy").parse(date);
+	private static long addDaysInMilis(Date d, int add) throws ParseException {
 		Calendar calendar = new GregorianCalendar();
 		calendar.setTime(d);
 		calendar.add(Calendar.DAY_OF_MONTH, add); // add n days to calendar instance
@@ -126,14 +170,9 @@ public class SetInvoiceEx {
 		return timestamp;
 	}
 
-	public static Invoice doInvoice(String[][] sArray) {
-		try {
-			return setInvoice(sArray);
-		} catch (ParseException | IOException e) {
-			logger.error("doInvoice(String[][] sArray) - " + e);
-		}
-		return null;
-	}
+	//###################################################################################################################################################
+	// Getter und Setter
+	//###################################################################################################################################################
 
 	public static String[] getSENDER() {
 		return SENDER;

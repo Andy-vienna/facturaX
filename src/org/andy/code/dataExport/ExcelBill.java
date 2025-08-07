@@ -2,23 +2,29 @@ package org.andy.code.dataExport;
 
 import static org.andy.toolbox.misc.Tools.FormatIBAN;
 import static org.andy.toolbox.misc.Tools.isLocked;
-import static org.andy.toolbox.sql.Insert.sqlInsert;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.sql.SQLException;
+import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import org.andy.code.eRechnung.CreateXRechnungXML;
 import org.andy.code.eRechnung.CreateZUGFeRDpdf;
+import org.andy.code.entityMaster.Bank;
+import org.andy.code.entityMaster.Kunde;
+import org.andy.code.entityProductive.FileStore;
+import org.andy.code.entityProductive.FileStoreRepository;
+import org.andy.code.entityProductive.Rechnung;
 import org.andy.code.main.LoadData;
 import org.andy.code.qr.ZxingQR;
-import org.andy.gui.main.JFoverview;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,15 +49,7 @@ public class ExcelBill{
 
 	private static final Logger logger = LogManager.getLogger(ExcelBill.class);
 
-	private static String[][] arrYearBill;
-	private static int iNumData;
-	public static int iNumKunde;
-	private static String[][] arrReContent = new String[30][16];
-
-	private static final String TBL_FILE = "tbl_files";
-	private static String sConn;
-
-	private static final int START_ROW_OFFSET = 15;
+	private static final int START_ROW_OFFSET = 16;
 	private static final int COLUMN_A = 0;
 	private static final int COLUMN_B = 1;
 	private static final int COLUMN_C = 2;
@@ -61,143 +59,12 @@ public class ExcelBill{
 
 	private static final String ZUGFeRD = "ZUGFeRD";
 	private static final String XRECHNUNG = "XRechnung";
-
-	/* Kommentarblock
-	 *
-	 *###################################################################################################################################################
-	 *Daten zusammensammeln und in ein globales Array ablegen:
-	 *arrReContent[0][0]				- Anzahl der in der Rechnung enthaltenen Positionszeilen
-	 *	 	    [1][1] - [1][14]	- Kundendaten (Kunde, Straße, PLZ, Ort, Land, Pronom, Ansprechpartner, UID, USt.-Satz, Rabatschlüssel, Zahlungsziel, eBillLeitwegId, eBillTyp, eBillMail)
-	 *			[2][1]				- Rechnungsdatum
-	 *			[2][2]				- Rechnungsnummer
-	 *			[2][3]				- Leistungszeitraum
-	 *			[2][4]				- Kundenreferenz
-	 *			[3][1] - [3][2]		- Rechnungstexte (Steuerhinweis, Zahlungsziel)
-	 *			[4][1] - [4][4]		- Bankverbindung (Bankname, IBAN, BIC, Kontoinhaber)
-	 *			[10][1] - [10][4]	- 1. Angebotszeile (Text, Anzahl, E-Preis, G-Preis)
-	 *			....... - .......	- 2. - 11. Angebotszeile
-	 *			[21][1] - [21][4]	- 12. Angebotszeile
-	 */
-	/* Excel-Vorlage 'template-bill.xlsx' - v2.05 - Struktur:
-	 *
-	 *Anschriftsfeld: 			B5
-	 *Rechnungsdatum: 			F5
-	 *Rechnungsnummer: 		F6
-	 *Leistungszeitraum: 		F7
-	 *Kunden-UID:				F8
-	 *Ansprechpartner: 		F9
-	 *Kundenreferenz: 			F10
-	 *Rechnungspositionen: 	B/C/D/F17 - B/C/D/F28 (Bezeichnung, Menge, E-Preis, G-Preis)
-	 *Nettosumme: 				F29
-	 *Steuersatz: 				F30
-	 *Umsatzsteuer: 			F31
-	 *Rechnungsbetrag: 		F32
-	 *Steuerhinweis: 			B36
-	 *Zahlungsziel: 			B38
-	 *QR-Code: 				F37
-	 *Bankverbindung: 			E47, E48, E49 (Bank Name, IBAN, BIC)
-	 *###################################################################################################################################################
-	 */
-
-	private static void reCollectData(String sNr) throws Exception {
-
-		int x = 0; int y = 0; int n = 0;
-
-		arrYearBill = JFoverview.getArrYearRE();
-
-		n = 1;
-		for(n = 1; (n-1) < Integer.valueOf(arrYearBill[0][0]); n++) {
-			if(arrYearBill[n][1].equals(sNr)) {
-				iNumData = n; // Datensatznummer der angeforderten Rechnung
-			}
-		}
-		arrReContent[0][0] = arrYearBill[iNumData][15]; //Anzahl Zeilen für Rechnung
-		String tmp = arrYearBill[iNumData][9];
-
-		String[] kundeTmp = DataExportHelper.kundeData(tmp);
-		for (int i = 0; i < 16; i++) {
-			arrReContent[1][i + 1] = kundeTmp[i];
-		}
-
-		arrReContent[2][1] = arrYearBill[iNumData][6]; //Rechnungsdatum
-		arrReContent[2][2] = sNr; //Rechnungsnummer
-		arrReContent[2][3] = arrYearBill[iNumData][7]; //Leistungszeitraum
-		arrReContent[2][4] = arrYearBill[iNumData][8]; //Kundenreferenz
-		x = 1;
-		y = 16;
-		while(x < (Integer.valueOf(arrReContent[0][0]) + 1)) {
-			arrReContent[x + 9][1] = arrYearBill[iNumData][y];
-			arrReContent[x + 9][2] = arrYearBill[iNumData][y + 1];
-			arrReContent[x + 9][3] = arrYearBill[iNumData][y + 2];
-			double anz = Double.parseDouble(arrReContent[x + 9][2]);
-			double ep = Double.parseDouble(arrReContent[x + 9][3]);
-			double gp = anz * ep;
-			arrReContent[x + 9][4] = String.valueOf(gp);
-			x = x + 1;
-			y = y + 3;
-		}
-
-		if (kundeTmp[9].equals("0")) { // Steuerhinweis prüfen
-			if (arrYearBill != null && arrYearBill[iNumData] != null &&
-					arrYearBill[iNumData].length > 10 && "true".equals(arrYearBill[iNumData][10])) { // Reverse Charge
-
-				ArrayList<ArrayList<String>> textList = DataExportHelper.textData();
-
-				if (textList != null && textList.size() > 1) {
-					ArrayList<String> text = textList.get(1);
-					if (text != null && text.size() > 1) {
-						arrReContent[3][1] = text.get(1);
-					} else {
-						arrReContent[3][1] = "Fehlender Text"; // Fallback
-					}
-				}
-			} else {
-				ArrayList<ArrayList<String>> textList = DataExportHelper.textData();
-
-				if (textList != null && textList.size() > 0) {
-					ArrayList<String> text = textList.get(0);
-					if (text != null && text.size() > 1) {
-						arrReContent[3][1] = text.get(1);
-					} else {
-						arrReContent[3][1] = "Fehlender Text"; // Fallback
-					}
-				}
-			}
-		} else {
-			arrReContent[3][1] = " ";
-		}
-
-		String zahlungsziel = kundeTmp[11]; // Zahlungsziel
-
-		ArrayList<ArrayList<String>> textList = DataExportHelper.textData();
-		if (textList != null && textList.size() > 1) { // Sicherstellen, dass genug Texte vorhanden sind
-			if ("0".equals(zahlungsziel)) {
-				ArrayList<String> text = textList.get(0);
-				if (text != null && text.size() > 2) {
-					arrReContent[3][2] = text.get(2);
-				} else {
-					arrReContent[3][2] = "Fehlender Text"; // Fallback für fehlende Einträge
-				}
-			} else {
-				ArrayList<String> text = textList.get(1);
-				if (text != null && text.size() > 2) {
-					arrReContent[3][2] = ReplaceText.doReplace(text.get(2), "none", "none", "none", "none", zahlungsziel, "none", "none", "none", "none", "none");
-				} else {
-					arrReContent[3][2] = "Fehlender Text"; // Fallback für fehlende Einträge
-				}
-			}
-		} else {
-			arrReContent[3][2] = "Fehlende Textdaten"; // Fallback für fehlende Text-Liste
-		}
-
-		int tmpBank = Integer.parseInt(arrYearBill[iNumData][11]); // Datensatz-Id der ausgewählten Bankverbindung
-
-	    String[] bankTmp = DataExportHelper.bankData(tmpBank);
-		for (int i = 0; i < 4; i++) {
-			arrReContent[4][i + 1] = bankTmp[i];
-		}
-
-	}
+	
+	private static String[] sReTxt = new String[12];
+	private static double[] dAnz = new double[12];
+	private static double[] dEp = new double[12];
+	
+	private static String taxNote;
 
 	//###################################################################################################################################################
 	// Rechnung erzeugen und auf Wunsch als pdf exportieren
@@ -206,23 +73,21 @@ public class ExcelBill{
 	public static void reExport(String sNr) throws Exception {
 
 		String sExcelIn = LoadData.getTplBill();
-		String sExcelOut = LoadData.getWorkPath() + "\\Rechnung_" + sNr + ".xlsx";
-		String sPdfOut = LoadData.getWorkPath() + "\\Rechnung_" + sNr + ".pdf";
+		String sExcelOut = LoadData.getWorkPath() + "Rechnung_" + sNr + ".xlsx";
+		String sPdfOut = LoadData.getWorkPath() + "Rechnung_" + sNr + ".pdf";
 
 		DecimalFormat formatter = new DecimalFormat("#.##");
 
-		final Cell rePos[] = new Cell[13];
-		final Cell reText[] = new Cell[13];
-		final Cell reAnz[] = new Cell[13];
-		final Cell reEPreis[] = new Cell[13];
-		final Cell reGPreis[] = new Cell[13];
+		final Cell rePos[] = new Cell[12];
+		final Cell reText[] = new Cell[12];
+		final Cell reAnz[] = new Cell[12];
+		final Cell reEPreis[] = new Cell[12];
+		final Cell reGPreis[] = new Cell[12];
 
-		double dNetto = 0;
-		double dUstSatz = 0;
-		double dUSt = 0;
-		double dBrutto = 0;
-
-		reCollectData(sNr); //Daten aufbereiten
+		Rechnung rechnung = DataExportHelper.loadRechnung(sNr);
+		Kunde kunde = DataExportHelper.kundeData(rechnung.getIdKunde());
+		Bank bank = DataExportHelper.bankData(rechnung.getIdBank());
+		DataExportHelper.textData();
 
 		//#######################################################################
 		// Rechnungs-Excel erzeugen
@@ -294,7 +159,8 @@ public class ExcelBill{
 			Cell reUID = ws.getRow(7).getCell(COLUMN_F); //UID
 			Cell reDuty = ws.getRow(8).getCell(COLUMN_F); //Ansprechpartner
 			Cell reRef = ws.getRow(9).getCell(COLUMN_F); //Kundenreferenz
-			for(int i = 1; i < (Integer.parseInt(arrReContent[0][0]) + 1); i++ ) { //Rechnungspositionen B, C, D, F Zeile 17-28
+			
+			for(int i = 0; i < rechnung.getAnzPos().intValue(); i++ ) { //Rechnungspositionen B, C, D, F Zeile 17-28
 				int j = i + START_ROW_OFFSET;
 				rePos[i] = ws.getRow(j).getCell(COLUMN_A); //Position
 				reText[i] = ws.getRow(j).getCell(COLUMN_B); //Text
@@ -302,6 +168,7 @@ public class ExcelBill{
 				reEPreis[i] = ws.getRow(j).getCell(COLUMN_D); //E-Preis
 				reGPreis[i] = ws.getRow(j).getCell(COLUMN_F); //G-Preis
 			}
+			
 			Cell reNetto = ws.getRow(28).getCell(COLUMN_F); //Nettosumme, Steuersatz, USt., Gesamtsumme
 			Cell reUstSatz = ws.getRow(29).getCell(COLUMN_F);
 			Cell reUSt = ws.getRow(30).getCell(COLUMN_F);
@@ -314,44 +181,62 @@ public class ExcelBill{
 			//#######################################################################
 			// Zellwerte beschreiben aus dem Array arrAnContent
 			//#######################################################################
-			reAdress.setCellValue(arrReContent[1][1] + "\n" + arrReContent[1][2] + "\n" + arrReContent[1][3] + " " +
-					arrReContent[1][4] + ", " + arrReContent[1][5]);
-			reDate.setCellValue(arrReContent[2][1]);
-			reNr.setCellValue(arrReContent[2][2]);
-			reLZ.setCellValue(arrReContent[2][3]);
-			reUID.setCellValue(arrReContent[1][8]);
-			reDuty.setCellValue(arrReContent[1][6] + " " + arrReContent[1][7]);
-			reRef.setCellValue(arrReContent[2][4]);
-			for(int i = 1; i < (Integer.parseInt(arrReContent[0][0]) + 1); i++ ) {
-				rePos[i].setCellValue(String.valueOf(i));
-				reText[i].setCellValue(arrReContent[(i + 9)][1]);
-				reAnz[i].setCellValue(Double.parseDouble(arrReContent[(i + 9)][2]));
-				reEPreis[i].setCellValue(Double.parseDouble(arrReContent[(i + 9)][3]));
-				reGPreis[i].setCellValue(Double.parseDouble(arrReContent[(i + 9)][4]));
-				dNetto = dNetto + Double.parseDouble(arrReContent[(i + 9)][4]);
+			reAdress.setCellValue(kunde.getName() + "\n" + kunde.getStrasse() + "\n" + kunde.getPlz() + " " +
+					kunde.getOrt() + ", " + kunde.getLand().toUpperCase());
+			reDate.setCellValue(rechnung.getDatum().toString());
+			reNr.setCellValue(rechnung.getIdNummer());
+			reLZ.setCellValue(rechnung.getlZeitr());
+			reUID.setCellValue(kunde.getUstid());
+			reDuty.setCellValue(kunde.getPronomen() + " " + kunde.getPerson());
+			reRef.setCellValue(rechnung.getRef());
+			
+			for(int i = 0; i < rechnung.getAnzPos().intValue(); i++ ) {
+				rePos[i].setCellValue(String.valueOf(i + 1));
+				try {
+					String art = (String) Rechnung.class.getMethod("getArt" + String.format("%02d", i + 1)).invoke(rechnung);
+		            BigDecimal menge = (BigDecimal) Rechnung.class.getMethod("getMenge" + String.format("%02d", i + 1)).invoke(rechnung);
+		            BigDecimal ep = (BigDecimal) Rechnung.class.getMethod("getePreis" + String.format("%02d", i + 1)).invoke(rechnung);
+		            sReTxt[i] = art; dAnz[i] = menge.doubleValue(); dEp[i] = ep.doubleValue();
+		            reText[i].setCellValue(art);
+					reAnz[i].setCellValue(menge.doubleValue());
+					reEPreis[i].setCellValue(ep.doubleValue());
+					reGPreis[i].setCellValue(menge.multiply(ep).doubleValue());
+				} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+					System.out.println(e.getMessage());
+				}
 			}
-			dUstSatz = Double.parseDouble(arrReContent[1][9]) / 100;
-			dUSt = dNetto * dUstSatz;
-			dBrutto = dNetto + dUSt;
-			reNetto.setCellValue(dNetto);
-			reUstSatz.setCellValue(arrReContent[1][9] + "%");
-			reUSt.setCellValue(dUSt);
-			reBrutto.setCellValue(dBrutto);
-			reText1.setCellValue(arrReContent[3][1]);
-			reText2.setCellValue(arrReContent[3][2]);
-			reBank.setCellValue(arrReContent[4][1]);
-			reIBAN.setCellValue(FormatIBAN(arrReContent[4][2]));
-			reBIC.setCellValue(arrReContent[4][3]);
+
+			reNetto.setCellValue(rechnung.getNetto().doubleValue());
+			reUstSatz.setCellValue(kunde.getTaxvalue() + "%");
+			reUSt.setCellValue(rechnung.getUst().doubleValue());
+			reBrutto.setCellValue(rechnung.getBrutto().doubleValue());
+			
+			if(rechnung.getRevCharge() == 0) {
+				taxNote = DataExportHelper.getTextUSt().get(0); // Steuerhinweis
+			} else {
+				taxNote = DataExportHelper.getTextUSt().get(1); // Steuerhinweis Reverse Charge
+			}
+			reText1.setCellValue(taxNote); // Steuerhinweis
+			
+			if(kunde.getZahlungsziel().equals("0")) {
+				reText2.setCellValue(DataExportHelper.getTextZahlZiel().get(0)); // Zahlungsziel
+			} else {
+				reText2.setCellValue(DataExportHelper.getTextZahlZiel().get(1).replace("{Tage}", kunde.getZahlungsziel())); // Zahlungsziel
+			}
+			
+			reBank.setCellValue(bank.getBankName());
+			reIBAN.setCellValue(FormatIBAN(bank.getIban()));
+			reBIC.setCellValue(bank.getBic());
 			//#######################################################################
 			// QR Code erzeugen und im Anwendungsverzeichnis ablegen
 			//#######################################################################
-			String sBrutto = formatter.format(dBrutto);
+			String sBrutto = formatter.format(rechnung.getBrutto());
 			try {
-				ZxingQR.makeQR(LoadData.getStrQRschema(), arrReContent[4][4], arrReContent[4][2], arrReContent[4][3], sBrutto.replace(",", "."), sNr);
+				ZxingQR.makeQR(LoadData.getStrQRschema(), bank.getKtoName(), bank.getIban(), bank.getBic(), sBrutto.replace(",", "."), sNr);
 			} catch (WriterException e) {
-				logger.error("makeQR(LoadData.strQRschema, arrReContent[4][4], arrReContent[4][2], arrReContent[4][3], sBrutto.replace(\",\", \".\"), sNr) - " + e);
+				logger.error("makeQR(...) - " + e);
 			} catch (IOException e) {
-				logger.error("makeQR(LoadData.strQRschema, arrReContent[4][4], arrReContent[4][2], arrReContent[4][3], sBrutto.replace(\",\", \".\"), sNr) - " + e);
+				logger.error("makeQR(...) - " + e);
 			}
 			//#######################################################################
 			// erzeugten QR Code als png-Datei einlesen
@@ -368,7 +253,7 @@ public class ExcelBill{
 				Picture pict = drawing.createPicture(anchor, pictureIdx);
 				pict.resize(0.9, 0.9); //Bild im Faktor 0,9x0,9 zoomen
 			} catch (IOException e) {
-				logger.error("reExport(String sNr) - " + e);
+				logger.error("reExport(...) - " + e);
 			}
 			//#######################################################################
 			// WORKBOOK mit Daten befüllen und schließen
@@ -376,9 +261,9 @@ public class ExcelBill{
 			wb.write(fileOut); //Excel mit Daten befüllen
 			wb.close(); //Excel workbook schließen
 		} catch (FileNotFoundException e) {
-			logger.error("reExport(String sNr) - " + e);
+			logger.error("reExport(...) - " + e);
 		} catch (IOException e) {
-			logger.error("reExport(String sNr) - " + e);
+			logger.error("reExport(...) - " + e);
 		}
 		//#######################################################################
 		// Datei qr.png wieder löschen
@@ -398,101 +283,93 @@ public class ExcelBill{
 		//#######################################################################
 		// eRechnung erstellen nach hinterlegtem Format (ZUGFeRD oder XRechnung)
 		//#######################################################################
-		switch(arrReContent[1][13]) {
+		String sFile = null;
+		
+		switch(kunde.geteBillTyp()) {
 		case ZUGFeRD:
-			String sFeRDpdf = LoadData.getWorkPath() + "\\Rechnung_" + sNr + "_ZUGFeRD.pdf";
+			sFile = LoadData.getWorkPath() + "Rechnung_" + sNr + "_ZUGFeRD.pdf";
 
 			try {
-				CreateZUGFeRDpdf.generateZUGFeRDpdf(arrReContent, sPdfOut, sFeRDpdf);
+				CreateZUGFeRDpdf.generateZUGFeRDpdf(rechnung, bank, kunde, DataExportHelper.getOwner(), sPdfOut, sFile);
 			} catch (ParseException | IOException e) {
 				logger.error("error generating zugferd - " + e);
-			}
-
-			boolean bLockedpdf = isLocked(sFeRDpdf);
-			while(bLockedpdf) {
-				System.out.println("warte auf Datei ...");
-			}
-
-			try {
-
-				String FileNamePath = sFeRDpdf;
-				File fn = new File(FileNamePath);
-				String FileName = fn.getName();
-
-				String tblName = TBL_FILE.replace("_", LoadData.getStrAktGJ());
-				String sSQLstatement = "INSERT INTO " + tblName + " ([IdNummer],[REFileName],[REpdfFile]) VALUES ('" + sNr + "','" + FileName
-						+ "',(SELECT * FROM OPENROWSET(BULK '" + FileNamePath + "', SINGLE_BLOB) AS DATA))";
-
-				sqlInsert(sConn, sSQLstatement);
-			} catch (SQLException | ClassNotFoundException e) {
-				logger.error("error writing zugferd to database - " + e);
-			}
-
-			File FeRD = new File(sFeRDpdf);
-			if(FeRD.delete()) {
-
-			}else {
-				logger.error("reExport(String sNr) - pdf-Datei konnte nicht gelöscht werden");
 			}
 			break;
 
 		case XRECHNUNG:
-			String sXRxml = LoadData.getWorkPath() + "\\Rechnung_" + sNr + "_XRechnung.xml";
+			sFile = LoadData.getWorkPath() + "Rechnung_" + sNr + "_XRechnung.xml";
 
 			try {
-				CreateXRechnungXML.generateXRechnungXML(arrReContent, sXRxml);
+				CreateXRechnungXML.generateXRechnungXML(rechnung, bank, kunde, DataExportHelper.getOwner(), sFile);
 			} catch (ParseException | IOException e) {
 				logger.error("error generating xrechnung - " + e);
 			}
-
-			boolean bLockedXML = isLocked(sXRxml);
-			while(bLockedXML) {
-				System.out.println("warte auf Datei ...");
-			}
-
-			try {
-
-				String FileNamePath = sXRxml;
-				File fn = new File(FileNamePath);
-				String FileName = fn.getName();
-
-				String tblName = TBL_FILE.replace("_", LoadData.getStrAktGJ());
-				String sSQLstatement = "INSERT INTO " + tblName + " ([IdNummer],[REFileName],[REpdfFile]) VALUES ('" + sNr + "','" + FileName
-						+ "',(SELECT * FROM OPENROWSET(BULK '" + FileNamePath + "', SINGLE_BLOB) AS DATA))";
-
-				sqlInsert(sConn, sSQLstatement);
-			} catch (SQLException | ClassNotFoundException e) {
-				logger.error("error writing xrechnung to database - " + e);
-			}
-
-			File XR = new File(sXRxml);
-			if(XR.delete()) {
-
-			}else {
-				logger.error("reExport(String sNr) - xml-Datei konnte nicht gelöscht werden");
-			}
-		default:
 			break;
+
+		default:
+			return;
 		}
+		
+		boolean bLockedoutput = isLocked(sFile);
+		while(bLockedoutput) {
+			System.out.println("warte auf Datei ...");
+		}
+		
+		String FileNamePath = sFile;
+		File fn = new File(FileNamePath);
+		String FileName = fn.getName();
+		
+		
+		FileStoreRepository fileStoreRepository = new FileStoreRepository();
+		FileStore fileStore = new FileStore();
+		
+		fileStore.setIdNummer(rechnung.getIdNummer());
+		fileStore.setYear(rechnung.getJahr());
+		fileStore.setReFileName(FileName);
+		
+		Path path = Paths.get(FileNamePath);
+		fileStore.setRePdfFile(Files.readAllBytes(path)); // ByteArray für Dateiinhalt
+		
+		fileStoreRepository.save(fileStore); // Datei in DB speichern
+		
 		//#######################################################################
 		// Ursprungs-Excel und -pdf löschen
 		//#######################################################################
 		boolean bLockedpdf = isLocked(sPdfOut);
 		boolean bLockedxlsx = isLocked(sExcelOut);
-		while(bLockedpdf || bLockedxlsx) {
+		boolean bLockedout = isLocked(sFile);
+		while(bLockedpdf || bLockedxlsx || bLockedout) {
 			System.out.println("warte auf Dateien ...");
 		}
 		File xlFile = new File(sExcelOut);
 		File pdFile = new File(sPdfOut);
-		if(xlFile.delete() && pdFile.delete()) {
+		File outFile = new File(sFile);
+		if(xlFile.delete() && pdFile.delete() && outFile.delete()) {
 
 		}else {
-			logger.error("reExport(String sNr) - xlsx-Datei konnte nicht gelöscht werden");
+			logger.error("reExport(...) - Dateien konnten nicht gelöscht werden");
 		}
 	}
+	
+	//###################################################################################################################################################
+	// Getter und Setter
+	//###################################################################################################################################################
 
-	public static void setsConn(String sConn) {
-		ExcelBill.sConn = sConn;
+	public static String[] getsReTxt() {
+		return sReTxt;
 	}
+
+	public static double[] getdAnz() {
+		return dAnz;
+	}
+
+	public static double[] getdEp() {
+		return dEp;
+	}
+
+	public static String getTaxNote() {
+		return taxNote;
+	}
+
 }
 

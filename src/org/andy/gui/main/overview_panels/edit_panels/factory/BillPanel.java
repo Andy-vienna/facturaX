@@ -168,8 +168,8 @@ public class BillPanel extends EditPanel {
 		datePicker[0].setBounds(60, 20, 150, 25);
 		
 		// Textfelder
-		txtFieldsHead[0] = makeField(350, 20, 200, 25, true, null);
-		txtFieldsHead[1] = makeField(640, 20, 1000, 25, true, null);
+		txtFieldsHead[0] = makeField(640, 20, 1000, 25, true, null); // Referenz
+		txtFieldsHead[1] = makeField(350, 20, 200, 25, true, null); // Leistungszeitraum
 	    for (int r = 0; r < txtFieldsHead.length; r++) {
 	    	txtFieldsHead[r].setHorizontalAlignment(SwingConstants.LEFT);
 	    	txtFieldsHead[r].setFocusable(false);

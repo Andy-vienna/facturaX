@@ -20,14 +20,7 @@ import org.andy.code.dataExport.ExcelConfirmation;
 import org.andy.code.dataExport.ExcelMahnung;
 import org.andy.code.dataExport.ExcelOffer;
 import org.andy.code.dataExport.ExcelReminder;
-import org.andy.code.entityMaster.SQLproductiveData;
-import org.andy.gui.bill.out.JFnewRa;
-import org.andy.gui.bill.out.JFstatusRa;
 import org.andy.gui.file.JFfileView;
-import org.andy.gui.main.JFoverview;
-import org.andy.gui.offer.JFconfirmA;
-import org.andy.gui.offer.JFnewA;
-import org.andy.gui.offer.JFstatusA;
 import org.andy.gui.reminder.JFnewReminder;
 import org.andy.gui.settings.JFdbSettings;
 
@@ -171,15 +164,13 @@ public class LoadData {
 				+ ";encrypt=" + LoadData.strDBencrypted + ";trustServerCertificate=" + LoadData.strDBServerCert
 				+ ";loginTimeout=30;";
 
-		SQLproductiveData.setsConn(tmpConnB);
-		JFoverview.setsConn(tmpConnB);
 		JFfileView.setsConn(tmpConnB);
 
 
 
 
 		JFnewReminder.setsConn(tmpConnB);
-		ExcelBill.setsConn(tmpConnB);
+		
 		ExcelConfirmation.setsConn(tmpConnB);
 		ExcelOffer.setsConn(tmpConnB);
 		ExcelReminder.setsConn(tmpConnB);

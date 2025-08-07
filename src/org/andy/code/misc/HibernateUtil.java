@@ -1,16 +1,15 @@
 package org.andy.code.misc;
 
-import org.andy.code.entityMaster.AnNr;
 import org.andy.code.entityMaster.Artikel;
 import org.andy.code.entityMaster.Bank;
 import org.andy.code.entityMaster.Gwb;
 import org.andy.code.entityMaster.Kunde;
 import org.andy.code.entityMaster.Owner;
-import org.andy.code.entityMaster.ReNr;
 import org.andy.code.entityMaster.Tax;
 import org.andy.code.entityMaster.Text;
 import org.andy.code.entityMaster.User;
 import org.andy.code.entityProductive.Angebot;
+import org.andy.code.entityProductive.FileStore;
 import org.andy.code.entityProductive.Rechnung;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
@@ -51,8 +50,6 @@ public class HibernateUtil {
                 .build();
 
         MetadataSources metadataSources = new MetadataSources(serviceRegistry);
-        metadataSources.addAnnotatedClass(AnNr.class); // Entitäten von DB1
-        metadataSources.addAnnotatedClass(ReNr.class);
         metadataSources.addAnnotatedClass(User.class);
         metadataSources.addAnnotatedClass(Owner.class);
         metadataSources.addAnnotatedClass(Kunde.class);
@@ -84,6 +81,7 @@ public class HibernateUtil {
         MetadataSources metadataSources = new MetadataSources(serviceRegistry);
         metadataSources.addAnnotatedClass(Angebot.class); // nur Entitäten von DB2
         metadataSources.addAnnotatedClass(Rechnung.class);
+        metadataSources.addAnnotatedClass(FileStore.class);
 
         Metadata metadata = metadataSources.getMetadataBuilder().build();
         return metadata.getSessionFactoryBuilder().build();

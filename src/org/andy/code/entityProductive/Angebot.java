@@ -22,13 +22,13 @@ public class Angebot {
 	@Column(name = "Datum", nullable = false)
 	private LocalDate datum;
 
-	@Column(name = "LZeitr", nullable = false, length = 50)
+	@Column(name = "LZeitr", nullable = false)
 	private String lZeitr;
 
-	@Column(name = "Ref", nullable = false, columnDefinition = "varchar(max)")
+	@Column(name = "Ref", nullable = false)
 	private String ref;
 
-	@Column(name = "IdKunde", nullable = false, length = 10)
+	@Column(name = "IdKunde", nullable = false)
 	private String idKunde;
 
 	@Column(name = "RevCharge", nullable = false)
@@ -52,84 +52,84 @@ public class Angebot {
 	@Column(name = "AnzPos", precision = 3, scale = 2, nullable = false)
 	private BigDecimal anzPos;
 
-	@Column(name = "Art01", nullable = false, columnDefinition = "varchar(max)")
+	@Column(name = "Art01", nullable = false)
 	private String art01;
 	@Column(name = "Menge01", precision = 9, scale = 2, nullable = false)
 	private BigDecimal menge01;
 	@Column(name = "EPreis01", precision = 9, scale = 2, nullable = false)
 	private BigDecimal ePreis01;
 
-	@Column(name = "Art02", columnDefinition = "varchar(max)")
+	@Column(name = "Art02")
 	private String art02;
 	@Column(name = "Menge02", precision = 9, scale = 2)
 	private BigDecimal menge02;
 	@Column(name = "EPreis02", precision = 9, scale = 2)
 	private BigDecimal ePreis02;
 
-	@Column(name = "Art03", columnDefinition = "varchar(max)")
+	@Column(name = "Art03")
 	private String art03;
 	@Column(name = "Menge03", precision = 9, scale = 2)
 	private BigDecimal menge03;
 	@Column(name = "EPreis03", precision = 9, scale = 2)
 	private BigDecimal ePreis03;
 
-	@Column(name = "Art04", columnDefinition = "varchar(max)")
+	@Column(name = "Art04")
 	private String art04;
 	@Column(name = "Menge04", precision = 9, scale = 2)
 	private BigDecimal menge04;
 	@Column(name = "EPreis04", precision = 9, scale = 2)
 	private BigDecimal ePreis04;
 
-	@Column(name = "Art05", columnDefinition = "varchar(max)")
+	@Column(name = "Art05")
 	private String art05;
 	@Column(name = "Menge05", precision = 9, scale = 2)
 	private BigDecimal menge05;
 	@Column(name = "EPreis05", precision = 9, scale = 2)
 	private BigDecimal ePreis05;
 
-	@Column(name = "Art06", columnDefinition = "varchar(max)")
+	@Column(name = "Art06")
 	private String art06;
 	@Column(name = "Menge06", precision = 9, scale = 2)
 	private BigDecimal menge06;
 	@Column(name = "EPreis06", precision = 9, scale = 2)
 	private BigDecimal ePreis06;
 
-	@Column(name = "Art07", columnDefinition = "varchar(max)")
+	@Column(name = "Art07")
 	private String art07;
 	@Column(name = "Menge07", precision = 9, scale = 2)
 	private BigDecimal menge07;
 	@Column(name = "EPreis07", precision = 9, scale = 2)
 	private BigDecimal ePreis07;
 
-	@Column(name = "Art08", columnDefinition = "varchar(max)")
+	@Column(name = "Art08")
 	private String art08;
 	@Column(name = "Menge08", precision = 9, scale = 2)
 	private BigDecimal menge08;
 	@Column(name = "EPreis08", precision = 9, scale = 2)
 	private BigDecimal ePreis08;
 
-	@Column(name = "Art09", columnDefinition = "varchar(max)")
+	@Column(name = "Art09")
 	private String art09;
 	@Column(name = "Menge09", precision = 9, scale = 2)
 	private BigDecimal menge09;
 	@Column(name = "EPreis09", precision = 9, scale = 2)
 	private BigDecimal ePreis09;
 
-	@Column(name = "Art10", columnDefinition = "varchar(max)")
+	@Column(name = "Art10")
 	private String art10;
 	@Column(name = "Menge10", precision = 9, scale = 2)
 	private BigDecimal menge10;
 	@Column(name = "EPreis10", precision = 9, scale = 2)
 	private BigDecimal ePreis10;
 
-	@Column(name = "Art11", columnDefinition = "varchar(max)")
+	@Column(name = "Art11")
 	private String art11;
 	@Column(name = "Menge11", precision = 9, scale = 2)
 	private BigDecimal menge11;
 	@Column(name = "EPreis11", precision = 9, scale = 2)
 	private BigDecimal ePreis11;
 
-	@Column(name = "Art12", columnDefinition = "varchar(max)")
+	@Column(name = "Art12")
 	private String art12;
 	@Column(name = "Menge12", precision = 9, scale = 2)
 	private BigDecimal menge12;

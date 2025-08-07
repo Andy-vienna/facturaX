@@ -12,7 +12,10 @@ import javax.swing.JOptionPane;
 import org.mustangproject.FileAttachment;
 import org.mustangproject.Invoice;
 import org.mustangproject.ZUGFeRD.ZUGFeRDExporterFromA3;
-
+import org.andy.code.entityMaster.Bank;
+import org.andy.code.entityMaster.Kunde;
+import org.andy.code.entityMaster.Owner;
+import org.andy.code.entityProductive.Rechnung;
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
 
@@ -21,11 +24,11 @@ public class CreateZUGFeRDpdf {
 	private static String[] SENDER;
 
 	@SuppressWarnings({ "resource" })
-	public static void generateZUGFeRDpdf(String[][] sArray, String sPdfInput, String sFeRDpdf) throws ParseException, IOException {
+	public static void generateZUGFeRDpdf(Rechnung rechnung, Bank bank, Kunde kunde, Owner owner, String sPdfInput, String sFeRDpdf) throws ParseException, IOException {
 
 		String[] sAttachment = new String[10];
 
-		Invoice i = SetInvoiceEx.doInvoice(sArray);
+		Invoice i = SetInvoiceEx.doInvoice(rechnung, bank, kunde, owner);
 		SENDER = SetInvoiceEx.getSENDER();
 
 		int dialogButton = 0;

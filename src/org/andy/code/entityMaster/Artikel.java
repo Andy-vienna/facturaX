@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 @Table(name = "tblArtikel")
 public class Artikel {
     @Id
-    @Column(name = "Id", length = 12, nullable = false)
+    @Column(name = "Id", nullable = false)
     private String id;
 
     @Column(name = "Text")

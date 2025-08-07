@@ -16,11 +16,14 @@ public class CreatePanel extends JPanel {
 	// Serialisierungs-ID für die Klasse
 	private static final long serialVersionUID = 1L;
 	
+	private JButton[] buttons;
+	
 	//###################################################################################################################################################
 	// public Teil
 	//###################################################################################################################################################
 	
 	public CreatePanel(CreateTable<Object> sPane, EditPanel editPanel, JButton[] buttons, SumPanel info) {
+		this.buttons = buttons;
 		buildPanel(sPane, editPanel, buttons, info);
 	}
 	
@@ -86,7 +89,7 @@ public class CreatePanel extends JPanel {
 	
 	private JPanel createBottomPanel(JButton[] buttons, SumPanel info) {
 		int i = 0;
-		
+
 		// Buttons und InfoPanel in einem BottomPanel anordnen
 		JPanel panel = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -118,6 +121,10 @@ public class CreatePanel extends JPanel {
 		}
 		
 		return panel;
+	}
+	
+	public JButton[] getButtons() {
+	    return buttons;
 	}
 	
 }

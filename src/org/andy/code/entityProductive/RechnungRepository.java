@@ -25,6 +25,24 @@ public class RechnungRepository {
                     .getSingleResult();
         }
     }
+    
+    public Integer findMaxNummerByJahr(int jahr) {
+        try (Session session = HibernateUtil.getSessionFactoryDb2().openSession()) {
+        	String prefix = "RE-" + jahr + "-";
+        	int prefixLength = ("RE-" + jahr + "-").length();
+            return session.createQuery(
+            		"SELECT CAST(SUBSTRING(r.idNummer, :prefixLen + 1) AS int) " +
+                            "FROM Rechnung r " +
+                            "WHERE r.jahr = :jahr AND r.idNummer LIKE :prefix " +
+                            "ORDER BY CAST(SUBSTRING(r.idNummer, :prefixLen + 1) AS int) DESC",
+                    Integer.class)
+            		.setParameter("jahr", jahr)
+                    .setParameter("prefix", prefix + "%")
+                    .setParameter("prefixLen", prefixLength)
+                    .setMaxResults(1)
+                    .uniqueResult();
+        }
+    }
 
     public void save(Rechnung rechnung) {
         Transaction tx = null;

@@ -1,13 +1,9 @@
-package org.andy.gui.offer;
+package org.andy.gui.main.create_panels;
 
 import static org.andy.toolbox.misc.CreateObject.createButton;
 import static org.andy.toolbox.misc.Tools.FormatIBAN;
-import static org.andy.toolbox.misc.Tools.cutBack;
-import static org.andy.toolbox.misc.Tools.cutFront;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,29 +11,23 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,8 +36,6 @@ import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
-import org.andy.code.entityMaster.AnNr;
-import org.andy.code.entityMaster.AnNrRepository;
 import org.andy.code.entityMaster.Artikel;
 import org.andy.code.entityMaster.ArtikelRepository;
 import org.andy.code.entityMaster.Bank;
@@ -62,12 +50,18 @@ import org.andy.gui.main.JFoverview;
 import org.andy.gui.misc.RoundedBorder;
 import org.andy.org.eclipse.wb.swing.FocusTraversalOnArray;
 
-public class JFnewA extends JFrame {
+public class CreateOfferPanel extends JPanel {
 
+	// Serialisierungs-ID für die Klasse
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = LogManager.getLogger(JFnewA.class);
 
-	private JPanel contentPanel = new JPanel();
+	private static final Logger logger = LogManager.getLogger(CreateBillPanel.class);
+	
+	JPanel panel = new JPanel(null);
+	private Border b;
+	
+	@SuppressWarnings("unused")
+	private TitledBorder border;
 
 	private static JLabel[] lblPos = new JLabel[13];
 	@SuppressWarnings("unchecked")
@@ -81,7 +75,6 @@ public class JFnewA extends JFrame {
 	private static BigDecimal[] bdSumme = new BigDecimal[13];
 	private static String[] sPosText = new String[13];
 
-	private static int iNumFrame;
 	private static boolean bKundeSel = false;
 	private static boolean bBankSel = false;
 	private static boolean bArtSel = false;
@@ -100,44 +93,32 @@ public class JFnewA extends JFrame {
     private static Artikel artikel;
 
 	//###################################################################################################################################################
+	// public Teil
 	//###################################################################################################################################################
+	
+    public CreateOfferPanel() {
+    	setLayout(null);
+        initContent();
+    }
 
-	public static void showGUI() {
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					fillVector();
-					JFnewA frame = new JFnewA();
-					frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-					frame.setVisible(true);
-				} catch (Exception e1) {
-					logger.fatal("showGUI(String sDate, String sAN) fehlgeschlagen - " + e1);
-				}
-			}
-		});
+	public void initContent() {
+		b = getBorder();
+	    if (b instanceof TitledBorder) {
+	        this.border = (TitledBorder) b;
+	    } else {
+	        logger.warn("Kein TitledBorder vorhanden – setsTitel() wird nicht funktionieren.");
+	    }
+	    
+	    fillVector();
+		buildPanel();
 	}
 
-	public JFnewA() {
+	
+	//###################################################################################################################################################
+	// private Teil
+	//###################################################################################################################################################
 
-		try (InputStream is = JFnewA.class.getResourceAsStream("/icons/edit_color.png")) {
-			if (is == null) {
-				throw new RuntimeException("Icon nicht gefunden!");
-			}
-			setIconImage(ImageIO.read(is));
-		} catch (IOException e) {
-			logger.error("error loading resource icon - " + e);
-		}
-
-		setResizable(false);
-		setTitle("Angebot erstellen");
-		//setIconImage(Toolkit.getDefaultToolkit().getImage(JFcreateA.class.getResource("/main/resources/icons/edit.png")));
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 1021, 428);
-		getContentPane().setLayout(new BorderLayout());
-		contentPanel.setLayout(null);
-		getContentPane().add(contentPanel);
-		setLocationRelativeTo(null);
+	private void buildPanel() {
 
 		JLabel lbl01 = new JLabel("Kundennummer");
 		JLabel lbl02 = new JLabel("Kundenname");
@@ -269,7 +250,7 @@ public class JFnewA extends JFrame {
 		textNummer.setBounds(450, 290, 140, 25);
 		chkPage2.setBounds(600, 320, 230, 23);
 		textReferenz.setBounds(450, 350, 385, 25);
-		btnDoExport.setBounds(850, 305, 120, 50);
+		btnDoExport.setBounds(850, 305, JFoverview.getButtonx(), JFoverview.getButtony());
 
 		datePicker.setBounds(452, 320, 140, 25);
 
@@ -347,123 +328,85 @@ public class JFnewA extends JFrame {
 			lblPos[x] = new JLabel(String.valueOf(x));
 			lblPos[x].setHorizontalAlignment(SwingConstants.CENTER);
 			lblPos[x].setBounds(320, 30 + ((x - 1) * 20), 20, 20);
-			contentPanel.add(lblPos[x]);
+			add(lblPos[x]);
 			cbPos[x] = new JComboBox<>(artikelTexte);
 			cbPos[x].setBounds(345,  30 + ((x - 1) * 20), 440, 20);
 			cbPos[x].setSelectedIndex(0);
-			contentPanel.add(cbPos[x]);
+			add(cbPos[x]);
 			txtAnz[x] = new JTextField();
 			txtAnz[x].setHorizontalAlignment(SwingConstants.CENTER);
 			txtAnz[x].setBounds(785, 30 + ((x - 1) * 20), 70, 20);
 			txtAnz[x].setEnabled(false);
-			contentPanel.add(txtAnz[x]);
+			add(txtAnz[x]);
 			txtEP[x] = new JTextField();
 			txtEP[x].setHorizontalAlignment(SwingConstants.CENTER);
 			txtEP[x].setBounds(855, 30 + ((x - 1) * 20), 70, 20);
 			txtEP[x].setEditable(false);
-			contentPanel.add(txtEP[x]);
+			add(txtEP[x]);
 			txtGP[x] = new JTextField();
 			txtGP[x].setHorizontalAlignment(SwingConstants.CENTER);
 			txtGP[x].setBounds(925, 30 + ((x - 1) * 20), 70, 20);
 			txtGP[x].setEditable(false);
-			contentPanel.add(txtGP[x]);
+			add(txtGP[x]);
 		}
 
-		btnDoExport.setIconTextGap(10);
-		btnDoExport.setIcon(new ImageIcon(JFnewA.class.getResource("/org/resources/icons/edit.png")));
+		add(lbl01);
+		add(lbl02);
+		add(lbl03);
+		add(lbl04);
+		add(lbl05);
+		add(lbl06);
+		add(lbl07);
+		add(lbl08);
+		add(lbl09);
+		add(lbl10);
+		add(lbl11);
+		add(lbl12);
+		add(lbl13);
+		add(lbl14);
+		add(lbl15);
+		add(lbl16);
+		add(lbl17);
+		add(lbl18);
+		add(lbl20);
+		add(lbl21);
+		add(lbl22);
+		add(lbl23);
+		add(lbl24);
+		add(lbl25);
+		add(lbl26);
+		add(lbl29);
+		add(separator1);
+		add(separator2);
+		add(separator3);
+		add(cmbKunde);
+		add(textKdNr);
+		add(textKdName);
+		add(textKdStrasse);
+		add(textKdPLZ);
+		add(textKdOrt);
+		add(textKdLand);
+		add(textKdPronom);
+		add(textKdDuty);
+		add(textKdUID);
+		add(textKdUSt);
+		add(textKdRabatt);
+		add(textKdZahlZiel);
+		add(chkRevCharge);
+		add(cmbBank);
+		add(textBank);
+		add(textIBAN);
+		add(textBIC);
+		add(textNummer);
+		add(chkPage2);
+		add(textReferenz);
+		add(btnDoExport);
 
-		contentPanel.add(lbl01);
-		contentPanel.add(lbl02);
-		contentPanel.add(lbl03);
-		contentPanel.add(lbl04);
-		contentPanel.add(lbl05);
-		contentPanel.add(lbl06);
-		contentPanel.add(lbl07);
-		contentPanel.add(lbl08);
-		contentPanel.add(lbl09);
-		contentPanel.add(lbl10);
-		contentPanel.add(lbl11);
-		contentPanel.add(lbl12);
-		contentPanel.add(lbl13);
-		contentPanel.add(lbl14);
-		contentPanel.add(lbl15);
-		contentPanel.add(lbl16);
-		contentPanel.add(lbl17);
-		contentPanel.add(lbl18);
-		contentPanel.add(lbl20);
-		contentPanel.add(lbl21);
-		contentPanel.add(lbl22);
-		contentPanel.add(lbl23);
-		contentPanel.add(lbl24);
-		contentPanel.add(lbl25);
-		contentPanel.add(lbl26);
-		contentPanel.add(lbl29);
-		contentPanel.add(separator1);
-		contentPanel.add(separator2);
-		contentPanel.add(separator3);
-		contentPanel.add(cmbKunde);
-		contentPanel.add(textKdNr);
-		contentPanel.add(textKdName);
-		contentPanel.add(textKdStrasse);
-		contentPanel.add(textKdPLZ);
-		contentPanel.add(textKdOrt);
-		contentPanel.add(textKdLand);
-		contentPanel.add(textKdPronom);
-		contentPanel.add(textKdDuty);
-		contentPanel.add(textKdUID);
-		contentPanel.add(textKdUSt);
-		contentPanel.add(textKdRabatt);
-		contentPanel.add(textKdZahlZiel);
-		contentPanel.add(chkRevCharge);
-		contentPanel.add(cmbBank);
-		contentPanel.add(textBank);
-		contentPanel.add(textIBAN);
-		contentPanel.add(textBIC);
-		contentPanel.add(textNummer);
-		contentPanel.add(chkPage2);
-		contentPanel.add(textReferenz);
-		contentPanel.add(btnDoExport);
+		add(datePicker);
 
-		contentPanel.add(datePicker);
-
-		contentPanel.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{cmbKunde, cmbBank, btnDoExport}));
+		setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{cmbKunde, cmbBank, btnDoExport}));
 
 		//###################################################################################################################################################
-		//###################################################################################################################################################
-
-		addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-
-				iNumFrame = 0;
-				bKundeSel = false;
-				bBankSel = false;
-				bArtSel = false;
-				for (int x = 0; x < bdAnzahl.length; x++) {
-					bdAnzahl[x]  = BigDecimal.ZERO;
-					bdEinzel[x]  = BigDecimal.ZERO;
-					bdSumme[x]  = BigDecimal.ZERO;
-					sPosText[x] = null;
-				}
-
-				cmbKunde.setSelectedIndex(0);
-				cmbBank.setSelectedIndex(0);
-				textKdNr.setText("");
-				textKdName.setText("");
-				textReferenz.setText("");
-
-				for (int x = 1; x < 13; x++) {
-					cbPos[x].setSelectedIndex(0);
-					txtAnz[x].setText("");
-					txtEP[x].setText("");
-					txtGP[x].setText("");
-				}
-
-				dispose();
-				Runtime.getRuntime().gc();
-
-			}
-		});
 
 		cmbKunde.addActionListener(new ActionListener() {
 			@Override
@@ -889,8 +832,6 @@ public class JFnewA extends JFrame {
 							angebotRepository.save(angebot); // Angebot in DB schreiben
 
 							JFoverview.actScreen();
-							dispose();
-							Runtime.getRuntime().gc();
 						}else {
 							JOptionPane.showMessageDialog(null, "keine Artikel ausgewählt ...", "Angebot erstellen", JOptionPane.INFORMATION_MESSAGE);
 							return;
@@ -908,23 +849,8 @@ public class JFnewA extends JFrame {
 	}
 
 	//###################################################################################################################################################
+	// ActionListener
 	//###################################################################################################################################################
-
-	private static void fillVector() {
-		
-		kundeListe.clear();
-        kundeListe.add(kundeLeer); // falls du immer einen Dummy-Eintrag vorne willst        
-        kundeListe.addAll(kundeRepository.findAll());
-		
-		bankListe.clear();
-        bankListe.add(bankLeer); // falls du immer einen Dummy-Eintrag vorne willst        
-        bankListe.addAll(bankRepository.findAll());
-        
-        artikelListe.clear();
-        artikelListe.add(artikelLeer); // falls du immer einen Dummy-Eintrag vorne willst        
-        artikelListe.addAll(artikelRepository.findAll());
-        
-	}
 
 	public static ActionListener cbPosListenerA(final int iNr, final JComboBox<?> cbPos, final JTextField txtAnz, final JTextField txtEP, final JTextField txtGP) {
 		ActionListener cbPosAction = new ActionListener() {
@@ -963,7 +889,7 @@ public class JFnewA extends JFrame {
 			bdAnzahl[iNr] = new BigDecimal(txtAnz.getText().replace(',', '.')).setScale(2, RoundingMode.HALF_UP);
 			bdEinzel[iNr] = new BigDecimal(txtEP.getText().replace(',', '.')).setScale(2, RoundingMode.HALF_UP);
 			bdSumme[iNr] = bdEinzel[iNr].multiply(bdAnzahl[iNr]).setScale(2, RoundingMode.HALF_UP);
-			txtGP.setText(String.format(Locale.GERMANY, "%.2f", JFnewA.bdSumme[iNr]));
+			txtGP.setText(String.format(Locale.GERMANY, "%.2f", bdSumme[iNr]));
 			txtAnz.setBackground(Color.WHITE);
 		}catch (NumberFormatException e) {
 			JOptionPane.showMessageDialog(null, "Eingabe inkorrekt ...", "Rechnung erstellen", JOptionPane.ERROR_MESSAGE);
@@ -986,28 +912,30 @@ public class JFnewA extends JFrame {
 	}
 
 	//###################################################################################################################################################
+	// private Teil
 	//###################################################################################################################################################
 	
+	private static void fillVector() {
+		
+		kundeListe.clear();
+        kundeListe.add(kundeLeer); // falls du immer einen Dummy-Eintrag vorne willst        
+        kundeListe.addAll(kundeRepository.findAll());
+		
+		bankListe.clear();
+        bankListe.add(bankLeer); // falls du immer einen Dummy-Eintrag vorne willst        
+        bankListe.addAll(bankRepository.findAll());
+        
+        artikelListe.clear();
+        artikelListe.add(artikelLeer); // falls du immer einen Dummy-Eintrag vorne willst        
+        artikelListe.addAll(artikelRepository.findAll());
+        
+	}
+	
 	private static String setAnNummer() {
-		AnNrRepository anNrRepository = new AnNrRepository();
-	    List<AnNr> anNrListe = new ArrayList<>();
-	    anNrListe = anNrRepository.findAll();
-	    
-	    if(anNrListe.size() > 0) {
-			
-			String sCutNrAn, sCutAn;
-			try {
-				sCutNrAn = cutFront(anNrListe.get(anNrListe.size()-1).getAnNr().trim(), "-", 2);
-				sCutAn = cutBack(anNrListe.get(anNrListe.size()-1).getAnNr().trim(), "-", 1);
-				int iIncAn = Integer.parseInt(sCutNrAn) + 1;
-				return sCutAn + "-" + String.format("%04d", iIncAn);
-			} catch (IOException e) {
-				logger.error("Fehler beim erzeugen der Angebotsnummer: " + e);
-				return "Angebotsnummer";
-			}
-		}else {
-			return "AN-" + LoadData.getStrAktGJ() + "-0001";
-		}
+		AngebotRepository angebotRepository = new AngebotRepository();
+		int maxAnNummer = angebotRepository.findMaxNummerByJahr(Integer.parseInt(LoadData.getStrAktGJ()));
+		
+		return "AN-" + LoadData.getStrAktGJ() + "-" + String.format("%04d", maxAnNummer + 1);
 	}
 
 	private static int setNum() {
@@ -1016,10 +944,6 @@ public class JFnewA extends JFrame {
 			Num = Num + 1;
 		}
 		return Num - 1;
-	}
-
-	public static int getiNumFrame() {
-		return iNumFrame;
 	}
 
 }
