@@ -1,8 +1,6 @@
 package org.andy.gui.reminder;
 
 import static org.andy.toolbox.misc.CreateObject.createButton;
-import static org.andy.toolbox.sql.Update.sqlUpdate;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -10,8 +8,6 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.sql.SQLException;
-
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -25,23 +21,21 @@ import org.apache.logging.log4j.Logger;
 
 import org.andy.code.dataExport.ExcelMahnung;
 import org.andy.code.dataExport.ExcelReminder;
-import org.andy.code.main.LoadData;
-import org.andy.code.main.overview.table.LoadBill;
+import org.andy.gui.main.JFoverview;
 import org.andy.toolbox.misc.SetFrameIcon;
 
-public class JFnewReminder extends JFrame {
+public class JFreminder extends JFrame {
 
-	private static final Logger logger = LogManager.getLogger(JFnewReminder.class);
+	private static final Logger logger = LogManager.getLogger(JFreminder.class);
 
 	private static final long serialVersionUID = 1L;
 
 	private JPanel contentPanel = new JPanel();
 
 	private static JButton btnRem = null;
-	private static final String TBL_BILL_OUT = "tbl_reOUT";
-	private static String sConn;
 
 	//###################################################################################################################################################
+	// public Teil
 	//###################################################################################################################################################
 
 	public static void showGUI(String sId) {
@@ -49,7 +43,7 @@ public class JFnewReminder extends JFrame {
 			@Override
 			public void run() {
 				try {
-					JFnewReminder frame = new JFnewReminder(sId);
+					JFreminder frame = new JFreminder(sId);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					logger.fatal("fatal error loading gui for editing data - " + e);
@@ -58,8 +52,11 @@ public class JFnewReminder extends JFrame {
 		});
 	}
 
+	//###################################################################################################################################################
+	// private Teil
+	//###################################################################################################################################################
 
-	public JFnewReminder(String sId) {
+	private JFreminder(String sId) {
 
 		try {
 			setIconImage(SetFrameIcon.getFrameIcon("rufzeichen.png"));
@@ -131,15 +128,6 @@ public class JFnewReminder extends JFrame {
 							logger.error("error creating payment reminder - " + e1);
 						}
 
-						String tblName = TBL_BILL_OUT.replace("_", LoadData.getStrAktGJ());
-						String sStatement = "UPDATE " + tblName + " SET [printState] = '1', [Status] = 'Zahlungserinnerung' WHERE [IdNummer] = '" + sId + "'";
-
-						try {
-							sqlUpdate(sConn, sStatement);
-						} catch (SQLException | ClassNotFoundException e2) {
-							logger.error("error updating bill state to database - " + e2);
-						}
-
 					}catch (Exception e3) {
 						logger.error("error writing payment reminder stage 0 - " + e3);
 					}
@@ -149,15 +137,6 @@ public class JFnewReminder extends JFrame {
 							ExcelMahnung.mahnungExport(sId, 1);
 						} catch (IOException e1) {
 							logger.error("error creating payment reminder - " + e1);
-						}
-
-						String tblName = TBL_BILL_OUT.replace("_", LoadData.getStrAktGJ());
-						String sStatement = "UPDATE " + tblName + " SET [printState] = '1', [Status] = 'Mahnstufe 1' WHERE [IdNummer] = '" + sId + "'";
-
-						try {
-							sqlUpdate(sConn, sStatement);
-						} catch (SQLException | ClassNotFoundException e2) {
-							logger.error("error updating bill state to database - " + e2);
 						}
 
 					}catch (Exception e3) {
@@ -171,31 +150,14 @@ public class JFnewReminder extends JFrame {
 							logger.error("error creating payment reminder - " + e1);
 						}
 
-						String tblName = TBL_BILL_OUT.replace("_", LoadData.getStrAktGJ());
-						String sStatement = "UPDATE " + tblName + " SET [printState] = '1', [Status] = 'Mahnstufe 2' WHERE [IdNummer] = '" + sId + "'";
-
-						try {
-							sqlUpdate(sConn, sStatement);
-						} catch (SQLException | ClassNotFoundException e2) {
-							logger.error("error updating bill state to database - " + e2);
-						}
-
 					}catch (Exception e3) {
 						logger.error("error writing payment reminder stage 2 - " + e3);
 					}
 				}
 
-				LoadBill.loadAusgangsRechnung(false);
+				JFoverview.actScreen();
 				dispose();
 			}
 		});
-
-
-
-	}
-
-
-	public static void setsConn(String sConn) {
-		JFnewReminder.sConn = sConn;
 	}
 }

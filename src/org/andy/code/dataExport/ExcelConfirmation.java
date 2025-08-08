@@ -2,19 +2,27 @@ package org.andy.code.dataExport;
 
 import static org.andy.toolbox.misc.Tools.FormatIBAN;
 import static org.andy.toolbox.misc.Tools.isLocked;
-import static org.andy.toolbox.sql.Update.sqlUpdate;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.sql.SQLException;
+import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+
+import org.andy.code.dataStructure.entitiyMaster.Bank;
+import org.andy.code.dataStructure.entitiyMaster.Kunde;
+import org.andy.code.dataStructure.entitiyProductive.Angebot;
+import org.andy.code.dataStructure.entitiyProductive.FileStore;
+import org.andy.code.dataStructure.repositoryProductive.AngebotRepository;
+import org.andy.code.dataStructure.repositoryProductive.FileStoreRepository;
 import org.andy.code.main.LoadData;
 import org.andy.code.qr.ZxingQR;
-import org.andy.gui.main.JFoverview;
 import org.andy.gui.offer.JFconfirmA;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -40,15 +48,7 @@ public class ExcelConfirmation{
 
 	private static final Logger logger = LogManager.getLogger(ExcelConfirmation.class);
 
-	private static String[][] arrYearOffer;
-	public static int iNumData;
-	public static int iNumKunde;
-	public static String[][] arrAbContent = new String[30][15];
-
-	private static final String TBL_FILE = "tbl_files";
-	private static String sConn;
-
-	private static final int START_ROW_OFFSET = 15;
+	private static final int START_ROW_OFFSET = 16;
 	private static final int COLUMN_A = 0;
 	private static final int COLUMN_B = 1;
 	private static final int COLUMN_C = 2;
@@ -56,111 +56,19 @@ public class ExcelConfirmation{
 	private static final int COLUMN_E = 4;
 	private static final int COLUMN_F = 5;
 
-	/* Kommentarblock
-	 *
-	 *###################################################################################################################################################
-	 *Daten zusammensammeln und in ein globales Array ablegen:
-	 *arrAnContent[0][0]				- Anzahl der enthaltenen Positionszeilen
-	 *		   	  [1][1] - [1][7]		- Kundendaten (Kunde, Straße, PLZ, Ort, Land, Pronom, Ansprechpartner)
-	 *			  [2][1]				- Datum
-	 *			  [2][2]				- Nummer
-	 *			  [2][3]				- Referenz
-	 *			  [2][4]				- Angebotsnummer
-	 *			  [3][1] - [3][7]		- Texte
-	 *			  [4][1] - [4][3]		- Bankverbindung (Bankname, IBAN, BIC)
-	 *			  [10][1] - [10][4]		- 1. Zeile (Text, Anzahl, E-Preis, G-Preis)
-	 *			  .......	- .......	- 2. - 11. Zeile
-	 *			  [21][1] - [21][4]		- 12. Zeile
-	 *
-	 */
-	/* Excel-Vorlage 'template-order-confirm.xlsx' - v2.05 - Struktur:
-	 *
-	 *Anschriftsfeld: 		B5
-	 *Datum: 				F5
-	 *Nummer: 				F6
-	 *Referenz: 			F7
-	 *Ansprechpartner: 		F9
-	 *Positionen:			B/C/D/F17 - B/C/D/F28 (Bezeichnung, Menge, E-Preis, G-Preis)
-	 *Summe: 				F29
-	 *Texte: 				B35, B38
-	 *AGB Hinweis:			B44
-	 *Zahlungsbedingungen:	B47
-	 *Bankverbindung: 		E47, E48, E49 (Bank Name, IBAN, BIC)
-	 *###################################################################################################################################################
-	 */
-
-	public static void abCollectData(String sNr) throws Exception {
-
-		int x = 0;
-		int y = 0;
-		int n = 0;
-
-		arrYearOffer = JFoverview.getArrYearAN();
-
-		n = 1;
-		for(n = 1; (n-1) < Integer.valueOf(arrYearOffer[0][0]); n++) {
-			if(arrYearOffer[n][1].equals(sNr)) {
-				iNumData = n; // Datensatznummer des angeforderten Angebots
-			}
-		}
-		arrAbContent[0][0] = arrYearOffer[iNumData][11]; // Anzahl Zeilen für Angebot
-		String tmp = arrYearOffer[iNumData][8];
-
-		String[] kundeTmp = DataExportHelper.kundeData(tmp);
-		for (int i = 0; i < 16; i++) {
-			arrAbContent[1][i + 1] = kundeTmp[i];
-		}
-
-		arrAbContent[2][1] = arrYearOffer[iNumData][6]; // Datum
-		arrAbContent[2][2] = sNr.replace("AN", "AB"); // Nummer
-		arrAbContent[2][3] = arrYearOffer[iNumData][7]; // Referenz
-		arrAbContent[2][4] = sNr; // Angebotsnummer
-		x = 1;
-		y = 12;
-		while(x < (Integer.valueOf(arrAbContent[0][0]) + 1)) {
-			arrAbContent[x + 9][1] = arrYearOffer[iNumData][y];
-			arrAbContent[x + 9][2] = arrYearOffer[iNumData][y + 1];
-			arrAbContent[x + 9][3] = arrYearOffer[iNumData][y + 2];
-			double anz = Double.parseDouble(arrAbContent[x + 9][2]);
-			double ep = Double.parseDouble(arrAbContent[x + 9][3]);
-			double gp = anz * ep;
-			arrAbContent[x + 9][4] = String.valueOf(gp);
-			x = x + 1;
-			y = y + 3;
-		}
-
-		ArrayList<ArrayList<String>> textList = DataExportHelper.textData();
-		if (textList != null && textList.size() >= 5) {
-			for (x = 0; x < 5; x++) { // Texte
-				ArrayList<String> text = textList.get(x);
-				if (text != null && text.size() > 5) {
-					arrAbContent[3][x + 1] = text.get(5);
-				} else {
-					arrAbContent[3][x + 1] = "Fehlender Text"; // Fallback
-				}
-			}
-		} else {
-			System.out.println("Fehler: Textliste ist null oder hat zu wenige Einträge.");
-		}
-
-		int tmpBank = Integer.parseInt(arrYearOffer[iNumData][9]); // Datensatz-Id der ausgewählten Bankverbindung
-
-	    String[] bankTmp = DataExportHelper.bankData(tmpBank);
-		for (int i = 0; i < 4; i++) {
-			arrAbContent[4][i + 1] = bankTmp[i];
-		}
-
-	}
+	private static String[] sAnTxt = new String[12];
+	private static double[] dAnz = new double[12];
+	private static double[] dEp = new double[12];
 
 	//###################################################################################################################################################
-	// Angebot erzeugen und auf Wunsch als pdf exportieren
+	// Angebotbestätigung erzeugen und als pdf exportieren
 	//###################################################################################################################################################
 
 	public static void abExport(String sNr) throws Exception {
 
 		String sExcelIn = LoadData.getTplConfirmation();
-		String sExcelOut = LoadData.getWorkPath() + "\\Auftragsbestätigung_" + sNr.replace("AN", "AB") + ".xlsx";
-		String sPdfOut = LoadData.getWorkPath() + "\\Auftragsbestätigung_" + sNr.replace("AN", "AB") + ".pdf";
+		String sExcelOut = LoadData.getWorkPath() + "Auftragsbestätigung_" + sNr.replace("AN", "AB") + ".xlsx";
+		String sPdfOut = LoadData.getWorkPath() + "Auftragsbestätigung_" + sNr.replace("AN", "AB") + ".pdf";
 
 		final Cell abPos[] = new Cell[13];
 		final Cell abText[] = new Cell[13];
@@ -168,9 +76,10 @@ public class ExcelConfirmation{
 		final Cell abEPreis[] = new Cell[13];
 		final Cell abGPreis[] = new Cell[13];
 
-		double dSumme = 0;
-
-		abCollectData(sNr); //Daten aufbereiten
+		Angebot angebot = DataExportHelper.loadAngebot(sNr);
+		Kunde kunde = DataExportHelper.kundeData(angebot.getIdKunde());
+		Bank bank = DataExportHelper.bankData(angebot.getIdBank());
+		DataExportHelper.textData();
 
 		//#######################################################################
 		// Angebots-Excel erzeugen
@@ -240,7 +149,8 @@ public class ExcelConfirmation{
 			Cell abNr = ws.getRow(5).getCell(COLUMN_F); //Nummer
 			Cell abRef = ws.getRow(6).getCell(COLUMN_F); //Referenz
 			Cell abDuty = ws.getRow(8).getCell(COLUMN_F); //Ansprechpartner
-			for(int i = 1; i < (Integer.parseInt(arrAbContent[0][0]) + 1); i++ ) { //Positionen B, C, D, F Zeile 17-28
+			
+			for(int i = 0; i < angebot.getAnzPos().intValue(); i++ ) { //Positionen B, C, D, F Zeile 17-28
 				int j = i + START_ROW_OFFSET;
 				abPos[i] = ws.getRow(j).getCell(COLUMN_A); //Position
 				abText[i] = ws.getRow(j).getCell(COLUMN_B); //Text
@@ -256,37 +166,48 @@ public class ExcelConfirmation{
 			Cell abBank = ws.getRow(46).getCell(COLUMN_E); //Bankverbindung E47 - E49: Bankname
 			Cell abIBAN = ws.getRow(47).getCell(COLUMN_E); //IBAN
 			Cell abBIC = ws.getRow(48).getCell(COLUMN_E); //BIC
+			
 			//#######################################################################
 			// Zellwerte beschreiben aus dem Array arrAnContent
 			//#######################################################################
-			abAdress.setCellValue(arrAbContent[1][1] + "\n" + arrAbContent[1][2] + "\n" + arrAbContent[1][3] + " " +
-					arrAbContent[1][4] + ", " + arrAbContent[1][5]);
-			abDate.setCellValue(arrAbContent[2][1]);
-			abNr.setCellValue(arrAbContent[2][2]);
-			abRef.setCellValue(arrAbContent[2][3]);
-			abDuty.setCellValue(arrAbContent[1][6] + " " + arrAbContent[1][7]);
-			for(int i = 1; i < (Integer.parseInt(arrAbContent[0][0]) + 1); i++ ) {
-				abPos[i].setCellValue(String.valueOf(i));
-				abText[i].setCellValue(arrAbContent[(i + 9)][1]);
-				abAnz[i].setCellValue(Double.parseDouble(arrAbContent[(i + 9)][2]));
-				abEPreis[i].setCellValue(Double.parseDouble(arrAbContent[(i + 9)][3]));
-				abGPreis[i].setCellValue(Double.parseDouble(arrAbContent[(i + 9)][4]));
-				dSumme = dSumme + Double.parseDouble(arrAbContent[(i + 9)][4]);
+			abAdress.setCellValue(kunde.getName() + "\n" + kunde.getStrasse() + "\n" + kunde.getPlz() + " " +
+					kunde.getOrt() + ", " + kunde.getLand().toUpperCase());
+			abDate.setCellValue(angebot.getDatum().toString());
+			abNr.setCellValue(angebot.getIdNummer().replace("AN", "AB"));
+			abDuty.setCellValue(kunde.getPronomen() + " " + kunde.getPerson());
+			abRef.setCellValue(angebot.getIdNummer());
+			
+			for(int i = 0; i < angebot.getAnzPos().intValue(); i++ ) {
+				abPos[i].setCellValue(String.valueOf(i + 1));
+				try {
+					String art = (String) Angebot.class.getMethod("getArt" + String.format("%02d", i + 1)).invoke(angebot);
+		            BigDecimal menge = (BigDecimal) Angebot.class.getMethod("getMenge" + String.format("%02d", i + 1)).invoke(angebot);
+		            BigDecimal ep = (BigDecimal) Angebot.class.getMethod("getePreis" + String.format("%02d", i + 1)).invoke(angebot);
+		            sAnTxt[i] = art; dAnz[i] = menge.doubleValue(); dEp[i] = ep.doubleValue();
+		            abText[i].setCellValue(art);
+					abAnz[i].setCellValue(menge.doubleValue());
+					abEPreis[i].setCellValue(ep.doubleValue());
+					abGPreis[i].setCellValue(menge.multiply(ep).doubleValue());
+				} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+					System.out.println(e.getMessage());
+				}
 			}
-			abSumme.setCellValue(dSumme);
-			String fillText = ReplaceText.doReplace(arrAbContent[3][1], "none", arrAbContent[2][4], JFconfirmA.getsConfNr(), JFconfirmA.getsConfDatum(), "none", "none", "none", "none", "none", "none");
-			abText1.setCellValue(fillText);
-			abText2.setCellValue(ReplaceText.doReplace(arrAbContent[3][2], "none", "none", "none", JFconfirmA.getsConfStart(), "none", "none", "none", "none", "none", "none"));
-			abText3.setCellValue(ReplaceText.doReplace(arrAbContent[3][3], "none", "none", "none", "none", arrAbContent[1][11], "none", "none", "none", "none", "none"));
-			abText4.setCellValue(arrAbContent[3][4]);
-			abBank.setCellValue(arrAbContent[4][1]);
-			abIBAN.setCellValue(FormatIBAN(arrAbContent[4][2]));
-			abBIC.setCellValue(arrAbContent[4][3]);
+			
+			abSumme.setCellValue(angebot.getNetto().doubleValue());
+			abText1.setCellValue(DataExportHelper.getTextOrderConfirm().get(0).replace("{AN}", angebot.getIdNummer())
+					.replace("{Best-Nr}", JFconfirmA.getsConfNr()).replace("{Datum}", JFconfirmA.getsConfDatum()));
+			abText2.setCellValue(DataExportHelper.getTextOrderConfirm().get(1).replace("{Datum}", JFconfirmA.getsConfStart()));
+			abText3.setCellValue(DataExportHelper.getTextOrderConfirm().get(2).replace("{Tage}", kunde.getZahlungsziel()));
+			abText4.setCellValue(DataExportHelper.getTextOrderConfirm().get(3));
+			
+			abBank.setCellValue(bank.getBankName());
+			abIBAN.setCellValue(FormatIBAN(bank.getIban()));
+			abBIC.setCellValue(bank.getBic());
 			//#######################################################################
 			// QR Code erzeugen und im Anwendungsverzeichnis ablegen
 			//#######################################################################
 			try {
-				ZxingQR.makeLinkQR(arrAbContent[3][5]);
+				ZxingQR.makeLinkQR(DataExportHelper.getTextOrderConfirm().get(4));
 			} catch (WriterException e) {
 				logger.error("makeLinkQR(arrAbContent[3][5]) - " + e);
 			}
@@ -338,21 +259,31 @@ public class ExcelConfirmation{
 			System.out.println("warte auf Datei ...");
 		}
 
-		try {
-
-			String FileNamePath = sPdfOut;
-			File fn = new File(FileNamePath);
-			String FileName = fn.getName();
-
-			String tblName = TBL_FILE.replace("_", LoadData.getStrAktGJ());
-			String sSQLStatementB = "UPDATE " + tblName + " SET [ABFIleName] = '" + FileName + "',[ABpdfFIle] = (SELECT * FROM OPENROWSET(BULK '"
-					+ FileNamePath + "', SINGLE_BLOB) AS DATA) WHERE [IdNummer] = '" + sNr + "'";
-
-			sqlUpdate(sConn, sSQLStatementB);
-
-		} catch (SQLException | ClassNotFoundException e) {
-			logger.error("error inserting offer confirmation files into database - " + e);
-		}
+		//#######################################################################
+		// Datei in DB speichern
+		//#######################################################################
+		
+		String PdfNamePath = sPdfOut;
+		File PdfFn = new File(PdfNamePath);
+		String PdfName = PdfFn.getName();
+		
+		FileStoreRepository fileStoreRepository = new FileStoreRepository();
+		FileStore fileStore = fileStoreRepository.findById(angebot.getIdNummer()); // Tabelleneintrag mit Hibernate lesen
+		
+		fileStore.setAbFileName(PdfName);
+		
+		Path PdfPath = Paths.get(PdfNamePath);
+		fileStore.setAbPdfFile(Files.readAllBytes(PdfPath)); // ByteArray für Dateiinhalt
+		
+		fileStoreRepository.update(fileStore); // Datei in DB speichern
+		
+		//#######################################################################
+		// Status des Angebots ändern
+		//#######################################################################
+		
+		angebot.setState(angebot.getState() + 100); // Zustand bestätigt setzen
+		AngebotRepository angebotRepository = new AngebotRepository();
+		angebotRepository.update(angebot);
 
 		//#######################################################################
 		// Ursprungs-Excel und -pdf löschen
@@ -371,8 +302,5 @@ public class ExcelConfirmation{
 		}
 	}
 
-	public static void setsConn(String sConn) {
-		ExcelConfirmation.sConn = sConn;
-	}
 }
 

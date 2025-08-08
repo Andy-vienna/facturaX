@@ -2,18 +2,19 @@ package org.andy.code.dataExport;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.andy.code.entityMaster.Bank;
-import org.andy.code.entityMaster.BankRepository;
-import org.andy.code.entityMaster.Kunde;
-import org.andy.code.entityMaster.KundeRepository;
-import org.andy.code.entityMaster.Owner;
-import org.andy.code.entityMaster.OwnerRepository;
-import org.andy.code.entityMaster.Text;
-import org.andy.code.entityMaster.TextRepository;
-import org.andy.code.entityProductive.Angebot;
-import org.andy.code.entityProductive.AngebotRepository;
-import org.andy.code.entityProductive.Rechnung;
-import org.andy.code.entityProductive.RechnungRepository;
+
+import org.andy.code.dataStructure.entitiyMaster.Bank;
+import org.andy.code.dataStructure.entitiyMaster.Kunde;
+import org.andy.code.dataStructure.entitiyMaster.Owner;
+import org.andy.code.dataStructure.entitiyMaster.Text;
+import org.andy.code.dataStructure.entitiyProductive.Angebot;
+import org.andy.code.dataStructure.entitiyProductive.Rechnung;
+import org.andy.code.dataStructure.repositoryMaster.BankRepository;
+import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
+import org.andy.code.dataStructure.repositoryMaster.OwnerRepository;
+import org.andy.code.dataStructure.repositoryMaster.TextRepository;
+import org.andy.code.dataStructure.repositoryProductive.AngebotRepository;
+import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
 import org.andy.code.main.LoadData;
 
 public class DataExportHelper {

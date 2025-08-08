@@ -19,8 +19,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 
-import org.andy.code.entityMaster.Text;
-import org.andy.code.entityMaster.TextRepository;
+import org.andy.code.dataStructure.entitiyMaster.Text;
+import org.andy.code.dataStructure.repositoryMaster.TextRepository;
 import org.andy.gui.misc.RoundedBorder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

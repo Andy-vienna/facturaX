@@ -2,22 +2,24 @@ package org.andy.code.dataExport;
 
 import static org.andy.toolbox.misc.Tools.FormatIBAN;
 import static org.andy.toolbox.misc.Tools.isLocked;
-import static org.andy.toolbox.sql.Update.sqlUpdate;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Locale;
 
+import org.andy.code.dataStructure.entitiyMaster.Bank;
+import org.andy.code.dataStructure.entitiyMaster.Kunde;
+import org.andy.code.dataStructure.entitiyProductive.FileStore;
+import org.andy.code.dataStructure.entitiyProductive.Rechnung;
+import org.andy.code.dataStructure.repositoryProductive.FileStoreRepository;
+import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
-import org.andy.gui.main.JFoverview;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
@@ -34,97 +36,26 @@ public class ExcelReminder{
 
 	private static final Logger logger = LogManager.getLogger(ExcelReminder.class);
 
-	private static String[][] arrYearBill;
-	public static int iNumData;
-	public static int iNumKunde;
-	public static String[][] arrReminderContent = new String[30][15];
-
-	private static final String TBL_FILE = "tbl_files";
-	private static String sConn;
-
 	private static final int COLUMN_A = 0;
 	private static final int COLUMN_B = 1;
 	private static final int COLUMN_E = 4;
 	private static final int COLUMN_F = 5;
 
-	/* Kommentarblock
-	 *###################################################################################################################################################
-	 *Daten zusammensammeln und in ein globales Array ablegen:
-	 *arrReminderContent[0][0]				- Anzahl der in der Rechnung enthaltenen Positionszeilen
-	 *	 	    [1][1] - [1][12]	- Kundendaten (Kunde, Straße, PLZ, Ort, Land, Pronom, Ansprechpartner, UID, USt.-Satz, Rabatschlüssel, Zahlungsziel)
-	 *			[2][1]				- Rechnungsdatum
-	 *			[2][2]				- Rechnungsnummer
-	 *			[2][3]				- Rechnungsbetrag
-	 *			[4][1] - [4][3]		- Bankverbindung (Bankname, IBAN, BIC)
-	 */
-	/* Excel-Vorlage 'template-reminder.xlsx' - v2.05 - Struktur:
-	 *Anschriftsfeld: 	B5
-	 *Datum: 			F5
-	 *Ansprechpartner: 	F9
-	 *Text 1:			B16
-	 *Anrede:			B18
-	 *Zeile 1:			B20
-	 *Zeile 2:			B21
-	 *Zeile 3:			B22
-	 *Zeile 4:			B23
-	 *Gruß:				B26
-	 *Name:				B27
-	 *Bankverbindung: 	E47, E48, E49 (Bank Name, IBAN, BIC)
-	 *###################################################################################################################################################
-	 */
-
-	public static void reminderCollectData(String sNr) throws Exception {
-
-		NumberFormat nf = NumberFormat.getNumberInstance(Locale.GERMANY);
-		DecimalFormat df = (DecimalFormat) nf;
-		df.applyPattern("###,###.00");
-		int n = 0;
-
-		arrYearBill = JFoverview.getArrYearRE();
-
-		n = 1;
-		for(n = 1; (n-1) < Integer.valueOf(arrYearBill[0][0]); n++) {
-			if(arrYearBill[n][1].equals(sNr)) {
-				iNumData = n; // Datensatznummer der angeforderten Rechnung
-			}
-		}
-		arrReminderContent[0][0] = arrYearBill[iNumData][15]; //Anzahl Zeilen für Rechnung
-		String tmp = arrYearBill[iNumData][9];
-
-		String[] kundeTmp = DataExportHelper.kundeData(tmp);
-		for (int i = 0; i < 16; i++) {
-			arrReminderContent[1][i + 1] = kundeTmp[i];
-		}
-
-		arrReminderContent[2][1] = arrYearBill[iNumData][6]; //Rechnungsdatum
-		arrReminderContent[2][2] = sNr; //Rechnungsnummer
-
-		double tmpBr = Double.parseDouble(arrYearBill[iNumData][14]);
-		String sBrutto = df.format(tmpBr); // Bruttosumme
-
-		arrReminderContent[2][3] = sBrutto; //Rechnungsbetrag brutto formattiert
-
-		int tmpBank = Integer.parseInt(arrYearBill[iNumData][11]); // Datensatz-Id der ausgewählten Bankverbindung
-
-	    String[] bankTmp = DataExportHelper.bankData(tmpBank);
-		for (int i = 0; i < 4; i++) {
-			arrReminderContent[4][i + 1] = bankTmp[i];
-		}
-		
-	}
-
 	//###################################################################################################################################################
-	// Zahlungserinnerung erzeugen und auf Wunsch als pdf exportieren
+	// Zahlungserinnerung erzeugen und als pdf exportieren
 	//###################################################################################################################################################
 
 	public static void reminderExport(String sNr) throws Exception {
 
 		new ArrayList<>();
 		String sExcelIn = LoadData.getTplReminder();
-		String sExcelOut = LoadData.getWorkPath() + "\\Zahlungserinnerung_" + sNr + ".xlsx";
-		String sPdfOut = LoadData.getWorkPath() + "\\Zahlungserinnerung_" + sNr + ".pdf";
+		String sExcelOut = LoadData.getWorkPath() + "Zahlungserinnerung_" + sNr + ".xlsx";
+		String sPdfOut = LoadData.getWorkPath() + "Zahlungserinnerung_" + sNr + ".pdf";
 
-		reminderCollectData(sNr); //Daten aufbereiten
+		Rechnung rechnung = DataExportHelper.loadRechnung(sNr);
+		Kunde kunde = DataExportHelper.kundeData(rechnung.getIdKunde());
+		Bank bank = DataExportHelper.bankData(rechnung.getIdBank());
+		DataExportHelper.textData();
 
 		//#######################################################################
 		// Zahlungserinnerung-Excel erzeugen
@@ -206,82 +137,35 @@ public class ExcelReminder{
 			Cell remBank = ws.getRow(46).getCell(COLUMN_E); //Bankverbindung E47 - E49: Bankname
 			Cell remIBAN = ws.getRow(47).getCell(COLUMN_E); //IBAN
 			Cell remBIC = ws.getRow(48).getCell(COLUMN_E); //BIC
+			
 			//#######################################################################
 			// Zellwerte beschreiben aus dem Array arrAnContent
 			//#######################################################################
-			remAdress.setCellValue(arrReminderContent[1][1] + "\n" + arrReminderContent[1][2] + "\n" + arrReminderContent[1][3] + " " +
-					arrReminderContent[1][4] + ", " + arrReminderContent[1][5]);
+			remAdress.setCellValue(kunde.getName() + "\n" + kunde.getStrasse() + "\n" + kunde.getPlz() + " " +
+					kunde.getOrt() + ", " + kunde.getLand().toUpperCase());
 			remDate.setCellValue(StartUp.getDtNow());
-			remDuty.setCellValue(arrReminderContent[1][7]);
+			remDuty.setCellValue(kunde.getPerson());
+			
+			remHeader.setCellValue(DataExportHelper.getTextZahlErin().get(0).replace("{RE}", rechnung.getIdNummer()).replace("{Datum}", rechnung.getDatum().toString()));
 
-			ArrayList<ArrayList<String>> textList = DataExportHelper.textData();
-			if (textList != null && textList.size() >= 10) {
-
-				// Erste Textzeile setzen
-				ArrayList<String> text = textList.get(0);
-				if (text != null && text.size() > 4) {
-					remHeader.setCellValue(ReplaceText.doReplace(text.get(4), arrReminderContent[2][2], "none", "none", arrReminderContent[2][1], "none", "none", "none", "none", "none", "none"));
-				}
-
-				// Anrede setzen
-				if (arrReminderContent != null && arrReminderContent.length > 1 && arrReminderContent[1] != null &&
-						arrReminderContent[1].length > 7 && arrReminderContent[1][6] != null) {
-
-					if (arrReminderContent[1][6].equals("Herr") && textList.size() > 1) {
-						text = textList.get(1);
-					} else if (arrReminderContent[1][6].equals("Frau") && textList.size() > 2) {
-						text = textList.get(2);
-					} else {
-						text = textList.get(3);
-					}
-
-					if (text != null && text.size() > 4) {
-						remAnrede.setCellValue(ReplaceText.doReplace(text.get(4), "none", "none", "none", "none", "none", arrReminderContent[1][7], "none", "none", "none", "none"));
-					}
-				}
-
-				// Weitere Texte setzen
-				for (int i = 4; i <= 9; i++) {
-					if (textList.size() > i) {
-						text = textList.get(i);
-						if (text != null && text.size() > 4) {
-							switch (i) {
-							case 4:
-								remText1.setCellValue(ReplaceText.doReplace(text.get(4), "none", "none", "none", arrReminderContent[2][1], "none", "none", arrReminderContent[2][3], "none", "none", "none"));
-								break;
-							case 5:
-								remText2.setCellValue(text.get(4));
-								break;
-							case 6:
-								remText3.setCellValue(text.get(4));
-								break;
-							case 7:
-								remText4.setCellValue(ReplaceText.doReplace(text.get(4), "none", "none", "none", arrReminderContent[2][1], "none", "none", "none", "none", "none", "none"));
-								break;
-							case 8:
-								remGruss.setCellValue(text.get(4));
-								break;
-							case 9:
-								remName.setCellValue(ReplaceText.doReplace(text.get(4), "none", "none", "none", "none", "none", "none", "none", "none", "none", DataExportHelper.getKontaktName()));
-								break;
-							}
-						}
-					}
-				}
-			} else {
-				System.out.println("Fehler: Textliste ist null oder hat zu wenige Einträge.");
+			if(kunde.getPronomen().equals("Herr")) {
+				remAnrede.setCellValue(DataExportHelper.getTextZahlErin().get(1).replace("{Name}", kunde.getPerson()));
+			}else if(kunde.getPronomen().equals("Frau")) {
+				remAnrede.setCellValue(DataExportHelper.getTextZahlErin().get(2).replace("{Name}", kunde.getPerson()));
+			}else {
+				remAnrede.setCellValue(DataExportHelper.getTextZahlErin().get(3));
 			}
 
-			// Bankdaten prüfen und setzen
-			if (arrReminderContent != null && arrReminderContent.length > 4 && arrReminderContent[4] != null &&
-					arrReminderContent[4].length > 3) {
+			remText1.setCellValue(DataExportHelper.getTextZahlErin().get(4).replace("{Datum}", rechnung.getDatum().toString()).replace("{Wert}", rechnung.getBrutto().toString()));
+			remText2.setCellValue(DataExportHelper.getTextZahlErin().get(5));
+			remText3.setCellValue(DataExportHelper.getTextZahlErin().get(6));
+			remText4.setCellValue(DataExportHelper.getTextZahlErin().get(7).replace("{Datum}", rechnung.getDatum().toString()));
+			remGruss.setCellValue(DataExportHelper.getTextZahlErin().get(8));
+			remName.setCellValue(DataExportHelper.getTextZahlErin().get(9).replace("{OwnerName}", DataExportHelper.getKontaktName()));
 
-				remBank.setCellValue(arrReminderContent[4][1] != null ? arrReminderContent[4][1] : "");
-				remIBAN.setCellValue(arrReminderContent[4][2] != null ? FormatIBAN(arrReminderContent[4][2]) : "");
-				remBIC.setCellValue(arrReminderContent[4][3] != null ? arrReminderContent[4][3] : "");
-			} else {
-				System.out.println("Fehler: arrReminderContent ist null oder hat keine Bankdaten.");
-			}
+			remBank.setCellValue(bank.getBankName());
+			remIBAN.setCellValue(FormatIBAN(bank.getIban()));
+			remBIC.setCellValue(bank.getBic());
 
 			//#######################################################################
 			// WORKBOOK mit Daten befüllen und schließen
@@ -304,28 +188,32 @@ public class ExcelReminder{
 			System.out.println("warte auf Datei ...");
 		}
 
-		try {
-
-			String FileNamePath = sPdfOut;
-			File fn = new File(FileNamePath);
-			String FileName = fn.getName();
-
-			String tblName = TBL_FILE.replace("_", LoadData.getStrAktGJ());
-			String sSQLStatementB = "UPDATE " + tblName + " SET [AddFileName01] = '" + FileName + "',[AddFile01] = (SELECT * FROM OPENROWSET(BULK '"
-					+ FileNamePath + "', SINGLE_BLOB) AS DATA) WHERE [IdNummer] = '" + sNr + "'";
-
-			sqlUpdate(sConn, sSQLStatementB);
-
-		} catch (SQLException | ClassNotFoundException e) {
-			logger.error("error inserting payment reminder files into database - " + e);
-		}
-
-		File reminder = new File(sPdfOut);
-		if(reminder.delete()) {
-
-		}else {
-			logger.error("reminderExport(String sNr) - pdf-Datei konnte nicht gelöscht werden");
-		}
+		//#######################################################################
+		// Datei in DB speichern
+		//#######################################################################
+		
+		String FileNamePath = sPdfOut;
+		File fn = new File(FileNamePath);
+		String FileName = fn.getName();
+		
+		FileStoreRepository fileStoreRepository = new FileStoreRepository();
+		FileStore fileStore = fileStoreRepository.findById(rechnung.getIdNummer()); // Tabelleneintrag mit Hibernate lesen
+		
+		fileStore.setZeFileName(FileName);
+		
+		Path path = Paths.get(FileNamePath);
+		fileStore.setZePdfFile(Files.readAllBytes(path)); // ByteArray für Dateiinhalt
+		
+		fileStoreRepository.update(fileStore); // Datei in DB speichern
+		
+		//#######################################################################
+		// Status der Rechnung ändern
+		//#######################################################################
+		
+		rechnung.setState(rechnung.getState() + 200); // Zustand Zahlungserinnerung setzen
+		RechnungRepository rechnungRepository = new RechnungRepository();
+		rechnungRepository.update(rechnung);
+		
 		//#######################################################################
 		// Ursprungs-Excel und -pdf löschen
 		//#######################################################################
@@ -343,8 +231,5 @@ public class ExcelReminder{
 		}
 	}
 
-	public static void setsConn(String sConn) {
-		ExcelReminder.sConn = sConn;
-	}
 }
 

@@ -24,8 +24,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
-import org.andy.code.entityMaster.Gwb;
-import org.andy.code.entityMaster.GwbRepository;
+import org.andy.code.dataStructure.entitiyMaster.Gwb;
+import org.andy.code.dataStructure.repositoryMaster.GwbRepository;
 import org.andy.gui.main.JFoverview;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

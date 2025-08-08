@@ -1,26 +1,27 @@
-package org.andy.code.entityProductive;
+package org.andy.code.dataStructure.repositoryProductive;
 
+import org.andy.code.dataStructure.entitiyProductive.Rechnung;
 import org.andy.code.misc.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.List;
 
-public class AngebotRepository {
+public class RechnungRepository {
 
-    public List<Angebot> findAllByJahr(int jahr) {
+    public List<Rechnung> findAllByJahr(int jahr) {
         try (Session session = HibernateUtil.getSessionFactoryDb2().openSession()) {
             return session.createQuery(
-                    "FROM Angebot r WHERE r.jahr = :jahr ORDER BY r.idNummer", Angebot.class)
+                    "FROM Rechnung r WHERE r.jahr = :jahr ORDER BY r.idNummer", Rechnung.class)
                     .setParameter("jahr", jahr)
                     .getResultList();
         }
     }
     
-    public Angebot findById(String id){
+    public Rechnung findById(String id){
     	try (Session session = HibernateUtil.getSessionFactoryDb2().openSession()) {
             return session.createQuery(
-                    "FROM Angebot r WHERE r.idNummer = :id", Angebot.class)
+                    "FROM Rechnung r WHERE r.idNummer = :id", Rechnung.class)
                     .setParameter("id", id)
                     .getSingleResult();
         }
@@ -28,11 +29,11 @@ public class AngebotRepository {
     
     public Integer findMaxNummerByJahr(int jahr) {
         try (Session session = HibernateUtil.getSessionFactoryDb2().openSession()) {
-        	String prefix = "AN-" + jahr + "-";
-        	int prefixLength = ("AN-" + jahr + "-").length();
+        	String prefix = "RE-" + jahr + "-";
+        	int prefixLength = ("RE-" + jahr + "-").length();
             return session.createQuery(
             		"SELECT CAST(SUBSTRING(r.idNummer, :prefixLen + 1) AS int) " +
-                            "FROM Angebot r " +
+                            "FROM Rechnung r " +
                             "WHERE r.jahr = :jahr AND r.idNummer LIKE :prefix " +
                             "ORDER BY CAST(SUBSTRING(r.idNummer, :prefixLen + 1) AS int) DESC",
                     Integer.class)
@@ -44,20 +45,20 @@ public class AngebotRepository {
         }
     }
 
-    public void save(Angebot angebot) {
+    public void save(Rechnung rechnung) {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactoryDb2().openSession()) {
             tx = session.beginTransaction();
-            session.persist(angebot);
+            session.persist(rechnung);
             tx.commit();
         }
     }
 
-    public void update(Angebot angebot) {
+    public void update(Rechnung rechnung) {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactoryDb2().openSession()) {
             tx = session.beginTransaction();
-            session.merge(angebot);
+            session.merge(rechnung);
             tx.commit();
         }
     }

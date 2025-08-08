@@ -5,10 +5,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 
-import org.andy.code.entityMaster.Bank;
-import org.andy.code.entityMaster.Kunde;
-import org.andy.code.entityMaster.Owner;
-import org.andy.code.entityProductive.Rechnung;
+import org.andy.code.dataStructure.entitiyMaster.Bank;
+import org.andy.code.dataStructure.entitiyMaster.Kunde;
+import org.andy.code.dataStructure.entitiyMaster.Owner;
+import org.andy.code.dataStructure.entitiyProductive.Rechnung;
 import org.mustangproject.Invoice;
 import org.mustangproject.ZUGFeRD.Profiles;
 import org.mustangproject.ZUGFeRD.ZUGFeRD2PullProvider;

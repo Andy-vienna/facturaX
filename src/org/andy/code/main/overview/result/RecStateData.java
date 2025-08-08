@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.andy.code.entityMaster.Kunde;
+import org.andy.code.dataStructure.entitiyMaster.Kunde;
 import org.andy.code.misc.parseBigDecimal;
 import org.andy.gui.main.result_panels.RecStatePanel;
 import org.apache.logging.log4j.LogManager;

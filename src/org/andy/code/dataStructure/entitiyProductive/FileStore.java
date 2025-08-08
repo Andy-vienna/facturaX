@@ -1,4 +1,4 @@
-package org.andy.code.entityProductive;
+package org.andy.code.dataStructure.entitiyProductive;
 
 import jakarta.persistence.*;
 
@@ -33,13 +33,34 @@ public class FileStore {
     @Lob
     @Column(name = "BEpdfFile")
     private byte[] bePdfFile;
-
+    
     @Column(name = "REFileName")
     private String reFileName;
 
     @Lob
     @Column(name = "REpdfFile")
     private byte[] rePdfFile;
+    
+    @Column(name = "ZEFileName")
+    private String ZeFileName;
+
+    @Lob
+    @Column(name = "ZEpdfFile")
+    private byte[] zePdfFile;
+
+    @Column(name = "M1FileName")
+    private String m1FileName;
+
+    @Lob
+    @Column(name = "M1pdfFile")
+    private byte[] m1PdfFile;
+    
+    @Column(name = "M2FileName")
+    private String m2FileName;
+
+    @Lob
+    @Column(name = "M2pdfFile")
+    private byte[] m2PdfFile;
 
     @Column(name = "AddFileName01")
     private String addFileName01;
@@ -145,6 +166,54 @@ public class FileStore {
     public void setRePdfFile(byte[] rePdfFile) {
         this.rePdfFile = rePdfFile;
     }
+    
+    public String getZeFileName() {
+		return ZeFileName;
+	}
+
+	public void setZeFileName(String zeFileName) {
+		ZeFileName = zeFileName;
+	}
+    
+    public byte[] getZePdfFile() {
+		return zePdfFile;
+	}
+
+	public void setZePdfFile(byte[] zePdfFile) {
+		this.zePdfFile = zePdfFile;
+	}
+	
+	public String getM1FileName() {
+		return m1FileName;
+	}
+
+	public void setM1FileName(String m1FileName) {
+		this.m1FileName = m1FileName;
+	}
+    
+	public byte[] getM1PdfFile() {
+		return m1PdfFile;
+	}
+
+	public void setM1PdfFile(byte[] m1PdfFile) {
+		this.m1PdfFile = m1PdfFile;
+	}
+
+	public String getM2FileName() {
+		return m2FileName;
+	}
+
+	public void setM2FileName(String m2FileName) {
+		this.m2FileName = m2FileName;
+	}
+
+	public byte[] getM2PdfFile() {
+		return m2PdfFile;
+	}
+
+	public void setM2PdfFile(byte[] m2PdfFile) {
+		this.m2PdfFile = m2PdfFile;
+	}
 
     public String getAddFileName01() {
         return addFileName01;
@@ -193,4 +262,5 @@ public class FileStore {
     public void setAddFile03(byte[] addFile03) {
         this.addFile03 = addFile03;
     }
+
 }

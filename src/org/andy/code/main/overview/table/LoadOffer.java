@@ -10,14 +10,11 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
 
-import org.andy.code.entityProductive.Angebot;
-import org.andy.code.entityProductive.AngebotRepository;
+import org.andy.code.dataStructure.entitiyProductive.Angebot;
+import org.andy.code.dataStructure.repositoryProductive.AngebotRepository;
 import org.andy.code.main.LoadData;
 
 public class LoadOffer {
-	
-	private static AngebotRepository angebotRepository = new AngebotRepository();
-    private static List<Angebot> angebotListe = new ArrayList<>();
     
     private static BigDecimal sumOpen = BigDecimal.ZERO;
     private static BigDecimal sumOrdered = BigDecimal.ZERO;
@@ -42,7 +39,8 @@ public class LoadOffer {
 		
 		sumOpen = BigDecimal.ZERO; sumOrdered = BigDecimal.ZERO;
 		
-		angebotListe.clear();
+		AngebotRepository angebotRepository = new AngebotRepository();
+	    List<Angebot> angebotListe = new ArrayList<>();
 		angebotListe.addAll(angebotRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ())));
 		
 		String[][] sTemp = new String [angebotListe.size()][6];
@@ -55,7 +53,7 @@ public class LoadOffer {
 				case 1 -> "erstellt";
 				case 11 -> "gedruckt";
 				case 111 -> "bestellt";
-				case 1111 -> "bestätigt";
+				case 211 -> "bestätigt";
 				default -> "-----";
 				};
 			

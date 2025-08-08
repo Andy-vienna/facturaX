@@ -1,4 +1,4 @@
-package org.andy.code.entityProductive;
+package org.andy.code.dataStructure.entitiyProductive;
 
 import jakarta.persistence.*;
 
@@ -6,8 +6,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "tblRe")
-public class Rechnung {
+@Table(name = "tblAn")
+public class Angebot {
 
 	@Id
 	@Column(name = "IdNummer", length = 12, nullable = false)

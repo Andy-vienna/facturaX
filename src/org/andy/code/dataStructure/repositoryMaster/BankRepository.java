@@ -1,39 +1,41 @@
-package org.andy.code.entityMaster;
+package org.andy.code.dataStructure.repositoryMaster;
 
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.andy.code.dataStructure.entitiyMaster.Bank;
 import org.andy.code.misc.HibernateUtil;
 
-public class ArtikelRepository {
+public class BankRepository {
 
-    public List<Artikel> findAll() {
+    public List<Bank> findAll() {
         try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
-            return session.createQuery("FROM Artikel", Artikel.class).list();
+            return session.createQuery("FROM Bank", Bank.class).list();
         }
     }
 
-    public void insert(Artikel artikel) {
+    public void insert(Bank bank) {
         try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
             Transaction tx = session.beginTransaction();
-            session.persist(artikel);
+            session.persist(bank);
             tx.commit();
         }
     }
 
-    public void update(Artikel artikel) {
+    public void update(Bank bank, int id) {
         try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
             Transaction tx = session.beginTransaction();
-            session.merge(artikel);
+            bank.setId(id);
+            session.merge(bank);
             tx.commit();
         }
     }
 
-    public void delete(String id) {
+    public void delete(int id) {
         try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
             Transaction tx = session.beginTransaction();
-            Artikel artikel = session.find(Artikel.class, id);
-            if (artikel != null) session.remove(artikel);
+            Bank bank = session.find(Bank.class, id);
+            if (bank != null) session.remove(bank);
             tx.commit();
         }
     }

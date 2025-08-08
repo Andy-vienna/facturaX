@@ -12,10 +12,10 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.andy.code.dataExport.ExcelBill;
-import org.andy.code.entityMaster.Bank;
-import org.andy.code.entityMaster.Kunde;
-import org.andy.code.entityMaster.Owner;
-import org.andy.code.entityProductive.Rechnung;
+import org.andy.code.dataStructure.entitiyMaster.Bank;
+import org.andy.code.dataStructure.entitiyMaster.Kunde;
+import org.andy.code.dataStructure.entitiyMaster.Owner;
+import org.andy.code.dataStructure.entitiyProductive.Rechnung;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mustangproject.BankDetails;

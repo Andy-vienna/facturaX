@@ -1,30 +1,31 @@
-package org.andy.code.entityMaster;
+package org.andy.code.dataStructure.repositoryMaster;
 
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.andy.code.dataStructure.entitiyMaster.Artikel;
 import org.andy.code.misc.HibernateUtil;
 
-public class UserRepository {
+public class ArtikelRepository {
 
-    public List<User> findAll() {
+    public List<Artikel> findAll() {
         try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
-            return session.createQuery("FROM User", User.class).list();
+            return session.createQuery("FROM Artikel", Artikel.class).list();
         }
     }
 
-    public void insert(User user) {
+    public void insert(Artikel artikel) {
         try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
             Transaction tx = session.beginTransaction();
-            session.persist(user);
+            session.persist(artikel);
             tx.commit();
         }
     }
 
-    public void update(User user) {
+    public void update(Artikel artikel) {
         try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
             Transaction tx = session.beginTransaction();
-            session.merge(user);
+            session.merge(artikel);
             tx.commit();
         }
     }
@@ -32,8 +33,8 @@ public class UserRepository {
     public void delete(String id) {
         try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
             Transaction tx = session.beginTransaction();
-            User user = session.find(User.class, id);
-            if (user != null) session.remove(user);
+            Artikel artikel = session.find(Artikel.class, id);
+            if (artikel != null) session.remove(artikel);
             tx.commit();
         }
     }

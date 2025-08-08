@@ -1,31 +1,23 @@
 package org.andy.code.main.overview.table;
 
-import static org.andy.toolbox.sql.Read.sqlReadArray;
-
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Currency;
+import java.util.List;
+import java.util.Locale;
 
+import org.andy.code.dataStructure.entitiyProductive.Ausgaben;
+import org.andy.code.dataStructure.repositoryProductive.AusgabenRepository;
 import org.andy.code.main.LoadData;
-import org.andy.gui.main.JFoverview;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class LoadExpenses {
 	
-	private static final Logger logger = LogManager.getLogger(LoadExpenses.class);
-	
-	private static final String dataTbl = "tbl_expenses";
-	private static String sConn;
-	
-	private static String[][] tmpArray = new String[100][9];
-	private static String[][] sTemp = new String [100][8];
-	
-	private static int tmpAnz;
+	private static BigDecimal bdNetto = BigDecimal.ZERO;
+	private static BigDecimal bdBrutto = BigDecimal.ZERO;
 	
 	//###################################################################################################################################################
 	// public Teil
@@ -41,74 +33,51 @@ public class LoadExpenses {
 	
 	private static String[][] loadData(boolean reRun) {
 
-		DecimalFormat decimalFormat = new DecimalFormat("#,###.00");
-		DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+		Currency currency = Currency.getInstance("EUR");
+		DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Locale.GERMANY);
+		DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
 
-		Arrays.stream(sTemp).forEach(a -> Arrays.fill(a, null));
+		AusgabenRepository ausgabenRepository = new AusgabenRepository();
+	    List<Ausgaben> ausgabenListe = new ArrayList<>();
+		ausgabenListe.addAll(ausgabenRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ())));
+		
+		String[][] sTemp = new String [ausgabenListe.size()][7];
+		
+		for (int i = 0; i < ausgabenListe.size(); i++){
+			Ausgaben ausgaben = ausgabenListe.get(i);
 
-		try {
-
-			Arrays.stream(tmpArray).forEach(a -> Arrays.fill(a, null));
-			String sTblName = dataTbl.replace("_", LoadData.getStrAktGJ());
-			String sSQLStatement = "SELECT * FROM " + sTblName + " ORDER BY [Datum]";
-
-			tmpArray = sqlReadArray(sConn, sSQLStatement);
-			JFoverview.setArrYearEX(tmpArray);
-
-			if(tmpArray[0][0] != null) {
-				tmpAnz = Integer.parseInt(tmpArray[0][0]);
-				JFoverview.setAnzYearEX(tmpAnz);
-			}else {
-				tmpAnz = 0;
-				JFoverview.setAnzYearEX(tmpAnz);
-			}
-
-			if(tmpAnz == 0) {
-				return sTemp;
-			}
-
-			for(int x = 1; (x - 1) < tmpAnz; x++) {
-
-				sTemp[x-1][0] = tmpArray[x][9]; // Spalte 0 - Id
-				LocalDate datum = LocalDate.parse(tmpArray[x][1], inputFormat);
-				String stmpD = datum.format(formatter);
-				sTemp[x-1][1] = stmpD; // Spalte 1 - Datum
-				sTemp[x-1][2] = tmpArray[x][2]; // Spalte 2 - Art
-				BigDecimal bdtmpN = new BigDecimal(tmpArray[x][3]).setScale(2, RoundingMode.HALF_UP);
-				String stmpN = decimalFormat.format(bdtmpN);
-				sTemp[x-1][3] = stmpN + "  EUR"; // Spalte 3 - Netto
-				sTemp[x-1][4] = tmpArray[x][4]; // Spalte 4 - Steuersatz
-				BigDecimal bdtmpU = new BigDecimal(tmpArray[x][5]).setScale(2, RoundingMode.HALF_UP);
-				String stmpU = decimalFormat.format(bdtmpU);
-				sTemp[x-1][5] = stmpU + "  EUR"; // Spalte 5 - USt.
-				BigDecimal bdtmpB = new BigDecimal(tmpArray[x][6]).setScale(2, RoundingMode.HALF_UP);
-				String stmpB = decimalFormat.format(bdtmpB);
-				sTemp[x-1][6] = stmpB + "  EUR"; // Spalte 6 - Brutto
-				sTemp[x-1][7] = tmpArray[x][7]; // Spalte 6 - Dateianlage
-			}
-		} catch (SQLException e) {
-			logger.error("error loading data from database - " + e);
-		} catch (ClassNotFoundException e) {
-			logger.error("error cause class for database connection is not found - " + e);
-		} finally {
-			if(!reRun) {
-				//setSumEX();
-			}
+			LocalDate date = LocalDate.parse(ausgaben.getDatum().toString(), DateTimeFormatter.ISO_LOCAL_DATE);
+	        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+	        String datum = date.format(outputFormatter);
+	        
+	        String netto = df.format(ausgaben.getNetto()) + " " + currency.getCurrencyCode();
+	        String ust = df.format(ausgaben.getSteuer()) + " " + currency.getCurrencyCode();
+	        String brutto = df.format(ausgaben.getBrutto()) + " " + currency.getCurrencyCode();
+	        
+			sTemp[i][0] = ausgaben.getId().toString();
+			sTemp[i][1] = datum;
+			sTemp[i][2] = ausgaben.getArt();
+			sTemp[i][3] = netto;
+			sTemp[i][4] = ust;
+			sTemp[i][5] = brutto;
+			sTemp[i][6] = ausgaben.getDateiname();
+			
+			bdNetto = bdNetto.add(ausgaben.getNetto());
+			bdBrutto = bdBrutto.add(ausgaben.getBrutto());
 		}
 		return sTemp;
 	}
 	
 	//###################################################################################################################################################
-	// Getter und Setter für Felder
+	// Getter und Setter
 	//###################################################################################################################################################
 
-	public static void setsConn(String sConn) {
-		LoadExpenses.sConn = sConn;
-	}
-	
-	public static String getDatatbl() {
-		return dataTbl;
+	public static BigDecimal getBdNetto() {
+		return bdNetto;
 	}
 
+	public static BigDecimal getBdBrutto() {
+		return bdBrutto;
+	}
+	
 }

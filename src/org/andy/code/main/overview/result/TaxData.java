@@ -8,10 +8,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import org.andy.code.entityMaster.Gwb;
-import org.andy.code.entityMaster.GwbRepository;
-import org.andy.code.entityMaster.Tax;
-import org.andy.code.entityMaster.TaxRepository;
+import org.andy.code.dataStructure.entitiyMaster.Gwb;
+import org.andy.code.dataStructure.entitiyMaster.Tax;
+import org.andy.code.dataStructure.repositoryMaster.GwbRepository;
+import org.andy.code.dataStructure.repositoryMaster.TaxRepository;
 import org.andy.code.main.LoadData;
 import org.andy.gui.main.result_panels.TaxPanel;
 import org.apache.logging.log4j.LogManager;

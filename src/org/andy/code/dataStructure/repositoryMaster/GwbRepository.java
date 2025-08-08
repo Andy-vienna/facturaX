@@ -1,8 +1,9 @@
-package org.andy.code.entityMaster;
+package org.andy.code.dataStructure.repositoryMaster;
 
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.andy.code.dataStructure.entitiyMaster.Gwb;
 import org.andy.code.misc.HibernateUtil;
 
 public class GwbRepository {

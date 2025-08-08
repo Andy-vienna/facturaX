@@ -34,8 +34,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
 
-import org.andy.code.entityMaster.User;
-import org.andy.code.entityMaster.UserRepository;
+import org.andy.code.dataStructure.entitiyMaster.User;
+import org.andy.code.dataStructure.repositoryMaster.UserRepository;
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
 import org.andy.gui.misc.ImagePanel;

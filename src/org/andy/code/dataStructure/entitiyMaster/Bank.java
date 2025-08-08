@@ -1,4 +1,4 @@
-package org.andy.code.entityMaster;
+package org.andy.code.dataStructure.entitiyMaster;
 
 import jakarta.persistence.*;
 

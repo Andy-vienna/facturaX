@@ -2,22 +2,24 @@ package org.andy.code.dataExport;
 
 import static org.andy.toolbox.misc.Tools.FormatIBAN;
 import static org.andy.toolbox.misc.Tools.isLocked;
-import static org.andy.toolbox.sql.Update.sqlUpdate;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Locale;
 
+import org.andy.code.dataStructure.entitiyMaster.Bank;
+import org.andy.code.dataStructure.entitiyMaster.Kunde;
+import org.andy.code.dataStructure.entitiyProductive.FileStore;
+import org.andy.code.dataStructure.entitiyProductive.Rechnung;
+import org.andy.code.dataStructure.repositoryProductive.FileStoreRepository;
+import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
-import org.andy.gui.main.JFoverview;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
@@ -34,19 +36,13 @@ public class ExcelMahnung{
 
 	private static final Logger logger = LogManager.getLogger(ExcelMahnung.class);
 
-	private static String[][] arrYearBill;
-	private static int iNumData;
-	private static String[][] arrReminderContent = new String[30][15];
-
-	private static final String TBL_FILE = "tbl_files";
-	private static String sConn;
-
 	private static final int COLUMN_A = 0;
 	private static final int COLUMN_B = 1;
 	private static final int COLUMN_E = 4;
 	private static final int COLUMN_F = 5;
 
 	//###################################################################################################################################################
+	// Mahnung erzeugen und als pdf exportieren
 	//###################################################################################################################################################
 
 	public static void mahnungExport(String sNr, int iStufe) throws Exception {
@@ -55,12 +51,14 @@ public class ExcelMahnung{
 			return;
 		}
 
-		new ArrayList<>();
 		String sExcelIn = LoadData.getTplMahnung();
-		String sExcelOut = LoadData.getWorkPath() + "\\Mahnung_" + String.valueOf(iStufe) + "_" + sNr + ".xlsx";
-		String sPdfOut = LoadData.getWorkPath() + "\\Mahnung_" + String.valueOf(iStufe) + "_" + sNr + ".pdf";
+		String sExcelOut = LoadData.getWorkPath() + "Mahnung_" + String.valueOf(iStufe) + "_" + sNr + ".xlsx";
+		String sPdfOut = LoadData.getWorkPath() + "Mahnung_" + String.valueOf(iStufe) + "_" + sNr + ".pdf";
 
-		mahnungCollectData(sNr); //Daten aufbereiten
+		Rechnung rechnung = DataExportHelper.loadRechnung(sNr);
+		Kunde kunde = DataExportHelper.kundeData(rechnung.getIdKunde());
+		Bank bank = DataExportHelper.bankData(rechnung.getIdBank());
+		DataExportHelper.textData();
 
 		//#######################################################################
 		// Zahlungserinnerung-Excel erzeugen
@@ -142,110 +140,54 @@ public class ExcelMahnung{
 			Cell remBank = ws.getRow(46).getCell(COLUMN_E); //Bankverbindung E47 - E49: Bankname
 			Cell remIBAN = ws.getRow(47).getCell(COLUMN_E); //IBAN
 			Cell remBIC = ws.getRow(48).getCell(COLUMN_E); //BIC
+			
 			//#######################################################################
 			// Zellwerte beschreiben aus dem Array arrAnContent
 			//#######################################################################
-			remAdress.setCellValue(arrReminderContent[1][1] + "\n" + arrReminderContent[1][2] + "\n" + arrReminderContent[1][3] + " " +
-					arrReminderContent[1][4] + ", " + arrReminderContent[1][5]);
+			remAdress.setCellValue(kunde.getName() + "\n" + kunde.getStrasse() + "\n" + kunde.getPlz() + " " +
+					kunde.getOrt() + ", " + kunde.getLand().toUpperCase());
 			remDate.setCellValue(StartUp.getDtNow());
-			remDuty.setCellValue(arrReminderContent[1][7]);
+			remDuty.setCellValue(kunde.getPerson());
+			
+			remHeader.setCellValue(DataExportHelper.getTextMahnung().get(0)
+					.replace("{NrMahn}", String.valueOf(iStufe))
+					.replace("{RE}", rechnung.getIdNummer())
+					.replace("{Datum}", rechnung.getDatum().toString()));
 
-			ArrayList<ArrayList<String>> textList = DataExportHelper.textData();
-			if (textList != null && textList.size() >= 10) {
-
-				// Erste Textzeile setzen
-				ArrayList<String> text = textList.get(0);
-				if (text != null && text.size() > 4) {
-					remHeader.setCellValue(ReplaceText.doReplace(text.get(6), arrReminderContent[2][2], "none", "none", arrReminderContent[2][1], "none", "none", "none", String.valueOf(iStufe), "none", "none"));
-				}
-
-				// Anrede setzen
-				if (arrReminderContent != null && arrReminderContent.length > 1 && arrReminderContent[1] != null &&
-						arrReminderContent[1].length > 7 && arrReminderContent[1][6] != null) {
-
-					if (arrReminderContent[1][6].equals("Herr") && textList.size() > 1) {
-						text = textList.get(1);
-					} else if (arrReminderContent[1][6].equals("Frau") && textList.size() > 2) {
-						text = textList.get(2);
-					} else {
-						text = textList.get(3);
-					}
-
-					if (text != null && text.size() > 4) {
-						remAnrede.setCellValue(ReplaceText.doReplace(text.get(6), String.valueOf(iStufe), "none", "none", "none", "none", arrReminderContent[1][7], "none", "none", "none", "none"));
-					}
-				}
-
-				// Weitere Texte setzen
-				for (int i = 4; i <= 13; i++) {
-					if (textList.size() > i) {
-						text = textList.get(i);
-						if (text != null && text.size() > 4) {
-							switch (i) {
-							case 4:
-								if(iStufe == 1) {
-									remText1.setCellValue(ReplaceText.doReplace(text.get(6), "none", "none", "none", arrReminderContent[2][1], "none", "none", arrReminderContent[2][3], "none", "none", "none"));
-								}
-								break;
-							case 5:
-								if(iStufe == 2) {
-									remText1.setCellValue(ReplaceText.doReplace(text.get(6), "none", "none", "none", arrReminderContent[2][1], "none", "none", arrReminderContent[2][3], "none", "none", "none"));
-								}
-								break;
-							case 6:
-								if(iStufe == 1) {
-									remText2.setCellValue(text.get(6));
-								}
-								break;
-							case 7:
-								if(iStufe == 2) {
-									remText2.setCellValue(text.get(6));
-								}
-								break;
-							case 8:
-								if(iStufe == 1) {
-									remText3.setCellValue(text.get(6));
-								}
-								break;
-							case 9:
-								if(iStufe == 2) {
-									remText3.setCellValue(ReplaceText.doReplace(text.get(6), "none", "none", "none", "none", "none", "none", "none", "none", "40,00", "none"));
-								}
-								break;
-							case 10:
-								if(iStufe == 1) {
-									remText4.setCellValue(text.get(6));
-								}
-								break;
-							case 11:
-								if(iStufe == 2) {
-									remText4.setCellValue(text.get(6));
-								}
-								break;
-							case 12:
-								remGruss.setCellValue(text.get(6));
-								break;
-							case 13:
-								remName.setCellValue(ReplaceText.doReplace(text.get(6), "none", "none", "none", "none", "none", "none", "none", "none", "none", DataExportHelper.getKontaktName()));
-								break;
-							}
-						}
-					}
-				}
-			} else {
-				System.out.println("Fehler: Textliste ist null oder hat zu wenige Einträge.");
+			if(kunde.getPronomen().equals("Herr")) {
+				remAnrede.setCellValue(DataExportHelper.getTextMahnung().get(1).replace("{Name}", kunde.getPerson()));
+			}else if(kunde.getPronomen().equals("Frau")) {
+				remAnrede.setCellValue(DataExportHelper.getTextMahnung().get(2).replace("{Name}", kunde.getPerson()));
+			}else {
+				remAnrede.setCellValue(DataExportHelper.getTextMahnung().get(3));
+			}
+			
+			switch(iStufe) {
+			case 1:
+				remText1.setCellValue(DataExportHelper.getTextMahnung().get(4)
+						.replace("{Datum}", rechnung.getDatum().toString())
+						.replace("{Wert}", rechnung.getBrutto().toString()));
+				remText2.setCellValue(DataExportHelper.getTextMahnung().get(6));
+				remText3.setCellValue(DataExportHelper.getTextMahnung().get(8));
+				remText4.setCellValue(DataExportHelper.getTextMahnung().get(10));
+				break;
+			case 2:
+				remText1.setCellValue(DataExportHelper.getTextMahnung().get(5)
+						.replace("{Datum}", rechnung.getDatum().toString())
+						.replace("{Wert}", rechnung.getBrutto().toString()));
+				remText2.setCellValue(DataExportHelper.getTextMahnung().get(7));
+				remText3.setCellValue(DataExportHelper.getTextMahnung().get(9)
+						.replace("{Spesen}", "40,00"));
+				remText4.setCellValue(DataExportHelper.getTextMahnung().get(11));
+				break;
 			}
 
-			// Bankdaten prüfen und setzen
-			if (arrReminderContent != null && arrReminderContent.length > 4 && arrReminderContent[4] != null &&
-					arrReminderContent[4].length > 3) {
+			remGruss.setCellValue(DataExportHelper.getTextZahlErin().get(8));
+			remName.setCellValue(DataExportHelper.getTextZahlErin().get(9).replace("{OwnerName}", DataExportHelper.getKontaktName()));
 
-				remBank.setCellValue(arrReminderContent[4][1] != null ? arrReminderContent[4][1] : "");
-				remIBAN.setCellValue(arrReminderContent[4][2] != null ? FormatIBAN(arrReminderContent[4][2]) : "");
-				remBIC.setCellValue(arrReminderContent[4][3] != null ? arrReminderContent[4][3] : "");
-			} else {
-				System.out.println("Fehler: arrReminderContent ist null oder hat keine Bankdaten.");
-			}
+			remBank.setCellValue(bank.getBankName());
+			remIBAN.setCellValue(FormatIBAN(bank.getIban()));
+			remBIC.setCellValue(bank.getBic());
 
 			//#######################################################################
 			// WORKBOOK mit Daten befüllen und schließen
@@ -268,35 +210,40 @@ public class ExcelMahnung{
 			System.out.println("warte auf Datei ...");
 		}
 
-		try {
-			String sSQLStatementB = null;
-
-			String FileNamePath = sPdfOut;
-			File fn = new File(FileNamePath);
-			String FileName = fn.getName();
-
-			String tblName = TBL_FILE.replace("_", LoadData.getStrAktGJ());
-			if(iStufe == 1) {
-				sSQLStatementB = "UPDATE " + tblName + " SET [AddFileName02] = '" + FileName + "',[AddFile02] = (SELECT * FROM OPENROWSET(BULK '"
-						+ FileNamePath + "', SINGLE_BLOB) AS DATA) WHERE [IdNummer] = '" + sNr + "'";
-			}
-			if(iStufe == 2) {
-				sSQLStatementB = "UPDATE " + tblName + " SET [AddFileName03] = '" + FileName + "',[AddFile03] = (SELECT * FROM OPENROWSET(BULK '"
-						+ FileNamePath + "', SINGLE_BLOB) AS DATA) WHERE [IdNummer] = '" + sNr + "'";
-			}
-
-			sqlUpdate(sConn, sSQLStatementB);
-
-		} catch (SQLException | ClassNotFoundException e) {
-			logger.error("error inserting payment reminder files into database - " + e);
+		//#######################################################################
+		// Datei in DB speichern
+		//#######################################################################
+		
+		String FileNamePath = sPdfOut;
+		File fn = new File(FileNamePath);
+		String FileName = fn.getName();
+		
+		FileStoreRepository fileStoreRepository = new FileStoreRepository();
+		FileStore fileStore = fileStoreRepository.findById(rechnung.getIdNummer()); // Tabelleneintrag mit Hibernate lesen
+		
+		Path path = Paths.get(FileNamePath);
+		
+		switch(iStufe) {
+		case 1:
+			fileStore.setM1FileName(FileName);
+			fileStore.setM1PdfFile(Files.readAllBytes(path)); // ByteArray für Dateiinhalt
+			break;
+		case 2:
+			fileStore.setM2FileName(FileName);
+			fileStore.setM2PdfFile(Files.readAllBytes(path)); // ByteArray für Dateiinhalt
+			break;
 		}
-
-		File reminder = new File(sPdfOut);
-		if(reminder.delete()) {
-
-		}else {
-			logger.error("reminderExport(String sNr) - pdf-Datei konnte nicht gelöscht werden");
-		}
+		
+		fileStoreRepository.update(fileStore); // Datei in DB speichern
+		
+		//#######################################################################
+		// Status der Rechnung ändern
+		//#######################################################################
+		
+		rechnung.setState(rechnung.getState() + 100); // Zustand Mahnstufe x setzen
+		RechnungRepository rechnungRepository = new RechnungRepository();
+		rechnungRepository.update(rechnung);
+				
 		//#######################################################################
 		// Ursprungs-Excel und -pdf löschen
 		//#######################################################################
@@ -314,80 +261,5 @@ public class ExcelMahnung{
 		}
 	}
 
-	//###################################################################################################################################################
-	//###################################################################################################################################################
-	/* Kommentarblock
-	 *###################################################################################################################################################
-	 *Daten zusammensammeln und in ein globales Array ablegen:
-	 *arrReminderContent[0][0]				- Anzahl der in der Rechnung enthaltenen Positionszeilen
-	 *	 	    [1][1] - [1][12]	- Kundendaten (Kunde, Straße, PLZ, Ort, Land, Pronom, Ansprechpartner, UID, USt.-Satz, Rabatschlüssel, Zahlungsziel)
-	 *			[2][1]				- Rechnungsdatum
-	 *			[2][2]				- Rechnungsnummer
-	 *			[2][3]				- Rechnungsbetrag
-	 *			[4][1] - [4][3]		- Bankverbindung (Bankname, IBAN, BIC)
-	 */
-	/* Excel-Vorlage 'template-mahnung.xlsx' - v2.10 - Struktur:
-	 *Anschriftsfeld: 	B5
-	 *Datum: 			F5
-	 *Ansprechpartner: 	F9
-	 *Text 1:			B16
-	 *Anrede:			B18
-	 *Zeile 1:			B20
-	 *Zeile 2:			B21
-	 *Zeile 3:			B22
-	 *Zeile 4:			B23
-	 *Gruß:				B26
-	 *Name:				B27
-	 *Bankverbindung: 	E47, E48, E49 (Bank Name, IBAN, BIC)
-	 *###################################################################################################################################################
-	 */
-
-	private static void mahnungCollectData(String sNr) throws Exception {
-
-		NumberFormat nf = NumberFormat.getNumberInstance(Locale.GERMANY);
-		DecimalFormat df = (DecimalFormat) nf;
-		df.applyPattern("###,###.00");
-		int n = 0;
-
-		arrYearBill = JFoverview.getArrYearRE();
-
-		n = 1;
-		for(n = 1; (n-1) < Integer.valueOf(arrYearBill[0][0]); n++) {
-			if(arrYearBill[n][1].equals(sNr)) {
-				iNumData = n; // Datensatznummer der angeforderten Rechnung
-				break;
-			}
-		}
-		arrReminderContent[0][0] = arrYearBill[iNumData][15]; //Anzahl Zeilen für Rechnung
-		String tmp = arrYearBill[iNumData][9];
-
-		String[] kundeTmp = DataExportHelper.kundeData(tmp);
-		for (int i = 0; i < 16; i++) {
-			arrReminderContent[1][i + 1] = kundeTmp[i];
-		}
-
-		arrReminderContent[2][1] = arrYearBill[iNumData][6]; //Rechnungsdatum
-		arrReminderContent[2][2] = sNr; //Rechnungsnummer
-
-		double tmpBr = Double.parseDouble(arrYearBill[iNumData][14]);
-		String sBrutto = df.format(tmpBr); // Bruttosumme
-
-		arrReminderContent[2][3] = sBrutto; //Rechnungsbetrag brutto formattiert
-
-		int tmpBank = Integer.parseInt(arrYearBill[iNumData][11]); // Datensatz-Id der ausgewählten Bankverbindung
-
-		String[] bankTmp = DataExportHelper.bankData(tmpBank);
-		for (int i = 0; i < 4; i++) {
-			arrReminderContent[4][i + 1] = bankTmp[i];
-		}
-	
-	}
-
-	//###################################################################################################################################################
-	//###################################################################################################################################################
-
-	public static void setsConn(String sConn) {
-		ExcelMahnung.sConn = sConn;
-	}
 }
 

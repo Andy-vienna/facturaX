@@ -53,11 +53,13 @@ import org.apache.logging.log4j.Logger;
 
 import org.andy.code.dataExport.ExcelBill;
 import org.andy.code.dataExport.ExcelOffer;
-import org.andy.code.entityMaster.Kunde;
-import org.andy.code.entityMaster.KundeRepository;
+import org.andy.code.dataStructure.entitiyMaster.Kunde;
+import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
 import org.andy.code.main.*;
 import org.andy.code.main.overview.table.LoadBill;
+import org.andy.code.main.overview.table.LoadExpenses;
 import org.andy.code.main.overview.table.LoadOffer;
+import org.andy.code.main.overview.table.LoadPurchase;
 import org.andy.gui.file.JFfileView;
 import org.andy.gui.main.create_panels.CreateBillPanel;
 import org.andy.gui.main.create_panels.CreateOfferPanel;
@@ -85,7 +87,7 @@ import org.andy.gui.main.table_panels.CreateTable;
 import org.andy.gui.misc.RoundedBorder;
 import org.andy.gui.misc.WrapLayout;
 import org.andy.gui.offer.JFconfirmA;
-import org.andy.gui.reminder.JFnewReminder;
+import org.andy.gui.reminder.JFreminder;
 import org.andy.toolbox.misc.*;
 
 public class JFoverview extends JFrame {
@@ -105,14 +107,13 @@ public class JFoverview extends JFrame {
 	private static final int STATEY = 30;
 
 	private static final String[] HEADER_AN = { "AN-Nummer", "Status", "Datum", "Referenz", "Kunde", "Netto" };
-	private static final String[] HEADER_RE = { "RE-Nummer", "Status", "Datum", "Leistungszeitraum", "Referenz", "Kunde", "Netto",
-			"USt.", "Brutto" };
-	private static final String[] HEADER_PU = {"RE-Datum","RE-Nummer",  "Kreditor Name", "Kreditor Strasse", "Kreditor PLZ", "Kreditor Ort",
-			"Kreditor Land", "Kreditor UID", "Waehrung", "Steuersatz", "Netto", "USt.", "Brutto", "Anzahlung", "Zahlungsziel", "Hinweis", "Dateiname" };
-	private static final String[] HEADER_EX = { "Id", "Datum", "Bezeichnung", "Netto (EUR)", "Steuersatz (%)", "Steuer (EUR)", "Brutto (EUR)", "Dateiname" };
+	private static final String[] HEADER_RE = { "RE-Nummer", "Status", "Datum", "Leistungszeitraum", "Referenz", "Kunde", "Netto", "USt.", "Brutto" };
+	private static final String[] HEADER_PU = {"RE-Datum","RE-Nummer", "Kreditor Name", "Kreditor Land", "Netto", "USt.", "Brutto", "Zahlungsziel", "Dateiname" };
+	private static final String[] HEADER_EX = { "Id", "Datum", "Bezeichnung", "Netto (EUR)", "Steuer (EUR)", "Brutto (EUR)", "Dateiname" };
 	private static final String[] HEADER_ST = { "Datum", "Zahlungsempfänger", "Bezeichnung", "Zahllast", "Fälligkeit", "Dateiname" };
 
-	private static String[][] sTempAN = new String [100][6], sTempRE = new String [100][9], sTempPU = new String [100][17], sTempEX = new String [100][8], sTempST = new String [30][6];
+	private static String[][] sTempAN = new String [100][6], sTempRE = new String [100][9], sTempPU = new String [100][9], sTempEX = new String [100][7],
+			sTempST = new String [30][6];
 
 	private static JFoverview frame;
 	private static JTabbedPane tabPanel;
@@ -130,7 +131,7 @@ public class JFoverview extends JFrame {
 	private static JScrollPane sPaneText, sPaneErg; //, sPaneSetting;
 	private static CreateTable<Object> sPaneAN, sPaneRE, sPanePU, sPaneEX, sPaneST;
 	
-	private static CreatePanel panelBillInfo;
+	private static CreatePanel panelOfferInfo, panelBillInfo;
 	
 	private static JMenuBar menuBar;
 	private static JMenu menu1, menu6, menu9;
@@ -139,7 +140,7 @@ public class JFoverview extends JFrame {
 	private static JLabel lblState;
 	private static JTextField txtWirtschaftsjahr;
 
-	private static String sLic = null, vZelleRE = null, vZelleA = null;
+	private static String sLic = null, vZelleAN = null, vStateAN = null, vZelleRE = null, vStateRE = null;
 	private static int iLic = 0, iUserRights = 0;
 	
 	//###################################################################################################################################################
@@ -361,8 +362,8 @@ public class JFoverview extends JFrame {
 							
 						}
 						if(selectedIndex == 1) {
-							BigDecimal bdExNetto = setSumEX(); // Summen-Infos Ausgaben
-							BigDecimal bdReNetto = setSumPU(); // Summen-Infos Eingangsrechnungen
+							setSumEX(); // Summen-Infos Ausgaben
+							setSumPU(); // Summen-Infos Eingangsrechnungen
 							/*UStData.setValuesUVA(panelUSt, AnzYearPU, AnzYearRE, AnzYearEX, arrYearPU, arrYearRE, arrYearEX);
 							RecStateData.RecState(panelZM, AnzYearRE, arrYearRE);
 							LoadSvTax.loadSvTax(false, panelP109a);
@@ -504,13 +505,11 @@ public class JFoverview extends JFrame {
 				pageRE.removeAll();
 				doAngebotPanel();
 				doRechnungPanel();
-				
-				//LoadPurchase.loadEinkaufsRechnung(false);
-				//LoadExpenses.loadAusgaben(false);
-				
+				doEinkaufPanel();
+				doAusgabenPanel();
+
 				setSumPU(); // Summen-Infos Eingangsrechnungen
-				BigDecimal bdReNetto = setSumPU(); // Summen-Infos Eingangsrechnungen
-				BigDecimal bdExNetto = setSumEX(); // Summen-Infos Ausgaben
+				setSumEX(); // Summen-Infos Ausgaben
 				break;
 			case 5: // FinancialUser
 				/*UStData.setValuesUVA(panelUSt, AnzYearPU, AnzYearRE, AnzYearEX, arrYearPU, arrYearRE, arrYearEX);
@@ -562,9 +561,9 @@ public class JFoverview extends JFrame {
 			infoAN = new SumPanel(new String[] {"Summe offen:", "Summe best.:"}, true);
 			setSumAN(); // Summen eintragen
 			
-			CreatePanel panel = new CreatePanel(sPaneAN, offerPanel, btn, infoAN);
+			panelOfferInfo = new CreatePanel(sPaneAN, offerPanel, btn, infoAN);
 			
-			btn = panel.getButtons(); // Button-Instanzen holen für Action Listener
+			btn = panelOfferInfo.getButtons(); // Button-Instanzen holen für Action Listener
 			
 			btn[0].addActionListener(new ActionListener() {
 				@Override
@@ -580,8 +579,12 @@ public class JFoverview extends JFrame {
 			btn[1].addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					if(vZelleAN == null) {
+						return;
+					}
 					try {
-						ExcelOffer.anExport(vZelleA);
+						ExcelOffer.anExport(vZelleAN);
+						actScreen();
 					} catch (Exception e1) {
 						logger.error("actionAN3() - " + e1);
 					}
@@ -590,15 +593,19 @@ public class JFoverview extends JFrame {
 			btn[2].addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					if(vZelleAN == null) {
+						return;
+					}
 					try {
-						JFconfirmA.showDialog(vZelleA);
+						JFconfirmA.showDialog(vZelleAN);
+						actScreen();
 					}catch (Exception e1) {
 						logger.error("actionAN5() - " + e1);
 					}
 				}
 			});
 			
-			pageAN.add(panel);
+			pageAN.add(panelOfferInfo);
 			pageAN.revalidate();
 			pageAN.repaint();
 		}
@@ -671,6 +678,7 @@ public class JFoverview extends JFrame {
 					}
 					try {
 						ExcelBill.reExport(vZelleRE);
+						actScreen();
 					} catch (Exception e1) {
 						logger.error("actionRE3() - " + e1);
 					}
@@ -682,7 +690,8 @@ public class JFoverview extends JFrame {
 					if(vZelleRE == null) {
 						return;
 					}
-					JFnewReminder.showGUI(vZelleRE);
+					JFreminder.showGUI(vZelleRE);
+					actScreen();
 				}
 			});
 			
@@ -710,7 +719,7 @@ public class JFoverview extends JFrame {
 	
 	static void doEinkaufPanel() {
 		if(iUserRights == 2) { // SuperUser
-			//sTempPU = LoadPurchase.loadEinkaufsRechnung(false);
+			sTempPU = LoadPurchase.loadEinkaufsRechnung(false);
 			
 			purchasePanel = EditPanelFactory.create("PU");
 			if (purchasePanel instanceof PurchasePanel pup) {
@@ -723,7 +732,7 @@ public class JFoverview extends JFrame {
 			sPanePU.getTable().addMouseListener(new MouseAdapter() {
 			    @Override
 			    public void mouseClicked(MouseEvent e) { actionClickPU(sPanePU.getTable(), e); } });
-			sPanePU.setColumnWidths(new int[] {100,80,150,150,80,150,80,100,60,60,70,70,70,70,100,250,200});
+			sPanePU.setColumnWidths(new int[] {100,150,150,150,80,100,100,250,200});
 			
 			// InfoPanel anlegen
 			infoPU = new SumPanel(new String[] {"Netto:", "Brutto:"}, false);
@@ -739,7 +748,7 @@ public class JFoverview extends JFrame {
 	
 	static void doAusgabenPanel() {
 		if(iUserRights == 2) { // SuperUser
-			//sTempEX = LoadExpenses.loadAusgaben(false);
+			sTempEX = LoadExpenses.loadAusgaben(false);
 			
 			expensesPanel = EditPanelFactory.create("EX");
 			if (expensesPanel instanceof ExpensesPanel ep) {
@@ -752,7 +761,7 @@ public class JFoverview extends JFrame {
 			sPaneEX.getTable().addMouseListener(new MouseAdapter() {
 			    @Override
 			    public void mouseClicked(MouseEvent e) { actionClickEX(sPaneEX.getTable(), e); } });
-			sPaneEX.setColumnWidths(new int[] {50,100,650,100,100,100,100,650});
+			sPaneEX.setColumnWidths(new int[] {50,100,650,100,100,100,650});
 			
 			// InfoPanel anlegen
 			infoEX = new SumPanel(new String[] {"Netto:", "Brutto:"}, false);
@@ -919,29 +928,12 @@ public class JFoverview extends JFrame {
 		infoRE.setProgressBar(prozent(LoadBill.getSumOpen(), LoadBill.getSumPayed()));
 	}
 
-	static BigDecimal setSumPU() {
-
-		BigDecimal bdNetto = new BigDecimal("0.00"), bdBrutto = new BigDecimal("0.00");
-
-		try {
-			/*if(AnzYearPU >0) {
-				for(int x = 1; (x - 1) < AnzYearPU; x++) {
-					String sNetto = arrYearPU[x][11].trim();
-					String sBrutto = arrYearPU[x][13].trim();
-
-					bdNetto = bdNetto.add(new BigDecimal(sNetto));
-					bdBrutto = bdBrutto.add(new BigDecimal(sBrutto));
-				}
-			}*/
-			Double dOpen = bdNetto.doubleValue();
-			Double dClosed = bdBrutto.doubleValue();
-			infoPU.setTxtSum(0, dOpen);
-			infoPU.setTxtSum(1, dClosed);
-		} catch (NullPointerException e1){
-			logger.error("error in calculating revenue sum - " + e1);
-		}
-		infoPU.setProgressBar(prozent(bdNetto, bdBrutto));
-		return bdNetto;
+	static void setSumPU() {
+		double dNetto = LoadExpenses.getBdNetto().doubleValue();
+		double dBrutto = LoadExpenses.getBdBrutto().doubleValue();
+		infoPU.setTxtSum(0, dNetto);
+		infoPU.setTxtSum(1, dBrutto);
+		infoPU.setProgressBar(prozent(LoadExpenses.getBdNetto(), LoadExpenses.getBdBrutto()));
 	}
 
 	static BigDecimal setSumEX() {
@@ -1354,6 +1346,25 @@ public class JFoverview extends JFrame {
 						anp.setsTitel("Angebotspositionen (Angebots-Nr. = " + table.getValueAt(row, 0).toString() + ")");
 						Kunde kunde = searchKundeAll(table.getValueAt(row, 4).toString());
 						anp.setTxtFields(table.getValueAt(row, 0).toString(), kunde.getTaxvalue());
+						vZelleAN = table.getValueAt(row, 0).toString();
+						vStateAN = table.getValueAt(row, 1).toString();
+						if(panelOfferInfo instanceof CreatePanel cp) {
+							JButton[] btn = cp.getButtons();
+							switch(vStateAN) {
+							case "erstellt":
+								btn[1].setEnabled(true);
+								btn[2].setEnabled(false);
+								break;
+							case "bestellt":
+								btn[1].setEnabled(false);
+								btn[2].setEnabled(true);
+								break;
+							default:
+								btn[1].setEnabled(false);
+								btn[2].setEnabled(false);
+								break;
+							}
+						}
 					}
 				}
 			}
@@ -1394,12 +1405,22 @@ public class JFoverview extends JFrame {
 						Kunde kunde = searchKundeAll(table.getValueAt(row, 5).toString());
 						rep.setTxtFields(table.getValueAt(row, 0).toString(), kunde.getTaxvalue());
 						vZelleRE = table.getValueAt(row, 0).toString();
+						vStateRE = table.getValueAt(row, 1).toString();
 						if(panelBillInfo instanceof CreatePanel cp) {
 							JButton[] btn = cp.getButtons();
-							if (table.getValueAt(row, 1).toString().equalsIgnoreCase("erstellt")) {
+							switch(vStateRE) {
+							case "erstellt":
 								btn[1].setEnabled(true);
-							} else {
+								btn[2].setEnabled(false);
+								break;
+							case "gedruckt", "Zahlungserinnerung", "Mahnstufe 1", "Mahnstufe 2":
 								btn[1].setEnabled(false);
+								btn[2].setEnabled(true);
+								break;
+							default:
+								btn[1].setEnabled(false);
+								btn[2].setEnabled(false);
+								break;
 							}
 						}
 					}
@@ -1560,6 +1581,10 @@ public class JFoverview extends JFrame {
 
 	public static int getButtony() {
 		return BUTTONY;
+	}
+
+	public static CreatePanel getPanelBillInfo() {
+		return panelBillInfo;
 	}
 	
 }

@@ -1,8 +1,6 @@
 package org.andy.gui.offer;
 
 import static org.andy.toolbox.misc.CreateObject.createButton;
-import static org.andy.toolbox.sql.Update.sqlUpdate;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.EventQueue;
@@ -10,8 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLException;
-
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -32,9 +28,8 @@ import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
 import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
 import org.andy.code.dataExport.ExcelConfirmation;
-import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
-import org.andy.code.main.overview.table.LoadOffer;
+import org.andy.gui.main.JFoverview;
 import org.andy.gui.misc.RoundedBorder;
 import org.andy.org.eclipse.wb.swing.FocusTraversalOnArray;
 
@@ -42,9 +37,6 @@ public class JFconfirmA extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = LogManager.getLogger(JFconfirmA.class);
-
-	private static String sConn;
-	private static final String TBL_OFFER = "tbl_an";
 
 	private JPanel contentPanel = new JPanel();
 
@@ -55,6 +47,7 @@ public class JFconfirmA extends JFrame {
 	private static String sConfStart = null;
 
 	//###################################################################################################################################################
+	// public Teil
 	//###################################################################################################################################################
 
 	public static void showDialog(String vZelleA) {
@@ -70,8 +63,12 @@ public class JFconfirmA extends JFrame {
 			}
 		});
 	}
+	
+	//###################################################################################################################################################
+	// private Teil
+	//###################################################################################################################################################
 
-	public JFconfirmA(String vZelleA) {
+	private JFconfirmA(String vZelleA) {
 
 		try (InputStream is = JFconfirmA.class.getResourceAsStream("/icons/edit_color.png")) {
 			if (is == null) {
@@ -176,16 +173,7 @@ public class JFconfirmA extends JFrame {
 					logger.error("JFconfirmA(String vZelleA) - " + e1);
 				}
 
-				String tblName = TBL_OFFER.replace("_", LoadData.getStrAktGJ());
-				String sStatement = "UPDATE " + tblName + " SET [orderState] = '1', [Status] = '" + JFstatusA.getConfirmed() + "' WHERE [IdNummer] = '" + vZelleA + "'";
-
-				try {
-					sqlUpdate(sConn, sStatement);
-				} catch (SQLException | ClassNotFoundException e2) {
-					logger.error("error updating offer state to database - " + e2);
-				}
-
-				LoadOffer.loadAngebot(false);
+				JFoverview.actScreen();
 				dispose();
 			}
 		});
@@ -209,7 +197,4 @@ public class JFconfirmA extends JFrame {
 		return sConfStart;
 	}
 
-	public static void setsConn(String sConn) {
-		JFconfirmA.sConn = sConn;
-	}
 }

@@ -1,30 +1,31 @@
-package org.andy.code.entityMaster;
+package org.andy.code.dataStructure.repositoryMaster;
 
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.andy.code.dataStructure.entitiyMaster.Owner;
 import org.andy.code.misc.HibernateUtil;
 
-public class TaxRepository {
+public class OwnerRepository {
 
-    public List<Tax> findAll() {
+    public List<Owner> findAll() {
         try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
-            return session.createQuery("FROM Tax", Tax.class).list();
+            return session.createQuery("FROM Owner", Owner.class).list();
         }
     }
 
-    public void insert(Tax tax) {
+    public void insert(Owner owner) {
         try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
             Transaction tx = session.beginTransaction();
-            session.persist(tax);
+            session.persist(owner);
             tx.commit();
         }
     }
 
-    public void update(Tax tax) {
+    public void update(Owner owner) {
         try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
             Transaction tx = session.beginTransaction();
-            session.merge(tax);
+            session.merge(owner);
             tx.commit();
         }
     }

@@ -13,6 +13,7 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -23,8 +24,8 @@ import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.NumberFormatter;
 
-import org.andy.code.entityProductive.Angebot;
-import org.andy.code.entityProductive.AngebotRepository;
+import org.andy.code.dataStructure.entitiyProductive.Angebot;
+import org.andy.code.dataStructure.repositoryProductive.AngebotRepository;
 import org.andy.code.main.StartUp;
 import org.andy.gui.main.JFoverview;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
@@ -58,6 +59,9 @@ public class OfferPanel extends EditPanel {
 	private JTextField[] txtFieldsEP = new JTextField[12];
 	private JTextField[] txtFieldsGP = new JTextField[12];
 	private JFormattedTextField[] txtFieldsSum = new JFormattedTextField[3];
+	
+	private JLabel lblState = null;
+	private JComboBox<String> cmbState = null;
 
 	private JButton[] btnFields = new JButton[3];
 	
@@ -93,6 +97,8 @@ public class OfferPanel extends EditPanel {
 	//###################################################################################################################################################
 	
 	private void buildPanel() {
+		
+		String[] selectState = {"", "storniert", "bestellt" };
 		
 		// Überschriften und Feldbeschriftungen
 	    String[] labelsTop = {"Datum:", "Referenz:"};
@@ -194,21 +200,53 @@ public class OfferPanel extends EditPanel {
 	    	add(txtFieldsSum[r]);
 	    }
 	    
+	    // Label für Status
+	    lblState = new JLabel("Status:");
+	    lblState.setBounds(1345, 70, 100, 25);
+	    lblState.setFont(new Font("Tahoma", Font.BOLD, 11));
+	    lblState.setVisible(false);
+	    add(lblState);
+	    // ComboBox für Status
+	    cmbState = new JComboBox<String>(selectState);
+	    cmbState.setBounds(1445, 70, 150, 25);
+	    cmbState.setVisible(false);
+	    add(cmbState);
+	    
 	    // Buttons
 		try {
 			btnFields[0] = createButton("<html>neu<br>berechnen</html>", "calc.png");
 			btnFields[1] = createButton("<html>update</html>", "save.png");
+			btnFields[2] = createButton("<html>Status<br>setzen</html>", "save.png");
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}
-		btnFields[0].setEnabled(false);
-		btnFields[1].setEnabled(false);
 		btnFields[0].setBounds(1625, 260, JFoverview.getButtonx(), JFoverview.getButtony());
 		btnFields[1].setBounds(1625, 320, JFoverview.getButtonx(), JFoverview.getButtony());
+		btnFields[2].setBounds(1625, 70, JFoverview.getButtonx(), JFoverview.getButtony());
+		btnFields[2].setVisible(false);
 		add(btnFields[0]);
 		add(btnFields[1]);
+		add(btnFields[2]);
 		
 		setPreferredSize(new Dimension(1000, 70 + txtFieldsPos.length * 25 + 20));
+		
+		// ------------------------------------------------------------------------------
+		// Action Listener für ComboBox
+		// ------------------------------------------------------------------------------
+		
+		cmbState.addActionListener(new ActionListener() {
+	        @Override
+	        public void actionPerformed(ActionEvent actionEvent) {
+	            int idx = cmbState.getSelectedIndex();
+
+	            if (idx == 0) {
+	                // Leereintrag: Felder leeren, Buttons sperren etc.
+	                btnFields[2].setEnabled(false);
+	            } else {
+	                btnFields[2].setEnabled(true);
+	            }
+	        }
+	    });
 	    
 	    // ------------------------------------------------------------------------------
  		// Action Listener für Buttons
@@ -231,6 +269,13 @@ public class OfferPanel extends EditPanel {
  			@Override
  			public void actionPerformed(ActionEvent e) {
  				updateTable();
+ 			}
+ 		});
+	    
+	    btnFields[2].addActionListener(new ActionListener() {
+ 			@Override
+ 			public void actionPerformed(ActionEvent e) {
+ 				updateState();
  			}
  		});
 	    
@@ -276,8 +321,11 @@ public class OfferPanel extends EditPanel {
 		for (int i = 0; i < this.txtFieldsSum.length; i++) {
 			this.txtFieldsSum[i].setFocusable(false);
 		}
+		lblState.setVisible(false);
+		cmbState.setVisible(false);
 		btnFields[0].setEnabled(b);
 		btnFields[1].setEnabled(false);
+		btnFields[2].setVisible(false);
     }
     
 	//###################################################################################################################################################
@@ -357,6 +405,26 @@ public class OfferPanel extends EditPanel {
     	JFoverview.actScreen();
     }
     
+    private void updateState() {
+    	AngebotRepository angebotRepository = new AngebotRepository();
+        Angebot angebot = angebotRepository.findById(id);
+        
+        switch (cmbState.getSelectedIndex()) {
+		case 1: // storniert
+			angebot.setState(0);
+			break;
+		case 2: // bestellt
+			angebot.setState(111);
+			break;
+		default:
+			break;
+		}
+        
+        angebotRepository.update(angebot);
+        
+        JFoverview.actScreen();
+    }
+    
 	//###################################################################################################################################################
 	// Getter und Setter für Felder
 	//###################################################################################################################################################
@@ -397,6 +465,7 @@ public class OfferPanel extends EditPanel {
     	ep.add(angebot.getePreis09()); ep.add(angebot.getePreis10()); ep.add(angebot.getePreis11()); ep.add(angebot.getePreis12());
     	
     	this.id = null; this.bdTaxRate = BigDecimal.ZERO;
+    	cmbState.setSelectedIndex(0);
     	bdNetto = BigDecimal.ZERO;
     	bdTaxRate = new BigDecimal(TaxVal.trim());
 
@@ -440,6 +509,15 @@ public class OfferPanel extends EditPanel {
     	txtFieldsSum[1].setValue(Double.parseDouble(bdTax.toString()));
     	bdBrutto = bdNetto.add(bdTax).setScale(2, RoundingMode.HALF_UP);
     	txtFieldsSum[2].setValue(Double.parseDouble(bdBrutto.toString()));
-    	if (angebot.getState() == 1) { txtFieldsFocusable(true); } // Bearbeitungsmöglichkeit setzen
+    	
+    	switch(angebot.getState()) {
+    	case 1:
+    		txtFieldsFocusable(true);
+    		break;
+    	case 11:
+    		lblState.setVisible(true);
+    		cmbState.setVisible(true);
+    		btnFields[2].setVisible(true);
+    	}
     }
 }

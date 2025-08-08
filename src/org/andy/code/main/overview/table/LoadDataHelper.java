@@ -3,8 +3,8 @@ package org.andy.code.main.overview.table;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.andy.code.entityMaster.Kunde;
-import org.andy.code.entityMaster.KundeRepository;
+import org.andy.code.dataStructure.entitiyMaster.Kunde;
+import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
 
 public class LoadDataHelper {
 	

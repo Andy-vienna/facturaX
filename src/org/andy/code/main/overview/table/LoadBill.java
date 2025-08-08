@@ -10,14 +10,11 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
 
-import org.andy.code.entityProductive.Rechnung;
-import org.andy.code.entityProductive.RechnungRepository;
+import org.andy.code.dataStructure.entitiyProductive.Rechnung;
+import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
 import org.andy.code.main.LoadData;
 
 public class LoadBill {
-	
-	private static RechnungRepository rechnungRepository = new RechnungRepository();
-    private static List<Rechnung> rechnungListe = new ArrayList<>();
     
     private static BigDecimal sumOpen = BigDecimal.ZERO;
     private static BigDecimal sumPayed = BigDecimal.ZERO;
@@ -42,7 +39,8 @@ public class LoadBill {
 		
 		sumOpen = BigDecimal.ZERO; sumPayed = BigDecimal.ZERO;
 		
-		rechnungListe.clear();
+		RechnungRepository rechnungRepository = new RechnungRepository();
+	    List<Rechnung> rechnungListe = new ArrayList<>();
 		rechnungListe.addAll(rechnungRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ())));
 		
 		String[][] sTemp = new String [rechnungListe.size()][9];
@@ -81,8 +79,8 @@ public class LoadBill {
 			
 			if (rechnung.getState() > 0) { // nicht storniert
 				switch (rechnung.getState()) {
-				case 11 -> sumOpen = sumOpen.add(rechnung.getBrutto());
-				case 111 -> sumPayed = sumPayed.add(rechnung.getBrutto());
+				case 11 -> sumOpen = sumOpen.add(rechnung.getNetto());
+				case 111 -> sumPayed = sumPayed.add(rechnung.getNetto());
 				}
 			}
 		}

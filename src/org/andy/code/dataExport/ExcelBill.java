@@ -2,6 +2,7 @@ package org.andy.code.dataExport;
 
 import static org.andy.toolbox.misc.Tools.FormatIBAN;
 import static org.andy.toolbox.misc.Tools.isLocked;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -16,13 +17,17 @@ import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
+
+import org.andy.code.dataStructure.entitiyMaster.Bank;
+import org.andy.code.dataStructure.entitiyMaster.Kunde;
+import org.andy.code.dataStructure.entitiyProductive.FileStore;
+import org.andy.code.dataStructure.entitiyProductive.Rechnung;
+import org.andy.code.dataStructure.repositoryProductive.FileStoreRepository;
+import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
 import org.andy.code.eRechnung.CreateXRechnungXML;
 import org.andy.code.eRechnung.CreateZUGFeRDpdf;
-import org.andy.code.entityMaster.Bank;
-import org.andy.code.entityMaster.Kunde;
-import org.andy.code.entityProductive.FileStore;
-import org.andy.code.entityProductive.FileStoreRepository;
-import org.andy.code.entityProductive.Rechnung;
 import org.andy.code.main.LoadData;
 import org.andy.code.qr.ZxingQR;
 import org.apache.commons.io.IOUtils;
@@ -67,11 +72,11 @@ public class ExcelBill{
 	private static String taxNote;
 
 	//###################################################################################################################################################
-	// Rechnung erzeugen und auf Wunsch als pdf exportieren
+	// Rechnung erzeugen und als pdf exportieren
 	//###################################################################################################################################################
 
 	public static void reExport(String sNr) throws Exception {
-
+		
 		String sExcelIn = LoadData.getTplBill();
 		String sExcelOut = LoadData.getWorkPath() + "Rechnung_" + sNr + ".xlsx";
 		String sPdfOut = LoadData.getWorkPath() + "Rechnung_" + sNr + ".pdf";
@@ -178,8 +183,9 @@ public class ExcelBill{
 			Cell reBank = ws.getRow(46).getCell(COLUMN_E); //Bankverbindung E47 - E49: Bankname
 			Cell reIBAN = ws.getRow(47).getCell(COLUMN_E); //IBAN
 			Cell reBIC = ws.getRow(48).getCell(COLUMN_E); //BIC
+			
 			//#######################################################################
-			// Zellwerte beschreiben aus dem Array arrAnContent
+			// Zellwerte beschreiben
 			//#######################################################################
 			reAdress.setCellValue(kunde.getName() + "\n" + kunde.getStrasse() + "\n" + kunde.getPlz() + " " +
 					kunde.getOrt() + ", " + kunde.getLand().toUpperCase());
@@ -283,7 +289,7 @@ public class ExcelBill{
 		//#######################################################################
 		// eRechnung erstellen nach hinterlegtem Format (ZUGFeRD oder XRechnung)
 		//#######################################################################
-		String sFile = null;
+		String sFile = null; boolean bResult = false;
 		
 		switch(kunde.geteBillTyp()) {
 		case ZUGFeRD:
@@ -294,6 +300,7 @@ public class ExcelBill{
 			} catch (ParseException | IOException e) {
 				logger.error("error generating zugferd - " + e);
 			}
+			bResult = true;
 			break;
 
 		case XRECHNUNG:
@@ -304,50 +311,67 @@ public class ExcelBill{
 			} catch (ParseException | IOException e) {
 				logger.error("error generating xrechnung - " + e);
 			}
+			bResult = true;
 			break;
 
 		default:
 			return;
 		}
 		
-		boolean bLockedoutput = isLocked(sFile);
-		while(bLockedoutput) {
-			System.out.println("warte auf Datei ...");
-		}
-		
-		String FileNamePath = sFile;
-		File fn = new File(FileNamePath);
-		String FileName = fn.getName();
-		
-		
-		FileStoreRepository fileStoreRepository = new FileStoreRepository();
-		FileStore fileStore = new FileStore();
-		
-		fileStore.setIdNummer(rechnung.getIdNummer());
-		fileStore.setYear(rechnung.getJahr());
-		fileStore.setReFileName(FileName);
-		
-		Path path = Paths.get(FileNamePath);
-		fileStore.setRePdfFile(Files.readAllBytes(path)); // ByteArray für Dateiinhalt
-		
-		fileStoreRepository.save(fileStore); // Datei in DB speichern
-		
-		//#######################################################################
-		// Ursprungs-Excel und -pdf löschen
-		//#######################################################################
-		boolean bLockedpdf = isLocked(sPdfOut);
-		boolean bLockedxlsx = isLocked(sExcelOut);
-		boolean bLockedout = isLocked(sFile);
-		while(bLockedpdf || bLockedxlsx || bLockedout) {
-			System.out.println("warte auf Dateien ...");
-		}
-		File xlFile = new File(sExcelOut);
-		File pdFile = new File(sPdfOut);
-		File outFile = new File(sFile);
-		if(xlFile.delete() && pdFile.delete() && outFile.delete()) {
+		if (bResult) {
+			boolean bLockedoutput = isLocked(sFile);
+			while(bLockedoutput) {
+				System.out.println("warte auf Datei ...");
+			}
+			
+			//#######################################################################
+			// Datei in DB speichern
+			//#######################################################################
+			
+			String FileNamePath = sFile;
+			File fn = new File(FileNamePath);
+			String FileName = fn.getName();
+			
+			FileStoreRepository fileStoreRepository = new FileStoreRepository();
+			FileStore fileStore = new FileStore();
+			
+			fileStore.setIdNummer(rechnung.getIdNummer());
+			fileStore.setYear(rechnung.getJahr());
+			fileStore.setReFileName(FileName);
+			
+			Path path = Paths.get(FileNamePath);
+			fileStore.setRePdfFile(Files.readAllBytes(path)); // ByteArray für Dateiinhalt
+			
+			fileStoreRepository.save(fileStore); // Datei in DB speichern
+			
+			//#######################################################################
+			// Status der Rechnung ändern
+			//#######################################################################
+			
+			rechnung.setState(rechnung.getState() + 10); // Zustand gedruckt setzen
+			RechnungRepository rechnungRepository = new RechnungRepository();
+			rechnungRepository.update(rechnung);
+			
+			//#######################################################################
+			// Ursprungs-Excel und -pdf löschen
+			//#######################################################################
+			boolean bLockedpdf = isLocked(sPdfOut);
+			boolean bLockedxlsx = isLocked(sExcelOut);
+			boolean bLockedout = isLocked(sFile);
+			while(bLockedpdf || bLockedxlsx || bLockedout) {
+				System.out.println("warte auf Dateien ...");
+			}
+			File xlFile = new File(sExcelOut);
+			File pdFile = new File(sPdfOut);
+			File outFile = new File(sFile);
+			if(xlFile.delete() && pdFile.delete() && outFile.delete()) {
 
-		}else {
-			logger.error("reExport(...) - Dateien konnten nicht gelöscht werden");
+			}else {
+				logger.error("reExport(...) - Dateien konnten nicht gelöscht werden");
+			}
+		} else {
+			JOptionPane.showMessageDialog(null, "Problem beim Drucken der Rechnung", "Rechnung drucken", JOptionPane.INFORMATION_MESSAGE);
+			logger.error("Rechnung nicht gedruckt !");
 		}
 	}
 	

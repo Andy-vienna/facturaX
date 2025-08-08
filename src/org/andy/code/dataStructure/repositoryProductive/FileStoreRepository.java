@@ -1,17 +1,19 @@
-package org.andy.code.entityProductive;
+package org.andy.code.dataStructure.repositoryProductive;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import java.util.Optional;
-
 import static org.andy.code.misc.HibernateUtil.getSessionFactoryDb2;
+
+import org.andy.code.dataStructure.entitiyProductive.FileStore;
 
 public class FileStoreRepository {
 	
-	public Optional<FileStore> findById(String idNummer) {
+	public FileStore findById(String id) {
         try (Session session = getSessionFactoryDb2().openSession()) {
-            FileStore result = session.find(FileStore.class, idNummer);
-            return Optional.ofNullable(result);
+        	return session.createQuery(
+                    "FROM FileStore r WHERE r.idNummer = :id", FileStore.class)
+                    .setParameter("id", id)
+                    .getSingleResult();
         }
     }
 

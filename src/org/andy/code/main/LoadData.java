@@ -15,13 +15,6 @@ import javax.swing.JOptionPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.andy.code.dataExport.ExcelBill;
-import org.andy.code.dataExport.ExcelConfirmation;
-import org.andy.code.dataExport.ExcelMahnung;
-import org.andy.code.dataExport.ExcelOffer;
-import org.andy.code.dataExport.ExcelReminder;
-import org.andy.gui.file.JFfileView;
-import org.andy.gui.reminder.JFnewReminder;
 import org.andy.gui.settings.JFdbSettings;
 
 public class LoadData {
@@ -61,6 +54,7 @@ public class LoadData {
 	private static boolean bFinished = false;
 
 	// ###################################################################################################################################################
+	// public teil
 	// ###################################################################################################################################################
 
 	public static void LoadProgSettings() {
@@ -72,6 +66,7 @@ public class LoadData {
 	}
 
 	// ###################################################################################################################################################
+	// private Teil
 	// ###################################################################################################################################################
 
 	private static void LoadSettings() throws FileNotFoundException, IOException {
@@ -159,28 +154,15 @@ public class LoadData {
 		// Datenbank-String zusammenbauen
 		// ------------------------------------------------------------------------------
 
-		String tmpConnB = "jdbc:sqlserver://" + LoadData.strDBComputer + ":" + LoadData.strDBPort + ";database="
+		/*String tmpConnB = "jdbc:sqlserver://" + LoadData.strDBComputer + ":" + LoadData.strDBPort + ";database="
 				+ LoadData.strDBNameDest + ";user=" + LoadData.strDBUser + ";password=" + LoadData.strDBPass
 				+ ";encrypt=" + LoadData.strDBencrypted + ";trustServerCertificate=" + LoadData.strDBServerCert
-				+ ";loginTimeout=30;";
-
-		JFfileView.setsConn(tmpConnB);
-
-
-
-
-		JFnewReminder.setsConn(tmpConnB);
-		
-		ExcelConfirmation.setsConn(tmpConnB);
-		ExcelOffer.setsConn(tmpConnB);
-		ExcelReminder.setsConn(tmpConnB);
-		ExcelMahnung.setsConn(tmpConnB);
+				+ ";loginTimeout=30;";*/
 
 		StartUp.setSERVICE_NAME("\"SQL Server (" + strDBservice + ")\"");
 
 	}
 
-	// ###################################################################################################################################################
 	// ###################################################################################################################################################
 
 	private static String askFinacialYear() {
@@ -201,6 +183,7 @@ public class LoadData {
 	}
 
 	// ###################################################################################################################################################
+	// Getter und Setter
 	// ###################################################################################################################################################
 
 	public static final String getBackupPath() {
