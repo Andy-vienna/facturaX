@@ -25,6 +25,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,12 +111,11 @@ public class JFoverview extends JFrame {
 
 	private static final String[] HEADER_AN = { "AN-Nummer", "Status", "Datum", "Referenz", "Kunde", "Netto" };
 	private static final String[] HEADER_RE = { "RE-Nummer", "Status", "Datum", "Leistungszeitraum", "Referenz", "Kunde", "Netto", "USt.", "Brutto" };
-	private static final String[] HEADER_PU = {"RE-Datum","RE-Nummer", "Kreditor Name", "Kreditor Land", "Netto", "USt.", "Brutto", "Zahlungsziel", "Dateiname" };
-	private static final String[] HEADER_EX = { "Id", "Datum", "Bezeichnung", "Netto (EUR)", "Steuer (EUR)", "Brutto (EUR)", "Dateiname" };
+	private static final String[] HEADER_PU = {"RE-Datum","RE-Nummer", "Kreditor Name", "Kreditor Land", "Netto", "USt.", "Brutto", "Zahlungsziel", "bezahlt", "Dateiname" };
+	private static final String[] HEADER_EX = { "Datum", "Bezeichnung", "Netto (EUR)", "Steuer (EUR)", "Brutto (EUR)", "Dateiname" };
 	private static final String[] HEADER_ST = { "Datum", "Zahlungsempfänger", "Bezeichnung", "Zahllast", "Fälligkeit", "Dateiname" };
 
-	private static String[][] sTempAN = new String [100][6], sTempRE = new String [100][9], sTempPU = new String [100][9], sTempEX = new String [100][7],
-			sTempST = new String [30][6];
+	private static String[][] sTempAN = null, sTempRE = null, sTempPU = null, sTempEX = null, sTempST = null;
 
 	private static JFoverview frame;
 	private static JTabbedPane tabPanel;
@@ -163,6 +165,48 @@ public class JFoverview extends JFrame {
 
 			}
 		});
+	}
+	
+	//###################################################################################################################################################
+	
+	public static void actScreen() {
+		
+		switch (iUserRights) {
+			case 1: // User
+				pageAN.removeAll();
+				pageRE.removeAll();
+				doAngebotPanel();
+				doRechnungPanel();
+				break;
+			case 2: // SuperUser
+				pageAN.removeAll();
+				pageRE.removeAll();
+				pagePU.removeAll();
+				pageEX.removeAll();
+				doAngebotPanel();
+				doRechnungPanel();
+				doEinkaufPanel();
+				doAusgabenPanel();
+
+				setSumPU(); // Summen-Infos Eingangsrechnungen
+				setSumEX(); // Summen-Infos Ausgaben
+				break;
+			case 5: // FinancialUser
+				/*UStData.setValuesUVA(panelUSt, AnzYearPU, AnzYearRE, AnzYearEX, arrYearPU, arrYearRE, arrYearEX);
+				RecStateData.RecState(panelZM, AnzYearRE, arrYearRE);
+				LoadSvTax.loadSvTax(false, panelP109a);
+				TaxData.setValuesTax(panelP109a, AnzYearRE, arrYearRE, bdExNetto, bdReNetto);*/
+				break;
+			case 9: // Admin
+				TextPanel.loadTexte();
+				break;
+		}
+		
+		contentPane.revalidate();
+		contentPane.repaint();
+
+		frame.setTitle(StartUp.APP_NAME + StartUp.APP_VERSION + " - Wirtschaftsjahr " + LoadData.getStrAktGJ());
+		
 	}
 	
 	//###################################################################################################################################################
@@ -384,7 +428,7 @@ public class JFoverview extends JFrame {
 		});
 		contentPane.add(tabPanel);
 
-		createStatus(); // Statuszeile
+		doStatus(); // Statuszeile
 
 		// ------------------------------------------------------------------------------
 		// Action Listener für JFrame und JPanel
@@ -457,79 +501,7 @@ public class JFoverview extends JFrame {
 	}
 	
 	//###################################################################################################################################################
-	//###################################################################################################################################################
-	
-	private void resizeGUI(Dimension xy) {
-		int x = xy.width;
-		int y = xy.height;
-
-		int iStateTop = y - BOTTOMY - STATEY;
-
-		menuBar.setBounds(0, 0, x, STATEY - 10);
-
-		tabPanel.setLocation(10, STATEY);
-		tabPanel.setSize(x - 20, y - 80);
-		
-		//#############################################################################################################
-
-		lblState.setBounds(BASEX, iStateTop+1, x - 100, STATEY-4);
-		txtWirtschaftsjahr.setBounds(x - 90, iStateTop-1, 80, STATEY);
-
-		LoadData.setsSizeX(String.valueOf(x));
-		LoadData.setsSizeY(String.valueOf(y));
-
-		LoadData.setPrpAppSettings("screenx", LoadData.getsSizeX());
-		LoadData.setPrpAppSettings("screeny", LoadData.getsSizeY());
-		try {
-			saveSettingsApp(LoadData.getPrpAppSettings());
-		} catch (IOException e1) {
-			logger.error("error saving settings - " + e1);
-		}
-
-	}
-	
-	//###################################################################################################################################################
-	//###################################################################################################################################################
-
-	public static void actScreen() {
-		
-		switch (iUserRights) {
-			case 1: // User
-				pageAN.removeAll();
-				pageRE.removeAll();
-				doAngebotPanel();
-				doRechnungPanel();
-				break;
-			case 2: // SuperUser
-				pageAN.removeAll();
-				pageRE.removeAll();
-				doAngebotPanel();
-				doRechnungPanel();
-				doEinkaufPanel();
-				doAusgabenPanel();
-
-				setSumPU(); // Summen-Infos Eingangsrechnungen
-				setSumEX(); // Summen-Infos Ausgaben
-				break;
-			case 5: // FinancialUser
-				/*UStData.setValuesUVA(panelUSt, AnzYearPU, AnzYearRE, AnzYearEX, arrYearPU, arrYearRE, arrYearEX);
-				RecStateData.RecState(panelZM, AnzYearRE, arrYearRE);
-				LoadSvTax.loadSvTax(false, panelP109a);
-				TaxData.setValuesTax(panelP109a, AnzYearRE, arrYearRE, bdExNetto, bdReNetto);*/
-				break;
-			case 9: // Admin
-				TextPanel.loadTexte();
-				break;
-		}
-		
-		contentPane.revalidate();
-		contentPane.repaint();
-
-		frame.setTitle(StartUp.APP_NAME + StartUp.APP_VERSION + " - Wirtschaftsjahr " + LoadData.getStrAktGJ());
-		
-	}
-	
-	//###################################################################################################################################################
+	// Panels erstellen
 	//###################################################################################################################################################
 	
 	static void doAngebotPanel() {
@@ -541,10 +513,10 @@ public class JFoverview extends JFrame {
 			offerPanel = EditPanelFactory.create("AN");
 			
 			// Tabelle mit ScrollPane anlegen
-			sPaneAN = new CreateTable<>(sTempAN, HEADER_AN, new TableANCellRenderer());
+			sPaneAN = new CreateTable<>(sTempAN, HEADER_AN, new TableANcr());
 			sPaneAN.getTable().addMouseListener(new MouseAdapter() {
 			    @Override
-			    public void mouseClicked(MouseEvent e) { actionClickOffer(sPaneAN.getTable(), e); } });
+			    public void mouseClicked(MouseEvent e) { actionClickAN(sPaneAN.getTable(), e); } });
 			sPaneAN.setColumnWidths(new int[] {200,200,200,750,200,200});
 	
 			// Buttons anlegen
@@ -635,7 +607,7 @@ public class JFoverview extends JFrame {
 			billPanel = EditPanelFactory.create("RE");
 			
 			// Tabelle mit ScrollPane anlegen
-			sPaneRE = new CreateTable<>(sTempRE, HEADER_RE, new TableRECellRenderer());
+			sPaneRE = new CreateTable<>(sTempRE, HEADER_RE, new TableREcr());
 			sPaneRE.getTable().addMouseListener(new MouseAdapter() {
 			    @Override
 			    public void mouseClicked(MouseEvent e) { actionClickBill(sPaneRE.getTable(), e); } });
@@ -728,11 +700,11 @@ public class JFoverview extends JFrame {
 			}
 			
 			// Tabelle mit ScrollPane anlegen
-			sPanePU = new CreateTable<>(sTempPU, HEADER_PU, new TablePUCellRenderer());
+			sPanePU = new CreateTable<>(sTempPU, HEADER_PU, new TablePUcr());
 			sPanePU.getTable().addMouseListener(new MouseAdapter() {
 			    @Override
 			    public void mouseClicked(MouseEvent e) { actionClickPU(sPanePU.getTable(), e); } });
-			sPanePU.setColumnWidths(new int[] {100,150,150,150,80,100,100,250,200});
+			sPanePU.setColumnWidths(new int[] {100,150,400,80,100,100,100,150,80,400});
 			
 			// InfoPanel anlegen
 			infoPU = new SumPanel(new String[] {"Netto:", "Brutto:"}, false);
@@ -757,11 +729,11 @@ public class JFoverview extends JFrame {
 			}
 			
 			// Tabelle mit ScrollPane anlegen
-			sPaneEX = new CreateTable<>(sTempEX, HEADER_EX, new TableEXCellRenderer());
+			sPaneEX = new CreateTable<>(sTempEX, HEADER_EX, new TableEXcr());
 			sPaneEX.getTable().addMouseListener(new MouseAdapter() {
 			    @Override
 			    public void mouseClicked(MouseEvent e) { actionClickEX(sPaneEX.getTable(), e); } });
-			sPaneEX.setColumnWidths(new int[] {50,100,650,100,100,100,650});
+			sPaneEX.setColumnWidths(new int[] {100,650,100,100,100,650});
 			
 			// InfoPanel anlegen
 			infoEX = new SumPanel(new String[] {"Netto:", "Brutto:"}, false);
@@ -786,7 +758,7 @@ public class JFoverview extends JFrame {
 			}
 			
 			// Tabelle mit ScrollPane anlegen
-			sPaneST = new CreateTable<>(sTempST, HEADER_ST, new TableSTCellRenderer());
+			sPaneST = new CreateTable<>(sTempST, HEADER_ST, new TableSTcr());
 			sPaneST.getTable().addMouseListener(new MouseAdapter() {
 			    @Override
 			    public void mouseClicked(MouseEvent e) { actionClickST(sPaneST.getTable(), e); } });
@@ -910,6 +882,7 @@ public class JFoverview extends JFrame {
 	}
 	
 	//###################################################################################################################################################
+	// Summen bilden
 	//###################################################################################################################################################
 
 	static void setSumAN() {
@@ -929,36 +902,19 @@ public class JFoverview extends JFrame {
 	}
 
 	static void setSumPU() {
-		double dNetto = LoadExpenses.getBdNetto().doubleValue();
-		double dBrutto = LoadExpenses.getBdBrutto().doubleValue();
+		double dNetto = LoadPurchase.getBdNetto().doubleValue();
+		double dBrutto = LoadPurchase.getBdBrutto().doubleValue();
 		infoPU.setTxtSum(0, dNetto);
 		infoPU.setTxtSum(1, dBrutto);
 		infoPU.setProgressBar(prozent(LoadExpenses.getBdNetto(), LoadExpenses.getBdBrutto()));
 	}
 
-	static BigDecimal setSumEX() {
-
-		BigDecimal bdNetto = new BigDecimal("0.00"), bdBrutto = new BigDecimal("0.00");
-
-		try {
-			/*if(AnzYearEX > 0) {
-				for(int x = 1; (x - 1) < AnzYearEX; x++) {
-					String sNetto = arrYearEX[x][3].trim();
-					String sBrutto = arrYearEX[x][6].trim();
-
-					bdNetto = bdNetto.add(new BigDecimal(sNetto));
-					bdBrutto = bdBrutto.add(new BigDecimal(sBrutto));
-				}
-			}*/
-			Double dOpen = bdNetto.doubleValue();
-			Double dClosed = bdBrutto.doubleValue();
-			infoEX.setTxtSum(0, dOpen);
-			infoEX.setTxtSum(1, dClosed);
-		} catch (NullPointerException e1){
-			logger.error("error in calculatin expenses sum - " + e1);
-		}
-		infoEX.setProgressBar(prozent(bdNetto, bdBrutto));
-		return bdNetto;
+	static void setSumEX() {
+		double dNetto = LoadExpenses.getBdNetto().doubleValue();
+		double dBrutto = LoadExpenses.getBdBrutto().doubleValue();
+		infoEX.setTxtSum(0, dNetto);
+		infoEX.setTxtSum(1, dBrutto);
+		infoEX.setProgressBar(prozent(LoadExpenses.getBdNetto(), LoadExpenses.getBdBrutto()));
 	}
 	
 	static BigDecimal setSumST() {
@@ -966,17 +922,6 @@ public class JFoverview extends JFrame {
 		BigDecimal bdSv = new BigDecimal("0.00"), bdTax = new BigDecimal("0.00");
 		
 		try {
-			/*if(AnzYearST > 0) {
-				for(int x = 1; (x - 1) < AnzYearST; x++) {
-					if (arrYearST[x][3].contains("Sozialversicherung")) {
-						bdSv = bdSv.add(new BigDecimal(arrYearST[x][5].trim()));
-					}
-					if (arrYearST[x][3].contains("Finanzamt")) {
-						bdTax = bdTax.add(new BigDecimal(arrYearST[x][5].trim()));
-					}
-
-				}
-			}*/
 			Double dSv = bdSv.doubleValue();
 			Double dTax = bdTax.doubleValue();
 			infoST.setTxtSum(0, dSv);
@@ -989,9 +934,8 @@ public class JFoverview extends JFrame {
 	}
 	
 	//###################################################################################################################################################
-	//###################################################################################################################################################
-
-	static void createStatus() {
+	
+	static void doStatus() {
 
 		String sStatus = "<html>"
 				+ "<b>" + StartUp.getDtNow() + "</b> | " + sLic
@@ -1035,300 +979,40 @@ public class JFoverview extends JFrame {
 		txtWirtschaftsjahr.setForeground(Color.BLACK);
 		contentPane.add(txtWirtschaftsjahr);
 	}
-	
-	//###################################################################################################################################################
-	//###################################################################################################################################################
-
-	static Kunde searchKundeAll(String sKdName) {
-		KundeRepository kundeRepository = new KundeRepository();
-	    List<Kunde> kundeListe = new ArrayList<>();
-	    kundeListe.addAll(kundeRepository.findAll());
-
-		for (int kd = 0; kd < kundeListe.size(); kd++) {
-			Kunde kunde = kundeListe.get(kd);
-
-			// Prüfen, ob die Kunde-Liste null oder zu kurz ist
-			if (kunde.getName() == null) {
-				continue; // Überspringe ungültige Einträge
-			}
-
-			if (kunde.getName().equals(sKdName)) {
-				return kunde; // Gib die Kundendaten zurück
-			}
-		}
-		return null;
-
-	}
-
-	static class TableANCellRenderer extends DefaultTableCellRenderer {
-		private static final long serialVersionUID = 1L;
-		@Override
-		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-			JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-			/*try {
-				if(hasFocus && column == 0) {
-					vZelleRa = null;
-					vZelleA = value.toString(); // Angebotsnummer
-					if(iLic == 2) { // nur bei Lizenz 2
-						switch(sTempAN[row][1]) {
-						case "storniert":
-							btnPrintAN.setEnabled(false);
-							btnPrintAB.setEnabled(false);
-							break;
-						case "erstellt":
-							btnPrintAN.setEnabled(true);
-							btnPrintAB.setEnabled(false);
-							break;
-						case "gedruckt":
-							btnPrintAN.setEnabled(false);
-							btnPrintAB.setEnabled(false);
-							break;
-						case "bestellt":
-							btnPrintAN.setEnabled(false);
-							btnPrintAB.setEnabled(true);
-							break;
-						case "bestätigt":
-							btnPrintAN.setEnabled(false);
-							btnPrintAB.setEnabled(false);
-							break;
-						}
-					}
-
-				}else if(hasFocus && column != 0) {
-					vZelleA = null;
-					btnPrintAN.setEnabled(false);
-					btnPrintAB.setEnabled(false);
-				}
-			}catch (NullPointerException e) {
-				vZelleA = null;
-				btnPrintAN.setEnabled(false);
-				btnPrintAB.setEnabled(false);
-			}*/
-			if(column == 0 || column == 1 || column == 2) {
-				label.setHorizontalAlignment(SwingConstants.CENTER);
-			} else if(column == 5){
-				label.setHorizontalAlignment(SwingConstants.RIGHT);
-			} else {
-				label.setHorizontalAlignment(SwingConstants.LEFT);
-			}
-			if (row % 2 < 1) {
-				setBackground(new Color(10, 10, 10, 10));
-			} else {
-				setBackground(Color.WHITE);
-			}
-			switch(sTempAN[row][1]) {
-				case "storniert" -> setBackground(Color.PINK);
-				case "gedruckt" -> setBackground(new Color(175,238,238)); // hellblau
-				case "bestellt" -> setBackground(new Color(37, 204, 196)); // türkis
-				case "bestätigt" -> setBackground(new Color(152, 251, 152)); // hellgrün
-				}
-			
-			return label;
-		}
-	}
-
-	static class TableRECellRenderer extends DefaultTableCellRenderer {
-		private static final long serialVersionUID = 1L;
-		@Override
-		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-			JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-			/*try {
-				if(hasFocus && column == 0) {
-					vZelleRa = value.toString();
-					vZelleA = null;
-					if(iLic == 2 && iUserRights != 5) { // nur bei Lizenz 2 und nicht FinancialUser
-						switch(sTempRE[row][1]) {
-						case "storniert":
-							btnPrintREa.setEnabled(false);
-							btnPrintRem.setEnabled(false);
-							break;
-						case "erstellt":
-							btnPrintREa.setEnabled(true);
-							btnPrintRem.setEnabled(false);
-							break;
-						case "gedruckt":
-							btnPrintREa.setEnabled(false);
-							btnPrintRem.setEnabled(true);
-							break;
-						case "Zahlungserinnerung":
-							btnPrintREa.setEnabled(false);
-							btnPrintRem.setEnabled(true);
-							break;
-						case "Mahnstufe 1":
-							btnPrintREa.setEnabled(false);
-							btnPrintRem.setEnabled(true);
-							break;
-						case "Mahnstufe 2":
-							btnPrintREa.setEnabled(false);
-							btnPrintRem.setEnabled(true);
-							break;
-						case "bezahlt":
-							btnPrintREa.setEnabled(false);
-							btnPrintRem.setEnabled(false);
-							break;
-						}
-					}
-				}else if(hasFocus && column != 0) {
-					vZelleRa = null;
-					btnPrintREa.setEnabled(false);
-					btnPrintRem.setEnabled(false);
-				}
-			}catch (NullPointerException e) {
-				vZelleRa = null;
-				btnPrintREa.setEnabled(false);
-				btnPrintRem.setEnabled(false);
-			}*/
-			if(column == 0 || column == 1 || column == 2 || column == 3) {
-				label.setHorizontalAlignment(SwingConstants.CENTER);
-			} else if(column == 6 || column == 7 || column == 8){
-				label.setHorizontalAlignment(SwingConstants.RIGHT);
-			} else {
-				label.setHorizontalAlignment(SwingConstants.LEFT);
-			}
-			if (row % 2 < 1) {
-				setBackground(new Color(10, 10, 10, 10));
-			} else {
-				setBackground(Color.WHITE);
-			}
-			switch(sTempRE[row][1]) {
-				case "storniert" -> setBackground(Color.PINK);
-				case "gedruckt" -> setBackground(new Color(175,238,238)); // hellblau
-				case "Zahlungserinnerung" -> setBackground(Color.YELLOW);
-				case "Mahnstufe 1" -> setBackground(Color.MAGENTA);
-				case "Mahnstufe 2" -> setBackground(Color.RED);
-				case "bezahlt" -> setBackground(new Color(152, 251, 152)); // hellgrün
-				}
-			return label;
-		}
-	}
-
-	static class TablePUCellRenderer extends DefaultTableCellRenderer {
-		private static final long serialVersionUID = 1L;
-		@Override
-		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-			JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-			if(column == 0 || column == 1 || column == 6 || column == 8 || column == 14) {
-				label.setHorizontalAlignment(SwingConstants.CENTER);
-			} else if(column == 7 || column == 9 || column == 10 || column == 11 || column == 12 || column == 13){
-				label.setHorizontalAlignment(SwingConstants.RIGHT);
-			} else {
-				label.setHorizontalAlignment(SwingConstants.LEFT);
-			}
-			if (row % 2 < 1) {
-				setBackground(new Color(10, 10, 10, 10));
-			} else {
-				setBackground(Color.WHITE);
-			}
-
-			if(sTempPU[row][0] != null) {
-				/*DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-				LocalDate dateNow = LocalDate.parse(LocalDate.now().toString());
-				LocalDate datePay = LocalDate.parse(arrYearPU[row + 1][15], inputFormat);
-				long daysBetween = ChronoUnit.DAYS.between(dateNow, datePay);
-				int daysPayable = 0;
-
-				try {
-					daysPayable = Math.toIntExact(daysBetween);
-				} catch (Exception e3) {
-					logger.error("error in converting long to integer - " + e3);
-				}
-
-				if(daysPayable < 0 && bPayedPU[row] == false) {
-					setBackground(Color.RED); // rot
-				}
-				if(daysPayable >= 0 && daysPayable < 3 && bPayedPU[row] == false) {
-					setBackground(Color.PINK); // rot
-				}
-
-				if(bPayedPU[row] == true) {
-					setBackground(new Color(152, 251, 152)); // hellgrün
-				}*/
-			}
-
-			return label;
-		}
-	}
-
-	static class TableEXCellRenderer extends DefaultTableCellRenderer {
-		private static final long serialVersionUID = 1L;
-		@Override
-		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-			JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-			if(column == 0 || column == 1 || column == 4) {
-				label.setHorizontalAlignment(SwingConstants.CENTER);
-			} else if(column == 3 || column == 5 || column == 6){
-				label.setHorizontalAlignment(SwingConstants.RIGHT);
-			} else {
-				label.setHorizontalAlignment(SwingConstants.LEFT);
-			}
-			if (row % 2 < 1) {
-				setBackground(new Color(10, 10, 10, 10));
-			} else {
-				setBackground(Color.WHITE);
-			}
-			
-			if(sTempEX[row][0] != null && sTempEX[row][6] != null){
-				setBackground(new Color(152, 251, 152)); // hellgrün
-			}else if(sTempEX[row][0] != null && sTempEX[row][6] == null){
-				setBackground(Color.PINK);
-			}
-			
-			return label;
-		}
-	}
-
-	static class TableSTCellRenderer extends DefaultTableCellRenderer {
-		private static final long serialVersionUID = 1L;
-		@Override
-		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-			JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-			if(column == 0 || column == 4) {
-				label.setHorizontalAlignment(SwingConstants.CENTER);
-			} else if(column == 3){
-				label.setHorizontalAlignment(SwingConstants.RIGHT);
-			} else {
-				label.setHorizontalAlignment(SwingConstants.LEFT);
-			}
-			if (row % 2 < 1) {
-				setBackground(new Color(10, 10, 10, 10));
-			} else {
-				setBackground(Color.WHITE);
-			}
-			
-			if(sTempST[row][0] != null) {
-				/*DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-				LocalDate dateNow = LocalDate.parse(LocalDate.now().toString());
-				LocalDate datePay = LocalDate.parse(arrYearST[row + 1][6], inputFormat);
-				long daysBetween = ChronoUnit.DAYS.between(dateNow, datePay);
-				int daysPayable = 0;
-
-				try {
-					daysPayable = Math.toIntExact(daysBetween);
-				} catch (Exception e3) {
-					logger.error("error in converting long to integer - " + e3);
-				}
-
-				if(daysPayable < 0 && bPayedST[row] == false) {
-					setBackground(Color.RED); // rot
-				}
-				if(daysPayable >= 0 && daysPayable < 3 && bPayedST[row] == false) {
-					setBackground(Color.PINK); // rot
-				}
-				if(bPayedST[row] == true) {
-					setBackground(new Color(152, 251, 152)); // hellgrün
-				}*/
-			}
-
-			return label;
-		}
-	}
 
 	//###################################################################################################################################################
+	// ActionListner
 	//###################################################################################################################################################
 	
-	private static void actionClickOffer(JTable table, MouseEvent e) {
+	private void resizeGUI(Dimension xy) {
+		int x = xy.width;
+		int y = xy.height;
+
+		int iStateTop = y - BOTTOMY - STATEY;
+
+		menuBar.setBounds(0, 0, x, STATEY - 10);
+
+		tabPanel.setLocation(10, STATEY);
+		tabPanel.setSize(x - 20, y - 80);
+
+		lblState.setBounds(BASEX, iStateTop+1, x - 100, STATEY-4);
+		txtWirtschaftsjahr.setBounds(x - 90, iStateTop-1, 80, STATEY);
+
+		LoadData.setsSizeX(String.valueOf(x));
+		LoadData.setsSizeY(String.valueOf(y));
+
+		LoadData.setPrpAppSettings("screenx", LoadData.getsSizeX());
+		LoadData.setPrpAppSettings("screeny", LoadData.getsSizeY());
+		try {
+			saveSettingsApp(LoadData.getPrpAppSettings());
+		} catch (IOException e1) {
+			logger.error("error saving settings - " + e1);
+		}
+	}
+	
+	//###################################################################################################################################################
+	
+	private static void actionClickAN(JTable table, MouseEvent e) {
 		if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1 && !e.isConsumed()) {
 			e.consume(); // Event verbrauchen, um weitere Verarbeitung zu verhindern
 			int row = table.rowAtPoint(e.getPoint());
@@ -1455,7 +1139,7 @@ public class JFoverview extends JFrame {
 					if (purchasePanel instanceof PurchasePanel pup) {
 						pup.setsTitel("neuen Einkaufsbeleg erfassen");
 						pup.setBtnText(1, "save");
-						//pup.setTxtFields(null);
+						pup.setTxtFields(null);
 						pup.setIcon();
 						pup.setFile(false);
 					}
@@ -1464,7 +1148,7 @@ public class JFoverview extends JFrame {
 					if (purchasePanel instanceof PurchasePanel pup) {
 						pup.setsTitel("vorhandenen Einkaufsbeleg (Rechnungs-Nr. = " + table.getValueAt(row, 1).toString() + ")  bearbeiten");
 						pup.setBtnText(1, "<html>bezahlt<br>setzen</html>");
-						//pup.setTxtFields(null);
+						pup.setTxtFields(table.getValueAt(row, 1).toString()); // Rechnungsnummer
 						pup.setIcon();
 						pup.setFile(false);
 					}
@@ -1473,6 +1157,8 @@ public class JFoverview extends JFrame {
 			}
 		}
 	}
+	
+	//###################################################################################################################################################
 
 	private static void actionClickEX(JTable table, MouseEvent e) {
 		if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1 && !e.isConsumed()) {
@@ -1480,19 +1166,20 @@ public class JFoverview extends JFrame {
 			int row = table.rowAtPoint(e.getPoint());
 			int column = table.columnAtPoint(e.getPoint());
 			// Hier die gewünschte Aktion bei Klick ausführen
+			int[] belegID = LoadExpenses.getBelegID();
 			if (row != -1 && column != -1) {
 				if (table.getValueAt(row, column) == null) {
 					if (expensesPanel instanceof ExpensesPanel ep) {
 						ep.setsTitel("neuen Beleg erfassen");
-						//ep.setTxtFields(null);
+						ep.setTxtFields(0);
 						ep.setIcon();
 						ep.setFile(false);
 					}
 					return;
 				} else {
 					if (expensesPanel instanceof ExpensesPanel ep) {
-						ep.setsTitel("vorhandenen Beleg (Beleg-Nr. = " + table.getValueAt(row, 0).toString() + ")  bearbeiten");
-						//ep.setTxtFields(null);
+						ep.setsTitel("vorhandenen Beleg bearbeiten");
+						ep.setTxtFields(belegID[row]);
 						ep.setIcon();
 						ep.setFile(false);
 					}
@@ -1501,6 +1188,8 @@ public class JFoverview extends JFrame {
 			}
 		}
 	}
+	
+	//###################################################################################################################################################
 
 	private static void actionClickST(JTable table, MouseEvent e) {
 		if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1 && !e.isConsumed()) {
@@ -1533,6 +1222,7 @@ public class JFoverview extends JFrame {
 	}
 	
 	//###################################################################################################################################################
+	// Hilfsmethoden
 	//###################################################################################################################################################
 
 	private static void actionFile(String value, Kunde kunde) {
@@ -1566,6 +1256,29 @@ public class JFoverview extends JFrame {
 		}
 		return iProzA;
 	}
+	
+	//###################################################################################################################################################
+
+	static Kunde searchKundeAll(String sKdName) {
+		KundeRepository kundeRepository = new KundeRepository();
+	    List<Kunde> kundeListe = new ArrayList<>();
+	    kundeListe.addAll(kundeRepository.findAll());
+
+		for (int kd = 0; kd < kundeListe.size(); kd++) {
+			Kunde kunde = kundeListe.get(kd);
+
+			// Prüfen, ob die Kunde-Liste null oder zu kurz ist
+			if (kunde.getName() == null) {
+				continue; // Überspringe ungültige Einträge
+			}
+
+			if (kunde.getName().equals(sKdName)) {
+				return kunde; // Gib die Kundendaten zurück
+			}
+		}
+		return null;
+
+	}
 
 	//###################################################################################################################################################
 	// Getter und Setter für Felder
@@ -1586,5 +1299,217 @@ public class JFoverview extends JFrame {
 	public static CreatePanel getPanelBillInfo() {
 		return panelBillInfo;
 	}
+
+	public static String[][] getsTempAN() {
+		return sTempAN;
+	}
+
+	public static String[][] getsTempRE() {
+		return sTempRE;
+	}
+
+	public static String[][] getsTempPU() {
+		return sTempPU;
+	}
+
+	public static String[][] getsTempEX() {
+		return sTempEX;
+	}
+
+	public static String[][] getsTempST() {
+		return sTempST;
+	}
 	
+}
+
+//###################################################################################################################################################
+// Klassen für Cell Rendering der Tabellen
+//###################################################################################################################################################
+
+class TableANcr extends DefaultTableCellRenderer {
+	private static final long serialVersionUID = 1L;
+	@Override
+	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+		JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+		if(column == 0 || column == 1 || column == 2) {
+			label.setHorizontalAlignment(SwingConstants.CENTER);
+		} else if(column == 5){
+			label.setHorizontalAlignment(SwingConstants.RIGHT);
+		} else {
+			label.setHorizontalAlignment(SwingConstants.LEFT);
+		}
+		if (row % 2 < 1) {
+			setBackground(new Color(10, 10, 10, 10));
+		} else {
+			setBackground(Color.WHITE);
+		}
+		String[][] s = JFoverview.getsTempAN();
+		switch(s[row][1]) {
+			case "storniert" -> setBackground(Color.PINK);
+			case "gedruckt" -> setBackground(new Color(175,238,238)); // hellblau
+			case "bestellt" -> setBackground(new Color(37, 204, 196)); // türkis
+			case "bestätigt" -> setBackground(new Color(152, 251, 152)); // hellgrün
+			}
+		return label;
+	}
+}
+
+//###################################################################################################################################################
+
+class TableREcr extends DefaultTableCellRenderer {
+	private static final long serialVersionUID = 1L;
+	@Override
+	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+		JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+		if(column == 0 || column == 1 || column == 2 || column == 3) {
+			label.setHorizontalAlignment(SwingConstants.CENTER);
+		} else if(column == 6 || column == 7 || column == 8){
+			label.setHorizontalAlignment(SwingConstants.RIGHT);
+		} else {
+			label.setHorizontalAlignment(SwingConstants.LEFT);
+		}
+		if (row % 2 < 1) {
+			setBackground(new Color(10, 10, 10, 10));
+		} else {
+			setBackground(Color.WHITE);
+		}
+		String[][] s = JFoverview.getsTempRE();
+		switch(s[row][1]) {
+			case "storniert" -> setBackground(Color.PINK);
+			case "gedruckt" -> setBackground(new Color(175,238,238)); // hellblau
+			case "Zahlungserinnerung" -> setBackground(Color.YELLOW);
+			case "Mahnstufe 1" -> setBackground(Color.MAGENTA);
+			case "Mahnstufe 2" -> setBackground(Color.RED);
+			case "bezahlt" -> setBackground(new Color(152, 251, 152)); // hellgrün
+			}
+		return label;
+	}
+}
+
+//###################################################################################################################################################
+
+class TablePUcr extends DefaultTableCellRenderer {
+	private static final long serialVersionUID = 1L;
+	private static final Logger logger = LogManager.getLogger(TablePUcr.class);
+	@Override
+	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+		JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+		if(column == 0 || column == 1 || column == 3 || column == 7 || column == 8) {
+			label.setHorizontalAlignment(SwingConstants.CENTER);
+		} else if(column == 4 || column == 5 || column == 6 || column == 9){
+			label.setHorizontalAlignment(SwingConstants.RIGHT);
+		} else {
+			label.setHorizontalAlignment(SwingConstants.LEFT);
+		}
+		if (row % 2 < 1) {
+			setBackground(new Color(10, 10, 10, 10));
+		} else {
+			setBackground(Color.WHITE);
+		}
+		String[][] s = JFoverview.getsTempPU();
+		if(s[row][0] != null) {
+			DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+			LocalDate dateNow = LocalDate.parse(LocalDate.now().toString());
+			LocalDate datePay = LocalDate.parse(s[row][7], inputFormat);
+			long daysBetween = ChronoUnit.DAYS.between(dateNow, datePay);
+			int daysPayable = 0;
+			try {
+				daysPayable = Math.toIntExact(daysBetween);
+				if (s[row][8].equals("nein")) {
+					if(daysPayable < 0) {
+						setBackground(Color.RED); // rot
+					}
+					if(daysPayable >= 0 && daysPayable < 3) {
+						setBackground(Color.PINK); // rot
+					}
+				}
+			} catch (Exception e3) {
+				logger.error("error in converting long to integer - " + e3);
+			}
+			if(s[row][8].equals("ja")) {
+				setBackground(new Color(152, 251, 152)); // hellgrün
+			}
+		} else {
+			setBackground(new Color(238,210,238)); // leerzeile für Eingabe kennzeichnen
+		}
+		return label;
+	}
+}
+
+//###################################################################################################################################################
+
+class TableEXcr extends DefaultTableCellRenderer {
+	private static final long serialVersionUID = 1L;
+	@Override
+	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+		JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+		if(column == 0 || column == 3) {
+			label.setHorizontalAlignment(SwingConstants.CENTER);
+		} else if(column == 2 || column == 4 || column == 5){
+			label.setHorizontalAlignment(SwingConstants.RIGHT);
+		} else {
+			label.setHorizontalAlignment(SwingConstants.LEFT);
+		}
+		if (row % 2 < 1) {
+			setBackground(new Color(176,226,255, 100));
+		} else {
+			setBackground(Color.WHITE);
+		}
+		String[][] s = JFoverview.getsTempEX();
+		if(s[row][0] != null) {
+			
+		} else {
+			setBackground(new Color(238,210,238)); // leerzeile für Eingabe kennzeichnen
+		}
+		return label;
+	}
+}
+
+//###################################################################################################################################################
+
+class TableSTcr extends DefaultTableCellRenderer {
+	private static final long serialVersionUID = 1L;
+	@Override
+	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+		JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+		if(column == 0 || column == 4) {
+			label.setHorizontalAlignment(SwingConstants.CENTER);
+		} else if(column == 3){
+			label.setHorizontalAlignment(SwingConstants.RIGHT);
+		} else {
+			label.setHorizontalAlignment(SwingConstants.LEFT);
+		}
+		if (row % 2 < 1) {
+			setBackground(new Color(10, 10, 10, 10));
+		} else {
+			setBackground(Color.WHITE);
+		}
+		String[][] s = JFoverview.getsTempST();
+		if(s[row][0] != null) {
+			/*DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+			LocalDate dateNow = LocalDate.parse(LocalDate.now().toString());
+			LocalDate datePay = LocalDate.parse(arrYearST[row + 1][6], inputFormat);
+			long daysBetween = ChronoUnit.DAYS.between(dateNow, datePay);
+			int daysPayable = 0;
+
+			try {
+				daysPayable = Math.toIntExact(daysBetween);
+			} catch (Exception e3) {
+				logger.error("error in converting long to integer - " + e3);
+			}
+
+			if(daysPayable < 0 && bPayedST[row] == false) {
+				setBackground(Color.RED); // rot
+			}
+			if(daysPayable >= 0 && daysPayable < 3 && bPayedST[row] == false) {
+				setBackground(Color.PINK); // rot
+			}
+			if(bPayedST[row] == true) {
+				setBackground(new Color(152, 251, 152)); // hellgrün
+			}*/
+		}
+
+		return label;
+	}
 }

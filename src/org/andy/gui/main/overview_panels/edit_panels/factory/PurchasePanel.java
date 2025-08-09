@@ -1,6 +1,9 @@
 package org.andy.gui.main.overview_panels.edit_panels.factory;
 
 import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.toolbox.misc.SelectFile.chooseFile;
+import static org.andy.toolbox.misc.SelectFile.choosePath;
+import static org.andy.toolbox.misc.SelectFile.getNotSelected;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -8,21 +11,26 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
+import org.andy.code.dataStructure.entitiyProductive.Einkauf;
+import org.andy.code.dataStructure.repositoryProductive.EinkaufRepository;
+import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
-import org.andy.code.main.overview.edit.Purchase;
 import org.andy.gui.file.JFfileView;
 import org.andy.gui.main.JFoverview;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
@@ -46,7 +54,6 @@ public class PurchasePanel extends EditPanel {
 	JPanel panel = new JPanel();
 	private Border b;
 	
-	private static final String OK = "OK";
 	private TitledBorder border;
 	private DemoPanel[] panelDate = new DemoPanel[2];
 	private DatePickerSettings[] dateSettings = new DatePickerSettings[2];
@@ -55,11 +62,15 @@ public class PurchasePanel extends EditPanel {
 	private JTextField[] txtFieldsCol2a = new JTextField[5];
 	private JTextField[] txtFieldsCol2b = new JTextField[2];
 	private JLabel lblFileTyp = new JLabel();
-	private JButton[] btnFields = new JButton[3];
+	private JButton[] btnFields = new JButton[2];
 	
 	private String[] sDatum = new String[2];
 	private String id = null;
 	private boolean file = false;
+	private boolean neuBeleg = false;
+	
+	private EinkaufRepository einkaufRepository = new EinkaufRepository();
+	private Einkauf einkauf = new Einkauf();
 	
 	//###################################################################################################################################################
 	// public Teil
@@ -197,7 +208,17 @@ public class PurchasePanel extends EditPanel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(lblFileTyp.getIcon() != null) {
-					Purchase.actionMouseClick(e, String.valueOf(id));
+					String outputPath;
+					outputPath = choosePath(LoadData.getWorkPath());
+					Path path = Paths.get(outputPath);
+					if (outputPath.equals(getNotSelected())) {
+						return; // nichts ausgewählt
+					}
+					try {
+						einkaufRepository.exportFileById(einkauf.getId(), path);
+					} catch (Exception e1) {
+						logger.error("Fehler beim speichern der Datei " + outputPath + ": " + e1.getMessage());
+					}
 				}
 			}
 		});
@@ -205,8 +226,17 @@ public class PurchasePanel extends EditPanel {
 	    btnFields[0].addActionListener(new ActionListener() {
  			@Override
  			public void actionPerformed(ActionEvent e) {
- 				String fName = Purchase.selectFile();
- 				txtFieldsCol2b[1].setText(fName);
+ 				String FileNamePath = chooseFile(LoadData.getWorkPath());
+ 				File fn = new File(FileNamePath);
+ 				String FileName = fn.getName();
+ 				txtFieldsCol2b[1].setText(FileName);
+ 				einkauf.setDateiname(FileName);
+ 				Path path = Paths.get(FileNamePath);
+ 				try {
+					einkauf.setDatei(Files.readAllBytes(path)); // ByteArray für Dateiinhalt
+				} catch (IOException e1) {
+					logger.error("Fehler laden der Datei " + FileName + ": " + e1.getMessage());
+				}
  				file = true;
  			}
  		});
@@ -214,33 +244,46 @@ public class PurchasePanel extends EditPanel {
 	    btnFields[1].addActionListener(new ActionListener() {
  			@Override
  			public void actionPerformed(ActionEvent e) {
- 				
- 				String[] arrTmp = new String[19];
- 				Arrays.fill(arrTmp, null);
- 				
- 				arrTmp[0] = sDatum[0];
- 				for (int i = 0; i < txtFieldsCol1.length; i++) {
- 					arrTmp[i + 1] = txtFieldsCol1[i].getText();
+ 				if (neuBeleg) {
+ 					String value = null;
+ 	 				einkauf.setJahr(Integer.parseInt(LoadData.getStrAktGJ()));
+ 	 				
+ 	 				boolean bResult = checkInput();
+ 	 				if (!bResult) {
+ 	 					JOptionPane.showMessageDialog(null, "Eingaben unvollständig, Beleg kann nicht gespeichert werden", "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
+ 	 					return;
+ 	 				}
+ 	 				
+ 	 				einkauf.setReDatum(datePicker[0].getDate());
+ 	 				einkauf.setId(txtFieldsCol1[0].getText().trim());
+ 	 				einkauf.setKredName(txtFieldsCol1[1].getText().trim());
+ 	 				value = (txtFieldsCol1[2].getText() != null) ? txtFieldsCol1[2].getText().trim() : "";
+ 	 				einkauf.setKredStrasse(value);
+ 	 				value = (txtFieldsCol1[3].getText() != null) ? txtFieldsCol1[3].getText().trim() : "";
+ 	 				einkauf.setKredPlz(value);
+ 	 				value = (txtFieldsCol1[4].getText() != null) ? txtFieldsCol1[4].getText().trim() : "";
+ 	 				einkauf.setKredOrt(value);
+ 	 				value = (txtFieldsCol1[5].getText() != null) ? txtFieldsCol1[5].getText().trim() : "";
+ 	 				einkauf.setKredLand(value);
+ 	 				value = (txtFieldsCol1[6].getText() != null) ? txtFieldsCol1[6].getText().trim() : "";
+ 	 				einkauf.setKredUid(value);
+ 	 				einkauf.setWaehrung(txtFieldsCol1[7].getText().trim());
+ 	 				einkauf.setSteuersatz(txtFieldsCol2a[0].getText().trim());
+ 	 				einkauf.setNetto(new BigDecimal(txtFieldsCol2a[1].getText().trim()));
+ 	 				einkauf.setUst(new BigDecimal(txtFieldsCol2a[2].getText().trim()));
+ 	 				einkauf.setBrutto(new BigDecimal(txtFieldsCol2a[3].getText().trim()));
+ 	 				einkauf.setZahlungsziel(datePicker[1].getDate());
+ 	 				einkauf.setHinweis(txtFieldsCol2b[0].getText().trim());
+ 	 				einkauf.setAnzahlung(BigDecimal.ZERO); // Feld Anzahlung aktuell nicht verwendet
+ 	 				
+ 	 				einkaufRepository.save(einkauf);
+ 				} else {
+ 					einkauf = einkaufRepository.findById(id);
+ 					einkauf.setStatus(1);
+ 					einkaufRepository.update(einkauf);
  				}
- 				for (int i = 0; i < txtFieldsCol2a.length; i++) {
- 					if (i ==0) {
- 						arrTmp[i + 9] = txtFieldsCol2a[i].getText();
- 					}
- 					if (i > 0 && i < 5) {
- 						arrTmp[i + 9] = txtFieldsCol2a[i].getText().replace(",", ".");
- 					}
- 				}
- 				arrTmp[14] = sDatum[1];
- 				arrTmp[15] = txtFieldsCol2b[0].getText();
- 				arrTmp[16] = txtFieldsCol2b[1].getText();
- 				arrTmp[17] = Purchase.getFilePath();
- 				arrTmp[18] = "0";
- 				
- 				String sResult = Purchase.writeData(arrTmp, id, file);
- 				if(sResult.equals(OK)) {
- 					JFoverview.actScreen();
- 					setIcon();
- 				}
+ 				neuBeleg = false;
+ 				JFoverview.actScreen();
  			}
  		});
 	}
@@ -258,6 +301,36 @@ public class PurchasePanel extends EditPanel {
         return t;
     }
     
+    private void txtFieldsFocusable(boolean b) {
+    	this.datePicker[0].setEnabled(b);
+    	this.datePicker[1].setEnabled(b);
+    	for (int i = 0; i < this.txtFieldsCol1.length; i++) {
+			this.txtFieldsCol1[i].setFocusable(b);
+		}
+		for (int i = 0; i < this.txtFieldsCol2a.length; i++) {
+			this.txtFieldsCol2a[i].setFocusable(b);
+		}
+		this.txtFieldsCol2b[0].setFocusable(b);
+		this.txtFieldsCol2b[1].setFocusable(false);
+    }
+    
+    private boolean checkInput() {
+    	if (datePicker[0].getDate() == null) return false;
+    	if (datePicker[1].getDate() == null) return false;
+    	System.out.println(txtFieldsCol1[0].getText() + txtFieldsCol1[1].getText() + txtFieldsCol1[7].getText());
+    	if (txtFieldsCol1[0].getText() == null || txtFieldsCol1[0].getText().equals("")) return false;
+    	if (txtFieldsCol1[1].getText() == null || txtFieldsCol1[1].getText().equals("")) return false;
+    	if (txtFieldsCol1[7].getText() == null || txtFieldsCol1[7].getText().equals("")) return false;
+    	System.out.println(txtFieldsCol1[0].getText() + txtFieldsCol1[1].getText() + txtFieldsCol1[7].getText());
+    	for (int i = 0; i < txtFieldsCol2a.length - 1; i++) {
+    		if (txtFieldsCol2a[i].getText() == null || txtFieldsCol2a[i].getText().equals("")) return false;
+    	}
+    	if (txtFieldsCol2b[0].getText() == null || txtFieldsCol2b[0].getText().equals("")) return false;
+    	if (txtFieldsCol2b[1].getText() == null || txtFieldsCol2b[1].getText().equals("")) return false;
+    	if (file == false) return false;
+    	return true;
+    }
+    
 	//###################################################################################################################################################
 	// Getter und Setter für Felder
 	//###################################################################################################################################################
@@ -272,52 +345,63 @@ public class PurchasePanel extends EditPanel {
 	    }
 	}
     
-    public void setTxtFields(String[] value, String id) {
+    public void setTxtFields(String id) {
     	this.id = null;
     	if (id != null && !id.isEmpty()) {
 			this.id = id;
-		} 
-    	if (value[0] == null || value[0].isEmpty()) {
-    		this.datePicker[0].setDate(null);
-    		this.datePicker[0].setEnabled(true);
+		} else {
+			this.datePicker[0].setDate(null);
     		for (int i = 0; i < this.txtFieldsCol1.length; i++) {
 				this.txtFieldsCol1[i].setText("");
-				this.txtFieldsCol1[i].setFocusable(true);
 			}
     		for (int i = 0; i < this.txtFieldsCol2a.length; i++) {
 				this.txtFieldsCol2a[i].setText("");
-				this.txtFieldsCol2a[i].setFocusable(true);
 			}
     		this.datePicker[1].setDate(null);
-    		this.datePicker[1].setEnabled(true);
     		for (int i = 0; i < this.txtFieldsCol2b.length; i++) {
 				this.txtFieldsCol2b[i].setText("");
-				this.txtFieldsCol2b[0].setFocusable(true);
 			}
+    		txtFieldsFocusable(true); // Bearbeitung freigeben
+    		for (int i = 0; i < this.btnFields.length; i++) {
+				this.btnFields[i].setEnabled(true);
+			}
+    		einkauf = new Einkauf();
+    		neuBeleg = true;
 			return;
 		}
-		DateTimeFormatter dfDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		LocalDate datum1 = LocalDate.parse(value[0], dfDate);
-		this.datePicker[0].setDate(datum1);
+
+    	einkauf = einkaufRepository.findById(id);
+    	
+		this.datePicker[0].setDate(einkauf.getReDatum());
 		this.datePicker[0].setEnabled(false);
-		for (int i = 0; i < this.txtFieldsCol1.length; i++) {
-			this.txtFieldsCol1[i].setText(value[i + 1]);
-			this.txtFieldsCol1[i].setFocusable(false);
-		}
-		for (int i = 0; i < this.txtFieldsCol2a.length; i++) {
-			if (i == 0) {
-				this.txtFieldsCol2a[i].setText(value[i + 9]);
-			} else {
-				this.txtFieldsCol2a[i].setText(value[i + 9].replace(".", ","));
-			}
-			this.txtFieldsCol2a[i].setFocusable(false);
-		}
-		LocalDate datum2 = LocalDate.parse(value[14], dfDate);
-		this.datePicker[1].setDate(datum2);
+		
+		this.datePicker[1].setDate(einkauf.getZahlungsziel());
 		this.datePicker[1].setEnabled(false);
-		this.txtFieldsCol2b[0].setText(value[15]);
-		this.txtFieldsCol2b[0].setFocusable(false);
-		this.txtFieldsCol2b[1].setText(value[16]);
+		
+		this.txtFieldsCol1[0].setText(einkauf.getId());
+		this.txtFieldsCol1[1].setText(einkauf.getKredName());
+		this.txtFieldsCol1[2].setText(einkauf.getKredStrasse());
+		this.txtFieldsCol1[3].setText(einkauf.getKredPlz());
+		this.txtFieldsCol1[4].setText(einkauf.getKredOrt());
+		this.txtFieldsCol1[5].setText(einkauf.getKredLand());
+		this.txtFieldsCol1[6].setText(einkauf.getKredUid());
+		this.txtFieldsCol1[7].setText(einkauf.getWaehrung());
+		
+		this.txtFieldsCol2a[0].setText(einkauf.getSteuersatz());
+		this.txtFieldsCol2a[1].setText(einkauf.getNetto().toString());
+		this.txtFieldsCol2a[2].setText(einkauf.getUst().toString());
+		this.txtFieldsCol2a[3].setText(einkauf.getBrutto().toString());
+		
+		this.txtFieldsCol2b[0].setText(einkauf.getHinweis());
+		this.txtFieldsCol2b[1].setText(einkauf.getDateiname());
+		
+		txtFieldsFocusable(false);
+		btnFields[0].setEnabled(false);
+		if (einkauf.getStatus() == 0) {
+			btnFields[1].setEnabled(true);
+		} else {
+			btnFields[1].setEnabled(false);
+		}
     }
 
 	public void setBtnText(int col, String value) {

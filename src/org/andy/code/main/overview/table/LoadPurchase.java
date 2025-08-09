@@ -36,12 +36,14 @@ public class LoadPurchase {
 		Currency currency = Currency.getInstance("EUR");
 		DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Locale.GERMANY);
 		DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
+		
+		bdNetto = BigDecimal.ZERO; bdBrutto = BigDecimal.ZERO;
 
 		EinkaufRepository einkaufRepository = new EinkaufRepository();
 	    List<Einkauf> einkaufListe = new ArrayList<>();
 	    einkaufListe.addAll(einkaufRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ())));
 		
-		String[][] sTemp = new String [einkaufListe.size()][9];
+		String[][] sTemp = new String [einkaufListe.size() + 1][10]; // 1 Zeile mehr für neuen Beleg
 		
 		for (int i = 0; i < einkaufListe.size(); i++){
 			Einkauf einkauf = einkaufListe.get(i);
@@ -56,6 +58,13 @@ public class LoadPurchase {
 	        String ust = df.format(einkauf.getUst()) + " " + currency.getCurrencyCode();
 	        String brutto = df.format(einkauf.getBrutto()) + " " + currency.getCurrencyCode();
 	        
+	        String status = null;
+	        if (einkauf.getStatus() == 1) {
+	        	status = "ja";
+	        } else {
+	        	status = "nein";
+	        }
+	        
 			sTemp[i][0] = datum;
 			sTemp[i][1] = einkauf.getId();
 			sTemp[i][2] = einkauf.getKredName();
@@ -64,7 +73,8 @@ public class LoadPurchase {
 			sTemp[i][5] = ust;
 			sTemp[i][6] = brutto;
 			sTemp[i][7] = datumZZ;
-			sTemp[i][8] = einkauf.getDateiname();
+			sTemp[i][8] = status;
+			sTemp[i][9] = einkauf.getDateiname();
 			
 			bdNetto = bdNetto.add(einkauf.getNetto());
 			bdBrutto = bdBrutto.add(einkauf.getBrutto());

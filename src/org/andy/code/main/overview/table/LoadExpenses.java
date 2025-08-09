@@ -19,6 +19,8 @@ public class LoadExpenses {
 	private static BigDecimal bdNetto = BigDecimal.ZERO;
 	private static BigDecimal bdBrutto = BigDecimal.ZERO;
 	
+	private static int[] belegID = null;
+	
 	//###################################################################################################################################################
 	// public Teil
 	//###################################################################################################################################################
@@ -41,7 +43,8 @@ public class LoadExpenses {
 	    List<Ausgaben> ausgabenListe = new ArrayList<>();
 		ausgabenListe.addAll(ausgabenRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ())));
 		
-		String[][] sTemp = new String [ausgabenListe.size()][7];
+		String[][] sTemp = new String [ausgabenListe.size() + 1][6];
+		belegID = new int[ausgabenListe.size()];
 		
 		for (int i = 0; i < ausgabenListe.size(); i++){
 			Ausgaben ausgaben = ausgabenListe.get(i);
@@ -54,13 +57,14 @@ public class LoadExpenses {
 	        String ust = df.format(ausgaben.getSteuer()) + " " + currency.getCurrencyCode();
 	        String brutto = df.format(ausgaben.getBrutto()) + " " + currency.getCurrencyCode();
 	        
-			sTemp[i][0] = ausgaben.getId().toString();
-			sTemp[i][1] = datum;
-			sTemp[i][2] = ausgaben.getArt();
-			sTemp[i][3] = netto;
-			sTemp[i][4] = ust;
-			sTemp[i][5] = brutto;
-			sTemp[i][6] = ausgaben.getDateiname();
+			sTemp[i][0] = datum;
+			sTemp[i][1] = ausgaben.getArt();
+			sTemp[i][2] = netto;
+			sTemp[i][3] = ust;
+			sTemp[i][4] = brutto;
+			sTemp[i][5] = ausgaben.getDateiname();
+			
+			belegID[i] = ausgaben.getId();
 			
 			bdNetto = bdNetto.add(ausgaben.getNetto());
 			bdBrutto = bdBrutto.add(ausgaben.getBrutto());
@@ -78,6 +82,10 @@ public class LoadExpenses {
 
 	public static BigDecimal getBdBrutto() {
 		return bdBrutto;
+	}
+
+	public static int[] getBelegID() {
+		return belegID;
 	}
 	
 }

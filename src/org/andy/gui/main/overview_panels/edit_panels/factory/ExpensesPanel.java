@@ -1,6 +1,10 @@
 package org.andy.gui.main.overview_panels.edit_panels.factory;
 
 import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.toolbox.misc.SelectFile.chooseFile;
+import static org.andy.toolbox.misc.SelectFile.choosePath;
+import static org.andy.toolbox.misc.SelectFile.getNotSelected;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -8,9 +12,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
 import javax.swing.JButton;
@@ -21,6 +28,9 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
+import org.andy.code.dataStructure.entitiyProductive.Ausgaben;
+import org.andy.code.dataStructure.repositoryProductive.AusgabenRepository;
+import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
 import org.andy.code.main.overview.edit.Expenses;
 import org.andy.gui.file.JFfileView;
@@ -51,11 +61,15 @@ public class ExpensesPanel extends EditPanel {
 	private DatePicker datePicker = new DatePicker();
 	private JTextField[] txtFields = new JTextField[6];
 	private JLabel lblFileTyp = new JLabel();
-	private JButton[] btnFields = new JButton[3];
+	private JButton[] btnFields = new JButton[2];
 	
 	private String sDatum;
 	private int id = 0;
 	private boolean file = false;
+	private boolean neuBeleg = false;
+	
+	private AusgabenRepository ausgabenRepository = new AusgabenRepository();
+	private Ausgaben ausgaben = new Ausgaben();
 	
 	//###################################################################################################################################################
 	// public Teil
@@ -89,8 +103,8 @@ public class ExpensesPanel extends EditPanel {
 	    String[] labels = {
 	        "Belegdatum:",
 	        "Buchungstext des Beleges:",
-	        "Betrag netto (EUR):",
 	        "Steuersatz (%):",
+	        "Betrag netto (EUR):",
 	        "Betrag Steuer (EUR):",
 	        "Betrag brutto (EUR):",
 	        "Dateianhang:"};
@@ -161,7 +175,17 @@ public class ExpensesPanel extends EditPanel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(lblFileTyp.getIcon() != null) {
-					Expenses.actionMouseClick(e, String.valueOf(id));
+					String outputPath;
+					outputPath = choosePath(LoadData.getWorkPath());
+					Path path = Paths.get(outputPath);
+					if (outputPath.equals(getNotSelected())) {
+						return; // nichts ausgewählt
+					}
+					try {
+						ausgabenRepository.exportFileById(ausgaben.getId(), path);
+					} catch (Exception e1) {
+						logger.error("Fehler beim speichern der Datei " + outputPath + ": " + e1.getMessage());
+					}
 				}
 			}
 		});
@@ -169,8 +193,17 @@ public class ExpensesPanel extends EditPanel {
 	    btnFields[0].addActionListener(new ActionListener() {
  			@Override
  			public void actionPerformed(ActionEvent e) {
- 				String fName = Expenses.selectFile();
- 				txtFields[5].setText(fName);
+ 				String FileNamePath = chooseFile(LoadData.getWorkPath());
+ 				File fn = new File(FileNamePath);
+ 				String FileName = fn.getName();
+ 				txtFields[5].setText(FileName);
+ 				ausgaben.setDateiname(FileName);
+ 				Path path = Paths.get(FileNamePath);
+ 				try {
+					ausgaben.setDatei(Files.readAllBytes(path)); // ByteArray für Dateiinhalt
+				} catch (IOException e1) {
+					logger.error("Fehler laden der Datei " + FileName + ": " + e1.getMessage());
+				}
  				file = true;
  			}
  		});
@@ -178,23 +211,21 @@ public class ExpensesPanel extends EditPanel {
 	    btnFields[1].addActionListener(new ActionListener() {
  			@Override
  			public void actionPerformed(ActionEvent e) {
- 				
- 				String[] arrTmp = new String[8];
- 				Arrays.fill(arrTmp, null);
- 				
- 				arrTmp[0] = sDatum; //txt01.getText();
- 				arrTmp[1] = txtFields[0].getText(); // Buchungstext
- 				arrTmp[2] = txtFields[1].getText().replace(",", "."); // Betrag netto
- 				arrTmp[3] = txtFields[2].getText().replace(",", "."); // Steuersatz
- 				arrTmp[4] = txtFields[3].getText().replace(",", "."); // Steuer
- 				arrTmp[5] = txtFields[4].getText().replace(",", "."); // Betrag brutto
- 				arrTmp[6] = txtFields[5].getText(); // Dateiname
- 				arrTmp[7] = Expenses.getFilePath(); // Dateipfad
- 				
- 				String sResult = Expenses.writeExpense(arrTmp, id, file);
- 				if(sResult.equals(OK)) {
- 					JFoverview.actScreen();
- 					setIcon();
+ 				if (neuBeleg) {
+ 					String value = null;
+ 					
+ 					
+ 					
+ 					
+ 					
+ 					
+ 					
+ 					
+ 					
+ 					
+ 					
+ 					
+ 					
  				}
  			}
  		});
@@ -213,6 +244,13 @@ public class ExpensesPanel extends EditPanel {
         return t;
     }
     
+    private void txtFieldsFocusable(boolean b) {
+    	this.datePicker.setEnabled(b);
+    	for (int i = 0; i < this.txtFields.length; i++) {
+			this.txtFields[i].setFocusable(b);
+		}
+    }
+    
 	//###################################################################################################################################################
 	// Getter und Setter für Felder
 	//###################################################################################################################################################
@@ -227,28 +265,38 @@ public class ExpensesPanel extends EditPanel {
 	    }
 	}
     
-    public void setTxtFields(String[] value, int id) {
+    public void setTxtFields(int id) {
     	this.id = 0;
     	if (id > 0) {
 			this.id = id;
-		} 
-    	if (value[0] == null || value[0].isEmpty()) {
-    		this.datePicker.setDate(null);
+		} else {
+			this.datePicker.setDate(null);
     		for (int i = 0; i < this.txtFields.length; i++) {
 				this.txtFields[i].setText("");
 			}
+    		txtFieldsFocusable(true); // Bearbeitung freigeben
+    		for (int i = 0; i < this.btnFields.length; i++) {
+				this.btnFields[i].setEnabled(true);
+			}
+    		ausgaben = new Ausgaben();
+    		neuBeleg = true;
 			return;
 		}
-    	DateTimeFormatter dfDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    	LocalDate datum = LocalDate.parse(value[0], dfDate);
-    	this.datePicker.setDate(datum);
-    	for (int i = 0; i < this.txtFields.length; i++) {
-    		if (i == 1 || i == 3 || i == 4) {
-    			this.txtFields[i].setText(value[i + 1].replace(".", ","));
-    		} else {
-    			this.txtFields[i].setText(value[i + 1]);
-    		}
-    	}
+    	
+    	ausgaben = ausgabenRepository.findById(id);
+    	
+    	this.datePicker.setDate(ausgaben.getDatum());
+    	
+    	txtFields[0].setText(ausgaben.getArt());
+    	txtFields[1].setText(ausgaben.getSteuersatz());
+    	txtFields[2].setText(ausgaben.getNetto().toString());
+    	txtFields[3].setText(ausgaben.getSteuer().toString());
+    	txtFields[4].setText(ausgaben.getBrutto().toString());
+    	txtFields[5].setText(ausgaben.getDateiname());
+    	
+    	txtFieldsFocusable(false);
+		btnFields[0].setEnabled(false);
+		
     }
 
 	public void setBtnText(int col, String value) {
