@@ -422,6 +422,9 @@ public class BillPanel extends EditPanel {
         
         switch (cmbState.getSelectedIndex()) {
 		case 1: // storniert
+			rechnung.setNetto(BigDecimal.ZERO);
+			rechnung.setUst(BigDecimal.ZERO);
+			rechnung.setBrutto(BigDecimal.ZERO);
 			rechnung.setState(0);
 			break;
 		case 2: // bestellt

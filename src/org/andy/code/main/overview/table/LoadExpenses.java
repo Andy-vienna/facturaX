@@ -38,6 +38,8 @@ public class LoadExpenses {
 		Currency currency = Currency.getInstance("EUR");
 		DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Locale.GERMANY);
 		DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
+		
+		bdNetto = BigDecimal.ZERO; bdBrutto = BigDecimal.ZERO;
 
 		AusgabenRepository ausgabenRepository = new AusgabenRepository();
 	    List<Ausgaben> ausgabenListe = new ArrayList<>();

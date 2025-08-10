@@ -411,6 +411,9 @@ public class OfferPanel extends EditPanel {
         
         switch (cmbState.getSelectedIndex()) {
 		case 1: // storniert
+			angebot.setNetto(BigDecimal.ZERO);
+			angebot.setUst(BigDecimal.ZERO);
+			angebot.setBrutto(BigDecimal.ZERO);
 			angebot.setState(0);
 			break;
 		case 2: // bestellt

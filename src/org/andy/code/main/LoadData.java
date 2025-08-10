@@ -2,8 +2,6 @@ package org.andy.code.main;
 
 import static org.andy.toolbox.misc.Tools.loadSettingsEx;
 import static org.andy.toolbox.misc.Tools.saveSettingsApp;
-import static org.andy.toolbox.crypto.Caesar.decryptString;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -14,8 +12,6 @@ import javax.swing.JOptionPane;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import org.andy.gui.settings.JFdbSettings;
 
 public class LoadData {
 
@@ -38,14 +34,13 @@ public class LoadData {
 	private static String tplP109a;
 	private static String workPath;
 	private static String backupPath;
+	private static String sMasterData;
+	private static String sProductiveData;
 
-	private static String strDBservice = "";
 	private static String strDBComputer = "";
 	private static String strDBPort = "";
-	private static String strDBUser = "";
 	private static String strDBNameSource = "";
 	private static String strDBNameDest = "";
-	private static String strDBPass = "";
 	private static String strDBencrypted = "";
 	private static String strDBServerCert = "";
 
@@ -121,29 +116,14 @@ public class LoadData {
 		// ------------------------------------------------------------------------------
 		try {
 			prpDBSettings = loadSettingsEx(new File(System.getProperty("user.dir") + "\\db.properties")); // DB-Einstellungen laden
-			strDBservice = prpDBSettings.getProperty("service");
 			strDBComputer = prpDBSettings.getProperty("computer");
 			strDBPort = prpDBSettings.getProperty("port");
 			strDBNameSource = prpDBSettings.getProperty("names");
 			strDBNameDest = prpDBSettings.getProperty("named");
-			strDBUser = prpDBSettings.getProperty("user");
-			String tmpPass = prpDBSettings.getProperty("pass");
-			strDBPass = decryptString(tmpPass, 13);
 			strDBencrypted = prpDBSettings.getProperty("encrypt");
 			strDBServerCert = prpDBSettings.getProperty("cert");
 		} catch (FileNotFoundException e) {
 			logger.error("Error loading db.properties", e);
-			JOptionPane.showMessageDialog(null, "Die Datei db.properties wurde nicht gefunden, bitte Verbindung festlegen.", "Fehler", JOptionPane.INFORMATION_MESSAGE);
-			JFdbSettings.loadGUI(true);
-			while (!bFinished) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e1) {
-					Thread.currentThread().interrupt();
-					logger.error("Error in sleep thread", e1);
-				}
-			}
-			bFinished = false;
 		} catch (IOException e) {
 			logger.error("Error reading db.properties", e);
 			JOptionPane.showMessageDialog(null, "Die Datei db.properties konnte nicht gelesen werden, Anwendung wird beendet!", "Fehler", JOptionPane.ERROR_MESSAGE);
@@ -151,16 +131,14 @@ public class LoadData {
 		}
 
 		// ------------------------------------------------------------------------------
-		// Datenbank-String zusammenbauen
+		// Datenbank Connection string für Hibernate
 		// ------------------------------------------------------------------------------
 
-		/*String tmpConnB = "jdbc:sqlserver://" + LoadData.strDBComputer + ":" + LoadData.strDBPort + ";database="
-				+ LoadData.strDBNameDest + ";user=" + LoadData.strDBUser + ";password=" + LoadData.strDBPass
-				+ ";encrypt=" + LoadData.strDBencrypted + ";trustServerCertificate=" + LoadData.strDBServerCert
-				+ ";loginTimeout=30;";*/
+		sMasterData = "jdbc:sqlserver://" + LoadData.strDBComputer + ":" + LoadData.strDBPort + ";databaseName="
+				+ LoadData.strDBNameSource + ";encrypt=" + LoadData.strDBencrypted + ";trustServerCertificate=" + LoadData.strDBServerCert;
 
-		StartUp.setSERVICE_NAME("\"SQL Server (" + strDBservice + ")\"");
-
+		sProductiveData = "jdbc:sqlserver://" + LoadData.strDBComputer + ":" + LoadData.strDBPort + ";databaseName="
+				+ LoadData.strDBNameDest + ";encrypt=" + LoadData.strDBencrypted + ";trustServerCertificate=" + LoadData.strDBServerCert;
 	}
 
 	// ###################################################################################################################################################
@@ -234,24 +212,12 @@ public class LoadData {
 		return strDBNameSource;
 	}
 
-	public static String getStrDBPass() {
-		return strDBPass;
-	}
-
 	public static String getStrDBPort() {
 		return strDBPort;
 	}
 
 	public static String getStrDBServerCert() {
 		return strDBServerCert;
-	}
-
-	public static final String getStrDBservice() {
-		return strDBservice;
-	}
-
-	public static String getStrDBUser() {
-		return strDBUser;
 	}
 
 	public static final String getStrQRschema() {
@@ -285,9 +251,6 @@ public class LoadData {
 	public static String getWorkPath() {
 		return workPath;
 	}
-
-	// ###################################################################################################################################################
-	// ###################################################################################################################################################
 
 	public static void setBackupPath(String backupPath) {
 		LoadData.backupPath = backupPath;
@@ -339,24 +302,12 @@ public class LoadData {
 		LoadData.strDBNameSource = strDBNameSource;
 	}
 
-	public static void setStrDBPass(String strDBPass) {
-		LoadData.strDBPass = strDBPass;
-	}
-
 	public static void setStrDBPort(String strDBPort) {
 		LoadData.strDBPort = strDBPort;
 	}
 
 	public static void setStrDBServerCert(String strDBServerCert) {
 		LoadData.strDBServerCert = strDBServerCert;
-	}
-
-	public static void setStrDBservice(String strDBservice) {
-		LoadData.strDBservice = strDBservice;
-	}
-
-	public static void setStrDBUser(String strDBUser) {
-		LoadData.strDBUser = strDBUser;
 	}
 
 	public static void setStrQRschema(String strQRschema) {
@@ -393,6 +344,14 @@ public class LoadData {
 
 	public static void setbFinished(boolean bFinished) {
 		LoadData.bFinished = bFinished;
+	}
+
+	public static String getsMasterData() {
+		return sMasterData;
+	}
+
+	public static String getsProductiveData() {
+		return sProductiveData;
 	}
 
 }

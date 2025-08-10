@@ -1,5 +1,6 @@
 package org.andy.gui.file;
 
+import static org.andy.code.dataStructure.HibernateUtil.getSessionFactoryDb2;
 import static org.andy.toolbox.misc.SelectFile.chooseFile;
 import static org.andy.toolbox.misc.SelectFile.choosePath;
 import static org.andy.toolbox.misc.SelectFile.getNotSelected;
@@ -31,8 +32,6 @@ import org.andy.code.dataStructure.entitiyProductive.FileStore;
 import org.andy.code.dataStructure.repositoryProductive.FileStoreRepository;
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
-
-import static org.andy.code.misc.HibernateUtil.getSessionFactoryDb2;
 import org.andy.toolbox.misc.SetFrameIcon;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -572,7 +571,7 @@ public class JFfileView extends JFrame {
 	        if (fs == null) {
 	            fs = new FileStore();
 	            fs.setIdNummer(id);
-	            fs.setYear(aktJahr()); // falls vorhanden
+	            fs.setJahr(aktJahr()); // falls vorhanden
 	        }
 	        setNameAndData(fs, typ, name, bytes);
 	        s.merge(fs);

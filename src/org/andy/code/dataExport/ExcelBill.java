@@ -217,11 +217,14 @@ public class ExcelBill{
 			reUSt.setCellValue(rechnung.getUst().doubleValue());
 			reBrutto.setCellValue(rechnung.getBrutto().doubleValue());
 			
-			if(rechnung.getRevCharge() == 0) {
-				taxNote = DataExportHelper.getTextUSt().get(0); // Steuerhinweis
-			} else {
-				taxNote = DataExportHelper.getTextUSt().get(1); // Steuerhinweis Reverse Charge
+			if(kunde.getTaxvalue().equals("0")) {
+				if(rechnung.getRevCharge() == 0) {
+					taxNote = DataExportHelper.getTextUSt().get(0); // Steuerhinweis
+				} else {
+					taxNote = DataExportHelper.getTextUSt().get(1); // Steuerhinweis Reverse Charge
+				}
 			}
+			
 			reText1.setCellValue(taxNote); // Steuerhinweis
 			
 			if(kunde.getZahlungsziel().equals("0")) {
@@ -336,7 +339,7 @@ public class ExcelBill{
 			FileStore fileStore = new FileStore();
 			
 			fileStore.setIdNummer(rechnung.getIdNummer());
-			fileStore.setYear(rechnung.getJahr());
+			fileStore.setJahr(rechnung.getJahr());
 			fileStore.setReFileName(FileName);
 			
 			Path path = Paths.get(FileNamePath);

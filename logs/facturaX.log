@@ -481,3 +481,1101 @@
 	Minimum pool size: 2
 	Maximum pool size: 10
 2025-08-09 14:34:38 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 08:22:25 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 08:22:35 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 08:22:36 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 08:22:36 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 08:22:37 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 2d618d0a-f93a-4690-a850-7ea51759e4fc
+2025-08-10 08:22:37 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 08:22:37 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 08:22:40 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 08:22:40 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 08:22:40 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 08:22:40 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: 16ad750e-8633-47b7-b305-7b60978745c4
+2025-08-10 08:22:40 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 08:22:40 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 08:22:40 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 09:35:50 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 09:36:00 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 09:36:00 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 09:36:01 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 09:36:01 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: ac084c00-8ed3-4d93-a556-14c4c5980845
+2025-08-10 09:36:01 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 09:36:01 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 09:36:03 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 09:36:03 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 09:36:03 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 09:36:03 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: 13918f02-dad6-464f-8a1e-e1abd0591780
+2025-08-10 09:36:03 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 09:36:03 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 09:36:03 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 10:40:25 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 10:48:35 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 10:48:43 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 10:48:44 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 10:48:44 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 10:48:45 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 2191b229-31e0-408d-9d2a-e87cdf68be68
+2025-08-10 10:48:45 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 10:48:45 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 10:48:47 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 10:48:47 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 10:48:47 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 10:48:48 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: e175fa17-879e-4f86-a01a-6b5b2a69a458
+2025-08-10 10:48:48 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 10:48:48 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 10:48:48 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 10:52:04 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 10:52:18 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 10:52:19 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 10:52:19 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 10:52:20 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: acc00514-3c3f-489b-b747-4632e6554971
+2025-08-10 10:52:20 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 10:52:20 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 10:52:22 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 10:52:22 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 10:52:22 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 10:52:23 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: d6cb36f8-db84-4290-837a-cab1bd8bd09b
+2025-08-10 10:52:23 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 10:52:23 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 10:52:23 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 10:55:46 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 10:55:56 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 10:55:57 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 10:55:57 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 10:55:57 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 7f3c755d-63da-4776-baef-79056e92db99
+2025-08-10 10:55:57 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 10:55:58 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 10:56:00 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 10:56:00 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 10:56:00 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 10:56:00 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: 42c8dfb3-0202-4e8b-a039-82b8ddb742e8
+2025-08-10 10:56:00 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 10:56:00 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 10:56:01 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 10:56:28 [AWT-EventQueue-0] WARN  org.andy.gui.main.create_panels.CreateBillPanel - Kein TitledBorder vorhanden – setsTitel() wird nicht funktionieren.
+2025-08-10 11:12:10 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 11:12:17 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 11:12:18 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 11:12:18 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 11:12:19 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 49a2eab7-d677-4648-82ea-27f1648d1880
+2025-08-10 11:12:19 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 11:12:19 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 11:12:21 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 11:12:22 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 11:12:22 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 11:12:22 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: 60a0a8ab-c14e-4681-bec6-b103931beb36
+2025-08-10 11:12:22 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 11:12:22 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 11:12:22 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 11:13:10 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 11:13:18 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 11:13:19 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 11:13:19 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 11:13:20 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 9ab9d516-c0af-4f3d-9fe7-04ad062b466e
+2025-08-10 11:13:20 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 11:13:20 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 11:13:23 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 11:13:23 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 11:13:23 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 11:13:23 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: 089dfc1d-ad93-4432-8600-8dabd5299468
+2025-08-10 11:13:23 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 11:13:23 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 11:13:23 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 11:17:25 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 11:17:43 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 11:17:44 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 11:17:44 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 11:17:45 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 4e08a79d-b941-4778-85b5-af40072674bd
+2025-08-10 11:17:45 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 11:17:45 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 11:17:47 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 11:17:47 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 11:17:47 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 11:17:48 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: f6880bfb-28c3-4dac-9174-a354e2517bf5
+2025-08-10 11:17:48 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 11:17:48 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 11:17:48 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 11:23:25 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 11:23:33 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 11:23:34 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 11:23:34 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 11:23:35 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: ac6677f4-58dc-479a-820f-8942c2df5875
+2025-08-10 11:23:35 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 11:23:35 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 11:23:37 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 11:23:37 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 11:23:37 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 11:23:37 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: ec4d9d15-6465-4d80-afd7-3a32cca186c6
+2025-08-10 11:23:37 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 11:23:37 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 11:23:38 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 11:29:10 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 11:29:18 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 11:29:19 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 11:29:19 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 11:29:20 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 3483cd75-c2ef-4d49-8b3b-d352f6f8ae1a
+2025-08-10 11:29:20 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 11:29:20 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 11:29:22 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 11:29:23 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 11:29:23 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 11:29:23 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: f0903af4-5645-446d-9efc-0d4b3623848e
+2025-08-10 11:29:23 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 11:29:23 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 11:29:23 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 11:46:37 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 11:46:46 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 11:46:47 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 11:46:47 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 11:46:48 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 2aca7c91-bb16-4880-8966-c30b3ee11b34
+2025-08-10 11:46:48 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 11:46:48 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 11:46:50 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 11:46:51 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 11:46:51 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 11:46:51 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: d908d8ae-652c-4c39-83dc-4848f8744b9f
+2025-08-10 11:46:51 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 11:46:51 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 11:46:51 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 11:46:54 [AWT-EventQueue-0] FATAL org.andy.gui.main.JFoverview - loadGUI fehlgeschlagen - java.lang.NullPointerException: Cannot invoke "org.andy.gui.main.table_panels.CreatePanel.removeAll()" because "org.andy.gui.main.JFoverview.panelOfferInfo" is null
+2025-08-10 11:47:49 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 11:47:59 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 11:48:00 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 11:48:00 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 11:48:01 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: e92ca6cb-c872-4732-b1b8-601c100d1f6d
+2025-08-10 11:48:01 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 11:48:01 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 11:48:03 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 11:48:03 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 11:48:03 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 11:48:03 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: 3d8369b0-a89c-4ea5-bb5a-d6a30ad2832b
+2025-08-10 11:48:03 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 11:48:03 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 11:48:04 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 11:51:31 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 11:51:40 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 11:51:41 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 11:51:41 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 11:51:42 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 8a122ace-4382-4e50-8d2e-5ece01945a79
+2025-08-10 11:51:42 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 11:51:42 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 11:51:44 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 11:51:44 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 11:51:44 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 11:51:44 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: 69f340ed-bddb-43c4-b677-1597c50fdbbc
+2025-08-10 11:51:44 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 11:51:45 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 11:51:45 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 11:54:34 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 11:54:43 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 11:54:43 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 11:54:43 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 11:54:44 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 32097994-9447-436b-8010-6dde27219ec2
+2025-08-10 11:54:44 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 11:54:45 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 11:54:47 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 11:54:47 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 11:54:47 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 11:54:47 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: ca614ac1-356a-4542-a45e-178a096c48bf
+2025-08-10 11:54:47 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 11:54:47 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 11:54:47 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 11:54:55 [AWT-EventQueue-0] ERROR org.andy.gui.main.JFoverview - btnNewAN - java.lang.NullPointerException: Cannot read field "parent" because "comp" is null
+2025-08-10 11:56:19 [AWT-EventQueue-0] ERROR org.andy.gui.main.JFoverview - btnNewAN - java.lang.NullPointerException: Cannot read field "parent" because "comp" is null
+2025-08-10 11:56:34 [AWT-EventQueue-0] ERROR org.andy.gui.main.JFoverview - btnNewAN - java.lang.NullPointerException: Cannot read field "parent" because "comp" is null
+2025-08-10 11:57:54 [AWT-EventQueue-0] ERROR org.andy.gui.main.JFoverview - btnNewAN - java.lang.NullPointerException: Cannot read field "parent" because "comp" is null
+2025-08-10 12:00:24 [AWT-EventQueue-0] ERROR org.andy.gui.main.JFoverview - btnNewAN - java.lang.NullPointerException: Cannot read field "parent" because "comp" is null
+2025-08-10 12:02:25 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 12:02:38 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 12:02:38 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 12:02:38 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 12:02:39 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 3b493a6e-0426-4d7d-a56e-42feca704d20
+2025-08-10 12:02:39 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 12:02:40 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 12:02:42 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 12:02:42 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 12:02:42 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 12:02:42 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: e3224cc5-db33-4485-9a72-7a07d4e9f20c
+2025-08-10 12:02:42 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 12:02:42 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 12:02:43 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 12:21:12 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 12:21:20 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 12:21:20 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 12:21:20 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 12:21:21 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: c07c4ed5-7664-430b-b1c3-3218ab74fde9
+2025-08-10 12:21:21 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 12:21:21 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 12:21:24 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 12:21:24 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 12:21:24 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 12:21:24 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: b596f016-f7f9-4b53-be1a-dbccf123b9f9
+2025-08-10 12:21:24 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 12:21:24 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 12:21:24 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 12:33:10 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 12:33:17 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 12:33:18 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 12:33:18 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 12:33:19 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 0ef0e6e5-4c27-4e10-befa-78422a4982db
+2025-08-10 12:33:19 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 12:33:19 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 12:33:22 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 12:33:22 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 12:33:22 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 12:33:22 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: bee4b477-9c8c-4d2d-8cb5-a0cb2222ae12
+2025-08-10 12:33:22 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 12:33:22 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 12:33:22 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 12:48:56 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 12:49:04 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 12:49:05 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 12:49:05 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 12:49:06 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 89bb1db6-e06f-488e-83fa-e1d04b290c1f
+2025-08-10 12:49:06 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 12:49:06 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 12:49:09 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 12:49:09 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 12:49:09 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 12:49:09 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: 54d66fa2-1a2d-48f8-920e-cad8863e96a8
+2025-08-10 12:49:09 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 12:49:09 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 12:49:09 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 13:09:49 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 13:09:58 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 13:09:59 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 13:09:59 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 13:10:00 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: dbb9bc11-8687-44e3-9833-0a63cda72a5f
+2025-08-10 13:10:00 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 13:10:00 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 13:10:02 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 13:10:02 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 13:10:02 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 13:10:02 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: 8227e3c2-6ef4-435d-a5e5-97583889363c
+2025-08-10 13:10:02 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 13:10:02 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 13:10:03 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 14:11:56 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 14:12:05 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 14:12:06 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 14:12:06 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 14:12:07 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 277118dc-b2b5-42c8-a767-7d2f9408587b
+2025-08-10 14:12:07 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 14:12:07 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 14:12:10 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 14:12:10 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 14:12:10 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 14:12:10 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: bf77d798-6ed2-4c53-883a-75d9d5066d82
+2025-08-10 14:12:10 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 14:12:10 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 14:12:10 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 14:16:50 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 14:16:58 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 14:16:59 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 14:16:59 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 14:17:00 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: a0735331-5c6d-47db-8594-37574d15852b
+2025-08-10 14:17:00 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 14:17:00 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 14:17:02 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 14:17:02 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 14:17:02 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 14:17:03 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: f8ca4a78-d3e1-4e36-a9f1-62cfc6aab182
+2025-08-10 14:17:03 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 14:17:03 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 14:17:03 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 14:20:23 [AWT-EventQueue-0] ERROR org.andy.gui.offer.JFconfirmA - JFconfirmA(String vZelleA) - java.lang.NullPointerException: Cannot invoke "org.andy.code.dataStructure.entitiyMaster.Bank.getBankName()" because "bank" is null
+2025-08-10 14:22:39 [AWT-EventQueue-0] ERROR org.andy.gui.offer.JFconfirmA - JFconfirmA(String vZelleA) - java.lang.NullPointerException: Cannot invoke "org.andy.code.dataStructure.entitiyMaster.Bank.getBankName()" because "bank" is null
+2025-08-10 14:24:03 [AWT-EventQueue-0] ERROR org.andy.gui.offer.JFconfirmA - JFconfirmA(String vZelleA) - java.lang.NullPointerException: Cannot invoke "org.andy.code.dataStructure.entitiyMaster.Bank.getBankName()" because "bank" is null
+2025-08-10 14:26:23 [AWT-EventQueue-0] ERROR org.andy.gui.offer.JFconfirmA - JFconfirmA(String vZelleA) - java.lang.NullPointerException: Cannot invoke "org.andy.code.dataStructure.entitiyMaster.Bank.getBankName()" because "bank" is null
+2025-08-10 14:30:29 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 14:30:38 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 14:30:39 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 14:30:39 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 14:30:40 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 00a36d87-e6f4-4cc2-9b69-769d5988dd94
+2025-08-10 14:30:40 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 14:30:40 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=FxMaster;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 14:30:42 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 14:30:42 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 14:30:42 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 14:30:42 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: b4703b48-0245-404d-acb0-23ba88dba49f
+2025-08-10 14:30:42 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 14:30:42 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 14:30:43 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 14:36:19 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 14:36:27 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 14:36:28 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 14:36:28 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 14:36:29 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 0ba361dd-02fb-401f-a835-7e220136c9b7
+2025-08-10 14:36:29 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 14:36:29 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=FxMaster;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 14:36:31 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 14:36:32 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 14:36:32 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 14:36:32 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: bda2aa4a-42aa-442f-9616-c174cae4d880
+2025-08-10 14:36:32 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 14:36:32 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 14:36:32 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 15:02:47 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 15:02:55 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 15:02:56 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 15:02:56 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 15:02:56 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 5de044bf-43ee-4307-b337-0f97d2b174f1
+2025-08-10 15:02:56 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 15:02:56 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=FxMaster;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 15:02:58 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 15:02:58 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 15:02:58 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 15:02:58 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:3 ClientConnectionId: b119bf0e-acf5-4993-b7aa-7f12c7a54015
+2025-08-10 15:02:58 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 15:02:58 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=FxProductive;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 15:02:58 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 15:11:23 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 15:11:30 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 15:11:31 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 15:11:31 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 15:11:31 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 7d0963d9-e244-4abb-927a-03f4c52d47b5
+2025-08-10 15:11:31 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 15:11:32 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=FxMaster;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 15:11:33 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 15:11:33 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 15:11:33 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 15:11:33 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:3 ClientConnectionId: 7087ebe7-4b88-4bf5-a67c-db828f145a38
+2025-08-10 15:11:33 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 15:11:33 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=FxProductive;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 15:11:34 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 15:25:53 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 15:26:05 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 15:26:05 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 15:26:05 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 15:26:06 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: ae0cc794-e377-4ee7-ab7d-e6743f6736b5
+2025-08-10 15:26:06 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 15:26:06 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 15:26:08 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 15:26:08 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 15:26:08 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 15:26:08 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: cec47e5d-ec45-4ea3-9684-7fa08c814472
+2025-08-10 15:26:08 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 15:26:08 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 15:26:08 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 15:26:10 [AWT-EventQueue-0] WARN  org.hibernate.orm.jdbc.error - HHH000247: ErrorCode: 208, SQLState: S0002
+2025-08-10 15:26:10 [AWT-EventQueue-0] WARN  org.hibernate.orm.jdbc.error - Ungültiger Objektname "tblAn".
+2025-08-10 15:26:10 [AWT-EventQueue-0] FATAL org.andy.gui.main.JFoverview - loadGUI fehlgeschlagen - org.hibernate.exception.SQLGrammarException: JDBC exception executing SQL [select a1_0.IdNummer,a1_0.AnzPos,a1_0.Art01,a1_0.Art02,a1_0.Art03,a1_0.Art04,a1_0.Art05,a1_0.Art06,a1_0.Art07,a1_0.Art08,a1_0.Art09,a1_0.Art10,a1_0.Art11,a1_0.Art12,a1_0.Brutto,a1_0.Datum,a1_0.EPreis01,a1_0.EPreis02,a1_0.EPreis03,a1_0.EPreis04,a1_0.EPreis05,a1_0.EPreis06,a1_0.EPreis07,a1_0.EPreis08,a1_0.EPreis09,a1_0.EPreis10,a1_0.EPreis11,a1_0.EPreis12,a1_0.IdBank,a1_0.IdKunde,a1_0.Jahr,a1_0.LZeitr,a1_0.Menge01,a1_0.Menge02,a1_0.Menge03,a1_0.Menge04,a1_0.Menge05,a1_0.Menge06,a1_0.Menge07,a1_0.Menge08,a1_0.Menge09,a1_0.Menge10,a1_0.Menge11,a1_0.Menge12,a1_0.Netto,a1_0.Page2,a1_0.Ref,a1_0.RevCharge,a1_0.State,a1_0.USt from tblAn a1_0 where a1_0.Jahr=? order by a1_0.IdNummer] [Ungültiger Objektname "tblAn".] [n/a]
+2025-08-10 15:28:26 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 15:29:05 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 15:29:06 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 15:29:06 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 15:29:06 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: d2eef7d5-ff48-441d-852e-5c6b58cbb3de
+2025-08-10 15:29:06 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 15:29:07 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=FxMaster;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 15:29:08 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 15:29:08 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 15:29:08 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 15:29:08 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:3 ClientConnectionId: 5c9a6455-4004-4187-8ee0-7aa85dc68b0a
+2025-08-10 15:29:08 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 15:29:08 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=FxMaster;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 15:29:09 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 15:29:10 [AWT-EventQueue-0] WARN  org.hibernate.orm.jdbc.error - HHH000247: ErrorCode: 208, SQLState: S0002
+2025-08-10 15:29:10 [AWT-EventQueue-0] WARN  org.hibernate.orm.jdbc.error - Ungültiger Objektname "tblAn".
+2025-08-10 15:29:10 [AWT-EventQueue-0] FATAL org.andy.gui.main.JFoverview - loadGUI fehlgeschlagen - org.hibernate.exception.SQLGrammarException: JDBC exception executing SQL [select a1_0.IdNummer,a1_0.AnzPos,a1_0.Art01,a1_0.Art02,a1_0.Art03,a1_0.Art04,a1_0.Art05,a1_0.Art06,a1_0.Art07,a1_0.Art08,a1_0.Art09,a1_0.Art10,a1_0.Art11,a1_0.Art12,a1_0.Brutto,a1_0.Datum,a1_0.EPreis01,a1_0.EPreis02,a1_0.EPreis03,a1_0.EPreis04,a1_0.EPreis05,a1_0.EPreis06,a1_0.EPreis07,a1_0.EPreis08,a1_0.EPreis09,a1_0.EPreis10,a1_0.EPreis11,a1_0.EPreis12,a1_0.IdBank,a1_0.IdKunde,a1_0.Jahr,a1_0.LZeitr,a1_0.Menge01,a1_0.Menge02,a1_0.Menge03,a1_0.Menge04,a1_0.Menge05,a1_0.Menge06,a1_0.Menge07,a1_0.Menge08,a1_0.Menge09,a1_0.Menge10,a1_0.Menge11,a1_0.Menge12,a1_0.Netto,a1_0.Page2,a1_0.Ref,a1_0.RevCharge,a1_0.State,a1_0.USt from tblAn a1_0 where a1_0.Jahr=? order by a1_0.IdNummer] [Ungültiger Objektname "tblAn".] [n/a]
+2025-08-10 15:30:46 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 15:31:05 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 15:31:06 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 15:31:06 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 15:31:07 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 5ac515c6-2af1-4b7a-afff-61ef1cb7a052
+2025-08-10 15:31:07 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 15:31:07 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=FxMaster;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 15:31:08 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 15:31:08 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 15:31:08 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 15:31:08 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:3 ClientConnectionId: 596590b1-876c-4b02-8c27-0b3916531b34
+2025-08-10 15:31:08 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 15:31:09 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 15:31:09 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 15:32:58 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 15:33:06 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 15:33:07 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 15:33:07 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 15:33:08 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: b4909665-4c71-493a-a435-4953b938f00b
+2025-08-10 15:33:08 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 15:33:08 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=FxMaster;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 15:33:09 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 15:33:10 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 15:33:10 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 15:33:10 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:3 ClientConnectionId: a82843ea-e17f-443b-8aa0-a3457febaa6f
+2025-08-10 15:33:10 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 15:33:10 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 15:33:10 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 15:35:57 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 15:36:05 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 15:36:05 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 15:36:05 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 15:36:06 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 82bf2f05-07b5-4f8b-9bb6-0f1767dc04c7
+2025-08-10 15:36:06 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 15:36:06 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=FxMaster;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 15:36:08 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 15:36:08 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 15:36:08 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 15:36:08 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:4 ClientConnectionId: e93a3d5a-9420-4101-8753-5e57413a73aa
+2025-08-10 15:36:08 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 15:36:08 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 15:36:08 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 15:45:36 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 15:45:44 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 15:45:45 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 15:45:45 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 15:45:46 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: ccd96972-6600-4233-9ae7-d26c0cc9bfbc
+2025-08-10 15:45:46 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 15:45:46 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=FxMaster;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 15:45:47 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 15:45:47 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 15:45:47 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 15:45:48 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:3 ClientConnectionId: b80e0bd3-5462-4676-8c26-520882d1018b
+2025-08-10 15:45:48 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 15:45:48 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 15:45:48 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 15:46:52 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 15:47:00 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 15:47:00 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 15:47:00 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 15:47:01 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: d1583d48-4095-45b5-8e75-e2d47f101522
+2025-08-10 15:47:01 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 15:47:01 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=FxMaster;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 15:47:03 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 15:47:03 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 15:47:03 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 15:47:03 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:3 ClientConnectionId: a8c5f698-7b07-4cc5-82bd-fd1ea077d80f
+2025-08-10 15:47:03 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 15:47:03 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 15:47:03 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 16:03:39 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 16:03:47 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 16:03:48 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 16:03:48 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 16:03:48 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: fbf4c1f1-c59e-4cef-b6a2-4726dfe0e645
+2025-08-10 16:03:48 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 16:03:48 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=FxMaster;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 16:03:50 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 16:03:50 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 16:03:50 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 16:03:50 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:3 ClientConnectionId: 03f47d57-7f42-49a2-b1ca-13f353ce364c
+2025-08-10 16:03:50 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 16:03:50 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 16:03:50 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 16:04:54 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 16:05:02 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 16:05:03 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 16:05:03 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 16:05:03 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: fa34610e-6934-432b-b8d9-98d1461a3673
+2025-08-10 16:05:03 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 16:05:03 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=FxMaster;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 16:05:05 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 16:05:05 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 16:05:05 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 16:05:05 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:3 ClientConnectionId: ee74ebc7-f0fa-4b38-8aa5-e8afceb4905a
+2025-08-10 16:05:05 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 16:05:05 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 16:05:05 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 16:13:44 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 16:14:00 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 16:14:00 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 16:14:00 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 16:14:01 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 07c32be8-f10f-4b9e-ab47-175827237f9b
+2025-08-10 16:14:01 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 16:14:01 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=FxMaster;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 16:14:03 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 16:14:03 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 16:14:03 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 16:14:03 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:3 ClientConnectionId: 5db8894a-a27f-4be5-9506-b19c2fb89bcf
+2025-08-10 16:14:03 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 16:14:03 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 16:14:03 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 16:40:44 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0-beta
+2025-08-10 16:40:52 [AWT-EventQueue-0] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 7.0.8.Final
+2025-08-10 16:40:52 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 16:40:52 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Starting...
+2025-08-10 16:40:53 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Added connection ConnectionID:1 ClientConnectionId: 09e4a103-2cf7-4492-a095-bcd866d4058b
+2025-08-10 16:40:53 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB1 - Start completed.
+2025-08-10 16:40:53 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=FxMaster;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 16:40:55 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-10 16:40:55 [AWT-EventQueue-0] INFO  org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator - HHH000130: Instantiating explicit connection provider: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+2025-08-10 16:40:55 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Starting...
+2025-08-10 16:40:55 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Added connection ConnectionID:3 ClientConnectionId: 98f3e33a-791b-4b93-a461-7453347da2a5
+2025-08-10 16:40:55 [AWT-EventQueue-0] INFO  com.zaxxer.hikari.HikariDataSource - FX-DB2 - Start completed.
+2025-08-10 16:40:55 [AWT-EventQueue-0] INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true]
+	Database driver: Microsoft JDBC Driver 12.10 for SQL Server
+	Database version: 16.0
+	Autocommit mode: true
+	Isolation level: undefined/unknown
+	Pool: HikariCPConnectionProvider
+	Minimum pool size: 2
+	Maximum pool size: 10
+2025-08-10 16:40:55 [AWT-EventQueue-0] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)

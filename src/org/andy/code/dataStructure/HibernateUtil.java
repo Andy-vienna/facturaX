@@ -1,4 +1,4 @@
-package org.andy.code.misc;
+package org.andy.code.dataStructure;
 
 import org.andy.code.dataStructure.entitiyMaster.Artikel;
 import org.andy.code.dataStructure.entitiyMaster.Bank;
@@ -14,6 +14,7 @@ import org.andy.code.dataStructure.entitiyProductive.Einkauf;
 import org.andy.code.dataStructure.entitiyProductive.FileStore;
 import org.andy.code.dataStructure.entitiyProductive.Rechnung;
 import org.andy.code.dataStructure.entitiyProductive.SVSteuer;
+import org.andy.code.main.LoadData;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
@@ -44,8 +45,7 @@ public class HibernateUtil {
         //settings.put("hibernate.dialect", "org.hibernate.dialect.SQLServerDialect");
 
         // ---- HikariCP-Einstellungen (DB1) ----
-        settings.put("hibernate.hikari.jdbcUrl",
-                "jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-01TEST;encrypt=true;trustServerCertificate=true");
+        settings.put("hibernate.hikari.jdbcUrl", LoadData.getsMasterData());
         settings.put("hibernate.hikari.username", "sa");
         settings.put("hibernate.hikari.password", "P@ssw0rd");
 
@@ -91,8 +91,7 @@ public class HibernateUtil {
         //settings.put("hibernate.dialect", "org.hibernate.dialect.SQLServerDialect");
 
         // ---- HikariCP-Einstellungen (DB2) ----
-        settings.put("hibernate.hikari.jdbcUrl",
-                "jdbc:sqlserver://ANDY-LENOVO:1433;databaseName=dbFacturaX-02TEST;encrypt=true;trustServerCertificate=true");
+        settings.put("hibernate.hikari.jdbcUrl", LoadData.getsProductiveData());
         settings.put("hibernate.hikari.username", "sa");
         settings.put("hibernate.hikari.password", "P@ssw0rd");
 

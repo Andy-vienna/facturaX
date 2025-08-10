@@ -1,161 +1,106 @@
 package org.andy.code.main.overview.table;
 
-import static org.andy.toolbox.sql.Read.sqlReadArray;
-
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Currency;
+import java.util.List;
 import java.util.Locale;
 
+import org.andy.code.dataStructure.entitiyProductive.SVSteuer;
+import org.andy.code.dataStructure.repositoryProductive.SVSteuerRepository;
 import org.andy.code.main.LoadData;
-import org.andy.code.main.overview.result.TaxData;
-import org.andy.gui.main.JFoverview;
-import org.andy.gui.main.result_panels.TaxPanel;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class LoadSvTax {
 	
-	private static final Logger logger = LogManager.getLogger(LoadOffer.class);
+	private static BigDecimal bdSV = BigDecimal.ZERO;
+	private static BigDecimal bdSteuer = BigDecimal.ZERO;
 	
-	private static final String dataTbl = "tbl_svtax";
-	private static String sConn;
-	
-	private static String[][] tmpArray = new String[30][9];
-	private static String[][] sTemp = new String [30][6];
-	
-	private static int tmpAnz;
+	private static int[] belegID = null;
 	
 	//###################################################################################################################################################
 	// public Teil
 	//###################################################################################################################################################
 	
-	public static String[][] loadSvTax(boolean reRun, TaxPanel panelP109a) {
-		return loadData(reRun, panelP109a);
+	public static String[][] loadSvTax(boolean reRun) {
+		return loadData(reRun);
 	}
 	
 	//###################################################################################################################################################
 	// private Teil
 	//###################################################################################################################################################
 	
-	private static String[][] loadData(boolean reRun, TaxPanel panelP109a) {
+	private static String[][] loadData(boolean reRun) {
 
-		DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-		NumberFormat nf = NumberFormat.getNumberInstance(Locale.GERMANY);
-		DecimalFormat df = (DecimalFormat) nf;
-		df.applyPattern("###,###.00");
+		Currency currency = Currency.getInstance("EUR");
+		DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Locale.GERMANY);
+		DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
 		
-		BigDecimal bdSvQ1 = BigDecimal.ZERO, 
-				bdSvQ2 = BigDecimal.ZERO, 
-				bdSvQ3 = BigDecimal.ZERO, 
-				bdSvQ4 = BigDecimal.ZERO;
+		bdSV = BigDecimal.ZERO; bdSteuer = BigDecimal.ZERO;
+		
+		SVSteuerRepository svsteuerRepository = new SVSteuerRepository();
+	    List<SVSteuer> svsteuerListe = new ArrayList<>();
+	    svsteuerListe.addAll(svsteuerRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ())));
+		
+		String[][] sTemp = new String [svsteuerListe.size() + 1][7];
+		belegID = new int[svsteuerListe.size()];
+		
+		for (int i = 0; i < svsteuerListe.size(); i++){
+			SVSteuer svsteuer = svsteuerListe.get(i);
 
-		Arrays.stream(sTemp).forEach(a -> Arrays.fill(a, null));
-
-		try {
-
-			Arrays.stream(tmpArray).forEach(a -> Arrays.fill(a, null));
-			String sTblName = dataTbl.replace("_", LoadData.getStrAktGJ());
-			String sSQLStatement = "SELECT * FROM " + sTblName + " ORDER BY [datum]";
-
-			tmpArray = sqlReadArray(sConn, sSQLStatement);
-			JFoverview.setArrYearST(tmpArray);
-
-			if(tmpArray[0][0] != null) {
-				tmpAnz = Integer.parseInt(tmpArray[0][0]);
-				JFoverview.setAnzYearST(tmpAnz);
-			}else {
-				tmpAnz = 0;
-				JFoverview.setAnzYearST(tmpAnz);
-			}
-
-			if(tmpAnz == 0) {
-				return sTemp;
-			}
-
-			for(int x = 1; (x - 1) < tmpAnz; x++) {
-				switch(Integer.parseInt(tmpArray[x][9])) {
-				case 0:
-					JFoverview.setbPayedST(x-1, false);
-					break;
-				case 1:
-					JFoverview.setbPayedST(x-1, true);
-					break;
-				}
-			}
-
-			for(int x = 1; (x - 1) < tmpAnz; x++) {
-
-				LocalDate datum1 = LocalDate.parse(tmpArray[x][2], inputFormat);
-				String stmpA = datum1.format(formatter);
-				sTemp[x-1][0] = stmpA; // Spalte 1 - Datum
-
-				sTemp[x-1][1] = tmpArray[x][3]; // Spalte 2 - Empfänger
-				sTemp[x-1][2] = tmpArray[x][4]; // Spalte 3 - Bezeichnung
-
-				BigDecimal bdtmpN1 = new BigDecimal(tmpArray[x][5]).setScale(2, RoundingMode.HALF_UP);
-				String stmpN1 = df.format(bdtmpN1);
-				sTemp[x-1][3] = stmpN1 + "  EUR"; // Spalte 4 - Zahllast
-
-				LocalDate datum2 = LocalDate.parse(tmpArray[x][6], inputFormat);
-				String stmpB = datum2.format(formatter);
-				sTemp[x-1][4] = stmpB; // Spalte 5 - Fälligkeit
-
-				sTemp[x-1][5] = tmpArray[x][7]; // Spalte 6 - Dateiname
-				
-				if(tmpArray[x][3].contains("Sozialversicherung")) {
-					if(tmpArray[x][4].contains("Q1")){
-						BigDecimal tmpQ1 = new BigDecimal(tmpArray[x][5]).setScale(2, RoundingMode.HALF_UP);
-						bdSvQ1 = bdSvQ1.add(tmpQ1);
-					}
-					if(tmpArray[x][4].contains("Q2")){
-						BigDecimal tmpQ2 = new BigDecimal(tmpArray[x][5]).setScale(2, RoundingMode.HALF_UP);
-						bdSvQ2 = bdSvQ2.add(tmpQ2);
-					}
-					if(tmpArray[x][4].contains("Q3")){
-						BigDecimal tmpQ3 = new BigDecimal(tmpArray[x][5]).setScale(2, RoundingMode.HALF_UP);
-						bdSvQ3 = bdSvQ3.add(tmpQ3);
-					}
-					if(tmpArray[x][4].contains("Q4")){
-						BigDecimal tmpQ4 = new BigDecimal(tmpArray[x][5]).setScale(2, RoundingMode.HALF_UP);
-						bdSvQ4 = bdSvQ4.add(tmpQ4);
-					}
-					if(panelP109a != null) {
-						TaxData.getSVData(panelP109a, bdSvQ1, bdSvQ2, bdSvQ3, bdSvQ4);
-					}
-				}
-				
-
-			}
-		} catch (SQLException e) {
-			logger.error("error loading data from database - " + e);
-		} catch (ClassNotFoundException e) {
-			logger.error("error cause class for database connection is not found - " + e);
-		} finally {
-			if(!reRun) {
-				//setSumEX();
-			}
+			DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			LocalDate date = LocalDate.parse(svsteuer.getDatum().toString(), DateTimeFormatter.ISO_LOCAL_DATE);
+	        LocalDate dateF = LocalDate.parse(svsteuer.getZahlungsziel().toString(), DateTimeFormatter.ISO_LOCAL_DATE);
+	        String datum = date.format(outputFormatter);
+	        String datumF = dateF.format(outputFormatter);
+	        
+	        String zahllast = df.format(svsteuer.getZahllast()) + " " + currency.getCurrencyCode();
+	        
+	        String status = null;
+	        if (svsteuer.getStatus() == 1) {
+	        	status = "ja";
+	        } else {
+	        	status = "nein";
+	        }
+		
+	        sTemp[i][0] = datum;
+	        sTemp[i][1] = svsteuer.getOrganisation();
+	        sTemp[i][2] = svsteuer.getBezeichnung();
+	        sTemp[i][3] = zahllast;
+	        sTemp[i][4] = datumF;
+	        sTemp[i][5] = status;
+	        sTemp[i][6] = svsteuer.getDateiname();
+	        
+	        belegID[i] = svsteuer.getId();
+			
+	        if (svsteuer.getOrganisation().contains("Sozialversicherung")) {
+	        	bdSV = bdSV.add(svsteuer.getZahllast());
+	        }
+	        if (svsteuer.getOrganisation().contains("Finanzamt")) {
+	        	bdSteuer = bdSteuer.add(svsteuer.getZahllast());
+	        }
+	        
 		}
 		return sTemp;
-
 	}
 	
 	//###################################################################################################################################################
 	// Getter und Setter für Felder
 	//###################################################################################################################################################
 
-	public static void setsConn(String sConn) {
-		LoadSvTax.sConn = sConn;
-	}
-	
-	public static String getDatatbl() {
-		return dataTbl;
+	public static BigDecimal getBdSV() {
+		return bdSV;
 	}
 
+	public static BigDecimal getBdSteuer() {
+		return bdSteuer;
+	}
+
+	public static int[] getBelegID() {
+		return belegID;
+	}
+	
 }

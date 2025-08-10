@@ -1,88 +1,73 @@
-package org.andy.gui.settings;
+package org.andy.gui.main.settings_panels;
 
 import static org.andy.toolbox.crypto.Password.checkComplexity;
 import static org.andy.toolbox.crypto.Password.hashPwd;
 import static org.andy.toolbox.crypto.Password.verifyPwd;
 import static org.andy.toolbox.misc.CreateObject.createButton;
-import static org.andy.toolbox.sql.Insert.sqlInsert;
-import static org.andy.toolbox.sql.Read.sqlReadArrayList;
-import static org.andy.toolbox.sql.Update.sqlUpdate;
-
 import java.awt.Color;
-import java.awt.EventQueue;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JFrame;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 
+import org.andy.code.dataStructure.entitiyMaster.User;
+import org.andy.code.dataStructure.repositoryMaster.UserRepository;
+import org.andy.code.main.LoadData;
+import org.andy.gui.main.JFoverview;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.andy.toolbox.misc.SetFrameIcon;
-import javax.swing.JComboBox;
-
-public class JFuserMgmt extends JFrame {
-
-	private static final Logger logger = LogManager.getLogger(JFuserMgmt.class);
-
+public class UserPanel extends JPanel {
+	
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
-
-	private static final String TBL_USER = "tblUser";
-	private static String sConn;
-
-	private static JButton btnShowPwd = null, btnPwdOK = null;
-
+    private static final Logger logger = LogManager.getLogger(QrPanel.class);
+    
+    private static JButton btnShowPwd = null, btnPwdOK = null;
+    
+    private final Font font = new Font("Tahoma", Font.BOLD, 11);
+    private final Color titleColor = Color.BLUE;
+    
+    private UserRepository userRepository = new UserRepository();
+	private List<User> userListe = new ArrayList<>();
+	private User storedUser = new User();
+    
 	//###################################################################################################################################################
+	// public Teil
+	//###################################################################################################################################################
+    
+    public UserPanel() {
+        setLayout(null);
+        TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "SEPA OR-Code Einstellungen (wirksam nach Neustart)");
+        border.setTitleFont(font);
+        border.setTitleColor(titleColor);
+        border.setTitleJustification(TitledBorder.LEFT);
+        border.setTitlePosition(TitledBorder.TOP);
+        setBorder(border);
+        
+        buildPanel();
+    }
+    
+	//###################################################################################################################################################
+	// private Teil
 	//###################################################################################################################################################
 
-	public static void loadGUI() {
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					JFuserMgmt frame = new JFuserMgmt();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					logger.error("error loading user management screen - " + e);
-				}
-			}
-		});
-	}
-
-	public JFuserMgmt() {
-
-		try {
-			setIconImage(SetFrameIcon.getFrameIcon("user.png"));
-		} catch (IOException e) {
-			logger.error("error loading frame icon - " + e);
-		}
-
-		setResizable(false);
-		setTitle("Benutzerverwaltung");
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 446, 186);
-		setLocationRelativeTo(null);
-
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setLayout(null);
-		setContentPane(contentPane);
-
-		JLabel lbl01 = new JLabel("Username");
+    private void buildPanel() {
+    	JLabel lbl01 = new JLabel("Username");
 		JLabel lbl02 = new JLabel("Kennwort alt");
 		JLabel lbl03 = new JLabel("Kennwort neu");
 		JLabel lbl04 = new JLabel("Kennw. wiederh.");
@@ -101,17 +86,17 @@ public class JFuserMgmt extends JFrame {
 		roles.add("admin");
 		JComboBox<String> cmbRoles = new JComboBox<>(roles.toArray(new String[0]));
 
-		lbl01.setBounds(10, 10, 60, 25);
-		lbl02.setBounds(10, 35, 90, 25);
-		lbl03.setBounds(10, 60, 90, 25);
-		lbl04.setBounds(10, 85, 90, 25);
-		lblBenutzerrolle.setBounds(10, 115, 90, 25);
+		lbl01.setBounds(10, 20, 60, 25);
+		lbl02.setBounds(10, 45, 90, 25);
+		lbl03.setBounds(10, 70, 90, 25);
+		lbl04.setBounds(10, 95, 90, 25);
+		lblBenutzerrolle.setBounds(10, 120, 90, 25);
 
-		textUserName.setBounds(100, 10, 220, 25);
-		pwdPassOld.setBounds(100, 35, 220, 25);
-		pwdPassNew.setBounds(100, 60, 220, 25);
-		pwdPassNewR.setBounds(100, 85, 220, 25);
-		cmbRoles.setBounds(100, 115, 220, 25);
+		textUserName.setBounds(100, 20, 220, 25);
+		pwdPassOld.setBounds(100, 45, 220, 25);
+		pwdPassNew.setBounds(100, 70, 220, 25);
+		pwdPassNewR.setBounds(100, 95, 220, 25);
+		cmbRoles.setBounds(100, 120, 220, 25);
 
 		pwdPassOld.setText("");
 		pwdPassOld.setEchoChar('*');
@@ -128,23 +113,24 @@ public class JFuserMgmt extends JFrame {
 		}
 		btnShowPwd.setEnabled(true);
 		btnPwdOK.setEnabled(true);
-		btnShowPwd.setBounds(320, 35, 25, 75);
-		btnPwdOK.setBounds(360, 10, 60, 100);
+		btnShowPwd.setBounds(320, 45, 25, 75);
+		btnPwdOK.setBounds(360, 20, JFoverview.getButtonx(), JFoverview.getButtony());
 
-		contentPane.add(lbl01);
-		contentPane.add(lbl02);
-		contentPane.add(lbl03);
-		contentPane.add(lbl04);
-		contentPane.add(lblBenutzerrolle);
-		contentPane.add(textUserName);
-		contentPane.add(pwdPassOld);
-		contentPane.add(pwdPassNew);
-		contentPane.add(pwdPassNewR);
-		contentPane.add(cmbRoles);
-		contentPane.add(btnShowPwd);
-		contentPane.add(btnPwdOK);
+		add(lbl01);
+		add(lbl02);
+		add(lbl03);
+		add(lbl04);
+		add(lblBenutzerrolle);
+		add(textUserName);
+		add(pwdPassOld);
+		add(pwdPassNew);
+		add(pwdPassNewR);
+		add(cmbRoles);
+		add(btnShowPwd);
+		add(btnPwdOK);
 
 		//###################################################################################################################################################
+		// ActionListener
 		//###################################################################################################################################################
 
 		pwdPassNewR.addKeyListener(new KeyAdapter() {
@@ -185,27 +171,19 @@ public class JFuserMgmt extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				String tmpUser = textUserName.getText();
-
-				ArrayList<String> User = new ArrayList<String>();
-				String storedUser;
-				boolean bCheckComplexity = false, bCheckUser = false, bCheckOld = false;
+				boolean bCheckComplexity = false, bCheckUser = false;
 
 				bCheckComplexity = checkComplexity(pwdPassNew.getPassword());
+				
+				userListe.clear();
+				userListe.addAll(userRepository.findAll());
 
-				try {
-					ArrayList<ArrayList<String>> arrUser = sqlReadArrayList(sConn, TBL_USER, "Id", "*");
-					int AnzUser = arrUser.size();
-					for(int x = 0; x < AnzUser; x++) {
-						User = arrUser.get(x);
-						storedUser = User.get(0).toString();
-						if(storedUser.equals(tmpUser)) {
-							bCheckUser = true;
-							break;
-						}
+				for(int x = 0; x < userListe.size(); x++) {
+					storedUser = userListe.get(x);
+					if(storedUser.getId().trim().equals(LoadData.getStrAktUser())) {
+						bCheckUser = true; // user exists
+						break;
 					}
-				} catch (Exception e1) {
-					logger.error("error while checking user - " + e1);
 				}
 
 				if(!bCheckUser) { //neuer User
@@ -228,18 +206,17 @@ public class JFuserMgmt extends JFrame {
 							return;
 						}
 
-						try {
-
-							String sSQLStatement = "INSERT INTO " + TBL_USER + " VALUES ('" + textUserName.getText() + "','" + newPass + "','" + userRole + "')"; //SQL Befehlszeile
-
-							sqlInsert(sConn, sSQLStatement);
-
-						} catch (SQLException | ClassNotFoundException e1) {
-							logger.error("error writing new user to database - " + e1);
-						} finally {
-							Arrays.fill(passwordChars, '\0');
-							newPass = null;
-						}
+						User newUser = new User();
+						
+						newUser.setId(textUserName.getText().trim());
+						newUser.setHash(newPass);
+						newUser.setRoles(userRole);
+						
+						userRepository.insert(newUser);
+						
+						Arrays.fill(passwordChars, '\0');
+						newPass = null;
+						
 					} else {
 						JOptionPane.showMessageDialog(null, "Passwörter nicht gleich", "Usermanagement", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -258,25 +235,19 @@ public class JFuserMgmt extends JFrame {
 
 					if(pwdPassOld.getPassword().length != 0 && Arrays.equals(pwdPassNew.getPassword(), pwdPassNewR.getPassword())) {
 						char[] passwordChars = pwdPassOld.getPassword();
-						bCheckOld = verifyPwd(passwordChars, User.get(1).toString());
+						boolean bCheckOld = verifyPwd(passwordChars, storedUser.getHash().trim());
 						Arrays.fill(passwordChars, '\0');
 
 						if(bCheckOld) {
 							char[] newPasswordChars = pwdPassNew.getPassword();
 							String changePass = hashPwd(newPasswordChars);
 
-							try {
-
-								String sSQLStatement = "UPDATE " + TBL_USER + " SET [Hash] = '" + changePass + "' WHERE [Id] = '" + textUserName.getText() + "'";
-
-								sqlUpdate(sConn, sSQLStatement);
-
-							} catch (SQLException | ClassNotFoundException e1) {
-								logger.error("error updating user to database - " + e1);
-							} finally {
-								Arrays.fill(newPasswordChars, '\0');
-								changePass = null;
-							}
+							storedUser.setHash(changePass);
+							
+							userRepository.update(storedUser);
+							
+							Arrays.fill(newPasswordChars, '\0');
+							changePass = null;
 						}else {
 							JOptionPane.showMessageDialog(null, "altes Passwort nicht OK", "Usermanagement", JOptionPane.ERROR_MESSAGE);
 							return;
@@ -294,13 +265,9 @@ public class JFuserMgmt extends JFrame {
 				pwdPassOld.setText("");
 				pwdPassNew.setText("");
 				pwdPassNewR.setText("");
-				dispose();
 			}
 		});
-
-	}
-
-	public static void setsConn(String sConn) {
-		JFuserMgmt.sConn = sConn;
+		
+		setPreferredSize(new Dimension(500, 165));
 	}
 }

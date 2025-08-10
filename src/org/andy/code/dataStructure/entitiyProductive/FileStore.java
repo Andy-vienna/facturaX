@@ -10,8 +10,8 @@ public class FileStore {
     @Column(name = "IdNummer", nullable = false)
     private String idNummer;
 
-    @Column(name = "Year", nullable = false)
-    private int year;
+    @Column(name = "Jahr", nullable = false)
+    private int jahr;
 
     @Column(name = "ANFileName")
     private String anFileName;
@@ -95,12 +95,12 @@ public class FileStore {
         this.idNummer = idNummer;
     }
 
-    public int getYear() {
-        return year;
+    public int getJahr() {
+        return jahr;
     }
 
-    public void setYear(int year) {
-        this.year = year;
+    public void setJahr(int jahr) {
+        this.jahr = jahr;
     }
 
     public String getAnFileName() {

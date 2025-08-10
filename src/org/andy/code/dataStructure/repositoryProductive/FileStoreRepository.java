@@ -2,7 +2,8 @@ package org.andy.code.dataStructure.repositoryProductive;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import static org.andy.code.misc.HibernateUtil.getSessionFactoryDb2;
+
+import static org.andy.code.dataStructure.HibernateUtil.getSessionFactoryDb2;
 
 import org.andy.code.dataStructure.entitiyProductive.FileStore;
 

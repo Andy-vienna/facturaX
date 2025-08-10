@@ -1,6 +1,10 @@
 package org.andy.gui.main.overview_panels.edit_panels.factory;
 
 import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.toolbox.misc.SelectFile.chooseFile;
+import static org.andy.toolbox.misc.SelectFile.choosePath;
+import static org.andy.toolbox.misc.SelectFile.getNotSelected;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -8,21 +12,24 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
-import org.andy.code.main.StartUp;
-import org.andy.code.main.overview.edit.SvTax;
+import org.andy.code.dataStructure.entitiyProductive.SVSteuer;
+import org.andy.code.dataStructure.repositoryProductive.SVSteuerRepository;
+import org.andy.code.main.LoadData;
 import org.andy.gui.file.JFfileView;
 import org.andy.gui.main.JFoverview;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
@@ -32,8 +39,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
-import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
-import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
 import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
 public class SvTaxPanel extends EditPanel {
@@ -46,7 +51,6 @@ public class SvTaxPanel extends EditPanel {
 	JPanel panel = new JPanel();
 	private Border b;
 	
-	private static final String OK = "OK";
 	private TitledBorder border;
 	private DemoPanel[] panelDate = new DemoPanel[2];
 	private DatePickerSettings[] dateSettings = new DatePickerSettings[2];
@@ -54,11 +58,14 @@ public class SvTaxPanel extends EditPanel {
 	private JTextField[] txtFields = new JTextField[3];
 	private JTextField txtFile = new JTextField();
 	private JLabel lblFileTyp = new JLabel();
-	private JButton[] btnFields = new JButton[3];
+	private JButton[] btnFields = new JButton[2];
 	
-	private String[] sDatum = new String[2];
 	private int id = 0;
 	private boolean file = false;
+	private boolean neuBeleg = false;
+	
+	private SVSteuerRepository svsteuerRepository = new SVSteuerRepository();
+	private SVSteuer svsteuer = new SVSteuer();
 	
 	//###################################################################################################################################################
 	// public Teil
@@ -118,17 +125,6 @@ public class SvTaxPanel extends EditPanel {
 			dateSettings[ii].setFormatForDatesCommonEra("dd.MM.yyyy");
 			datePicker[ii] = new DatePicker(dateSettings[i]);
 			datePicker[ii].getComponentDateTextField().setBorder(new RoundedBorder(10));
-			datePicker[ii].addDateChangeListener(new DateChangeListener() {
-				@Override
-				public void dateChanged(DateChangeEvent arg0) {
-					LocalDate selectedDate = datePicker[ii].getDate();
-					if (selectedDate != null) {
-						sDatum[ii] = selectedDate.format(StartUp.getDfdate());
-					} else {
-						sDatum[ii] = null;
-					}
-				}
-			});
 			add(datePicker[ii]);
 	    }
 		datePicker[0].setBounds(212, 20, 180, 25);
@@ -172,7 +168,17 @@ public class SvTaxPanel extends EditPanel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(lblFileTyp.getIcon() != null) {
-					SvTax.actionMouseClick(e, String.valueOf(id));
+					String outputPath;
+					outputPath = choosePath(LoadData.getWorkPath());
+					Path path = Paths.get(outputPath);
+					if (outputPath.equals(getNotSelected())) {
+						return; // nichts ausgewählt
+					}
+					try {
+						svsteuerRepository.exportFileById(svsteuer.getId(), path);
+					} catch (Exception e1) {
+						logger.error("Fehler beim speichern der Datei " + outputPath + ": " + e1.getMessage());
+					}
 				}
 			}
 		});
@@ -180,8 +186,17 @@ public class SvTaxPanel extends EditPanel {
 	    btnFields[0].addActionListener(new ActionListener() {
  			@Override
  			public void actionPerformed(ActionEvent e) {
- 				String fName = SvTax.selectFile();
- 				txtFile.setText(fName);
+ 				String FileNamePath = chooseFile(LoadData.getWorkPath());
+ 				File fn = new File(FileNamePath);
+ 				String FileName = fn.getName();
+ 				txtFile.setText(FileName);
+ 				svsteuer.setDateiname(FileName);
+ 				Path path = Paths.get(FileNamePath);
+ 				try {
+					svsteuer.setDatei(Files.readAllBytes(path)); // ByteArray für Dateiinhalt
+				} catch (IOException e1) {
+					logger.error("Fehler laden der Datei " + FileName + ": " + e1.getMessage());
+				}
  				file = true;
  			}
  		});
@@ -189,23 +204,31 @@ public class SvTaxPanel extends EditPanel {
 	    btnFields[1].addActionListener(new ActionListener() {
  			@Override
  			public void actionPerformed(ActionEvent e) {
- 				
- 				String[] arrTmp = new String[7];
- 				Arrays.fill(arrTmp, null);
- 				
- 				arrTmp[0] = sDatum[0]; // Belegdatum
- 				arrTmp[1] = txtFields[0].getText(); // Organisation
- 				arrTmp[2] = txtFields[1].getText(); // Bezeichnung
- 				arrTmp[3] = txtFields[2].getText().replace(",", "."); // Zahllast
- 				arrTmp[4] = sDatum[1]; // Zahlungsziel
- 				arrTmp[5] = txtFile.getText(); // Dateiname
- 				arrTmp[6] = SvTax.getFilePath(); // Dateipfad
- 				
- 				String sResult = SvTax.writeData(arrTmp, id, file);
- 				if(sResult.equals(OK)) {
- 					JFoverview.actScreen();
- 					setIcon();
+ 				if (neuBeleg) {
+ 					
+ 					svsteuer.setJahr(Integer.parseInt(LoadData.getStrAktGJ()));
+ 	 				
+ 	 				boolean bResult = checkInput();
+ 	 				if (!bResult) {
+ 	 					JOptionPane.showMessageDialog(null, "Eingaben unvollständig, Beleg kann nicht gespeichert werden", "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
+ 	 					return;
+ 	 				}
+ 					
+ 					svsteuer.setDatum(datePicker[0].getDate());
+ 					svsteuer.setOrganisation(txtFields[0].getText());
+ 					svsteuer.setBezeichnung(txtFields[1].getText());
+ 					svsteuer.setZahllast(new BigDecimal(txtFields[2].getText()));
+ 					
+ 					svsteuer.setZahlungsziel(datePicker[1].getDate());
+ 					
+ 					svsteuerRepository.save(svsteuer);
+ 				} else {
+ 					svsteuer = svsteuerRepository.findById(id);
+ 					svsteuer.setStatus(1);
+ 					svsteuerRepository.update(svsteuer);
  				}
+ 				neuBeleg = false;
+ 				JFoverview.actScreen();
  			}
  		});
 	}
@@ -223,6 +246,26 @@ public class SvTaxPanel extends EditPanel {
         return t;
     }
     
+    private void txtFieldsFocusable(boolean b) {
+    	for (int i = 0; i < this.btnFields.length; i++) {
+			this.btnFields[i].setEnabled(b);
+		}
+    	for (int i = 0; i < this.txtFields.length; i++) {
+			this.txtFields[i].setFocusable(b);
+		}
+    	this.txtFile.setFocusable(false);
+    }
+    
+    private boolean checkInput() {
+    	if (datePicker[0].getDate() == null) return false;
+    	for (int i = 0; i < txtFields.length - 1; i++) {
+    		if (txtFields[i].getText() == null || txtFields[i].getText().equals("")) return false;
+    	}
+    	if (txtFile.getText() == null || txtFile.getText().equals("")) return false;
+    	if (file == false) return false;
+    	return true;
+    }
+    
 	//###################################################################################################################################################
 	// Getter und Setter für Felder
 	//###################################################################################################################################################
@@ -237,33 +280,41 @@ public class SvTaxPanel extends EditPanel {
 	    }
 	}
     
-    public void setTxtFields(String[] value, int id) {
-    	this.id = 0;
+    public void setTxtFields(int id) {
     	if (id > 0) {
-			this.id = id;
-		} 
-    	if (value[0] == null || value[0].isEmpty()) {
+    		this.id = id;
+		} else {
     		this.datePicker[0].setDate(null);
     		for (int i = 0; i < this.txtFields.length; i++) {
 				this.txtFields[i].setText("");
 			}
     		this.datePicker[1].setDate(null);
     		this.txtFile.setText("");
+    		svsteuer = new SVSteuer();
+    		neuBeleg = true;
 			return;
 		}
-    	DateTimeFormatter dfDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    	LocalDate datumA = LocalDate.parse(value[0], dfDate);
-    	this.datePicker[0].setDate(datumA);
-    	for (int i = 0; i < this.txtFields.length; i++) {
-    		if (i == 2) {
-    			this.txtFields[i].setText(value[i + 1].replace(".", ","));
-    		} else {
-    			this.txtFields[i].setText(value[i + 1]);
-    		}
-    	}
-    	LocalDate datumB = LocalDate.parse(value[4], dfDate);
-    	this.datePicker[1].setDate(datumB);
-    	txtFile.setText(value[5]);
+    	
+    	svsteuer = svsteuerRepository.findById(id);
+    	
+    	this.datePicker[0].setDate(svsteuer.getDatum());
+    	
+    	this.txtFields[0].setText(svsteuer.getOrganisation());
+    	this.txtFields[1].setText(svsteuer.getBezeichnung());
+    	this.txtFields[2].setText(svsteuer.getZahllast().toString());
+
+    	this.datePicker[1].setDate(svsteuer.getZahlungsziel());
+    	
+    	this.txtFile.setText(svsteuer.getDateiname());
+    	
+    	txtFieldsFocusable(false);
+    	this.btnFields[0].setEnabled(false);
+    	neuBeleg = false;
+		if (svsteuer.getStatus() == 0) {
+			this.btnFields[1].setEnabled(true);
+		} else {
+			this.btnFields[1].setEnabled(false);
+		}
     }
 
 	public void setBtnText(int col, String value) {

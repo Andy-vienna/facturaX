@@ -1,7 +1,7 @@
 package org.andy.code.dataStructure.repositoryProductive;
 
+import org.andy.code.dataStructure.HibernateUtil;
 import org.andy.code.dataStructure.entitiyProductive.Angebot;
-import org.andy.code.misc.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 

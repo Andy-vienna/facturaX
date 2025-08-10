@@ -14,14 +14,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.util.Arrays;
-
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -31,8 +30,6 @@ import javax.swing.border.TitledBorder;
 import org.andy.code.dataStructure.entitiyProductive.Ausgaben;
 import org.andy.code.dataStructure.repositoryProductive.AusgabenRepository;
 import org.andy.code.main.LoadData;
-import org.andy.code.main.StartUp;
-import org.andy.code.main.overview.edit.Expenses;
 import org.andy.gui.file.JFfileView;
 import org.andy.gui.main.JFoverview;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
@@ -42,8 +39,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
-import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
-import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
 import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
 public class ExpensesPanel extends EditPanel {
@@ -56,15 +51,12 @@ public class ExpensesPanel extends EditPanel {
 	JPanel panel = new JPanel();
 	private Border b;
 	
-	private static final String OK = "OK";
 	private TitledBorder border;
 	private DatePicker datePicker = new DatePicker();
 	private JTextField[] txtFields = new JTextField[6];
 	private JLabel lblFileTyp = new JLabel();
 	private JButton[] btnFields = new JButton[2];
 	
-	private String sDatum;
-	private int id = 0;
 	private boolean file = false;
 	private boolean neuBeleg = false;
 	
@@ -127,17 +119,6 @@ public class ExpensesPanel extends EditPanel {
 		dateSettings.setFormatForDatesCommonEra("dd.MM.yyyy");
 		datePicker = new DatePicker(dateSettings);
 		datePicker.getComponentDateTextField().setBorder(new RoundedBorder(10));
-		datePicker.addDateChangeListener(new DateChangeListener() {
-			@Override
-			public void dateChanged(DateChangeEvent arg0) {
-				LocalDate selectedDate = datePicker.getDate();
-				if (selectedDate != null) {
-					sDatum = selectedDate.format(StartUp.getDfdate());
-				} else {
-					sDatum = null;
-				}
-			}
-		});
 		datePicker.setBounds(212, 20, 180, 25);
 		add(datePicker);
 		
@@ -162,7 +143,6 @@ public class ExpensesPanel extends EditPanel {
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}
-		btnFields[1].setEnabled(true);
 		btnFields[1].setBounds(660, 145, JFoverview.getButtonx(), JFoverview.getButtony());
 		add(btnFields[1]);
 		
@@ -212,20 +192,26 @@ public class ExpensesPanel extends EditPanel {
  			@Override
  			public void actionPerformed(ActionEvent e) {
  				if (neuBeleg) {
- 					String value = null;
  					
+ 					ausgaben.setJahr(Integer.parseInt(LoadData.getStrAktGJ()));
+ 	 				
+ 	 				boolean bResult = checkInput();
+ 	 				if (!bResult) {
+ 	 					JOptionPane.showMessageDialog(null, "Eingaben unvollständig, Beleg kann nicht gespeichert werden", "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
+ 	 					return;
+ 	 				}
  					
+ 					ausgaben.setDatum(datePicker.getDate());
+ 					ausgaben.setArt(txtFields[0].getText());
+ 					ausgaben.setSteuersatz(txtFields[1].getText());
+ 					ausgaben.setNetto(new BigDecimal(txtFields[2].getText()));
+ 					ausgaben.setSteuer(new BigDecimal(txtFields[3].getText()));
+ 					ausgaben.setBrutto(new BigDecimal(txtFields[4].getText()));
  					
+ 					ausgabenRepository.save(ausgaben);
  					
- 					
- 					
- 					
- 					
- 					
- 					
- 					
- 					
- 					
+ 					neuBeleg = false;
+ 	 				JFoverview.actScreen();
  				}
  			}
  		});
@@ -249,6 +235,16 @@ public class ExpensesPanel extends EditPanel {
     	for (int i = 0; i < this.txtFields.length; i++) {
 			this.txtFields[i].setFocusable(b);
 		}
+    	txtFields[5].setFocusable(false);
+    }
+    
+    private boolean checkInput() {
+    	if (datePicker.getDate() == null) return false;
+    	for (int i = 0; i < txtFields.length - 1; i++) {
+    		if (txtFields[i].getText() == null || txtFields[i].getText().equals("")) return false;
+    	}
+    	if (file == false) return false;
+    	return true;
     }
     
 	//###################################################################################################################################################
@@ -266,9 +262,7 @@ public class ExpensesPanel extends EditPanel {
 	}
     
     public void setTxtFields(int id) {
-    	this.id = 0;
     	if (id > 0) {
-			this.id = id;
 		} else {
 			this.datePicker.setDate(null);
     		for (int i = 0; i < this.txtFields.length; i++) {
@@ -287,16 +281,18 @@ public class ExpensesPanel extends EditPanel {
     	
     	this.datePicker.setDate(ausgaben.getDatum());
     	
-    	txtFields[0].setText(ausgaben.getArt());
-    	txtFields[1].setText(ausgaben.getSteuersatz());
-    	txtFields[2].setText(ausgaben.getNetto().toString());
-    	txtFields[3].setText(ausgaben.getSteuer().toString());
-    	txtFields[4].setText(ausgaben.getBrutto().toString());
-    	txtFields[5].setText(ausgaben.getDateiname());
+    	this.txtFields[0].setText(ausgaben.getArt());
+    	this.txtFields[1].setText(ausgaben.getSteuersatz());
+    	this.txtFields[2].setText(ausgaben.getNetto().toString());
+    	this.txtFields[3].setText(ausgaben.getSteuer().toString());
+    	this.txtFields[4].setText(ausgaben.getBrutto().toString());
+    	this.txtFields[5].setText(ausgaben.getDateiname());
     	
     	txtFieldsFocusable(false);
-		btnFields[0].setEnabled(false);
-		
+    	neuBeleg = false;
+    	for (int i = 0; i < this.btnFields.length; i++) {
+			this.btnFields[i].setEnabled(false);
+		}
     }
 
 	public void setBtnText(int col, String value) {

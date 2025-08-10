@@ -17,7 +17,6 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -30,7 +29,6 @@ import javax.swing.border.TitledBorder;
 import org.andy.code.dataStructure.entitiyProductive.Einkauf;
 import org.andy.code.dataStructure.repositoryProductive.EinkaufRepository;
 import org.andy.code.main.LoadData;
-import org.andy.code.main.StartUp;
 import org.andy.gui.file.JFfileView;
 import org.andy.gui.main.JFoverview;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
@@ -40,8 +38,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
-import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
-import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
 import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
 public class PurchasePanel extends EditPanel {
@@ -64,7 +60,6 @@ public class PurchasePanel extends EditPanel {
 	private JLabel lblFileTyp = new JLabel();
 	private JButton[] btnFields = new JButton[2];
 	
-	private String[] sDatum = new String[2];
 	private String id = null;
 	private boolean file = false;
 	private boolean neuBeleg = false;
@@ -148,17 +143,6 @@ public class PurchasePanel extends EditPanel {
 			dateSettings[ii].setFormatForDatesCommonEra("dd.MM.yyyy");
 			datePicker[ii] = new DatePicker(dateSettings[i]);
 			datePicker[ii].getComponentDateTextField().setBorder(new RoundedBorder(10));
-			datePicker[ii].addDateChangeListener(new DateChangeListener() {
-				@Override
-				public void dateChanged(DateChangeEvent arg0) {
-					LocalDate selectedDate = datePicker[ii].getDate();
-					if (selectedDate != null) {
-						sDatum[ii] = selectedDate.format(StartUp.getDfdate());
-					} else {
-						sDatum[ii] = null;
-					}
-				}
-			});
 			add(datePicker[ii]);
 	    }
 		datePicker[0].setBounds(212, 20, 180, 25);
@@ -396,11 +380,12 @@ public class PurchasePanel extends EditPanel {
 		this.txtFieldsCol2b[1].setText(einkauf.getDateiname());
 		
 		txtFieldsFocusable(false);
-		btnFields[0].setEnabled(false);
+		this.btnFields[0].setEnabled(false);
+		neuBeleg = false;
 		if (einkauf.getStatus() == 0) {
-			btnFields[1].setEnabled(true);
+			this.btnFields[1].setEnabled(true);
 		} else {
-			btnFields[1].setEnabled(false);
+			this.btnFields[1].setEnabled(false);
 		}
     }
 

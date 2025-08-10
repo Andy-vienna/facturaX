@@ -297,7 +297,7 @@ public class ExcelOffer{
 		FileStore fileStore = new FileStore();
 		
 		fileStore.setIdNummer(angebot.getIdNummer());
-		fileStore.setYear(angebot.getJahr());
+		fileStore.setJahr(angebot.getJahr());
 		fileStore.setAnFileName(PdfName);
 		fileStore.setAddFileName01(ExcelName);
 		
