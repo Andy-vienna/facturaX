@@ -53,6 +53,9 @@ import org.andy.code.dataExport.ExcelOffer;
 import org.andy.code.dataStructure.entitiyMaster.Kunde;
 import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
 import org.andy.code.main.*;
+import org.andy.code.main.overview.result.ZmData;
+import org.andy.code.main.overview.result.TaxData;
+import org.andy.code.main.overview.result.UStData;
 import org.andy.code.main.overview.table.LoadBill;
 import org.andy.code.main.overview.table.LoadExpenses;
 import org.andy.code.main.overview.table.LoadOffer;
@@ -67,16 +70,16 @@ import org.andy.gui.main.overview_panels.edit_panels.factory.ExpensesPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.OfferPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.PurchasePanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.SvTaxPanel;
-import org.andy.gui.main.result_panels.RecStatePanel;
+import org.andy.gui.main.result_panels.ZmPanel;
 import org.andy.gui.main.result_panels.TaxPanel;
 import org.andy.gui.main.result_panels.UStPanel;
 import org.andy.gui.main.settings_panels.BankPanel;
 import org.andy.gui.main.settings_panels.DbPanel;
 import org.andy.gui.main.settings_panels.GwbTablePanel;
-import org.andy.gui.main.settings_panels.ItemPanel;
+import org.andy.gui.main.settings_panels.ArtikelPanel;
 import org.andy.gui.main.settings_panels.KundePanel;
 import org.andy.gui.main.settings_panels.OwnerPanel;
-import org.andy.gui.main.settings_panels.PathPanel;
+import org.andy.gui.main.settings_panels.PfadPanel;
 import org.andy.gui.main.settings_panels.QrPanel;
 import org.andy.gui.main.settings_panels.TaxTablePanel;
 import org.andy.gui.main.settings_panels.TextPanel;
@@ -122,7 +125,7 @@ public class JFoverview extends JFrame {
 	private static EditPanel offerPanel, billPanel, purchasePanel, svTaxPanel, expensesPanel;
 	private static SumPanel infoAN, infoRE, infoPU, infoEX, infoST;
 	private static UStPanel panelUSt;
-	private static RecStatePanel panelZM;
+	private static ZmPanel panelZM;
 	private static TaxPanel panelP109a;
 	private static JScrollPane sPaneText, sPaneErg; //, sPaneSetting;
 	private static CreateTable<Object> sPaneAN, sPaneRE, sPanePU, sPaneEX, sPaneST;
@@ -152,7 +155,8 @@ public class JFoverview extends JFrame {
 					frame.setVisible(true);
 
 				} catch (Exception  e) {
-					logger.fatal("loadGUI fehlgeschlagen - " + e);
+					//logger.fatal("loadGUI fehlgeschlagen - " + e);
+					e.printStackTrace();
 				}
 			}
 		});
@@ -181,10 +185,9 @@ public class JFoverview extends JFrame {
 				break;
 			case 5: // FinancialUser
 				pageST.removeAll();
+				//pageOv.removeAll();
 				doSvsTaxPanel();
-				/*UStData.setValuesUVA(panelUSt, AnzYearPU, AnzYearRE, AnzYearEX, arrYearPU, arrYearRE, arrYearEX);
-				RecStateData.RecState(panelZM, AnzYearRE, arrYearRE);*/
-				//TaxData.setValuesTax(panelP109a, AnzYearRE, arrYearRE, bdExNetto, bdReNetto);*/
+				doJahresergebnis();
 				break;
 			case 9: // Admin
 				TextPanel.loadTexte();
@@ -449,7 +452,7 @@ public class JFoverview extends JFrame {
 		sPaneAN.getTable().addMouseListener(new MouseAdapter() {
 		    @Override
 		    public void mouseClicked(MouseEvent e) { actionClickAN(sPaneAN.getTable(), e); } });
-		sPaneAN.setColumnWidths(new int[] {200,200,200,750,200,200});
+		sPaneAN.setColumnWidths(new int[] {200,200,200,750,300,200});
 		
 		// InfoPanel anlegen
 		infoAN = new SumPanel(new String[] {"Summe offen:", "Summe best.:"}, true);
@@ -636,7 +639,7 @@ public class JFoverview extends JFrame {
 			sPaneEX.getTable().addMouseListener(new MouseAdapter() {
 			    @Override
 			    public void mouseClicked(MouseEvent e) { actionClickEX(sPaneEX.getTable(), e); } });
-			sPaneEX.setColumnWidths(new int[] {100,650,100,100,100,650});
+			sPaneEX.setColumnWidths(new int[] {100,650,150,150,150,650});
 			
 			// InfoPanel anlegen
 			infoEX = new SumPanel(new String[] {"Netto:", "Brutto:"}, false);
@@ -686,12 +689,16 @@ public class JFoverview extends JFrame {
 			panelUSt = new UStPanel();
 			panelUSt.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 			
-			panelZM = new RecStatePanel();
+			panelZM = new ZmPanel();
 			panelZM.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 	
 			panelP109a = new TaxPanel();
 			panelP109a.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 	
+			UStData.setValuesUVA(panelUSt);
+			ZmData.RecState(panelZM);
+			TaxData.setValuesTax(panelP109a);
+			
 			pageErg = new JPanel(new GridBagLayout());
 			GridBagConstraints erg = new GridBagConstraints();
 			erg.gridx = 0; erg.weightx = 1.0; erg.fill = GridBagConstraints.HORIZONTAL;
@@ -719,6 +726,8 @@ public class JFoverview extends JFrame {
 			sPaneErg = new JScrollPane(pageErg);
 			pageOv = new JPanel(new BorderLayout());
 			pageOv.add(sPaneErg, BorderLayout.CENTER);
+			pageOv.revalidate();
+			pageOv.repaint();
 		}
 	}
 	
@@ -763,12 +772,12 @@ public class JFoverview extends JFrame {
 			            	break;
 			            case 3:
 			                KundePanel kundePanel = new KundePanel();
-			                ItemPanel itemPanel = new ItemPanel();
+			                ArtikelPanel itemPanel = new ArtikelPanel();
 			                pageSetting.add(kundePanel);
 			                pageSetting.add(itemPanel);
 			                break;
 			            case 4:
-			                PathPanel pathPanel = new PathPanel();
+			                PfadPanel pathPanel = new PfadPanel();
 			                pageSetting.add(pathPanel);
 			                break;
 			            case 5:
@@ -1354,9 +1363,9 @@ class TableEXcr extends DefaultTableCellRenderer {
 	@Override
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 		JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-		if(column == 0 || column == 3) {
+		if(column == 0) {
 			label.setHorizontalAlignment(SwingConstants.CENTER);
-		} else if(column == 2 || column == 4 || column == 5){
+		} else if(column == 2 || column == 3 || column == 4 || column == 5){
 			label.setHorizontalAlignment(SwingConstants.RIGHT);
 		} else {
 			label.setHorizontalAlignment(SwingConstants.LEFT);
@@ -1386,7 +1395,7 @@ class TableSTcr extends DefaultTableCellRenderer {
 		JLabel label = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 		if(column == 0 || column == 4 || column == 5) {
 			label.setHorizontalAlignment(SwingConstants.CENTER);
-		} else if(column == 3){
+		} else if(column == 3 || column == 6){
 			label.setHorizontalAlignment(SwingConstants.RIGHT);
 		} else {
 			label.setHorizontalAlignment(SwingConstants.LEFT);

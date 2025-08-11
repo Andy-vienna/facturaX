@@ -15,6 +15,8 @@ import org.andy.code.dataStructure.entitiyProductive.FileStore;
 import org.andy.code.dataStructure.entitiyProductive.Rechnung;
 import org.andy.code.dataStructure.entitiyProductive.SVSteuer;
 import org.andy.code.main.LoadData;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
@@ -30,6 +32,14 @@ public class HibernateUtil {
     private static SessionFactory sessionFactoryDb2;
 
     static {
+        // Logging drosseln
+        Configurator.setRootLevel(Level.WARN);
+        Configurator.setLevel("org.hibernate", Level.WARN);
+        Configurator.setLevel("org.hibernate.SQL", Level.ERROR);           // SQL stumm
+        Configurator.setLevel("org.hibernate.orm.jdbc.bind", Level.ERROR); // Bind-Parameter stumm
+        Configurator.setLevel("com.zaxxer.hikari", Level.WARN);
+
+        // Hibernate initialisieren
         sessionFactoryDb1 = buildSessionFactoryDb1();
         sessionFactoryDb2 = buildSessionFactoryDb2();
     }
@@ -103,8 +113,8 @@ public class HibernateUtil {
         settings.put("hibernate.hikari.poolName", "FX-DB2");
 
         // Hibernate
-        settings.put("hibernate.show_sql", "true");
-        settings.put("hibernate.format_sql", "true");
+        settings.put("hibernate.show_sql", "false");
+        settings.put("hibernate.format_sql", "false");
         settings.put("hibernate.hbm2ddl.auto", "none");
 
         StandardServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()

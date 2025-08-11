@@ -306,7 +306,7 @@ public class OfferPanel extends EditPanel {
         if (bg != null) t.setBackground(bg);
         return t;
     }
-    
+  
     private void txtFieldsFocusable(boolean b) {
     	this.datePicker[0].setEnabled(b);
     	for (int i = 0; i < this.txtFieldsHead.length; i++) {

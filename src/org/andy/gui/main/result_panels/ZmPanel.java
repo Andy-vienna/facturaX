@@ -5,7 +5,7 @@ import org.andy.code.main.LoadData;
 
 import java.awt.*;
 
-public class RecStatePanel extends JPanel {
+public class ZmPanel extends JPanel {
 
 	// Serialisierungs-ID für die Klasse
 	private static final long serialVersionUID = 1L;
@@ -17,7 +17,7 @@ public class RecStatePanel extends JPanel {
 	// public Teil
 	//###################################################################################################################################################
 
-    public RecStatePanel() {
+    public ZmPanel() {
         setLayout(null);
         buildPanel();
     }

@@ -10,9 +10,14 @@ import java.util.Locale;
 
 import org.andy.code.dataStructure.entitiyMaster.Gwb;
 import org.andy.code.dataStructure.entitiyMaster.Tax;
+import org.andy.code.dataStructure.entitiyProductive.Rechnung;
 import org.andy.code.dataStructure.repositoryMaster.GwbRepository;
 import org.andy.code.dataStructure.repositoryMaster.TaxRepository;
+import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
 import org.andy.code.main.LoadData;
+import org.andy.code.main.overview.table.LoadExpenses;
+import org.andy.code.main.overview.table.LoadPurchase;
+import org.andy.code.main.overview.table.LoadSvTax;
 import org.andy.gui.main.result_panels.TaxPanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,8 +27,7 @@ public class TaxData {
 	private static final Logger logger = LogManager.getLogger(TaxData.class);
 	
 	private static NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.GERMANY);
-	
-	private static BigDecimal bdSVQ1 = BigDecimal.ZERO, bdSVQ2 = BigDecimal.ZERO, bdSVQ3 = BigDecimal.ZERO, bdSVQ4 = BigDecimal.ZERO;
+
 	private static BigDecimal bdSVYear = BigDecimal.ZERO;
 	
 	private static String[][] arrTaxValues = new String[2][25];
@@ -33,20 +37,22 @@ public class TaxData {
 	// public Teil
 	//###################################################################################################################################################
 	
-	public static void setValuesTax(TaxPanel panel, int AnzYearBillOut, String[][] arrYearBillOut, BigDecimal bdREnetto, BigDecimal bdEnetto) {	
-		setValues(panel, AnzYearBillOut, arrYearBillOut, bdREnetto, bdEnetto);
+	public static void setValuesTax(TaxPanel panel) {	
+		setValues(panel);
 	}
 	
 	//###################################################################################################################################################
 	// private Teil
 	//###################################################################################################################################################
 	
-	private static void setValues(TaxPanel panel, int AnzYearBillOut, String[][] arrYearBillOut, BigDecimal bdREnetto, BigDecimal bdEnetto) {
+	private static void setValues(TaxPanel panel) {
 		
 		getDBData(); // Steuergrenzen und Gewinnfreibetragsgrenzen aus DB lesen
 		
-		BigDecimal bdTmp1 = BigDecimal.ZERO;
-		BigDecimal bdTmp2 = BigDecimal.ZERO;
+		List<BigDecimal> GwbStufe = new ArrayList<>();
+		List<BigDecimal> TaxStufe = new ArrayList<>();
+		
+		BigDecimal netto = BigDecimal.ZERO;
 		BigDecimal bdVorGwb = BigDecimal.ZERO;
 		BigDecimal bdErgYear = BigDecimal.ZERO;
 		BigDecimal bdOeffiP = new BigDecimal(arrTaxValues[1][23].toString().replace(",", ".")).multiply(new BigDecimal("-1")).setScale(2, RoundingMode.HALF_UP);
@@ -55,33 +61,36 @@ public class TaxData {
 		BigDecimal bdGwbTotal = BigDecimal.ZERO;
 		BigDecimal bdGwbTotalNeg = BigDecimal.ZERO;
 		BigDecimal bdTaxTotal = BigDecimal.ZERO;
-		List<BigDecimal> GwbStufe = new ArrayList<>();
-		List<BigDecimal> TaxStufe = new ArrayList<>();
+		BigDecimal[] bdSVQ = new BigDecimal[4];
+		bdSVQ = LoadSvTax.getBdSVQ(); // Quartalswerte der SV-Vorschreibungen
+		
+		for (int i = 0; i < bdSVQ.length; i++) {
+			bdSVYear = bdSVYear.add(bdSVQ[i].multiply(new BigDecimal("-1")));
+		}
+		
+		RechnungRepository rechnungRepository = new RechnungRepository();
+	    List<Rechnung> rechnungListe = new ArrayList<>();
+		rechnungListe.addAll(rechnungRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ()))); // Rechnungen nach GJ laden
 		
 		try {
-			
-			if(AnzYearBillOut > 0) {
-				for(int x = 1; (x - 1) < AnzYearBillOut; x++) {
-					String sTmp = arrYearBillOut[x][3].trim();
-					String sValue = arrYearBillOut[x][12].trim();
-					if(sTmp.equals("1")) { // Rechnung wurde ausgestellt
-						bdTmp1 = new BigDecimal(sValue);
-						bdTmp2 = bdTmp2.add(bdTmp1);
-					}
+			for(int x = 1; x < rechnungListe.size(); x++) {
+				Rechnung rechnung = rechnungListe.get(x);
+				if(rechnung.getState() > 0) { // Rechnung wurde ausgestellt
+					netto = netto.add(rechnung.getNetto());
 				}
 			}
 			
-			BigDecimal bdBA = bdREnetto.add(bdEnetto); // Betriebsausgaben netto komplett
+			BigDecimal bdBA = LoadPurchase.getBdNetto().add(LoadExpenses.getBdNetto()); // Betriebsausgaben netto komplett
 			bdExpenses = bdBA.multiply(new BigDecimal("-1")).setScale(2, RoundingMode.HALF_UP); // Betriebsausgaben netto negativ
 			
-			bdVorGwb = bdTmp2.add(bdSVYear).add(bdOeffiP).add(bdAPausch).add(bdExpenses); // VorGWB wird aus der Summe der Einnahmen, SV, öffentlicher Pauschale, APauschale und Ausgaben netto berechnet
+			bdVorGwb = netto.add(bdSVYear).add(bdOeffiP).add(bdAPausch).add(bdExpenses); // VorGWB wird aus der Summe der Einnahmen, SV, öffentlicher Pauschale, APauschale und Ausgaben netto berechnet
 			
 			GwbStufe = calcGWB(panel, bdVorGwb); // Berechnung der GWB-Stufen
 			
 			bdGwbTotal = GwbStufe.stream().reduce(BigDecimal.ZERO, BigDecimal::add); // Summe der GWB-Stufen
 			bdGwbTotalNeg = bdGwbTotal.multiply(new BigDecimal("-1")).setScale(2, RoundingMode.HALF_UP); // GWB negativ
 			
-			bdErgYear = bdTmp2.add(bdSVYear).add(bdOeffiP).add(bdAPausch).add(bdExpenses).add(bdGwbTotalNeg); // Ergebnis wird aus der Summe der Einnahmen, SV, öffentlicher Pauschale, APauschale, Ausgaben netto und GWB negativ berechnet
+			bdErgYear = netto.add(bdSVYear).add(bdOeffiP).add(bdAPausch).add(bdExpenses).add(bdGwbTotalNeg); // Ergebnis wird aus der Summe der Einnahmen, SV, öffentlicher Pauschale, APauschale, Ausgaben netto und GWB negativ berechnet
 
 			//bdErgYear = new BigDecimal("98456.23");
 			
@@ -95,8 +104,11 @@ public class TaxData {
 			logger.error("error in calculating revenue sum - " + e1);
 		}
 		
-		panel.setTxtP109aEin(Double.valueOf(bdTmp2.toString().replace(",", ".")));
+		panel.setTxtP109aEin(Double.valueOf(netto.toString().replace(",", ".")));
 		panel.setTxtP109aSVS(0, Double.valueOf(bdSVYear.toString().replace(",", ".")));
+		for (int i= 0; i < bdSVQ.length; i++) {
+			panel.setTxtP109aSVS(i + 1, Double.valueOf(bdSVQ[i].toString().replace(",", ".")));
+		}
 		panel.setTxtP109aOeffiP(Double.valueOf(bdOeffiP.toString().replace(",", ".")));
 		panel.setTxtP109aAPausch(Double.valueOf(bdAPausch.toString().replace(",", ".")));
 		panel.setTxtP109aExpenses(Double.valueOf(bdExpenses.toString().replace(",", ".")));
@@ -130,11 +142,11 @@ public class TaxData {
 		panel.setTxtE1Summe(Double.valueOf(bdTaxTotal.toString().replace(",", "."))); // voraussichtliche Einkommensteuer gesamt
 		
 		ArrayList<BigDecimal> tmpListe = new ArrayList<>(); // Liste für §109a Formular erzeugen und in Setter schreiben
-		tmpListe.add(bdTmp2); // Einnahmen
-		tmpListe.add(bdSVQ1); // SV Q1
-		tmpListe.add(bdSVQ2); // SV Q2
-		tmpListe.add(bdSVQ3); // SV Q3
-		tmpListe.add(bdSVQ4); // SV Q4
+		tmpListe.add(netto); // Einnahmen
+		tmpListe.add(bdSVQ[0]); // SV Q1
+		tmpListe.add(bdSVQ[1]); // SV Q2
+		tmpListe.add(bdSVQ[2]); // SV Q3
+		tmpListe.add(bdSVQ[3]); // SV Q4
 		tmpListe.add(bdSVYear); // SV Jahr
 		tmpListe.add(bdOeffiP); // Öffi-Pauschale
 		tmpListe.add(bdAPausch); // Arbeitsplatzpauschale
@@ -436,25 +448,6 @@ public class TaxData {
 				arrGwbValues[1][9] = gwb.getVal_4().toString();
 			}
 		}
-	}
-	
-	//###################################################################################################################################################
-	
-	public static void getSVData(TaxPanel panel, BigDecimal bdSVQx1, BigDecimal bdSVQx2, BigDecimal bdSVQx3, BigDecimal bdSVQx4) {
-		
-		bdSVQ1 = bdSVQx1;
-		bdSVQ2 = bdSVQx2;
-		bdSVQ3 = bdSVQx3;
-		bdSVQ4 = bdSVQx4;
-		
-		panel.setTxtP109aSVS(1, Double.valueOf(bdSVQ1.toString().replace(",", ".")));
-		panel.setTxtP109aSVS(2, Double.valueOf(bdSVQ2.toString().replace(",", ".")));
-		panel.setTxtP109aSVS(3, Double.valueOf(bdSVQ3.toString().replace(",", ".")));
-		panel.setTxtP109aSVS(4, Double.valueOf(bdSVQ4.toString().replace(",", ".")));
-		
-		bdSVYear = bdSVQ1.add(bdSVQ2).add(bdSVQ3).add(bdSVQ4);
-		bdSVYear = bdSVYear.multiply(new BigDecimal("-1")).setScale(2, RoundingMode.HALF_UP);
-		
 	}
 	
 	//###################################################################################################################################################

@@ -26,6 +26,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.AbstractDocument;
 
 import org.andy.code.dataStructure.entitiyProductive.Ausgaben;
 import org.andy.code.dataStructure.repositoryProductive.AusgabenRepository;
@@ -33,6 +34,7 @@ import org.andy.code.main.LoadData;
 import org.andy.gui.file.JFfileView;
 import org.andy.gui.main.JFoverview;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
+import org.andy.gui.misc.CommaHelper;
 import org.andy.gui.misc.RoundedBorder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -127,6 +129,9 @@ public class ExpensesPanel extends EditPanel {
 	    	txtFields[r] = makeField(210, 45 + r * 25, 400, 25, false, null);
 	    	add(txtFields[r]);
 	    }
+	    attachCommaToDot(txtFields[2]);
+        attachCommaToDot(txtFields[3]);
+        attachCommaToDot(txtFields[4]);
 	    
 	    // Anzeige Filetyp
 	    lblFileTyp.setHorizontalAlignment(SwingConstants.CENTER);
@@ -228,6 +233,10 @@ public class ExpensesPanel extends EditPanel {
         if (bold) t.setFont(new Font("Tahoma", Font.BOLD, 11));
         if (bg != null) t.setBackground(bg);
         return t;
+    }
+    
+    private void attachCommaToDot(JTextField field) {
+        ((AbstractDocument) field.getDocument()).setDocumentFilter(new CommaHelper.CommaToDotFilter());
     }
     
     private void txtFieldsFocusable(boolean b) {

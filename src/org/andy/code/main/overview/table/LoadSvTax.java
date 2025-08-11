@@ -19,6 +19,8 @@ public class LoadSvTax {
 	private static BigDecimal bdSV = BigDecimal.ZERO;
 	private static BigDecimal bdSteuer = BigDecimal.ZERO;
 	
+	private static BigDecimal[] bdSVQ = new BigDecimal[4];
+	
 	private static int[] belegID = null;
 	
 	//###################################################################################################################################################
@@ -40,6 +42,9 @@ public class LoadSvTax {
 		DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
 		
 		bdSV = BigDecimal.ZERO; bdSteuer = BigDecimal.ZERO;
+		for (int a = 0; a < bdSVQ.length; a++) {
+			 bdSVQ[a] = new BigDecimal("0.00");
+		}
 		
 		SVSteuerRepository svsteuerRepository = new SVSteuerRepository();
 	    List<SVSteuer> svsteuerListe = new ArrayList<>();
@@ -78,11 +83,16 @@ public class LoadSvTax {
 			
 	        if (svsteuer.getOrganisation().contains("Sozialversicherung")) {
 	        	bdSV = bdSV.add(svsteuer.getZahllast());
+	        	for (int x = 0; x < 4; x++) {
+	        	    String token = "Q" + (x + 1);
+	        	    if (svsteuer.getBezeichnung().contains(token)) {
+	        	        bdSVQ[x] = bdSVQ[x].add(svsteuer.getZahllast());
+	        	    }
+	        	}
 	        }
 	        if (svsteuer.getOrganisation().contains("Finanzamt")) {
 	        	bdSteuer = bdSteuer.add(svsteuer.getZahllast());
 	        }
-	        
 		}
 		return sTemp;
 	}
@@ -102,5 +112,9 @@ public class LoadSvTax {
 	public static int[] getBelegID() {
 		return belegID;
 	}
-	
+
+	public static BigDecimal[] getBdSVQ() {
+		return bdSVQ;
+	}
+
 }

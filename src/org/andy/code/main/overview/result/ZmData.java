@@ -11,33 +11,42 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.andy.code.dataStructure.entitiyMaster.Kunde;
-import org.andy.code.misc.parseBigDecimal;
-import org.andy.gui.main.result_panels.RecStatePanel;
+import org.andy.code.dataStructure.entitiyProductive.Rechnung;
+import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
+import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
+import org.andy.code.main.LoadData;
+import org.andy.gui.main.result_panels.ZmPanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class RecStateData {
+public class ZmData {
 	
 	private static final Logger logger = LogManager.getLogger(UStData.class);
-	
-	private static List<Kunde> kundeListe = new ArrayList<>(); // Kundenliste
 	
 	//###################################################################################################################################################
 	// public Teil
 	//###################################################################################################################################################
 	
-	public static void RecState(RecStatePanel panel, int anzahl, String[][] array) {
-		setValues(panel, anzahl, array);
+	public static void RecState(ZmPanel panel) {
+		setValues(panel);
 	}
 	
 	//###################################################################################################################################################
 	// private Teil
 	//###################################################################################################################################################
 	
-	private static void setValues(RecStatePanel panel, int anzahl, String[][] array) {
+	private static void setValues(ZmPanel panel) {
 		NumberFormat nf = NumberFormat.getNumberInstance(Locale.GERMANY);
 		nf.setMinimumFractionDigits(2);
 		nf.setMaximumFractionDigits(2);
+		
+		KundeRepository kundeRepository = new KundeRepository();
+		List<Kunde> kundeListe = new ArrayList<>();
+		kundeListe.addAll(kundeRepository.findAll());
+		
+		RechnungRepository rechnungRepository = new RechnungRepository();
+	    List<Rechnung> rechnungListe = new ArrayList<>();
+		rechnungListe.addAll(rechnungRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ()))); // Rechnungen nach GJ laden
 		
 	    List<Map<String, Statistik>> mapProQuartal = new ArrayList<>();
 	    for (int i = 0; i < 4; i++) {
@@ -45,15 +54,17 @@ public class RecStateData {
 	    }
 
 	    try {
-	        for (int x = 1; x < anzahl + 1; x++) {
-	            int quartal = getQuartalFromString(array[x][6].trim(), "dd.MM.yyyy") - 1;
-	            String sKunde = array[x][9].trim();
+	        for (int x = 1; x < rechnungListe.size(); x++) {
+	        	Rechnung rechnung = rechnungListe.get(x);
+	            int quartal = getQuartalFromString(rechnung.getDatum().toString(), "yyyy-MM-dd") - 1;
+	            String sKunde = rechnung.getIdKunde().trim();
 
 	            for (int i = 0; i < kundeListe.size(); i++) {
-	                if (kundeListe.get(i).getName().trim().equals(sKunde)) {
-	                    if (!kundeListe.get(i).getLand().trim().equals("ÖSTERREICH")) {
-	                        String ustId = kundeListe.get(i).getUstid().trim();
-	                        BigDecimal betrag = parseBigDecimal.fromArray(array, x, 12);
+	            	Kunde kunde = kundeListe.get(i);
+	                if (kunde.getId().trim().equals(sKunde)) {
+	                    if (!kunde.getLand().trim().equals("ÖSTERREICH")) {
+	                        String ustId = kunde.getUstid().trim();
+	                        BigDecimal betrag = rechnung.getNetto();
 
 	                        mapProQuartal.get(quartal)
 	                            .computeIfAbsent(ustId, _ -> new Statistik())
@@ -86,28 +97,23 @@ public class RecStateData {
         LocalDate datum = LocalDate.parse(datumString, formatter);
         return (datum.getMonthValue() - 1) / 3 + 1;
     }
-
-	public static void setKundeListe(List<Kunde> kundeListe2) {
-		RecStateData.kundeListe = kundeListe2;
-	}
-	
-	//###################################################################################################################################################
-	// interne Klasse
-	//###################################################################################################################################################
-	
-	static class Statistik {
-        long anzahl = 0;
-        BigDecimal summe = BigDecimal.ZERO;
-
-        void add(BigDecimal betrag) {
-            anzahl++;
-            summe = summe.add(betrag);
-        }
-
-        @Override
-        public String toString() {
-            return "Anzahl: " + anzahl + ", Summe: " + summe;
-        }
-    }
-
 }
+
+//###################################################################################################################################################
+// interne Klasse
+//###################################################################################################################################################
+
+class Statistik {
+	long anzahl = 0;
+	BigDecimal summe = BigDecimal.ZERO;
+
+	void add(BigDecimal betrag) {
+		anzahl++;
+		summe = summe.add(betrag);
+	}
+
+	@Override
+	public String toString() {
+		return "Anzahl: " + anzahl + ", Summe: " + summe;
+    }
+ }

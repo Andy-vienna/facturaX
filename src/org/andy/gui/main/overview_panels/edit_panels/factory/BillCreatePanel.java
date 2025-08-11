@@ -28,7 +28,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -188,7 +187,7 @@ public class BillCreatePanel extends EditPanel {
         add(txtReferenz);
         txtReferenz.getDocument().addDocumentListener(bgFlipOnNonEmpty(txtReferenz));
 
-        JButton btnDoExport = createButton("<html>Angebot<br>erstellen</html>", "edit.png");
+        JButton btnDoExport = createButton("<html>Rechnung<br>erstellen</html>", "edit.png");
         btnDoExport.setBounds(865,345, JFoverview.getButtonx(), JFoverview.getButtony());
         btnDoExport.setEnabled(true);
         add(btnDoExport);
@@ -298,7 +297,7 @@ public class BillCreatePanel extends EditPanel {
             bdEinzel[i] = safeScale(parseDE(s));
             onQtyOrEPChanged(i);
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Eingabe inkorrekt …", "Angebot", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Eingabe inkorrekt …", "Rechnung", JOptionPane.ERROR_MESSAGE);
             txtEP[i].setText("");
         }
     }
@@ -312,7 +311,7 @@ public class BillCreatePanel extends EditPanel {
             txtGP[i].setText(formatDE(bdSumme[i]));
             txtAnz[i].setBackground(Color.WHITE);
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Eingabe inkorrekt …", "Angebot", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Eingabe inkorrekt …", "Rechnung", JOptionPane.ERROR_MESSAGE);
             txtAnz[i].setText("");
             txtGP[i].setText("");
         }
@@ -503,7 +502,7 @@ public class BillCreatePanel extends EditPanel {
     }
 
     private static void info(String msg){
-        JOptionPane.showMessageDialog(null, msg, "Angebot erstellen", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(null, msg, "Rechnung erstellen", JOptionPane.INFORMATION_MESSAGE);
     }
 
 	@Override

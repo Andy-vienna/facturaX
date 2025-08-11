@@ -21,17 +21,19 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.AbstractDocument;
 
 import org.andy.code.dataStructure.entitiyMaster.Artikel;
 import org.andy.code.dataStructure.repositoryMaster.ArtikelRepository;
 import org.andy.gui.main.JFoverview;
+import org.andy.gui.misc.CommaHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class ItemPanel extends JPanel {
+public class ArtikelPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger logger = LogManager.getLogger(ItemPanel.class);
+    private static final Logger logger = LogManager.getLogger(ArtikelPanel.class);
     
     private ArtikelRepository artikelRepository = new ArtikelRepository();
     private List<Artikel> artikelListe = new ArrayList<>();
@@ -48,7 +50,7 @@ public class ItemPanel extends JPanel {
 	// public Teil
 	//###################################################################################################################################################
     
-    public ItemPanel() {
+    public ArtikelPanel() {
         setLayout(null);
         TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Artikelverwaltung");
         border.setTitleFont(font);
@@ -96,6 +98,7 @@ public class ItemPanel extends JPanel {
             txtFields[i] = makeField(x, y + i * 25, 650, 25, false, null);
             add(txtFields[i]);
         }
+        attachCommaToDot(txtFields[2]);
         x = 10; y = y + ((txtFields.length - 1) * 25);
 
         try {
@@ -187,6 +190,10 @@ public class ItemPanel extends JPanel {
         if (bold) t.setFont(font);
         if (bg != null) t.setBackground(bg);
         return t;
+    }
+    
+    private void attachCommaToDot(JTextField field) {
+        ((AbstractDocument) field.getDocument()).setDocumentFilter(new CommaHelper.CommaToDotFilter());
     }
     
   //###################################################################################################################################################

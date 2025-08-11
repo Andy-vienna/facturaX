@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -26,6 +27,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.AbstractDocument;
 
 import org.andy.code.dataStructure.entitiyProductive.SVSteuer;
 import org.andy.code.dataStructure.repositoryProductive.SVSteuerRepository;
@@ -33,6 +35,7 @@ import org.andy.code.main.LoadData;
 import org.andy.gui.file.JFfileView;
 import org.andy.gui.main.JFoverview;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
+import org.andy.gui.misc.CommaHelper;
 import org.andy.gui.misc.RoundedBorder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,7 +58,9 @@ public class SvTaxPanel extends EditPanel {
 	private DemoPanel[] panelDate = new DemoPanel[2];
 	private DatePickerSettings[] dateSettings = new DatePickerSettings[2];
 	private DatePicker[] datePicker = new DatePicker[2];
-	private JTextField[] txtFields = new JTextField[3];
+	private JComboBox<String> cmbOrganisation;
+	private JComboBox<String> cmbBezeichnung;
+	private JTextField[] txtFields = new JTextField[2];
 	private JTextField txtFile = new JTextField();
 	private JLabel lblFileTyp = new JLabel();
 	private JButton[] btnFields = new JButton[2];
@@ -96,13 +101,10 @@ public class SvTaxPanel extends EditPanel {
 	private void buildPanel() {
 		
 		// Überschriften und Feldbeschriftungen
-	    String[] labels = {
-	        "Eingangsdatum:",
-	        "Organisation:",
-	        "Bezeichnung:",
-	        "Zahllast:",
-	        "Zahlungsziel:",
-	        "Dateianhang:"};
+	    String[] labels = {"Eingangsdatum:", "Organisation:", "Bezeichnung:", "Zahllast:", "Zahlungsziel:", "Dateianhang:"};
+	    String[] orga = {"", "Finanzamt Österreich", "Sozialversicherungsanstalt der Selbstständigen"};
+	    String[] art = {"", "freie Texteingabe", "Beitragsveroschreibung Q1", "Beitragsveroschreibung Q2", "Beitragsveroschreibung Q3", "Beitragsveroschreibung Q4",
+	    		"Zahlungserinnerung Beitragsvorschreibung"};
 		
 	    // Label Arrays
 	    JLabel[] lblFields = new JLabel[labels.length];
@@ -131,9 +133,25 @@ public class SvTaxPanel extends EditPanel {
 		
 		// Textfelder
 	    for (int r = 0; r < txtFields.length; r++) {
-	    	txtFields[r] = makeField(210, 45 + r * 25, 400, 25, false, null);
+	    	txtFields[r] = makeField(210, 70 + r * 25, 400, 25, false, null);
 	    	add(txtFields[r]);
 	    }
+	    attachCommaToDot(txtFields[1]);
+		
+		cmbOrganisation = new JComboBox<>(orga);
+		cmbOrganisation.setBounds(210, 45, 400, 25);
+		cmbOrganisation.setSelectedIndex(0);
+		add(cmbOrganisation);
+		
+		cmbBezeichnung = new JComboBox<>(art);
+		cmbBezeichnung.setBounds(210, 70, 400,25);
+		cmbBezeichnung.setSelectedIndex(0);
+		cmbBezeichnung.setVisible(false);
+		add(cmbBezeichnung);
+		
+		cmbOrganisation.addActionListener(orgaListener);
+		cmbBezeichnung.addActionListener(artListener);
+	    
 	    datePicker[1].setBounds(212, 120, 180, 25);
 	    
 	    txtFile = makeField(210, 145, 400, 25, false, null);
@@ -215,11 +233,15 @@ public class SvTaxPanel extends EditPanel {
  	 				}
  					
  					svsteuer.setDatum(datePicker[0].getDate());
- 					svsteuer.setOrganisation(txtFields[0].getText());
- 					svsteuer.setBezeichnung(txtFields[1].getText());
- 					svsteuer.setZahllast(new BigDecimal(txtFields[2].getText()));
- 					
+ 					svsteuer.setOrganisation(cmbOrganisation.getSelectedItem().toString());
+ 					if (cmbBezeichnung.getSelectedIndex() < 1) {
+ 						svsteuer.setBezeichnung(txtFields[0].getText());
+ 					} else {
+ 						svsteuer.setBezeichnung(cmbBezeichnung.getSelectedItem().toString());
+ 					}
+ 					svsteuer.setZahllast(new BigDecimal(txtFields[1].getText()));
  					svsteuer.setZahlungsziel(datePicker[1].getDate());
+ 					svsteuer.setStatus(0);
  					
  					svsteuerRepository.save(svsteuer);
  				} else {
@@ -239,11 +261,15 @@ public class SvTaxPanel extends EditPanel {
     private JTextField makeField(int x, int y, int w, int h, boolean bold, Color bg) {
         JTextField t = new JTextField();
         t.setBounds(x, y, w, h);
-        t.setHorizontalAlignment(SwingConstants.RIGHT);
+        t.setHorizontalAlignment(SwingConstants.LEFT);
         t.setFocusable(true);
         if (bold) t.setFont(new Font("Tahoma", Font.BOLD, 11));
         if (bg != null) t.setBackground(bg);
         return t;
+    }
+    
+    private void attachCommaToDot(JTextField field) {
+        ((AbstractDocument) field.getDocument()).setDocumentFilter(new CommaHelper.CommaToDotFilter());
     }
     
     private void txtFieldsFocusable(boolean b) {
@@ -258,13 +284,62 @@ public class SvTaxPanel extends EditPanel {
     
     private boolean checkInput() {
     	if (datePicker[0].getDate() == null) return false;
-    	for (int i = 0; i < txtFields.length - 1; i++) {
-    		if (txtFields[i].getText() == null || txtFields[i].getText().equals("")) return false;
+    	if (cmbOrganisation.getSelectedIndex() < 1) return false;
+    	if (cmbOrganisation.getSelectedIndex() > 0 && cmbBezeichnung.getSelectedIndex() == 0) {
+    		for (int i = 0; i < txtFields.length - 1; i++) {
+        		if (txtFields[i].getText() == null || txtFields[i].getText().equals("")) return false;
+        	}
+    	} else {
+    		if (cmbBezeichnung.getSelectedIndex() < 1) return false;
+    		if (txtFields[1].getText() == null || txtFields[1].getText().equals("")) return false;
     	}
     	if (txtFile.getText() == null || txtFile.getText().equals("")) return false;
     	if (file == false) return false;
     	return true;
     }
+    
+	//###################################################################################################################################################
+	// ActionListener
+	//###################################################################################################################################################
+    
+    private final ActionListener orgaListener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            int idx = cmbOrganisation.getSelectedIndex();
+            switch (idx) {
+            case 2: // Sozialversicherung ausgewählt
+            	txtFields[0].setVisible(false);
+            	cmbBezeichnung.setVisible(true);
+            	cmbBezeichnung.setSelectedIndex(0);
+            	break;
+            default:
+            	txtFields[0].setVisible(true);
+            	cmbBezeichnung.setVisible(false);
+            	break;
+            }
+            revalidate();
+        	repaint();
+        }
+    };
+    
+    private final ActionListener artListener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            int idx = cmbBezeichnung.getSelectedIndex();
+            switch (idx) {
+            case 1: // freie Texteingabe ausgewählt
+            	txtFields[0].setVisible(true);
+            	cmbBezeichnung.setVisible(false);
+            	break;
+            default:
+            	txtFields[0].setVisible(false);
+            	cmbBezeichnung.setVisible(true);
+            	break;
+            }
+            revalidate();
+        	repaint();
+        }
+    };
     
 	//###################################################################################################################################################
 	// Getter und Setter für Felder
@@ -285,11 +360,17 @@ public class SvTaxPanel extends EditPanel {
     		this.id = id;
 		} else {
     		this.datePicker[0].setDate(null);
+    		this.datePicker[0].setEnabled(true);
     		for (int i = 0; i < this.txtFields.length; i++) {
 				this.txtFields[i].setText("");
 			}
     		this.datePicker[1].setDate(null);
+    		this.datePicker[1].setEnabled(true);
+    		this.cmbOrganisation.setSelectedIndex(0);
     		this.txtFile.setText("");
+    		txtFieldsFocusable(true);
+    		cmbOrganisation.setEnabled(true);
+        	cmbBezeichnung.setEnabled(true);
     		svsteuer = new SVSteuer();
     		neuBeleg = true;
 			return;
@@ -298,16 +379,40 @@ public class SvTaxPanel extends EditPanel {
     	svsteuer = svsteuerRepository.findById(id);
     	
     	this.datePicker[0].setDate(svsteuer.getDatum());
+    	this.datePicker[0].setEnabled(false);
     	
-    	this.txtFields[0].setText(svsteuer.getOrganisation());
-    	this.txtFields[1].setText(svsteuer.getBezeichnung());
-    	this.txtFields[2].setText(svsteuer.getZahllast().toString());
+    	switch (svsteuer.getOrganisation().trim()) {
+    		case "Finanzamt Österreich" -> this.cmbOrganisation.setSelectedIndex(1);
+    		case "Sozialversicherungsanstalt der Selbstständigen" -> this.cmbOrganisation.setSelectedIndex(2);
+    	}
+    	this.cmbBezeichnung.setVisible(true);
+    	switch (svsteuer.getBezeichnung().trim()) {
+    	case "Beitragsvorschreibung Q1" -> this.cmbBezeichnung.setSelectedIndex(2);
+    	case "Beitragsvorschreibung Q2" -> this.cmbBezeichnung.setSelectedIndex(3);
+    	case "Beitragsvorschreibung Q3" -> this.cmbBezeichnung.setSelectedIndex(4);
+    	case "Beitragsvorschreibung Q4" -> this.cmbBezeichnung.setSelectedIndex(5);
+    	case "Zahlungserinnerung Beitragsvorschreibung" -> this.cmbBezeichnung.setSelectedIndex(6);
+    	default -> cmbBezeichnung.setVisible(false);
+    	}
+    	if (cmbBezeichnung.isVisible()) {
+    		this.txtFields[0].setVisible(false);
+    		this.txtFields[0].setText("");
+    	} else {
+    		this.txtFields[0].setVisible(true);
+    		this.txtFields[0].setText(svsteuer.getBezeichnung());
+    		this.cmbBezeichnung.setVisible(true);
+    	}
+    	this.txtFields[0].setText(svsteuer.getBezeichnung());
+    	this.txtFields[1].setText(svsteuer.getZahllast().toString());
 
     	this.datePicker[1].setDate(svsteuer.getZahlungsziel());
+    	this.datePicker[1].setEnabled(false);
     	
     	this.txtFile.setText(svsteuer.getDateiname());
     	
     	txtFieldsFocusable(false);
+    	cmbOrganisation.setEnabled(false);
+    	cmbBezeichnung.setEnabled(false);
     	this.btnFields[0].setEnabled(false);
     	neuBeleg = false;
 		if (svsteuer.getStatus() == 0) {

@@ -3,8 +3,18 @@ package org.andy.code.main.overview.result;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.JFormattedTextField;
 
+import org.andy.code.dataStructure.entitiyProductive.Ausgaben;
+import org.andy.code.dataStructure.entitiyProductive.Einkauf;
+import org.andy.code.dataStructure.entitiyProductive.Rechnung;
+import org.andy.code.dataStructure.repositoryProductive.AusgabenRepository;
+import org.andy.code.dataStructure.repositoryProductive.EinkaufRepository;
+import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
+import org.andy.code.main.LoadData;
 import org.andy.code.misc.parseBigDecimal;
 import org.andy.gui.main.result_panels.UStPanel;
 import org.apache.logging.log4j.LogManager;
@@ -21,15 +31,15 @@ public final class UStData {
 	// public Teil
 	//###################################################################################################################################################
 	
-	public static void setValuesUVA(UStPanel panel, int anzYearPU, int anzYearRE, int anzYearEX, String[][] arrYearPU, String[][] arrYearRE, String[][] arrYearEX) {
-		setValues(panel, anzYearPU, anzYearRE, anzYearEX, arrYearPU, arrYearRE, arrYearEX);
+	public static void setValuesUVA(UStPanel panel) {
+		setValues(panel);
 	}
 	
 	//###################################################################################################################################################
 	// private Teil
 	//###################################################################################################################################################
 	
-	private static void setValues(UStPanel panel, int anzYearPU, int anzYearRE, int anzYearEX, String[][] arrYearPU, String[][] arrYearRE, String[][] arrYearEX) {
+	private static void setValues(UStPanel panel) {
 
 		// Pro Quartal: 0=Q1, 1=Q2, 2=Q3, 3=Q4
 		BigDecimal[] bdKz000 = new BigDecimal[4], bdKz021 = new BigDecimal[4], bdKz022 = new BigDecimal[4], bdKz060 = new BigDecimal[4];
@@ -37,7 +47,18 @@ public final class UStData {
 		BigDecimal[] tmpKz021 = new BigDecimal[4], tmpKz022 = new BigDecimal[4];
 		BigDecimal[] tmpUst20 = new BigDecimal[5];
 		
-
+		RechnungRepository rechnungRepository = new RechnungRepository();
+	    List<Rechnung> rechnungListe = new ArrayList<>();
+		rechnungListe.addAll(rechnungRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ()))); // Rechnungen nach GJ laden
+		
+		EinkaufRepository einkaufRepository = new EinkaufRepository();
+	    List<Einkauf> einkaufListe = new ArrayList<>();
+	    einkaufListe.addAll(einkaufRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ()))); // Einkäufe nach GJ laden
+	    
+	    AusgabenRepository ausgabenRepository = new AusgabenRepository();
+	    List<Ausgaben> ausgabenListe = new ArrayList<>();
+		ausgabenListe.addAll(ausgabenRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ()))); // Betriebsausgebane nach GJ laden
+		
 		// Initialisieren
 		for (int i = 0; i < 4; i++) {
 			bdKz000[i] = bdKz021[i] = bdKz022[i] = bdKz060[i] = BigDecimal.ZERO;
@@ -50,12 +71,13 @@ public final class UStData {
 
 		// Berechnung Bemessungsgrundlage (Ausgangsrechnungen Inland | Ausgangsrechnungen Ausland)
 		try {
-			for (int x = 1; (x - 1) < anzYearRE; x++) {
-				int quartal = getQuartalFromString(arrYearRE[x][6].trim(), "dd.MM.yyyy") - 1;
-				String sValue = arrYearRE[x][13].trim();
-				BigDecimal bdVal = parseBigDecimal.fromArray(arrYearRE, x, 12);
+			for (int x = 1; x < rechnungListe.size(); x++) {
+				Rechnung rechnung = rechnungListe.get(x);
+				int quartal = getQuartalFromString(rechnung.getDatum().toString(), "yyyy-MM-dd") - 1;
+				BigDecimal bdTax = rechnung.getUst();
+				BigDecimal bdVal = rechnung.getNetto();
 				if (quartal >= 0 && quartal < 4) {
-					if (sValue.equals("0.00")) {
+					if (bdTax.compareTo(BigDecimal.ZERO) == 0) {
 						tmpKz021[quartal] = tmpKz021[quartal].add(bdVal);
 					} else {
 						tmpKz022[quartal] = tmpKz022[quartal].add(bdVal);
@@ -75,21 +97,16 @@ public final class UStData {
 		
 		// Berechnung der abziehbaren Vorsteuer (Eingangsrechnungen Inland mit Steuersatz 20%, 10% und 13%)
 		try {
-			for (int x = 1; (x - 1) < anzYearPU; x++) {
-				int quartal = getQuartalFromString(arrYearPU[x][1].trim(), "yyyy-MM-dd") - 1;
-				String sValue = arrYearPU[x][10].trim();
-				BigDecimal bdVal = parseBigDecimal.fromArray(arrYearPU, x, 12);
+			for (int x = 1; x < einkaufListe.size(); x++) {
+				Einkauf einkauf = einkaufListe.get(x);
+				int quartal = getQuartalFromString(einkauf.getReDatum().toString(), "yyyy-MM-dd") - 1;
+				String sTax = einkauf.getSteuersatz();
+				BigDecimal bdVal = einkauf.getUst();
 				if (quartal >= 0 && quartal < 4) {
-					switch (sValue) {
-					case "20":
-						tmp20[quartal] = tmp20[quartal].add(bdVal);
-						break;
-					case "10":
-						tmp10[quartal] = tmp10[quartal].add(bdVal);
-						break;
-					case "13":
-						tmp13[quartal] = tmp13[quartal].add(bdVal);
-						break;
+					switch (sTax) {
+					case "20" -> tmp20[quartal] = tmp20[quartal].add(bdVal);
+					case "10" -> tmp10[quartal] = tmp10[quartal].add(bdVal);
+					case "13" -> tmp13[quartal] = tmp13[quartal].add(bdVal);
 					}
 				}
 			}
@@ -99,21 +116,16 @@ public final class UStData {
 
 		// Berechnung der abziehbaren Vorsteuer (Betriebsausgaben Inland mit Steuersatz 20%, 10% und 13%)
 		try {
-			for (int x = 1; (x - 1) < anzYearEX; x++) {
-				int quartal = getQuartalFromString(arrYearEX[x][1].trim(), "yyyy-MM-dd") - 1;
-				String sValue = arrYearEX[x][4].trim();
-				BigDecimal bdVal = parseBigDecimal.fromArray(arrYearEX, x, 5);
+			for (int x = 1; x < ausgabenListe.size(); x++) {
+				Ausgaben ausgaben = ausgabenListe.get(x);
+				int quartal = getQuartalFromString(ausgaben.getDatum().toString(), "yyyy-MM-dd") - 1;
+				String sTax = ausgaben.getSteuersatz();
+				BigDecimal bdVal = ausgaben.getSteuer();
 				if (quartal >= 0 && quartal < 4) {
-					switch (sValue) {
-					case "20":
-						tmp20[quartal] = tmp20[quartal].add(bdVal);
-						break;
-					case "10":
-						tmp10[quartal] = tmp10[quartal].add(bdVal);
-						break;
-					case "13":
-						tmp13[quartal] = tmp13[quartal].add(bdVal);
-						break;
+					switch (sTax) {
+					case "20" -> tmp20[quartal] = tmp20[quartal].add(bdVal);
+					case "10" -> tmp10[quartal] = tmp10[quartal].add(bdVal);
+					case "13" -> tmp13[quartal] = tmp13[quartal].add(bdVal);
 					}
 				}
 			}

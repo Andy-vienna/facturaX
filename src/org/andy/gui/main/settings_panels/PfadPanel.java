@@ -18,7 +18,7 @@ import javax.swing.border.TitledBorder;
 import org.andy.code.main.LoadData;
 import org.andy.toolbox.misc.SelectFile;
 
-public class PathPanel extends JPanel {
+public class PfadPanel extends JPanel {
 	
 	// Serialisierungs-ID für die Klasse
 	private static final long serialVersionUID = 1L;
@@ -38,7 +38,7 @@ public class PathPanel extends JPanel {
 	// public Teil
 	//###################################################################################################################################################
 	
-	public PathPanel() {
+	public PfadPanel() {
 		
         setLayout(null);
         

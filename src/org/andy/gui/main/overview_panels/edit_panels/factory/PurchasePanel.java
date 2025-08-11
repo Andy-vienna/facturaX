@@ -25,6 +25,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.AbstractDocument;
 
 import org.andy.code.dataStructure.entitiyProductive.Einkauf;
 import org.andy.code.dataStructure.repositoryProductive.EinkaufRepository;
@@ -32,6 +33,7 @@ import org.andy.code.main.LoadData;
 import org.andy.gui.file.JFfileView;
 import org.andy.gui.main.JFoverview;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
+import org.andy.gui.misc.CommaHelper;
 import org.andy.gui.misc.RoundedBorder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -155,6 +157,7 @@ public class PurchasePanel extends EditPanel {
 	    for (int r = 0; r < txtFieldsCol2a.length; r++) {
 	    	txtFieldsCol2a[r] = makeField(830, 20 + r * 25, 400, 25, false, null);
 	    	add(txtFieldsCol2a[r]);
+	    	attachCommaToDot(txtFieldsCol2a[r]);
 	    }
 	    txtFieldsCol2a[4].setVisible(false); // Anzahlung wird aktuell nicht benötigt
 	    datePicker[1].setBounds(832, 145, 180, 25);
@@ -283,6 +286,10 @@ public class PurchasePanel extends EditPanel {
         if (bold) t.setFont(new Font("Tahoma", Font.BOLD, 11));
         if (bg != null) t.setBackground(bg);
         return t;
+    }
+    
+    private void attachCommaToDot(JTextField field) {
+        ((AbstractDocument) field.getDocument()).setDocumentFilter(new CommaHelper.CommaToDotFilter());
     }
     
     private void txtFieldsFocusable(boolean b) {
