@@ -53,6 +53,8 @@ public class LoadBill {
 				case 1 -> "erstellt";
 				case 11 -> "gedruckt";
 				case 111 -> "bezahlt";
+				case 112 -> "bez. Skonto 1";
+				case 113 -> "bez. Skonto 2";
 				case 211 -> "Zahlungserinnerung";
 				case 311 -> "Mahnstufe 1";
 				case 411 -> "Mahnstufe 2";

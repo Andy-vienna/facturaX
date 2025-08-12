@@ -44,9 +44,5 @@ public class LoadDataHelper {
 		}
 		return sKdNr; // Falls keine Übereinstimmung gefunden wurde, gib die Nummer zurück
 	}
-	
-	//###################################################################################################################################################
-	
-	
 
 }

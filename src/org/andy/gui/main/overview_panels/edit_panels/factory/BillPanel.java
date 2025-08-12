@@ -12,7 +12,11 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -24,7 +28,9 @@ import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.NumberFormatter;
 
+import org.andy.code.dataStructure.entitiyMaster.Kunde;
 import org.andy.code.dataStructure.entitiyProductive.Rechnung;
+import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
 import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
 import org.andy.code.main.StartUp;
 import org.andy.gui.main.JFoverview;
@@ -63,6 +69,10 @@ public class BillPanel extends EditPanel {
 	private JLabel lblState = null;
 	private JComboBox<String> cmbState = null;
 	
+	private JLabel lblSkonto1, lblSkonto1a, lblSkonto2, lblSkonto2a;
+	private JCheckBox chkSkonto1; private JTextField txtSkontoTage1; private JTextField txtSkontoWert1;
+    private JCheckBox chkSkonto2; private JTextField txtSkontoTage2; private JTextField txtSkontoWert2;
+	
 	private JButton[] btnFields = new JButton[3];
 	
 	private String[] sDatum = new String[2];
@@ -98,7 +108,7 @@ public class BillPanel extends EditPanel {
 	
 	private void buildPanel() {
 		
-		String[] selectState = {"", "storniert", "bezahlt" };
+		String[] selectState = {"", "storniert", "bezahlt"};
 		
 		// Überschriften und Feldbeschriftungen
 	    String[] labelsTop = {"Datum:", "Leistungszeitraum", "Referenz:"};
@@ -214,6 +224,22 @@ public class BillPanel extends EditPanel {
 	    cmbState.setVisible(false);
 	    add(cmbState);
 	    
+	    chkSkonto1 = new JCheckBox("Skonto 1"); chkSkonto1.setBounds(1345, 120, 80, 25); add(chkSkonto1);
+        txtSkontoTage1 = new JTextField(); txtSkontoTage1.setBounds(1425, 120, 50, 25); add(txtSkontoTage1);
+        lblSkonto1 = new JLabel("Tage"); lblSkonto1.setBounds(1475, 120, 50, 25); add(lblSkonto1);
+        txtSkontoWert1 = new JTextField(); txtSkontoWert1.setBounds(1525, 120, 50, 25); add(txtSkontoWert1);
+        lblSkonto1a = new JLabel("%"); lblSkonto1a.setBounds(1575, 120, 50, 25); add(lblSkonto1a);
+        chkSkonto2 = new JCheckBox("Skonto 2"); chkSkonto2.setBounds(1345, 145, 80, 25); add(chkSkonto2);
+        txtSkontoTage2 = new JTextField(); txtSkontoTage2.setBounds(1425, 145, 50, 25); add(txtSkontoTage2);
+        lblSkonto2 = new JLabel("Tage"); lblSkonto2.setBounds(1475, 145, 50, 25); add(lblSkonto2);
+        txtSkontoWert2 = new JTextField(); txtSkontoWert2.setBounds(1525, 145, 50, 25); add(txtSkontoWert2);
+        lblSkonto2a = new JLabel("%"); lblSkonto2a.setBounds(1575, 145, 50, 25); add(lblSkonto2a);
+        lblSkonto1.setVisible(false); lblSkonto1a.setVisible(false); lblSkonto2.setVisible(false); lblSkonto2a.setVisible(false);
+        chkSkonto1.setVisible(false); txtSkontoTage1.setVisible(false); txtSkontoWert1.setVisible(false);
+        chkSkonto2.setVisible(false); txtSkontoTage2.setVisible(false); txtSkontoWert2.setVisible(false);
+        chkSkonto1.setEnabled(false); txtSkontoTage1.setEnabled(false); txtSkontoWert1.setEnabled(false);
+        chkSkonto2.setEnabled(false); txtSkontoTage2.setEnabled(false); txtSkontoWert2.setEnabled(false);
+	    
 	    // Buttons
 		try {
 			btnFields[0] = createButton("<html>neu<br>berechnen</html>", "calc.png");
@@ -328,6 +354,9 @@ public class BillPanel extends EditPanel {
 		btnFields[0].setEnabled(b);
 		btnFields[1].setEnabled(false);
 		btnFields[2].setVisible(false);
+		lblSkonto1.setVisible(false); lblSkonto1a.setVisible(false); lblSkonto2.setVisible(false); lblSkonto2a.setVisible(false);
+        chkSkonto1.setVisible(false); txtSkontoTage1.setVisible(false); txtSkontoWert1.setVisible(false);
+        chkSkonto2.setVisible(false); txtSkontoTage2.setVisible(false); txtSkontoWert2.setVisible(false);
     }
     
 	//###################################################################################################################################################
@@ -410,16 +439,13 @@ public class BillPanel extends EditPanel {
     	double brutto = numberB.doubleValue();
     	rechnung.setBrutto(BigDecimal.valueOf(brutto));
     	
-    	rechnungRepository.update(rechnung);
-    	
-    	JFoverview.actScreen();
+    	rechnungRepository.update(rechnung); // Hibernate update
     	JFoverview.actScreen();
     }
     
     private void updateState() {
     	RechnungRepository rechnungRepository = new RechnungRepository();
         Rechnung rechnung = rechnungRepository.findById(id);
-        
         switch (cmbState.getSelectedIndex()) {
 		case 1: // storniert
 			rechnung.setNetto(BigDecimal.ZERO);
@@ -427,16 +453,47 @@ public class BillPanel extends EditPanel {
 			rechnung.setBrutto(BigDecimal.ZERO);
 			rechnung.setState(0);
 			break;
-		case 2: // bestellt
+		case 2: // bezahlt
 			rechnung.setState(111);
+			break;
+		case 3: // bezahlt mit Skonto 1
+			updateSkonto(rechnung, 1);
+			break;
+		case 4: // bezahlt mit Skonto 2
+			updateSkonto(rechnung, 2);
 			break;
 		default:
 			break;
 		}
-        
-        rechnungRepository.update(rechnung);
-        
+        rechnungRepository.update(rechnung); // Hibernate update
         JFoverview.actScreen();
+    }
+    
+    private void updateSkonto(Rechnung r, int stufe) {
+    	KundeRepository kundeRepository = new KundeRepository();
+    	List<Kunde> kundeListe = kundeRepository.findAll();
+    	BigDecimal oldNetto = BigDecimal.ZERO, skonto = BigDecimal.ZERO, taxRate = BigDecimal.ZERO;
+    	BigDecimal newNetto = BigDecimal.ZERO, newUSt = BigDecimal.ZERO, newBrutto = BigDecimal.ZERO;
+    	for (int i = 0; i < kundeListe.size(); i++) {
+    		Kunde k = kundeListe.get(i);
+    		if (k.getId().equals(r.getIdKunde())){
+    			taxRate = new BigDecimal(k.getTaxvalue()).divide(new BigDecimal("100.00"));
+    		}
+    	}
+    	switch(stufe) {
+    	case 1:
+    		oldNetto = r.getNetto();
+    		skonto = oldNetto.multiply(r.getSkonto1wert());
+    		r.setState(112);
+    		break;
+    	case 2:
+    		oldNetto = r.getNetto();
+    		skonto = oldNetto.multiply(r.getSkonto2wert());
+    		r.setState(113);
+    		break;
+    	}
+    	newNetto = oldNetto.subtract(skonto); newUSt = newNetto.multiply(taxRate); newBrutto = newNetto.add(newUSt);
+    	r.setNetto(newNetto); r.setUst(newUSt); r.setBrutto(newBrutto);
     }
     
 	//###################################################################################################################################################
@@ -522,15 +579,34 @@ public class BillPanel extends EditPanel {
     	txtFieldsSum[1].setValue(Double.parseDouble(bdTax.toString()));
     	bdBrutto = bdNetto.add(bdTax).setScale(2, RoundingMode.HALF_UP);
     	txtFieldsSum[2].setValue(Double.parseDouble(bdBrutto.toString()));
+    	
+    	if (rechnung.getSkonto1() == 1) {chkSkonto1.setSelected(true);} else {chkSkonto1.setSelected(false);}
+    	txtSkontoTage1.setText(String.valueOf(rechnung.getSkonto1tage()));
+    	txtSkontoWert1.setText(rechnung.getSkonto1wert().multiply(new BigDecimal("100")).setScale(1, RoundingMode.HALF_UP).toString());
+    	if (rechnung.getSkonto2() == 1) {chkSkonto2.setSelected(true);} else {chkSkonto2.setSelected(false);}
+    	txtSkontoTage2.setText(String.valueOf(rechnung.getSkonto2tage()));
+    	txtSkontoWert2.setText(rechnung.getSkonto2wert().multiply(new BigDecimal("100")).setScale(1, RoundingMode.HALF_UP).toString());
 
     	switch(rechnung.getState()) {
     	case 1:
     		txtFieldsFocusable(true);
     		break;
     	case 11:
+    		String[] selectState = null;
+    		if (rechnung.getSkonto1() == 1) {
+    			selectState = new String[] {"", "storniert", "bezahlt", "bezahlt Skonto 1"};
+    			if (rechnung.getSkonto2() == 1) {
+    				selectState = new String[] {"", "storniert", "bezahlt", "bezahlt Skonto 1", "bezahlt Skonto 2"};
+    			}
+    			cmbState.setModel(new DefaultComboBoxModel<>(selectState));
+    			cmbState.setSelectedIndex(0);
+    		}
     		lblState.setVisible(true);
     		cmbState.setVisible(true);
     		btnFields[2].setVisible(true);
+    		lblSkonto1.setVisible(true); lblSkonto1a.setVisible(true); lblSkonto2.setVisible(true); lblSkonto2a.setVisible(true);
+    		chkSkonto1.setVisible(true); txtSkontoTage1.setVisible(true); txtSkontoWert1.setVisible(true);
+            chkSkonto2.setVisible(true); txtSkontoTage2.setVisible(true); txtSkontoWert2.setVisible(true);
     	}
     }
 }

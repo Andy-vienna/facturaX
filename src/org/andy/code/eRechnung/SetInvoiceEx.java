@@ -5,6 +5,7 @@ import static org.andy.toolbox.misc.Tools.cutFront;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -19,6 +20,7 @@ import org.andy.code.dataStructure.entitiyProductive.Rechnung;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mustangproject.BankDetails;
+import org.mustangproject.CashDiscount;
 import org.mustangproject.Contact;
 import org.mustangproject.Invoice;
 import org.mustangproject.Item;
@@ -132,22 +134,31 @@ public class SetInvoiceEx {
 			position[x] = new Item(new Product(posText[x], "", "C62", new BigDecimal(RECV_TAX)), BigDecimal.valueOf(posEp[x]), BigDecimal.valueOf(posAnz[x]));
 		}
 		Invoice iInv = new Invoice()
-				.setDueDate(new Date(due)) // Fälligkeit
+				.setNumber(RE_NR) // Rechnungsnummer
 				.setIssueDate(new Date(issue)) // Rechnungsdatum
+				.setDueDate(new Date(due)) // Fälligkeit
+				.setDeliveryDate(new Date(start)) // Liefertermin od. Leistungszeitraum
+				.setSender(sender) // Rechnungssteller
+				.setRecipient(recipient) //Rechnungsempfänger
 				.setBuyerOrderReferencedDocumentID(rechnung.getRef()) // Kundenreferenz
 				.setDetailedDeliveryPeriod(new Date(start), new Date(end)) // Leistungszeitraum
-				.setDeliveryDate(new Date(start)) // Liefertermin od. Leistungszeitraum
-				.setCurrency(SENDER[9])
-				.setSender(sender)
-				.setRecipient(recipient)
-				.setReferenceNumber(LEITWEG_ID)
-				.setNumber(RE_NR);
-
+				.setCurrency(SENDER[9]) // Währung
+				.setReferenceNumber(LEITWEG_ID); // Leitweg-ID
 		if(RECV_COUNTRY != "AT") {
 			iInv.addTaxNote(TAX_NOTE);
 		}
 		for(int i = 0; i < iAnz; i++) {
 			iInv.addItem(position[i]);
+		}
+		if(rechnung.getSkonto1() == 1 && rechnung.getSkonto2() == 0) { // Rechnung mit Skonto 1
+			BigDecimal skonto1 = rechnung.getSkonto1wert().multiply(new BigDecimal("100.00")).setScale(2, RoundingMode.HALF_UP);
+			iInv.addCashDiscount(new CashDiscount(skonto1,rechnung.getSkonto1tage())); // Skonto 1
+		}
+		if(rechnung.getSkonto1() == 1 && rechnung.getSkonto2() == 1) { // Rechnung mit Skonto 2
+			BigDecimal skonto1 = rechnung.getSkonto1wert().multiply(new BigDecimal("100.00")).setScale(2, RoundingMode.HALF_UP);
+			BigDecimal skonto2 = rechnung.getSkonto2wert().multiply(new BigDecimal("100.00")).setScale(2, RoundingMode.HALF_UP);
+			iInv.addCashDiscount(new CashDiscount(skonto1,rechnung.getSkonto1tage())); // Skonto 1
+			iInv.addCashDiscount(new CashDiscount(skonto2,rechnung.getSkonto2tage())); // Skonto 2
 		}
 		return iInv;
 	}

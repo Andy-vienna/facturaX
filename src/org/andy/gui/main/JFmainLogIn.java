@@ -152,13 +152,6 @@ public class JFmainLogIn {
 		//------------------------------------------------------------------------------
 		//Felddefinitionen
 		//------------------------------------------------------------------------------
-		JLabel lblNewLabel = new JLabel(StartUp.APP_NAME + StartUp.APP_VERSION);
-		lblNewLabel.setForeground(Color.ORANGE);
-		lblNewLabel.setFont(new Font("Tempus Sans ITC", Font.BOLD, 50));
-		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel.setBounds(20, 10, 810, 70);
-		mainPanel.add(lblNewLabel);
-
 		String sLic = StartUp.getAPP_LICENSE();
 		JLabel lblLicense = new JLabel(sLic);
 		lblLicense.setForeground(Color.RED);
@@ -240,11 +233,6 @@ public class JFmainLogIn {
 
 				if(bLogIn) {
 					userRights = rights; // user rights for the current user
-					//try {
-					//	SQLmasterData.loadBaseData();
-					//} catch (SQLException | ParseException | ClassNotFoundException e1) {
-					//	logger.error("createMainPanel() - " + e1);
-					//}
 					mainPanel.setVisible(false);
 				} else {
 					JOptionPane.showMessageDialog(null, "User oder Passwort falsch ...", "Anmeldefehler", JOptionPane.ERROR_MESSAGE);
@@ -280,6 +268,7 @@ public class JFmainLogIn {
 	}
 
 	// ###################################################################################################################################################
+	// Getter und Setter
 	// ###################################################################################################################################################
 	
 	public static String getUserRights() {

@@ -36,6 +36,24 @@ public class Rechnung {
 	
 	@Column(name = "Page2", nullable = false)
 	private int page2;
+	
+	@Column(name = "Skonto1", nullable = false)
+	private int skonto1;
+	
+	@Column(name = "Skonto1Tage", nullable = false)
+	private int skonto1tage;
+	
+	@Column(name = "Skonto1Wert", precision = 9, scale = 3, nullable = false)
+	private BigDecimal skonto1wert;
+	
+	@Column(name = "Skonto2", nullable = false)
+	private int skonto2;
+	
+	@Column(name = "Skonto2Tage", nullable = false)
+	private int skonto2tage;
+	
+	@Column(name = "Skonto2Wert", precision = 9, scale = 3, nullable = false)
+	private BigDecimal skonto2wert;
 
 	@Column(name = "IdBank", nullable = false)
 	private int idBank;
@@ -538,6 +556,54 @@ public class Rechnung {
 
 	public void setePreis12(BigDecimal ePreis12) {
 		this.ePreis12 = ePreis12;
+	}
+
+	public int getSkonto1() {
+		return skonto1;
+	}
+
+	public void setSkonto1(int skonto1) {
+		this.skonto1 = skonto1;
+	}
+
+	public int getSkonto1tage() {
+		return skonto1tage;
+	}
+
+	public void setSkonto1tage(int skonto1tage) {
+		this.skonto1tage = skonto1tage;
+	}
+
+	public int getSkonto2() {
+		return skonto2;
+	}
+
+	public void setSkonto2(int skonto2) {
+		this.skonto2 = skonto2;
+	}
+
+	public int getSkonto2tage() {
+		return skonto2tage;
+	}
+
+	public void setSkonto2tage(int skonto2tage) {
+		this.skonto2tage = skonto2tage;
+	}
+
+	public BigDecimal getSkonto1wert() {
+		return skonto1wert;
+	}
+
+	public void setSkonto1wert(BigDecimal skonto1wert) {
+		this.skonto1wert = skonto1wert;
+	}
+
+	public BigDecimal getSkonto2wert() {
+		return skonto2wert;
+	}
+
+	public void setSkonto2wert(BigDecimal skonto2wert) {
+		this.skonto2wert = skonto2wert;
 	}
 
 }

@@ -82,8 +82,10 @@ import org.andy.gui.main.settings_panels.OwnerPanel;
 import org.andy.gui.main.settings_panels.PfadPanel;
 import org.andy.gui.main.settings_panels.QrPanel;
 import org.andy.gui.main.settings_panels.TaxTablePanel;
-import org.andy.gui.main.settings_panels.TextPanel;
 import org.andy.gui.main.settings_panels.UserPanel;
+import org.andy.gui.main.settings_panels.text_panels.TextPanel;
+import org.andy.gui.main.settings_panels.text_panels.TextPanelFactory;
+import org.andy.gui.main.settings_panels.text_panels.factory.TextAngebot;
 import org.andy.gui.main.table_panels.CreatePanel;
 import org.andy.gui.main.table_panels.CreateTable;
 import org.andy.gui.misc.RoundedBorder;
@@ -127,7 +129,7 @@ public class JFoverview extends JFrame {
 	private static UStPanel panelUSt;
 	private static ZmPanel panelZM;
 	private static TaxPanel panelP109a;
-	private static JScrollPane sPaneText, sPaneErg; //, sPaneSetting;
+	private static JScrollPane sPaneErg; //, sPaneSetting;
 	private static CreateTable<Object> sPaneAN, sPaneRE, sPanePU, sPaneEX, sPaneST;
 	
 	private static CreatePanel panelOfferInfo, panelBillInfo;
@@ -155,8 +157,7 @@ public class JFoverview extends JFrame {
 					frame.setVisible(true);
 
 				} catch (Exception  e) {
-					//logger.fatal("loadGUI fehlgeschlagen - " + e);
-					e.printStackTrace();
+					logger.fatal("loadGUI fehlgeschlagen - " + e);
 				}
 			}
 		});
@@ -185,12 +186,11 @@ public class JFoverview extends JFrame {
 				break;
 			case 5: // FinancialUser
 				pageST.removeAll();
-				//pageOv.removeAll();
 				doSvsTaxPanel();
 				doJahresergebnis();
 				break;
 			case 9: // Admin
-				TextPanel.loadTexte();
+				
 				break;
 		}
 		
@@ -311,11 +311,10 @@ public class JFoverview extends JFrame {
 		// TAB 8 - Textbausteine
 		//------------------------------------------------------------------------------
 		if(iUserRights == 9) { // Admin
-			pageText = new TextPanel();
-			TextPanel.loadTexte();
+			pageText = new TextAngebot();
+			//TextAngebot.loadTexte();
 			
-			// ScrollPane für das Panel
-			sPaneText = new JScrollPane(pageText);
+			new JScrollPane(pageText);
 		}
 		//------------------------------------------------------------------------------
 		// Tabpanel allgemeines
@@ -348,18 +347,13 @@ public class JFoverview extends JFrame {
 			break;
 		case 9: // Admin
 			tabPanel.addTab("Einstellungen", pageAdmin);
-			tabPanel.addTab("Textbausteine", sPaneText);
 			
 			tabPanel.setIconAt(0, new ImageIcon(JFoverview.class.getResource("/org/resources/icons/config.png")));
-			tabPanel.setIconAt(1, new ImageIcon(JFoverview.class.getResource("/org/resources/icons/bausteine.png")));
 			break;
 		default: System.exit(2); // Ende mit Code 2
 		};
 
-		// Add the JTabbedPane to the JFrame's content
 		tabPanel.setFont(new Font("Tahoma", Font.BOLD, 12));
-		
-		// TabPanel einbinden und anzeigen
 		contentPane.add(tabPanel);
 		
 		// Statusleiste anlegen und befüllen
@@ -395,7 +389,6 @@ public class JFoverview extends JFrame {
 				System.exit(0);
 			}
 		});
-
 		aktualisieren.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -457,11 +450,13 @@ public class JFoverview extends JFrame {
 		// InfoPanel anlegen
 		infoAN = new SumPanel(new String[] {"Summe offen:", "Summe best.:"}, true);
 		setSumAN(); // Summen eintragen
+		if (use) {
+			infoAN.setVisible(false);
+		}
 		
 		panelOfferInfo = new CreatePanel(sPaneAN, offerPanel, btn, infoAN);
 		
 		btn = panelOfferInfo.getButtons(); // Button-Instanzen holen für Action Listener
-		
 		btn[0].addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -546,11 +541,13 @@ public class JFoverview extends JFrame {
 		// InfoPanel anlegen
 		infoRE = new SumPanel(new String[] {"Summe offen:", "Summe bez.:"}, true);
 		setSumRE(); // Summen eintragen
+		if (use) {
+			infoRE.setVisible(false);
+		}
 		
 		panelBillInfo = new CreatePanel(sPaneRE, billPanel, btn, infoRE);
 		
 		btn = panelBillInfo.getButtons(); // Button-Instanzen holen für Action Listener
-		
 		btn[0].addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -736,7 +733,10 @@ public class JFoverview extends JFrame {
 	static void doEinstellungen() {
 		if(iUserRights == 9) { // Admin
 			
-			String[] select = { "", "Eigentümerdaten", "Bankdaten", "Stammdatenverwaltung", "Pfadverwaltung", "Benutzerverwaltung", "Steuerdaten", "SEPA QR-Code", "Datenbank" };
+			String[] select = { "", "Eigentümerdaten", "Bankdaten", "Stammdatenverwaltung", "Pfadverwaltung", "Benutzerverwaltung", "Steuerdaten",
+					"SEPA QR-Code", "Datenbank", "Angebotstexte (Textbausteine)", "Auftragsbestätigungstexte (Textbausteine)",
+					"Umsatzsteuerhinweistexte (Textbausteine)", "Zahlungszieltexte (Textbausteine)", "Zahlungserinnerungstexte (Textbausteine)",
+					"Mahnungstexte (Textbausteine)" };
 
 			TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), null);
 			border.setTitleJustification(TitledBorder.LEFT);
@@ -747,11 +747,16 @@ public class JFoverview extends JFrame {
 
 			// Nutze BorderLayout, dann kannst du zentral das pageSetting platzieren
 			pageSetting = new JPanel(new WrapLayout(FlowLayout.LEFT, 5, 5));
-			pageSetting.setBounds(5, 50, 1200, 800); // Beispielgröße
+			pageSetting.setBounds(5, 50, 1850, 800); // Beispielgröße
 
+			JLabel lbl = new JLabel("Auswahl der Einstellungen:");
+			lbl.setFont(new Font("Arial", Font.BOLD, 12));
+			lbl.setBounds(10, 10, 250, 30);
 			JComboBox<String> cmbSelect = new JComboBox<>(select);
-			cmbSelect.setBounds(10, 10, 500, 25);
+			cmbSelect.setFont(new Font("Arial", Font.BOLD, 12));
+			cmbSelect.setBounds(260, 10, 500, 30);
 
+			pageAdmin.add(lbl);
 			pageAdmin.add(cmbSelect);
 			pageAdmin.add(pageSetting);
 
@@ -797,6 +802,30 @@ public class JFoverview extends JFrame {
 			            case 8:
 			            	DbPanel dbPanel = new DbPanel();
 			            	pageSetting.add(dbPanel);
+			            	break;
+			            case 9:
+			            	TextPanel anText = TextPanelFactory.create("AnT");
+			            	pageSetting.add(anText);
+			            	break;
+			            case 10:
+			            	TextPanel abText = TextPanelFactory.create("AbT");
+			            	pageSetting.add(abText);
+			            	break;
+			            case 11:
+			            	TextPanel reText = TextPanelFactory.create("ReT");
+			            	pageSetting.add(reText);
+			            	break;
+			            case 12:
+			            	TextPanel zzText = TextPanelFactory.create("ZzT");
+			            	pageSetting.add(zzText);
+			            	break;
+			            case 13:
+			            	TextPanel zeText = TextPanelFactory.create("ZeT");
+			            	pageSetting.add(zeText);
+			            	break;
+			            case 14:
+			            	TextPanel maText = TextPanelFactory.create("MaT");
+			            	pageSetting.add(maText);
 			            	break;
 			            default: break;
 			        }
@@ -1301,6 +1330,8 @@ class TableREcr extends DefaultTableCellRenderer {
 			case "Mahnstufe 1" -> setBackground(Color.MAGENTA);
 			case "Mahnstufe 2" -> setBackground(Color.RED);
 			case "bezahlt" -> setBackground(new Color(152, 251, 152)); // hellgrün
+			case "bez. Skonto 1" -> setBackground(new Color(152, 251, 152)); // hellgrün
+			case "bez. Skonto 2" -> setBackground(new Color(152, 251, 152)); // hellgrün
 			}
 		return label;
 	}

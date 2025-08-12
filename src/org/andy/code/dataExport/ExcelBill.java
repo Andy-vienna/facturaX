@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -180,6 +181,9 @@ public class ExcelBill{
 			Cell reBrutto = ws.getRow(31).getCell(COLUMN_F);
 			Cell reText1 = ws.getRow(35).getCell(COLUMN_A); //Rechnungstexte (Steuerhinweis, Zahlungsziel)
 			Cell reText2 = ws.getRow(37).getCell(COLUMN_A);
+			Cell reSkontoText = ws.getRow(39).getCell(COLUMN_A); //Skontovereinbarung
+			Cell reSkonto1 = ws.getRow(40).getCell(COLUMN_A); //Skonto Zeile 1
+			Cell reSkonto2 = ws.getRow(41).getCell(COLUMN_A); //Skonto Zeile 1
 			Cell reBank = ws.getRow(46).getCell(COLUMN_E); //Bankverbindung E47 - E49: Bankname
 			Cell reIBAN = ws.getRow(47).getCell(COLUMN_E); //IBAN
 			Cell reBIC = ws.getRow(48).getCell(COLUMN_E); //BIC
@@ -231,6 +235,24 @@ public class ExcelBill{
 				reText2.setCellValue(DataExportHelper.getTextZahlZiel().get(0)); // Zahlungsziel
 			} else {
 				reText2.setCellValue(DataExportHelper.getTextZahlZiel().get(1).replace("{Tage}", kunde.getZahlungsziel())); // Zahlungsziel
+			}
+			
+			if(rechnung.getSkonto1() == 1) { // Skontovereinbarung
+				reSkontoText.setCellValue(DataExportHelper.getTextZahlZiel().get(2));
+				reSkonto1.setCellValue(DataExportHelper.getTextZahlZiel().get(3)
+						.replace("{Skontowert-1}", rechnung.getSkonto1wert().multiply(new BigDecimal("100.00")).setScale(1, RoundingMode.HALF_UP).toString())
+						.replace("{Skontotage-1}", String.valueOf(rechnung.getSkonto1tage())));
+				if(rechnung.getSkonto2() == 1) {
+					reSkonto2.setCellValue(DataExportHelper.getTextZahlZiel().get(4)
+							.replace("{Skontowert-2}", rechnung.getSkonto2wert().multiply(new BigDecimal("100.00")).setScale(1, RoundingMode.HALF_UP).toString())
+							.replace("{Skontotage-2}", String.valueOf(rechnung.getSkonto2tage())));
+				} else {
+					reSkonto2.setCellValue(" ");
+				}
+			} else {
+				reSkontoText.setCellValue(" ");
+				reSkonto1.setCellValue(" ");
+				reSkonto2.setCellValue(" ");
 			}
 			
 			reBank.setCellValue(bank.getBankName());

@@ -119,92 +119,87 @@ public class OfferCreatePanel extends EditPanel {
             "Bank","IBAN","BIC"
         };
         final int[][] leftBounds = {
-            {10,50},{10,70},{10,90},{10,110},{10,130},{10,150},{10,170},{10,190},{10,210},{10,230},{155,230},{10,250},{155,250},{10,270},{155,270},
-            {10,330},{10,350},{10,370}
-        };
+                {10,55},{10,80},{10,105},{10,130},{10,155},{10,180},{10,205},{10,230},{10,255},{10,280},{155,280},{10,305},{155,305},{10,330},{155,330},
+                {1010,280},{1010,305},{1010,330}
+            };
         List<JLabel> left = new ArrayList<>();
         for (int i=0;i<leftLabels.length;i++){
             JLabel l=new JLabel(leftLabels[i]);
-            l.setBounds(leftBounds[i][0], leftBounds[i][1], (i==10||i==12||i==14)?30:110, 20);
+            l.setBounds(leftBounds[i][0], leftBounds[i][1], (i==10||i==12||i==14)?30:110, 25);
             l.setForeground(Color.GRAY);
             if (i==10||i==12||i==14) l.setHorizontalAlignment(SwingConstants.CENTER);
             add(l);
             left.add(l);
         }
 
-        JLabel lbl20=new JLabel("Nr.");  lbl20.setBounds(320,30,25,20);
-        JLabel lbl21=new JLabel("Position"); lbl21.setBounds(345,30,440,20);
-        JLabel lbl22=new JLabel("Anz."); lbl22.setBounds(785,30,70,20);
-        JLabel lbl23=new JLabel("Einzel"); lbl23.setBounds(855,30,70,20);
-        JLabel lbl24=new JLabel("Summe"); lbl24.setBounds(925,30,70,20);
+        JLabel lbl20=new JLabel("Nr.");  lbl20.setBounds(320,30,25,25);
+        JLabel lbl21=new JLabel("Position"); lbl21.setBounds(345,30,440,25);
+        JLabel lbl22=new JLabel("Anz."); lbl22.setBounds(785,30,70,25);
+        JLabel lbl23=new JLabel("Einzel"); lbl23.setBounds(855,30,70,25);
+        JLabel lbl24=new JLabel("Summe"); lbl24.setBounds(925,30,70,25);
         for (JLabel x : new JLabel[]{lbl20,lbl21,lbl22,lbl23,lbl24}) {
             x.setHorizontalAlignment(SwingConstants.CENTER);
             add(x);
         }
 
-        JLabel lbl25=new JLabel("Angebotsnummer:"); lbl25.setBounds(330,310,125,25); add(lbl25);
-        JLabel lbl26=new JLabel("Angebotsdatum:");  lbl26.setBounds(330,340,125,25); add(lbl26);
-        JLabel lbl29=new JLabel("Referenz");        lbl29.setBounds(330,370,60,25);  add(lbl29);
+        JLabel lbl25=new JLabel("Angebotsnummer:"); lbl25.setBounds(1010,55,125,25); add(lbl25);
+        JLabel lbl26=new JLabel("Angebotsdatum:");  lbl26.setBounds(1010,80,125,25); add(lbl26);
+        JLabel lbl29=new JLabel("Referenz");        lbl29.setBounds(1010,105,60,25);  add(lbl29);
 
         // Combos/Textfelder links
         cmbKunde = new JComboBox<>(kunden.stream().map(k -> nullToEmpty(k.getName())).toArray(String[]::new));
-        cmbKunde.setBounds(10,30,300,20); add(cmbKunde);
+        cmbKunde.setBounds(10,30,300,25); add(cmbKunde);
 
         for (int ii=0;ii<txtKd.length;ii++) {
-        	txtKd[ii]=setRO(110, 50+(ii*20));
+        	txtKd[ii]=setRO(110, 55+(ii*25));
         	add(txtKd[ii]);
         }
 
-        chkRevCharge = new JCheckBox("ReverseCharge"); chkRevCharge.setBounds(200,210,110,20); chkRevCharge.setVisible(false); add(chkRevCharge);
+        chkRevCharge = new JCheckBox("ReverseCharge-Hinweis"); chkRevCharge.setBounds(110,355,110,25); chkRevCharge.setVisible(false); add(chkRevCharge);
 
         cmbBank = new JComboBox<>(banken.stream().map(b -> nullToEmpty(b.getBankName())).toArray(String[]::new));
-        cmbBank.setBounds(10,310,300,20); add(cmbBank);
+        cmbBank.setBounds(1010,255,300,25); add(cmbBank);
 
-        txtBank=setRO(110,330); txtIBAN=setRO(110,350); txtBIC=setRO(110,370);
+        txtBank=setRO(1110,280); txtIBAN=setRO(1110,305); txtBIC=setRO(1110,330);
         add(txtBank); add(txtIBAN); add(txtBIC);
 
         txtNummer = new JTextField(nextAnNummer());
-        txtNummer.setBounds(450,310,140,25);
+        txtNummer.setBounds(1130,55,140,25);
         txtNummer.setForeground(Color.BLUE);
         txtNummer.setFont(new Font("Tahoma", Font.BOLD, 14));
         txtNummer.setHorizontalAlignment(SwingConstants.CENTER);
         txtNummer.setEditable(false);
         add(txtNummer);
 
-        datePicker = makeDatePicker(452,340); add(datePicker);
-
-        chkPage2 = new JCheckBox("Angebot mit Anlage (Beschreibung)");
-        chkPage2.setBounds(600,340,230,23); add(chkPage2);
+        datePicker = makeDatePicker(1132,80); add(datePicker);
 
         txtReferenz = new JTextField();
-        txtReferenz.setBounds(450,370,385,25);
+        txtReferenz.setBounds(1130,105,385,25);
         txtReferenz.setForeground(Color.BLUE);
         txtReferenz.setBackground(Color.PINK);
         txtReferenz.setFont(new Font("Tahoma", Font.BOLD, 11));
         add(txtReferenz);
         txtReferenz.getDocument().addDocumentListener(bgFlipOnNonEmpty(txtReferenz));
+        
+        chkPage2 = new JCheckBox("Angebot mit Anlage (Beschreibung aus Seite 2 hinzufügen)");
+        chkPage2.setBounds(1130,130,385,25); add(chkPage2);
 
         JButton btnDoExport = createButton("<html>Angebot<br>erstellen</html>", "edit.png");
-        btnDoExport.setBounds(865,345, JFoverview.getButtonx(), JFoverview.getButtony());
+        btnDoExport.setBounds(1545,305, JFoverview.getButtonx(), JFoverview.getButtony());
         btnDoExport.setEnabled(true);
         add(btnDoExport);
-
-        // Trenner
-        JSeparator s1=new JSeparator(); s1.setBounds(10,300,300,2); add(s1);
-        JSeparator s2=new JSeparator(JSeparator.VERTICAL); s2.setBounds(315,10,2,390); add(s2);
-        JSeparator s3=new JSeparator(); s3.setBounds(320,300,675,2); add(s3);
 
         // Positionszeilen
         final String[] artikelTexte = artikel.stream().map(a -> nullToEmpty(a.getText())).toArray(String[]::new);
         for (int ii=0;ii<POS_COUNT;ii++) {
         	final int i = ii;
-            final int y = 50 + i*20;
+            final int y = 55 + i*25;
             lblPos[i]=new JLabel(String.valueOf(i+1));
             lblPos[i].setHorizontalAlignment(SwingConstants.CENTER);
-            lblPos[i].setBounds(320,y,20,20); add(lblPos[i]);
+            lblPos[i].setBounds(320,y,20,25); add(lblPos[i]);
 
             cbPos[i]=new JComboBox<>(artikelTexte);
-            cbPos[i].setBounds(345,y,440,20); add(cbPos[i]);
+            cbPos[i].setBounds(345,y,440,25); add(cbPos[i]);
 
             txtAnz[i]=centeredField(785,y,70); txtAnz[i].setEnabled(false); add(txtAnz[i]);
             txtEP[i] =centeredField(855,y,70); txtEP[i].setEditable(false); add(txtEP[i]);
@@ -215,6 +210,10 @@ public class OfferCreatePanel extends EditPanel {
             txtEP[i].getDocument().addDocumentListener(docChanged(() -> onEPChanged(i)));
             txtAnz[i].getDocument().addDocumentListener(docChanged(() -> onQtyOrEPChanged(i)));
         }
+        
+        // Trenner
+        JSeparator s1=new JSeparator(JSeparator.VERTICAL); s1.setBounds(315,10,2,370); add(s1);
+        JSeparator s2=new JSeparator(JSeparator.VERTICAL); s2.setBounds(1000,10,2,370); add(s2);
 
         // Aktionen
         cmbKunde.addActionListener(_ -> onKundeChanged());
@@ -222,7 +221,7 @@ public class OfferCreatePanel extends EditPanel {
 
         btnDoExport.addActionListener(_ -> doSave());
 
-        setPreferredSize(new Dimension(1000, 420));
+        setPreferredSize(new Dimension(1000, 390));
     }
     
 	//###################################################################################################################################################
@@ -249,7 +248,7 @@ public class OfferCreatePanel extends EditPanel {
         txtKd[9].setText(k.getTaxvalue());
         txtKd[10].setText(k.getDeposit());
         txtKd[11].setText(k.getZahlungsziel());
-        chkRevCharge.setVisible("0".equals(txtKd[8].getText()));
+        chkRevCharge.setVisible("0".equals(txtKd[9].getText()));
         kundeGewählt = true;
     }
 
@@ -405,7 +404,7 @@ public class OfferCreatePanel extends EditPanel {
     private static JTextField setRO(int x, int y) { return setRO(x, y, 200); }
     private static JTextField setRO(int x, int y, int w) {
         JTextField t=new JTextField();
-        t.setBounds(x,y,w,20);
+        t.setBounds(x,y,w,25);
         t.setFont(new Font("Tahoma", Font.BOLD, 11));
         t.setEditable(false);
         return t;
@@ -414,7 +413,7 @@ public class OfferCreatePanel extends EditPanel {
     private static JTextField centeredField(int x,int y,int w){
         JTextField t=new JTextField();
         t.setHorizontalAlignment(SwingConstants.CENTER);
-        t.setBounds(x,y,w,20);
+        t.setBounds(x,y,w,25);
         return t;
     }
 

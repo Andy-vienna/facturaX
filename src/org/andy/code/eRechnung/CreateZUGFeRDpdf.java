@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 
 import org.mustangproject.FileAttachment;
 import org.mustangproject.Invoice;
+import org.mustangproject.ZUGFeRD.Profiles;
 import org.mustangproject.ZUGFeRD.ZUGFeRDExporterFromA3;
 import org.andy.code.dataStructure.entitiyMaster.Bank;
 import org.andy.code.dataStructure.entitiyMaster.Kunde;
@@ -45,6 +46,7 @@ public class CreateZUGFeRDpdf {
 				}
 			}
 			ZUGFeRDExporterFromA3 ze = new ZUGFeRDExporterFromA3().load(sPdfInput)
+					.setProfile(Profiles.getByName("EN16931"))
 					.setCreatorTool(StartUp.APP_NAME + StartUp.APP_VERSION)
 					.setProducer(StartUp.APP_NAME + StartUp.APP_VERSION)
 					.setCreator(StartUp.APP_NAME + StartUp.APP_VERSION)
@@ -67,6 +69,7 @@ public class CreateZUGFeRDpdf {
 			ze.export(sFeRDpdf);
 		} else if(dialogButton == JOptionPane.NO_OPTION) {
 			ZUGFeRDExporterFromA3 ze = new ZUGFeRDExporterFromA3().load(sPdfInput)
+					.setProfile(Profiles.getByName("EN16931"))
 					.setCreatorTool(StartUp.APP_NAME + StartUp.APP_VERSION)
 					.setProducer(StartUp.APP_NAME + StartUp.APP_VERSION)
 					.setCreator(StartUp.APP_NAME + StartUp.APP_VERSION)
