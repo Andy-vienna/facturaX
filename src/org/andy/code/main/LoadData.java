@@ -24,8 +24,6 @@ public class LoadData {
 	private static String strAktUser;
 	private static String strAktGJ;
 
-	private static String sSizeX = "1200";
-	private static String sSizeY = "800";
 	private static String tplOffer;
 	private static String tplConfirmation;
 	private static String tplBill;
@@ -71,8 +69,6 @@ public class LoadData {
 		// ------------------------------------------------------------------------------
 		try {
 			prpAppSettings = loadSettingsEx(new File(System.getProperty("user.dir") + "\\app.properties")); // App-Einstellungen laden
-			sSizeX = prpAppSettings.getProperty("screenx");
-			sSizeY = prpAppSettings.getProperty("screeny");
 			strAktGJ = prpAppSettings.getProperty("year");
 			strQRschema = prpAppSettings.getProperty("qrschema");
 			tplOffer = prpAppSettings.getProperty("templateoffer");
@@ -131,12 +127,10 @@ public class LoadData {
 		}
 
 		// ------------------------------------------------------------------------------
-		// Datenbank Connection string für Hibernate
+		// Datenbank Connection strings für Hibernate
 		// ------------------------------------------------------------------------------
-
 		sMasterData = "jdbc:sqlserver://" + LoadData.strDBComputer + ":" + LoadData.strDBPort + ";databaseName="
 				+ LoadData.strDBNameSource + ";encrypt=" + LoadData.strDBencrypted + ";trustServerCertificate=" + LoadData.strDBServerCert;
-
 		sProductiveData = "jdbc:sqlserver://" + LoadData.strDBComputer + ":" + LoadData.strDBPort + ";databaseName="
 				+ LoadData.strDBNameDest + ";encrypt=" + LoadData.strDBencrypted + ";trustServerCertificate=" + LoadData.strDBServerCert;
 	}
@@ -150,8 +144,6 @@ public class LoadData {
 		try {
 			strAktGJ = year;
 			prpAppSettings.setProperty("year", strAktGJ);
-			prpAppSettings.setProperty("screenx", sSizeX);
-			prpAppSettings.setProperty("screeny", sSizeY);
 			saveSettingsApp(LoadData.getPrpAppSettings());
 			return year;
 		} catch (IOException e1) {
@@ -178,14 +170,6 @@ public class LoadData {
 
 	public static Properties getPrpDBSettings() {
 		return prpDBSettings;
-	}
-
-	public static String getsSizeX() {
-		return sSizeX;
-	}
-
-	public static String getsSizeY() {
-		return sSizeY;
 	}
 
 	public static String getStrAktGJ() {
@@ -261,21 +245,12 @@ public class LoadData {
 		try {
 			saveSettingsApp(LoadData.getPrpAppSettings());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("error writing settings to file " + e);
 		}
 	}
 
 	public static void setPrpDBSettings(String sKey, String sEntry) {
 		LoadData.prpDBSettings.setProperty(sKey, sEntry);
-	}
-
-	public static void setsSizeX(String sSizeX) {
-		LoadData.sSizeX = sSizeX;
-	}
-
-	public static void setsSizeY(String sSizeY) {
-		LoadData.sSizeY = sSizeY;
 	}
 
 	public static void setStrAktGJ(String strAktGJ) {

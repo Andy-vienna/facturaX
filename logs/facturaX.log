@@ -38,3 +38,104 @@
 2025-08-12 14:00:12 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0
 2025-08-12 14:23:57 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0
 2025-08-12 14:45:53 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0
+2025-08-13 07:42:59 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0
+2025-08-13 10:39:14 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0
+2025-08-13 10:49:42 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0
+2025-08-13 11:38:59 [FX-DB2 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Thread starvation or clock leap detected (housekeeper delta=19m35s337ms391µs500ns).
+2025-08-13 11:39:27 [FX-DB1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Thread starvation or clock leap detected (housekeeper delta=19m35s324ms451µs200ns).
+2025-08-13 11:45:18 [FX-DB2 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - FX-DB2 - Thread starvation or clock leap detected (housekeeper delta=3m18s575ms486µs200ns).
+2025-08-13 11:45:46 [FX-DB1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - FX-DB1 - Thread starvation or clock leap detected (housekeeper delta=3m18s573ms869µs800ns).
+2025-08-13 11:52:33 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0
+2025-08-13 12:03:44 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0
+2025-08-13 12:05:10 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0
+2025-08-13 12:22:52 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0
+2025-08-13 12:24:36 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0
+2025-08-13 12:31:43 [main] INFO  org.andy.code.main.StartUp - facturaX startet - Version: 2.0.0
+2025-08-13 14:59:10 [AWT-EventQueue-0] ERROR org.andy.code.dataExport.ExcelBill - reExport(...) - java.io.FileNotFoundException: C:\Users\andre\Documents\Datenbank\templates\template-rechnung_deu_v2.110.xlsx (Das System kann die angegebene Datei nicht finden)
+2025-08-13 14:59:10 [AWT-EventQueue-0] ERROR org.andy.code.dataExport.ExcelBill - reExport(String sNr) - qr.png konnte nicht gelöscht werden
+2025-08-13 14:59:11 [AWT-EventQueue-0] ERROR org.andy.code.dataExport.SaveAsPdf - toPDF(String sFileExcel, String sFilePDF) - com.jacob.com.ComFailException: Invoke of: Open
+Source: Microsoft Excel
+Description: Wir konnten 'C:\Users\andre\Documents\Rechnung_RE-2025-0033.xlsx' nicht finden. Wurde das Objekt vielleicht verschoben, umbenannt oder gelöscht?
+
+2025-08-13 14:59:11 [AWT-EventQueue-0] ERROR org.andy.gui.main.JFoverview - RE export
+java.lang.IllegalArgumentException: Can't pass in null Dispatch object
+	at com.jacob.com.Dispatch.throwIfUnattachedDispatch(Dispatch.java:280) ~[jacob-1.21.jar:1.21]
+	at com.jacob.com.Dispatch.call(Dispatch.java:522) ~[jacob-1.21.jar:1.21]
+	at org.andy.code.dataExport.SaveAsPdf.toPDF(SaveAsPdf.java:42) ~[classes/:?]
+	at org.andy.code.dataExport.ExcelBill.reExport(ExcelBill.java:312) ~[classes/:?]
+	at org.andy.gui.main.JFoverview.lambda$9(JFoverview.java:349) ~[classes/:?]
+	at java.desktop/javax.swing.AbstractButton.fireActionPerformed(AbstractButton.java:1972) ~[?:?]
+	at java.desktop/javax.swing.AbstractButton$Handler.actionPerformed(AbstractButton.java:2314) ~[?:?]
+	at java.desktop/javax.swing.DefaultButtonModel.fireActionPerformed(DefaultButtonModel.java:407) ~[?:?]
+	at java.desktop/javax.swing.DefaultButtonModel.setPressed(DefaultButtonModel.java:262) ~[?:?]
+	at java.desktop/javax.swing.plaf.basic.BasicButtonListener.mouseReleased(BasicButtonListener.java:279) ~[?:?]
+	at java.desktop/java.awt.AWTEventMulticaster.mouseReleased(AWTEventMulticaster.java:297) ~[?:?]
+	at java.desktop/java.awt.Component.processMouseEvent(Component.java:6621) ~[?:?]
+	at java.desktop/javax.swing.JComponent.processMouseEvent(JComponent.java:3404) ~[?:?]
+	at java.desktop/java.awt.Component.processEvent(Component.java:6386) ~[?:?]
+	at java.desktop/java.awt.Container.processEvent(Container.java:2266) ~[?:?]
+	at java.desktop/java.awt.Component.dispatchEventImpl(Component.java:4996) ~[?:?]
+	at java.desktop/java.awt.Container.dispatchEventImpl(Container.java:2324) ~[?:?]
+	at java.desktop/java.awt.Component.dispatchEvent(Component.java:4828) ~[?:?]
+	at java.desktop/java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4948) ~[?:?]
+	at java.desktop/java.awt.LightweightDispatcher.processMouseEvent(Container.java:4575) ~[?:?]
+	at java.desktop/java.awt.LightweightDispatcher.dispatchEvent(Container.java:4516) ~[?:?]
+	at java.desktop/java.awt.Container.dispatchEventImpl(Container.java:2310) ~[?:?]
+	at java.desktop/java.awt.Window.dispatchEventImpl(Window.java:2780) ~[?:?]
+	at java.desktop/java.awt.Component.dispatchEvent(Component.java:4828) ~[?:?]
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:775) ~[?:?]
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:720) ~[?:?]
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:714) ~[?:?]
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400) [?:?]
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:87) ~[?:?]
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:98) ~[?:?]
+	at java.desktop/java.awt.EventQueue$5.run(EventQueue.java:747) ~[?:?]
+	at java.desktop/java.awt.EventQueue$5.run(EventQueue.java:745) ~[?:?]
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400) [?:?]
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:87) [?:?]
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:744) [?:?]
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203) [?:?]
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124) [?:?]
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113) [?:?]
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109) [?:?]
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101) [?:?]
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90) [?:?]
+2025-08-13 15:00:34 [AWT-EventQueue-0] ERROR org.andy.code.dataExport.ExcelBill - reExport(...) - java.io.FileNotFoundException: C:\Users\andre\Documents\Datenbank\templates\template-rechnung_deu_v2.110.xlsx (Das System kann die angegebene Datei nicht finden)
+2025-08-13 15:00:34 [AWT-EventQueue-0] ERROR org.andy.code.dataExport.ExcelBill - reExport(String sNr) - qr.png konnte nicht gelöscht werden
+2025-08-13 15:00:35 [AWT-EventQueue-0] ERROR org.andy.code.dataExport.SaveAsPdf - toPDF(String sFileExcel, String sFilePDF) - com.jacob.com.ComFailException: Invoke of: Open
+Source: Microsoft Excel
+Description: Wir konnten 'C:\Users\andre\Documents\Rechnung_RE-2025-0033.xlsx' nicht finden. Wurde das Objekt vielleicht verschoben, umbenannt oder gelöscht?
+
+2025-08-13 15:00:35 [AWT-EventQueue-0] ERROR org.andy.gui.main.JFoverview - RE export
+java.lang.IllegalArgumentException: Can't pass in null Dispatch object
+	at com.jacob.com.Dispatch.throwIfUnattachedDispatch(Dispatch.java:280) ~[jacob-1.21.jar:1.21]
+	at com.jacob.com.Dispatch.call(Dispatch.java:522) ~[jacob-1.21.jar:1.21]
+	at org.andy.code.dataExport.SaveAsPdf.toPDF(SaveAsPdf.java:42) ~[classes/:?]
+	at org.andy.code.dataExport.ExcelBill.reExport(ExcelBill.java:312) ~[classes/:?]
+	at org.andy.gui.main.JFoverview.lambda$9(JFoverview.java:349) ~[classes/:?]
+	at java.desktop/javax.swing.AbstractButton.fireActionPerformed(AbstractButton.java:1972) ~[?:?]
+	at java.desktop/javax.swing.AbstractButton$Handler.actionPerformed(AbstractButton.java:2314) ~[?:?]
+	at java.desktop/javax.swing.DefaultButtonModel.fireActionPerformed(DefaultButtonModel.java:407) ~[?:?]
+	at java.desktop/javax.swing.DefaultButtonModel.setPressed(DefaultButtonModel.java:262) ~[?:?]
+	at java.desktop/javax.swing.plaf.basic.BasicButtonListener.mouseReleased(BasicButtonListener.java:279) ~[?:?]
+	at java.desktop/java.awt.AWTEventMulticaster.mouseReleased(AWTEventMulticaster.java:297) ~[?:?]
+	at java.desktop/java.awt.Component.processMouseEvent(Component.java:6621) ~[?:?]
+	at java.desktop/javax.swing.JComponent.processMouseEvent(JComponent.java:3404) ~[?:?]
+	at java.desktop/java.awt.Component.processEvent(Component.java:6386) ~[?:?]
+	at java.desktop/java.awt.Container.processEvent(Container.java:2266) ~[?:?]
+	at java.desktop/java.awt.Component.dispatchEventImpl(Component.java:4996) ~[?:?]
+	at java.desktop/java.awt.Container.dispatchEventImpl(Container.java:2324) ~[?:?]
+	at java.desktop/java.awt.Component.dispatchEvent(Component.java:4828) ~[?:?]
+	at java.desktop/java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4948) ~[?:?]
+	at java.desktop/java.awt.LightweightDispatcher.processMouseEvent(Container.java:4575) ~[?:?]
+	at java.desktop/java.awt.LightweightDispatcher.dispatchEvent(Container.java:4516) ~[?:?]
+	at java.desktop/java.awt.Container.dispatchEventImpl(Container.java:2310) ~[?:?]
+	at java.desktop/java.awt.Window.dispatchEventImpl(Window.java:2780) ~[?:?]
+	at java.desktop/java.awt.Component.dispatchEvent(Component.java:4828) ~[?:?]
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:775) ~[?:?]
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:720) ~[?:?]
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:714) ~[?:?]
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400) [?:?]
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:87) ~[?:?]
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doI2025-08-13 15:38:09 [main] INFO  org.andy.code.main.StartUp - OrderManager ist bereits gestartet.
+2025-08-13 15:41:27 [main] INFO  org.andy.code.main.StartUp - OrderManager ist bereits gestartet.

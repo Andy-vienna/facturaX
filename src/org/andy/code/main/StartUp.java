@@ -3,6 +3,7 @@ package org.andy.code.main;
 import static org.andy.toolbox.crypto.License.getLicense;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ServerSocket;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -11,30 +12,32 @@ import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.andy.gui.main.JFmainLogIn;
-import org.andy.gui.main.JFoverview;
 
 public class StartUp {
-
-	public static final String APP_NAME = "facturaX ";
-	public static String APP_VERSION = null;
-
+	
 	static final Logger logger = LogManager.getLogger(StartUp.class);
+	@SuppressWarnings("unused")
+	private static ServerSocket lockSocket;
 
+	public static final String APP_NAME = "FacturaX v2 ";
+	public static String APP_VERSION = null;
 	private static String APP_LICENSE = null;
 	private static int APP_MODE = 0;
-
-	private static String SERVICE_NAME = "";
 
 	private static LocalDate dateNow;
 	private static String dtNow;
 	private static final DateTimeFormatter dfDate = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
 	// ###################################################################################################################################################
+	// Starten der Applikation
 	// ###################################################################################################################################################
 
 	public static void main(String[] args) {
-
-		Runtime.getRuntime().addShutdownHook(new ShutdownThread()); // shutdown-hook bekannt machen als thread
+		
+		if (isAlreadyRunning()) {
+			System.err.println("Beende: eine Instanz läuft bereits");
+			System.exit(99); // 99 = eine Instanz läuft bereits
+		}
 
 		try {
 			APP_MODE = getLicense(LoadData.getFileLicense());
@@ -42,33 +45,37 @@ public class StartUp {
 			logger.error("error reading license" + e);
 		}
 		switch (APP_MODE) {
-		case 0:
-			APP_LICENSE = "unlizensiertes Produkt";
-			break;
-		case 1:
-			APP_LICENSE = "Lizenz DEMO";
-			break;
-		case 2:
-			APP_LICENSE = "Lizenz OK";
-			break;
+		case 0 -> APP_LICENSE = "unlizensiertes Produkt";
+		case 1 -> APP_LICENSE = "Lizenz DEMO";
+		case 2 -> APP_LICENSE = "Lizenz OK";
 		}
 
 		System.setProperty("log4j.configurationFile", "log4j2.xml");
 
 		dateNow = LocalDate.now();
 		dtNow = dateNow.format(dfDate);
-
 		APP_VERSION = getVersion();
-		logger.info("facturaX startet - Version: " + APP_VERSION);
 
-		LoadData.LoadProgSettings();
-		
+		LoadData.LoadProgSettings(); // Einstellungen laden
 		JFmainLogIn.loadLogIn(); // Anmeldefenster einblenden
-
-		Runtime.getRuntime().gc();
+	}
+	
+	// ###################################################################################################################################################
+	// Hilfsmethoden
+	// ###################################################################################################################################################
+	
+	private static boolean isAlreadyRunning() {
+		try {
+			lockSocket = new ServerSocket(54556);
+			return false;
+		} catch (IOException e) {
+			logger.info("OrderManager ist bereits gestartet.");
+			return true;
+		}
 	}
 
 	// ###################################################################################################################################################
+	// Getter und Setter
 	// ###################################################################################################################################################
 
 	public static String getVersion() {
@@ -96,14 +103,6 @@ public class StartUp {
 		return APP_MODE;
 	}
 
-	public static String getSERVICE_NAME() {
-		return SERVICE_NAME;
-	}
-
-	public static void setSERVICE_NAME(String sSERVICE_NAME) {
-		SERVICE_NAME = sSERVICE_NAME;
-	}
-
 	public static String getDtNow() {
 		return dtNow;
 	}
@@ -118,15 +117,3 @@ public class StartUp {
 
 }
 
-// ###################################################################################################################################################
-// ###################################################################################################################################################
-
-class ShutdownThread extends Thread {
-
-	@Override
-	public void run() {
-		JFoverview.getLock().delete();
-		Runtime.getRuntime().gc();
-	}
-
-}

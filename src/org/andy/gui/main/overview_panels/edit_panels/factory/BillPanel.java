@@ -26,6 +26,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.NumberFormatter;
 
 import org.andy.code.dataStructure.entitiyMaster.Kunde;
@@ -35,6 +36,7 @@ import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
 import org.andy.code.main.StartUp;
 import org.andy.gui.main.JFoverview;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
+import org.andy.gui.misc.CommaHelper;
 import org.andy.gui.misc.RoundedBorder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -202,9 +204,9 @@ public class BillPanel extends EditPanel {
 	    	txtFieldsEP[r].setFocusable(false);
 	    	txtFieldsGP[r].setFocusable(false);
 	    	add(txtFieldsPos[r]);
-	    	add(txtFieldsAnz[r]);
-	    	add(txtFieldsEP[r]);
-	    	add(txtFieldsGP[r]);
+	    	add(txtFieldsAnz[r]); attachCommaToDot(txtFieldsAnz[r]);
+	    	add(txtFieldsEP[r]); attachCommaToDot(txtFieldsEP[r]);
+	    	add(txtFieldsGP[r]); attachCommaToDot(txtFieldsGP[r]);
 	    }
 	    for (int r = 0; r < txtFieldsSum.length; r++) {
 	    	txtFieldsSum[r] = makeFormatField(1445, 295 + r * 25, 150, 25, true, null);
@@ -335,6 +337,10 @@ public class BillPanel extends EditPanel {
         return t;
     }
     
+    private void attachCommaToDot(JTextField field) {
+        ((AbstractDocument) field.getDocument()).setDocumentFilter(new CommaHelper.CommaToDotFilter());
+    }
+    
     private void txtFieldsFocusable(boolean b) {
     	this.datePicker[0].setEnabled(b);
     	for (int i = 0; i < this.txtFieldsHead.length; i++) {
@@ -376,8 +382,8 @@ public class BillPanel extends EditPanel {
 	    		String anz = this.txtFieldsAnz[i].getText();
 	    		String ep = this.txtFieldsEP[i].getText();
 	    		
-	    		bdAnz = new BigDecimal(anz.replace(",", ".").trim()).setScale(2, RoundingMode.HALF_UP);
-	    	    bdEP = new BigDecimal(ep.replace(",", ".").trim()).setScale(2, RoundingMode.HALF_UP);
+	    		bdAnz = new BigDecimal(anz.trim()).setScale(2, RoundingMode.HALF_UP);
+	    	    bdEP = new BigDecimal(ep.trim()).setScale(2, RoundingMode.HALF_UP);
 	        	bdGP = bdAnz.multiply(bdEP).setScale(2, RoundingMode.HALF_UP);
 	
 	        	bdNetto = bdNetto.add(bdGP).setScale(2, RoundingMode.HALF_UP);
@@ -404,8 +410,8 @@ public class BillPanel extends EditPanel {
     	for (int i = 0; i < this.txtFieldsPos.length; i++) {
     		if (!this.txtFieldsPos[i].getText().isEmpty()) {
 				sPosText[i] = this.txtFieldsPos[i].getText();
-				bdAnzahl[i] = new BigDecimal(this.txtFieldsAnz[i].getText().replace(",", ".")).setScale(2, RoundingMode.HALF_UP);
-				bdEinzel[i] = new BigDecimal(this.txtFieldsEP[i].getText().replace(",", ".")).setScale(2, RoundingMode.HALF_UP);
+				bdAnzahl[i] = new BigDecimal(this.txtFieldsAnz[i].getText()).setScale(2, RoundingMode.HALF_UP);
+				bdEinzel[i] = new BigDecimal(this.txtFieldsEP[i].getText()).setScale(2, RoundingMode.HALF_UP);
 				anzPos = anzPos.add(BigDecimal.ONE); // Anzahl der Positionen
     		}
 		}

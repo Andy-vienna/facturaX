@@ -8,13 +8,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import javax.swing.JButton;
@@ -28,6 +25,8 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.AbstractDocument;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -46,6 +45,7 @@ import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
 import org.andy.gui.main.JFoverview;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
+import org.andy.gui.misc.CommaHelper;
 import org.andy.gui.misc.RoundedBorder;
 
 public class BillCreatePanel extends EditPanel {
@@ -149,8 +149,8 @@ public class BillCreatePanel extends EditPanel {
         JLabel lbl25=new JLabel("Rechnungsnummer:"); lbl25.setBounds(1010,55,125,25); add(lbl25);
         JLabel lbl26=new JLabel("Rechnungsdatum:"); lbl26.setBounds(1010,80,125,25); add(lbl26);
         JLabel lbl29=new JLabel("Referenz"); lbl29.setBounds(1010,105,60,25); add(lbl29);
-        JLabel lbl30=new JLabel("Leistungs-Zr. von:"); lbl30.setBounds(1280,55,125,25); add(lbl30);
-        JLabel lbl31=new JLabel("Leistungs-Zr. von:"); lbl31.setBounds(1280,80,125,25); add(lbl31);
+        JLabel lbl30=new JLabel("Leistungs-Zr. von:"); lbl30.setBounds(1280,55,100,25); add(lbl30);
+        JLabel lbl31=new JLabel("Leistungs-Zr. von:"); lbl31.setBounds(1280,80,100,25); add(lbl31);
 
         // Combos/Textfelder links
         cmbKunde = new JComboBox<>(kunden.stream().map(k -> nullToEmpty(k.getName())).toArray(String[]::new));
@@ -179,11 +179,11 @@ public class BillCreatePanel extends EditPanel {
 
         datePicker = makeDatePicker(true, 1132,80); add(datePicker);
 
-        dateLZvon = makeDatePicker(false, 1405, 55); add(dateLZvon);
-        dateLZbis = makeDatePicker(false, 1405, 80); add(dateLZbis);
+        dateLZvon = makeDatePicker(false, 1380, 55); add(dateLZvon);
+        dateLZbis = makeDatePicker(false, 1380, 80); add(dateLZbis);
         
         txtReferenz = new JTextField();
-        txtReferenz.setBounds(1130,105,385,25);
+        txtReferenz.setBounds(1130,105,390,25);
         txtReferenz.setForeground(Color.BLUE);
         txtReferenz.setBackground(Color.PINK);
         txtReferenz.setFont(new Font("Tahoma", Font.BOLD, 11));
@@ -206,6 +206,7 @@ public class BillCreatePanel extends EditPanel {
         txtSkontoWert2 = new JTextField(); txtSkontoWert2.setBounds(1260, 180, 50, 25); add(txtSkontoWert2);
         JLabel lblSkonto2a = new JLabel("%"); lblSkonto2a.setBounds(1310, 180, 50, 25); add(lblSkonto2a);
         chkSkonto2.setEnabled(false); txtSkontoTage2.setEnabled(false); txtSkontoWert2.setEnabled(false);
+        attachCommaToDot(txtSkontoWert1); attachCommaToDot(txtSkontoWert2);
 
         // Positionszeilen
         final String[] artikelTexte = artikel.stream().map(a -> nullToEmpty(a.getText())).toArray(String[]::new);
@@ -219,8 +220,8 @@ public class BillCreatePanel extends EditPanel {
             cbPos[i]=new JComboBox<>(artikelTexte);
             cbPos[i].setBounds(345,y,440,25); add(cbPos[i]);
 
-            txtAnz[i]=centeredField(785,y,70); txtAnz[i].setEnabled(false); add(txtAnz[i]);
-            txtEP[i] =centeredField(855,y,70); txtEP[i].setEditable(false); add(txtEP[i]);
+            txtAnz[i]=centeredField(785,y,70); txtAnz[i].setEnabled(false); add(txtAnz[i]); attachCommaToDot(txtAnz[i]);
+            txtEP[i] =centeredField(855,y,70); txtEP[i].setEditable(false); add(txtEP[i]); attachCommaToDot(txtEP[i]);
             txtGP[i] =centeredField(925,y,70); txtGP[i].setEditable(false); add(txtGP[i]);
 
             // Listener je Zeile
@@ -297,8 +298,8 @@ public class BillCreatePanel extends EditPanel {
         }
         Artikel a = artikel.get(idx);
         sPosText[i] = a.getText();
-        bdEinzel[i] = safeScale(a.getWert());
-        txtEP[i].setText(formatDE(bdEinzel[i]));
+        bdEinzel[i] = a.getWert();
+        txtEP[i].setText(bdEinzel[i].toString());
         txtAnz[i].setEnabled(true);
         txtAnz[i].setBackground(Color.PINK);
         recomputeMind1Artikel();
@@ -309,7 +310,7 @@ public class BillCreatePanel extends EditPanel {
         String s = txtEP[i].getText().trim();
         if (s.isEmpty()) { bdEinzel[i]=null; txtGP[i].setText(""); return; }
         try {
-            bdEinzel[i] = safeScale(parseDE(s));
+            bdEinzel[i] = new BigDecimal(s);
             onQtyOrEPChanged(i);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Eingabe inkorrekt …", "Rechnung", JOptionPane.ERROR_MESSAGE);
@@ -320,10 +321,10 @@ public class BillCreatePanel extends EditPanel {
     private void onQtyOrEPChanged(int i) {
         if (isEmpty(txtEP[i]) || isEmpty(txtAnz[i])) { txtAnz[i].setBackground(Color.PINK); txtGP[i].setText(""); return; }
         try {
-            bdAnzahl[i] = safeScale(parseDE(txtAnz[i].getText()));
-            if (bdEinzel[i] == null) bdEinzel[i] = safeScale(parseDE(txtEP[i].getText()));
+            bdAnzahl[i] = new BigDecimal(txtAnz[i].getText());
+            if (bdEinzel[i] == null) bdEinzel[i] = new BigDecimal(txtEP[i].getText());
             bdSumme[i]  = bdEinzel[i].multiply(bdAnzahl[i]).setScale(2, RoundingMode.HALF_UP);
-            txtGP[i].setText(formatDE(bdSumme[i]));
+            txtGP[i].setText(bdSumme[i].toString());
             txtAnz[i].setBackground(Color.WHITE);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Eingabe inkorrekt …", "Rechnung", JOptionPane.ERROR_MESSAGE);
@@ -487,29 +488,6 @@ public class BillCreatePanel extends EditPanel {
 
     private static boolean isEmpty(JTextField t){ return t.getText()==null || t.getText().trim().isEmpty(); }
 
-    private static BigDecimal parseDE(String s) {
-        try {
-            Number n = NumberFormat.getNumberInstance(Locale.GERMANY).parse(s.trim());
-            return new BigDecimal(n.toString());
-        } catch (ParseException e) {
-            throw new NumberFormatException(e.getMessage());
-        }
-    }
-
-    private static String formatDE(BigDecimal bd) {
-        if (bd == null) return "";
-        var df = (java.text.DecimalFormat) java.text.NumberFormat.getNumberInstance(Locale.GERMANY);
-        df.setGroupingUsed(true);          // tausenderpunkte
-        df.setMinimumFractionDigits(2);    // immer 2 Nachkommastellen
-        df.setMaximumFractionDigits(2);
-        df.setRoundingMode(RoundingMode.HALF_UP);
-        return df.format(bd);
-    }
-
-    private static BigDecimal safeScale(BigDecimal bd){
-        return bd==null ? null : bd.setScale(2, RoundingMode.HALF_UP);
-    }
-
     private static DocumentListener docChanged(Runnable r){
         return new DocumentListener() {
             @Override public void insertUpdate(DocumentEvent e){ r.run(); }
@@ -537,7 +515,11 @@ public class BillCreatePanel extends EditPanel {
     private static void info(String msg){
         JOptionPane.showMessageDialog(null, msg, "Rechnung erstellen", JOptionPane.INFORMATION_MESSAGE);
     }
-
+    
+    private void attachCommaToDot(JTextField field) {
+        ((AbstractDocument) field.getDocument()).setDocumentFilter(new CommaHelper.CommaToDotFilter());
+    }
+    
 	@Override
 	public void initContent() {
 		// TODO Auto-generated method stub

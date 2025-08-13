@@ -8,12 +8,9 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import javax.swing.JButton;
@@ -174,7 +171,7 @@ public class OfferCreatePanel extends EditPanel {
         datePicker = makeDatePicker(1132,80); add(datePicker);
 
         txtReferenz = new JTextField();
-        txtReferenz.setBounds(1130,105,385,25);
+        txtReferenz.setBounds(1130,105,390,25);
         txtReferenz.setForeground(Color.BLUE);
         txtReferenz.setBackground(Color.PINK);
         txtReferenz.setFont(new Font("Tahoma", Font.BOLD, 11));
@@ -182,7 +179,7 @@ public class OfferCreatePanel extends EditPanel {
         txtReferenz.getDocument().addDocumentListener(bgFlipOnNonEmpty(txtReferenz));
         
         chkPage2 = new JCheckBox("Angebot mit Anlage (Beschreibung aus Seite 2 hinzufügen)");
-        chkPage2.setBounds(1130,130,385,25); add(chkPage2);
+        chkPage2.setBounds(1130,130,390,25); add(chkPage2);
 
         JButton btnDoExport = createButton("<html>Angebot<br>erstellen</html>", "edit.png");
         btnDoExport.setBounds(1545,305, JFoverview.getButtonx(), JFoverview.getButtony());
@@ -278,8 +275,8 @@ public class OfferCreatePanel extends EditPanel {
         }
         Artikel a = artikel.get(idx);
         sPosText[i] = a.getText();
-        bdEinzel[i] = safeScale(a.getWert());
-        txtEP[i].setText(formatDE(bdEinzel[i]));
+        bdEinzel[i] = a.getWert();
+        txtEP[i].setText(bdEinzel[i].toString());
         txtAnz[i].setEnabled(true);
         txtAnz[i].setBackground(Color.PINK);
         recomputeMind1Artikel();
@@ -290,7 +287,7 @@ public class OfferCreatePanel extends EditPanel {
         String s = txtEP[i].getText().trim();
         if (s.isEmpty()) { bdEinzel[i]=null; txtGP[i].setText(""); return; }
         try {
-            bdEinzel[i] = safeScale(parseDE(s));
+            bdEinzel[i] = new BigDecimal(s);
             onQtyOrEPChanged(i);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Eingabe inkorrekt …", "Angebot", JOptionPane.ERROR_MESSAGE);
@@ -301,10 +298,10 @@ public class OfferCreatePanel extends EditPanel {
     private void onQtyOrEPChanged(int i) {
         if (isEmpty(txtEP[i]) || isEmpty(txtAnz[i])) { txtAnz[i].setBackground(Color.PINK); txtGP[i].setText(""); return; }
         try {
-            bdAnzahl[i] = safeScale(parseDE(txtAnz[i].getText()));
-            if (bdEinzel[i] == null) bdEinzel[i] = safeScale(parseDE(txtEP[i].getText()));
+            bdAnzahl[i] = new BigDecimal(txtAnz[i].getText());
+            if (bdEinzel[i] == null) bdEinzel[i] = new BigDecimal(txtEP[i].getText());
             bdSumme[i]  = bdEinzel[i].multiply(bdAnzahl[i]).setScale(2, RoundingMode.HALF_UP);
-            txtGP[i].setText(formatDE(bdSumme[i]));
+            txtGP[i].setText(bdSumme[i].toString());
             txtAnz[i].setBackground(Color.WHITE);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Eingabe inkorrekt …", "Angebot", JOptionPane.ERROR_MESSAGE);
@@ -438,29 +435,6 @@ public class OfferCreatePanel extends EditPanel {
     private static String nullToEmpty(String s){ return s==null ? "" : s; }
 
     private static boolean isEmpty(JTextField t){ return t.getText()==null || t.getText().trim().isEmpty(); }
-
-    private static BigDecimal parseDE(String s) {
-        try {
-            Number n = NumberFormat.getNumberInstance(Locale.GERMANY).parse(s.trim());
-            return new BigDecimal(n.toString());
-        } catch (ParseException e) {
-            throw new NumberFormatException(e.getMessage());
-        }
-    }
-
-    private static String formatDE(BigDecimal bd) {
-        if (bd == null) return "";
-        var df = (java.text.DecimalFormat) java.text.NumberFormat.getNumberInstance(Locale.GERMANY);
-        df.setGroupingUsed(true);          // tausenderpunkte
-        df.setMinimumFractionDigits(2);    // immer 2 Nachkommastellen
-        df.setMaximumFractionDigits(2);
-        df.setRoundingMode(RoundingMode.HALF_UP);
-        return df.format(bd);
-    }
-
-    private static BigDecimal safeScale(BigDecimal bd){
-        return bd==null ? null : bd.setScale(2, RoundingMode.HALF_UP);
-    }
 
     private static DocumentListener docChanged(Runnable r){
         return new DocumentListener() {

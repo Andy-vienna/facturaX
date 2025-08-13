@@ -14,7 +14,6 @@ import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Rectangle;
-import java.awt.Window;
 import java.awt.event.*;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -58,7 +57,6 @@ import org.andy.gui.main.settings_panels.*;
 import org.andy.gui.main.settings_panels.text_panels.TextPanelFactory;
 import org.andy.gui.main.table_panels.CreatePanel;
 import org.andy.gui.main.table_panels.CreateTable;
-import org.andy.gui.misc.BusyDialog;
 import org.andy.gui.misc.RoundedBorder;
 import org.andy.gui.misc.WrapLayout;
 import org.andy.gui.offer.JFconfirmA;
@@ -66,7 +64,6 @@ import org.andy.gui.reminder.JFreminder;
 import org.andy.toolbox.misc.*;
 
 public class JFoverview extends JFrame {
-	private static volatile JFoverview instance; // Instanz bilden
 
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LogManager.getLogger(JFoverview.class);
@@ -115,12 +112,8 @@ public class JFoverview extends JFrame {
 
     // Rollen
     enum Role { NONE, USER, SUPERUSER, FINANCIALUSER, ADMIN }
-    
-	//###################################################################################################################################################
-	// public Teil
-	//###################################################################################################################################################
 
-    /*public static void loadGUI() {
+    public static void loadGUI() {
         EventQueue.invokeLater(() -> {
             try {
                 JFoverview f = new JFoverview();
@@ -129,32 +122,9 @@ public class JFoverview extends JFrame {
                 logger.fatal("loadGUI fehlgeschlagen", e);
             }
         });
-    }*/
-    
-    public static void loadGUI() {
-        if (SwingUtilities.isEventDispatchThread()) {
-            ensureInstanceEDT().setVisible(true);
-        } else {
-            EventQueue.invokeLater(() -> ensureInstanceEDT().setVisible(true));
-        }
-    }
-    
-    //###################################################################################################################################################
-    
-    public static void actScreen() {
-        EventQueue.invokeLater(() -> ensureInstanceEDT().updScreen());
     }
 
-	//###################################################################################################################################################
-	// private Teil
-	//###################################################################################################################################################
-    
-    private static JFoverview ensureInstanceEDT() {
-        if (!SwingUtilities.isEventDispatchThread())
-            throw new IllegalStateException("Aufruf muss auf dem EDT erfolgen");
-        if (instance == null) instance = new JFoverview();
-        return instance;
-    }
+    // ------------------------------------------------------------------------
 
     private JFoverview() {
         try {
@@ -162,29 +132,39 @@ public class JFoverview extends JFrame {
         } catch (IOException e) {
             logger.error("error loading frame icon", e);
         }
+        setMinimumSize(new Dimension(1250, 1000));
         sLic = StartUp.getAPP_LICENSE();
         iLic = StartUp.getAPP_MODE();
         role = roleFromLogin();
 
-        setTitle("FacturaX v2 (" + StartUp.APP_VERSION + ") - Wirtschaftsjahr " + LoadData.getStrAktGJ() + " - " + sLic);
+        setTitle(StartUp.APP_NAME + StartUp.APP_VERSION + " - Wirtschaftsjahr " + LoadData.getStrAktGJ() + " - " + sLic);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         Rectangle screenBounds = ge.getMaximumWindowBounds(); // liefert Arbeitsbereich ohne Taskleiste
-        setMinimumSize(new Dimension(1280, 1080));
         setMaximizedBounds(screenBounds);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setResizable(false);
         setLocationRelativeTo(null);
 
         contentPane = new JPanel(new BorderLayout());
         setContentPane(contentPane);
-        
-        buildMenuBar();    // Menüzeile bauen
-        loadData();        // Tabellen-Daten laden
-        buildTabs(role);   // Tabs aufbauen und anzeigen
-        buildStatusBar();  // Statuszeile bauen
+
+        buildMenuBar();
+        buildTabs(role);
+        buildStatusBar();
     }
 
-    //###################################################################################################################################################
+    private Role roleFromLogin() {
+        return switch (JFmainLogIn.getUserRights()) {
+            case "user" -> Role.USER;
+            case "superuser" -> Role.SUPERUSER;
+            case "financialuser" -> Role.FINANCIALUSER;
+            case "admin" -> Role.ADMIN;
+            default -> Role.NONE;
+        };
+    }
+
+    // ------------------------------------------------------------------------
     // Menü
 
     private void buildMenuBar() {
@@ -192,10 +172,13 @@ public class JFoverview extends JFrame {
         JMenu menu6 = new JMenu("Ansicht");
         JMenu menu9 = new JMenu("Info");
 
+        JMenuItem logoff = new JMenuItem("User abmelden", safeIcon("key.png"));
         JMenuItem exit = new JMenuItem("Exit", safeIcon("exit.png"));
         JMenuItem aktualisieren = new JMenuItem("Aktualisieren", safeIcon("actualize.png"));
         JMenuItem info = new JMenuItem("Info", safeIcon("info.png"));
 
+        menu1.add(logoff);
+        menu1.addSeparator();
         menu1.add(exit);
         menu6.add(aktualisieren);
         menu9.add(info);
@@ -216,12 +199,21 @@ public class JFoverview extends JFrame {
         }
 
         // Actions
+        logoff.addActionListener(_ -> {
+            dispose();
+            JFmainLogIn.loadLogIn();
+        });
         exit.addActionListener(_ -> System.exit(0));
         aktualisieren.addActionListener(_ -> updScreen());
         info.addActionListener(_ -> JFinfo.loadFrame());
     }
 
-    //###################################################################################################################################################
+    private ImageIcon safeIcon(String file) {
+        try { return new ImageIcon(SetMenuIcon.getMenuIcon(file)); }
+        catch (IOException e) { logger.warn("icon missing: {}", file, e); return new ImageIcon(); }
+    }
+
+    // ------------------------------------------------------------------------
     // Tabs
 
     private void buildTabs(Role role) {
@@ -267,14 +259,89 @@ public class JFoverview extends JFrame {
             default -> System.exit(2);
         }
         contentPane.add(tabPanel, BorderLayout.CENTER);
+        setTitle(StartUp.APP_NAME + StartUp.APP_VERSION + " - Wirtschaftsjahr " + LoadData.getStrAktGJ());
     }
 
-    //###################################################################################################################################################
+    public static void actScreen() {
+    	JFoverview.actScreen();
+    }
+    
+    private void updScreen() {
+        // Tabs je nach Rolle neu befüllen
+        pageAN.removeAll(); pageRE.removeAll(); pagePU.removeAll(); pageEX.removeAll();
+        pageST.removeAll(); pageOv = null; pageErg = null;
+
+        switch (role) {
+            case USER -> {
+                doAngebotPanel(false);
+                doRechnungPanel(false);
+            }
+            case SUPERUSER -> {
+                doAngebotPanel(false);
+                doRechnungPanel(false);
+                doEinkaufPanel();
+                doAusgabenPanel();
+            }
+            case FINANCIALUSER -> {
+                doSvsTaxPanel();
+                doJahresergebnis();
+            }
+            case ADMIN -> { /* bleibt */ }
+            default -> {}
+        }
+        contentPane.revalidate();
+        contentPane.repaint();
+        setTitle(StartUp.APP_NAME + StartUp.APP_VERSION + " - Wirtschaftsjahr " + LoadData.getStrAktGJ());
+    }
+
+    // ------------------------------------------------------------------------
+    // Statusbar
+
+    private void buildStatusBar() {
+        String sStatus = String.format(
+                "<html><b>%s</b> | %s | Angemeldeter Benutzer: <font color='blue'><b>%s</b> (%s)</font>"
+                        + " | Master-DB: <font color='blue'><b>%s</b></font>"
+                        + " | Produktiv-DB: <font color='blue'><b>%s</b></font></html>",
+                StartUp.getDtNow(), sLic, LoadData.getStrAktUser(), JFmainLogIn.getUserRights(),
+                LoadData.getStrDBNameSource(), LoadData.getStrDBNameDest());
+
+        lblState = new JLabel(sStatus);
+        lblState.setBorder(new RoundedBorder(10));
+        lblState.setHorizontalAlignment(SwingConstants.LEFT);
+        lblState.setOpaque(true);
+        lblState.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        lblState.setBackground(switch (iLic) {
+            case 1 -> new Color(255, 246, 143);
+            case 2 -> new Color(152, 251, 152);
+            default -> Color.PINK;
+        });
+
+        txtWirtschaftsjahr = new JTextField(LoadData.getStrAktGJ(), 8);
+        txtWirtschaftsjahr.addActionListener(_ -> {
+            LoadData.setStrAktGJ(txtWirtschaftsjahr.getText());
+            LoadData.setPrpAppSettings("year", LoadData.getStrAktGJ());
+            try { saveSettingsApp(LoadData.getPrpAppSettings()); }
+            catch (IOException ex) { logger.error("error writing financial year", ex); }
+            updScreen();
+        });
+        txtWirtschaftsjahr.setBackground(new Color(176, 224, 230));
+        txtWirtschaftsjahr.setHorizontalAlignment(SwingConstants.CENTER);
+        txtWirtschaftsjahr.setFont(new Font("Tahoma", Font.BOLD, 12));
+        txtWirtschaftsjahr.setForeground(Color.BLACK);
+
+        JPanel status = new JPanel(new BorderLayout(8, 0));
+        status.add(lblState, BorderLayout.CENTER);
+        status.add(txtWirtschaftsjahr, BorderLayout.EAST);
+        contentPane.add(status, BorderLayout.SOUTH);
+    }
+
+    // ------------------------------------------------------------------------
     // Panels
 
     private void doAngebotPanel(boolean use) {
         if (role != Role.USER && role != Role.SUPERUSER) return;
 
+        sTempAN = LoadOffer.loadAngebot(false);
         JButton[] btn;
         if (use) {
             btn = new JButton[1];
@@ -305,22 +372,7 @@ public class JFoverview extends JFrame {
         // Actions
         btn[0].addActionListener(_ -> { if (!use) doAngebotPanel(true); else updScreen(); });
         if (!use) {
-        	btn[1].addActionListener(e -> {
-        	    if (vZelleAN == null) return;
-        	    Window w = SwingUtilities.getWindowAncestor((Component) e.getSource());
-        	    BusyDialog.run(w,
-        	        "Bitte warten",
-        	        "Angebot wird erzeugt …",
-        	        () -> {
-						try {
-							ExcelOffer.anExport(vZelleAN);
-						} catch (Exception ex) {
-							logger.error("error exporting offer: ", ex);
-						}
-					},
-        	        this::updScreen   // oder: this::actScreen, falls so benannt
-        	    );
-        	});
+            btn[1].addActionListener(_ -> { if (vZelleAN != null) { try { ExcelOffer.anExport(vZelleAN); updScreen(); } catch (Exception ex) { logger.error("AN export", ex); } }});
             btn[2].addActionListener(_ -> { if (vZelleAN != null) { try { JFconfirmA.showDialog(vZelleAN); updScreen(); } catch (Exception ex) { logger.error("AN AB", ex); } }});
         }
 
@@ -328,12 +380,11 @@ public class JFoverview extends JFrame {
         pageAN.add(panelOfferInfo, BorderLayout.CENTER);
         pageAN.revalidate(); pageAN.repaint();
     }
-    
-    //###################################################################################################################################################
 
     private void doRechnungPanel(boolean use) {
         if (role != Role.USER && role != Role.SUPERUSER) return;
 
+        sTempRE = LoadBill.loadRechnung(false);
         JButton[] btn;
         if (use) {
             btn = new JButton[1];
@@ -363,22 +414,7 @@ public class JFoverview extends JFrame {
 
         btn[0].addActionListener(_ -> { if (!use) doRechnungPanel(true); else updScreen(); });
         if (!use) {
-        	btn[1].addActionListener(e -> {
-        	    if (vZelleRE == null) return;
-        	    Window w = SwingUtilities.getWindowAncestor((Component) e.getSource());
-        	    BusyDialog.run(w,
-        	        "Bitte warten",
-        	        "Rechnung wird erzeugt …",
-        	        () -> {
-						try {
-							ExcelBill.reExport(vZelleRE);
-						} catch (Exception ex) {
-							logger.error("error exporting bill: ", ex);
-						}
-					},
-        	        this::updScreen
-        	    );
-        	});
+            btn[1].addActionListener(_ -> { if (vZelleRE != null) { try { ExcelBill.reExport(vZelleRE); updScreen(); } catch (Exception ex) { logger.error("RE export", ex); } }});
             btn[2].addActionListener(_ -> { if (vZelleRE != null) { JFreminder.showGUI(vZelleRE); updScreen(); }});
         }
 
@@ -386,11 +422,11 @@ public class JFoverview extends JFrame {
         pageRE.add(panelBillInfo, BorderLayout.CENTER);
         pageRE.revalidate(); pageRE.repaint();
     }
-    
-    //###################################################################################################################################################
 
     private void doEinkaufPanel() {
         if (role != Role.SUPERUSER) return;
+
+        sTempPU = LoadPurchase.loadEinkaufsRechnung(false);
 
         purchasePanel = EditPanelFactory.create("PU");
         if (purchasePanel instanceof PurchasePanel pup) {
@@ -413,11 +449,11 @@ public class JFoverview extends JFrame {
         pagePU.add(cp, BorderLayout.CENTER);
         pagePU.revalidate(); pagePU.repaint();
     }
-    
-    //###################################################################################################################################################
 
     private void doAusgabenPanel() {
         if (role != Role.SUPERUSER) return;
+
+        sTempEX = LoadExpenses.loadAusgaben(false);
 
         expensesPanel = EditPanelFactory.create("EX");
         if (expensesPanel instanceof ExpensesPanel ep) {
@@ -440,11 +476,11 @@ public class JFoverview extends JFrame {
         pageEX.add(cp, BorderLayout.CENTER);
         pageEX.revalidate(); pageEX.repaint();
     }
-    
-    //###################################################################################################################################################
 
     private void doSvsTaxPanel() {
         if (role != Role.FINANCIALUSER) return;
+
+        sTempST = LoadSvTax.loadSvTax(false);
 
         svTaxPanel = EditPanelFactory.create("SVT");
         if (svTaxPanel instanceof SvTaxPanel svt) {
@@ -467,8 +503,6 @@ public class JFoverview extends JFrame {
         pageST.add(cp, BorderLayout.CENTER);
         pageST.revalidate(); pageST.repaint();
     }
-    
-    //###################################################################################################################################################
 
     private void doJahresergebnis() {
         if (role != Role.FINANCIALUSER) return;
@@ -497,8 +531,6 @@ public class JFoverview extends JFrame {
         pageOv.add(sPaneErg, BorderLayout.CENTER);
         pageOv.revalidate(); pageOv.repaint();
     }
-    
-    //###################################################################################################################################################
 
     private void doEinstellungen() {
         if (role != Role.ADMIN) return;
@@ -549,63 +581,9 @@ public class JFoverview extends JFrame {
             pageSetting.revalidate(); pageSetting.repaint();
         });
     }
-    
-    //###################################################################################################################################################
-    // Statusbar
 
-    private void buildStatusBar() {
-        String sStatus = String.format(
-                "<html><b>%s</b> | %s | Angemeldeter Benutzer: <font color='blue'><b>%s</b> (%s)</font>"
-                        + " | Master-DB: <font color='blue'><b>%s</b></font>"
-                        + " | Produktiv-DB: <font color='blue'><b>%s</b></font></html>",
-                StartUp.getDtNow(), sLic, LoadData.getStrAktUser(), JFmainLogIn.getUserRights(),
-                LoadData.getStrDBNameSource(), LoadData.getStrDBNameDest());
-
-        lblState = new JLabel(sStatus);
-        lblState.setBorder(new RoundedBorder(10));
-        lblState.setHorizontalAlignment(SwingConstants.LEFT);
-        lblState.setOpaque(true);
-        lblState.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        lblState.setBackground(switch (iLic) {
-            case 1 -> new Color(255, 246, 143);
-            case 2 -> new Color(152, 251, 152);
-            default -> Color.PINK;
-        });
-
-        txtWirtschaftsjahr = new JTextField(LoadData.getStrAktGJ(), 8);
-        txtWirtschaftsjahr.addActionListener(_ -> {
-            LoadData.setStrAktGJ(txtWirtschaftsjahr.getText());
-            LoadData.setPrpAppSettings("year", LoadData.getStrAktGJ());
-            try { saveSettingsApp(LoadData.getPrpAppSettings()); }
-            catch (IOException ex) { logger.error("error writing financial year", ex); }
-            updScreen();
-        });
-        txtWirtschaftsjahr.setBackground(new Color(176, 224, 230));
-        txtWirtschaftsjahr.setHorizontalAlignment(SwingConstants.CENTER);
-        txtWirtschaftsjahr.setFont(new Font("Tahoma", Font.BOLD, 12));
-        txtWirtschaftsjahr.setForeground(Color.BLACK);
-
-        JPanel status = new JPanel(new BorderLayout(8, 0));
-        status.add(lblState, BorderLayout.CENTER);
-        status.add(txtWirtschaftsjahr, BorderLayout.EAST);
-        contentPane.add(status, BorderLayout.SOUTH);
-    }
-    
-    //###################################################################################################################################################
+    // ------------------------------------------------------------------------
     // Summen
-    
-    private void loadData() {
-    	sTempAN = LoadOffer.loadAngebot(false);
-        if (sTempAN == null) sTempAN = new String[0][HEADER_AN.length];
-        sTempRE = LoadBill.loadRechnung(false);
-        if (sTempRE == null) sTempRE = new String[0][HEADER_RE.length];
-    	sTempPU = LoadPurchase.loadEinkaufsRechnung(false);
-        if (sTempPU == null) sTempPU = new String[0][HEADER_PU.length];
-        sTempEX = LoadExpenses.loadAusgaben(false);
-        if (sTempEX == null) sTempEX = new String[0][HEADER_EX.length];
-        sTempST = LoadSvTax.loadSvTax(false);
-        if (sTempST == null) sTempST = new String[0][HEADER_ST.length];
-    }
 
     private void setSumAN() {
         double dOpen = LoadOffer.getSumOpen().doubleValue();
@@ -628,6 +606,7 @@ public class JFoverview extends JFrame {
         double dBrutto = LoadPurchase.getBdBrutto().doubleValue();
         infoPU.setTxtSum(0, dNetto);
         infoPU.setTxtSum(1, dBrutto);
+        infoPU.setProgressBar(prozent(LoadPurchase.getBdNetto(), LoadPurchase.getBdBrutto()));
     }
 
     private void setSumEX() {
@@ -635,6 +614,7 @@ public class JFoverview extends JFrame {
         double dBrutto = LoadExpenses.getBdBrutto().doubleValue();
         infoEX.setTxtSum(0, dNetto);
         infoEX.setTxtSum(1, dBrutto);
+        infoEX.setProgressBar(prozent(LoadExpenses.getBdNetto(), LoadExpenses.getBdBrutto()));
     }
 
     private void setSumST() {
@@ -642,9 +622,20 @@ public class JFoverview extends JFrame {
         double dSteuer = LoadSvTax.getBdSteuer().doubleValue();
         infoST.setTxtSum(0, dSv);
         infoST.setTxtSum(1, dSteuer);
+        infoST.setProgressBar(prozent(LoadSvTax.getBdSV(), LoadSvTax.getBdSteuer()));
     }
 
-    //###################################################################################################################################################
+    private int prozent(BigDecimal open, BigDecimal closed) {
+        if (open == null) open = BigDecimal.ZERO;
+        if (closed == null) closed = BigDecimal.ZERO;
+        BigDecimal sum = open.add(closed);
+        if (sum.signum() <= 0) return 0;
+        return open.multiply(BigDecimal.valueOf(100))
+                .divide(sum, 0, RoundingMode.DOWN)
+                .intValue();
+    }
+
+    // ------------------------------------------------------------------------
     // Click-Aktionen
 
     private void actionClickAN(JTable table, MouseEvent e) {
@@ -794,60 +785,6 @@ public class JFoverview extends JFrame {
             }
         }
     }
-    
-    //###################################################################################################################################################
-    // Hilfsmethoden
-    //###################################################################################################################################################
-    
-    private void updScreen() {
-        // Tabs je nach Rolle neu befüllen
-    	sTempAN = sTempRE = sTempPU = sTempEX = sTempST = null;
-        pageOv = null; pageErg = null;
-
-        loadData();
-        switch (role) {
-            case USER -> {
-            	pageAN.removeAll();
-				pageRE.removeAll();
-				doAngebotPanel(false);
-				doRechnungPanel(false);
-            }
-            case SUPERUSER -> {
-            	pageAN.removeAll();
-				pageRE.removeAll();
-				pagePU.removeAll();
-				pageEX.removeAll();
-				doAngebotPanel(false);
-				doRechnungPanel(false);
-				doEinkaufPanel();
-				doAusgabenPanel();
-            }
-            case FINANCIALUSER -> {
-            	pageST.removeAll();
-				doSvsTaxPanel();
-				doJahresergebnis();
-            }
-            case ADMIN -> { /* bleibt */ }
-            default -> {}
-        }
-        contentPane.revalidate();
-        contentPane.repaint();
-    }
-
-    private Role roleFromLogin() {
-        return switch (JFmainLogIn.getUserRights()) {
-            case "user" -> Role.USER;
-            case "superuser" -> Role.SUPERUSER;
-            case "financialuser" -> Role.FINANCIALUSER;
-            case "admin" -> Role.ADMIN;
-            default -> Role.NONE;
-        };
-    }
-    
-    private ImageIcon safeIcon(String file) {
-        try { return new ImageIcon(SetMenuIcon.getMenuIcon(file)); }
-        catch (IOException e) { logger.warn("icon missing: {}", file, e); return new ImageIcon(); }
-    }
 
     private void actionFile(String value, Kunde kunde) {
         if (value == null || kunde == null) return;
@@ -885,20 +822,9 @@ public class JFoverview extends JFrame {
                 .filter(k -> name.equals(k.getName()))
                 .findFirst().orElse(null);
     }
-    
-    private int prozent(BigDecimal open, BigDecimal closed) {
-        if (open == null) open = BigDecimal.ZERO;
-        if (closed == null) closed = BigDecimal.ZERO;
-        BigDecimal sum = open.add(closed);
-        if (sum.signum() <= 0) return 0;
-        return open.multiply(BigDecimal.valueOf(100))
-                .divide(sum, 0, RoundingMode.DOWN)
-                .intValue();
-    }
 
-    //###################################################################################################################################################
+    // ------------------------------------------------------------------------
     // Renderer-Klassen ohne statischen Zugriff
-    //###################################################################################################################################################
 
     static class TableANcr extends DefaultTableCellRenderer {
         private static final long serialVersionUID = 1L;
@@ -943,8 +869,7 @@ public class JFoverview extends JFrame {
                     case "Zahlungserinnerung" -> setBackground(Color.YELLOW);
                     case "Mahnstufe 1" -> setBackground(Color.MAGENTA);
                     case "Mahnstufe 2" -> setBackground(Color.RED);
-                    case "bezahlt" -> setBackground(new Color(152,251,152));
-                    case "bez. Skonto 1", "bez. Skonto 2" -> setBackground(new Color(155,205,155));
+                    case "bezahlt", "bez. Skonto 1", "bez. Skonto 2" -> setBackground(new Color(152,251,152));
                 }
             }
             return label;
@@ -1037,10 +962,6 @@ public class JFoverview extends JFrame {
             return label;
         }
     }
-    
-    //###################################################################################################################################################
-    // Getter und Setter
-    //###################################################################################################################################################
 
 	public static int getButtonx() {
 		return BUTTONX;

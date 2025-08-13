@@ -1,15 +1,11 @@
 package org.andy.gui.main.settings_panels;
 
 import static org.andy.toolbox.misc.CreateObject.createButton;
-import static org.andy.toolbox.misc.CreateObject.changeKomma;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,12 +17,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.AbstractDocument;
 
 import org.andy.code.dataStructure.entitiyMaster.Tax;
 import org.andy.code.dataStructure.repositoryMaster.TaxRepository;
 import org.andy.gui.main.JFoverview;
+import org.andy.gui.misc.CommaHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -146,13 +143,7 @@ public class TaxTablePanel extends JPanel {
         		txtFields[i] = makeField(x + (i - 18) * 100, y + 150, 100, 25, false, null);
                 add(txtFields[i]);
         	}
-        	final int index = i;
-        	txtFields[index].addKeyListener(new KeyAdapter() {
-    			@Override
-    			public void keyTyped(KeyEvent e) {
-    				SwingUtilities.invokeLater(() -> txtFields[index].setText(changeKomma(txtFields[index])));
-    			}
-    		});
+        	attachCommaToDot(txtFields[i]);
             
         }
         x = 10;
@@ -179,6 +170,7 @@ public class TaxTablePanel extends JPanel {
         for (int i = 0; i < txtFieldsP.length; i++) {
         	txtFieldsP[i] = makeField(x, y + i * 25, 100, 25, false, null);
             add(txtFieldsP[i]);
+            attachCommaToDot(txtFieldsP[i]);
         }
         x = txtFieldsP[txtFieldsP.length - 1].getX() + txtFieldsP[txtFieldsP.length - 1].getWidth();
         y = txtFieldsP[0].getY();
@@ -368,6 +360,10 @@ public class TaxTablePanel extends JPanel {
         if (bold) t.setFont(font);
         if (bg != null) t.setBackground(bg);
         return t;
+    }
+    
+    private void attachCommaToDot(JTextField field) {
+        ((AbstractDocument) field.getDocument()).setDocumentFilter(new CommaHelper.CommaToDotFilter());
     }
         
     //###################################################################################################################################################

@@ -66,8 +66,8 @@ public class TextZahlZiel extends TextPanel  {
 
 		// Arrays für Labels und TextAreas
 		String[] labels = {
-				"Textbaustein Zahlungsziel A38/a", "Textbaustein Zahlungsziel A38/b", "Textbaustein Zahlungsziel ...",
-				"Textbaustein Zahlungsziel ...", "Textbaustein Zahlungsziel ...", "Textbaustein Zahlungsziel ...",
+				"Textbaustein Zahlungsziel A38/a", "Textbaustein Zahlungsziel A38/b", "Textbaustein Zahlungsziel A40",
+				"Textbaustein Zahlungsziel A41", "Textbaustein Zahlungsziel A42", "Textbaustein Zahlungsziel ...",
 				"Textbaustein Zahlungsziel ...", "Textbaustein Zahlungsziel ...", "Textbaustein Zahlungsziel ...",
 				"Textbaustein Zahlungsziel ...", "Textbaustein Zahlungsziel ...", "Textbaustein Zahlungsziel ...",
 				"Textbaustein Zahlungsziel ...", "Textbaustein Zahlungsziel ...", "Textbaustein Zahlungsziel ..."};
