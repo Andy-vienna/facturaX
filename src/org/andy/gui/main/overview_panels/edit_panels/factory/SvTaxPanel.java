@@ -1,5 +1,7 @@
 package org.andy.gui.main.overview_panels.edit_panels.factory;
 
+import static org.andy.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
+import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
 import static org.andy.toolbox.misc.CreateObject.createButton;
 import static org.andy.toolbox.misc.SelectFile.chooseFile;
 import static org.andy.toolbox.misc.SelectFile.choosePath;
@@ -14,10 +16,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -32,8 +34,9 @@ import javax.swing.text.AbstractDocument;
 import org.andy.code.dataStructure.entitiyProductive.SVSteuer;
 import org.andy.code.dataStructure.repositoryProductive.SVSteuerRepository;
 import org.andy.code.main.LoadData;
+import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
 import org.andy.gui.file.JFfileView;
-import org.andy.gui.main.JFoverview;
+import org.andy.gui.main.MainWindow;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.gui.misc.CommaHelper;
 import org.andy.gui.misc.RoundedBorder;
@@ -174,7 +177,7 @@ public class SvTaxPanel extends EditPanel {
 			logger.error("error creating button - " + e1);
 		}
 		btnFields[1].setEnabled(true);
-		btnFields[1].setBounds(660, 120, JFoverview.getButtonx(), JFoverview.getButtony());
+		btnFields[1].setBounds(660, 120, MainWindow.getButtonx(), MainWindow.getButtony());
 		add(btnFields[1]);
 		
 		setPreferredSize(new Dimension(1000, 20 + 5 * 25 + 50));
@@ -224,7 +227,7 @@ public class SvTaxPanel extends EditPanel {
  			public void actionPerformed(ActionEvent e) {
  				if (neuBeleg) {
  					
- 					svsteuer.setJahr(Integer.parseInt(LoadData.getStrAktGJ()));
+ 					svsteuer.setJahr(parseStringToIntSafe(LoadData.getStrAktGJ()));
  	 				
  	 				boolean bResult = checkInput();
  	 				if (!bResult) {
@@ -239,7 +242,7 @@ public class SvTaxPanel extends EditPanel {
  					} else {
  						svsteuer.setBezeichnung(cmbBezeichnung.getSelectedItem().toString());
  					}
- 					svsteuer.setZahllast(new BigDecimal(txtFields[1].getText()));
+ 					svsteuer.setZahllast(parseStringToBigDecimalSafe(txtFields[1].getText(), LocaleFormat.EU));
  					svsteuer.setZahlungsziel(datePicker[1].getDate());
  					svsteuer.setStatus(0);
  					
@@ -250,7 +253,7 @@ public class SvTaxPanel extends EditPanel {
  					svsteuerRepository.update(svsteuer);
  				}
  				neuBeleg = false;
- 				JFoverview.actScreen();
+ 				MainWindow.actScreen();
  			}
  		});
 	}

@@ -1,5 +1,7 @@
 package org.andy.code.main.overview.table;
 
+import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
+
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -13,11 +15,12 @@ import java.util.Locale;
 import org.andy.code.dataStructure.entitiyProductive.Ausgaben;
 import org.andy.code.dataStructure.repositoryProductive.AusgabenRepository;
 import org.andy.code.main.LoadData;
+import org.andy.code.misc.BD;
 
 public class LoadExpenses {
 	
-	private static BigDecimal bdNetto = BigDecimal.ZERO;
-	private static BigDecimal bdBrutto = BigDecimal.ZERO;
+	private static BigDecimal bdNetto = BD.ZERO;
+	private static BigDecimal bdBrutto = BD.ZERO;
 	
 	private static int[] belegID = null;
 	
@@ -39,11 +42,11 @@ public class LoadExpenses {
 		DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Locale.GERMANY);
 		DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
 		
-		bdNetto = BigDecimal.ZERO; bdBrutto = BigDecimal.ZERO;
+		bdNetto = BD.ZERO; bdBrutto = BD.ZERO;
 
 		AusgabenRepository ausgabenRepository = new AusgabenRepository();
 	    List<Ausgaben> ausgabenListe = new ArrayList<>();
-		ausgabenListe.addAll(ausgabenRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ())));
+		ausgabenListe.addAll(ausgabenRepository.findAllByJahr(parseStringToIntSafe(LoadData.getStrAktGJ())));
 		
 		String[][] sTemp = new String [ausgabenListe.size() + 1][6];
 		belegID = new int[ausgabenListe.size()];

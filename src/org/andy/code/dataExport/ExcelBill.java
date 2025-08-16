@@ -30,6 +30,7 @@ import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
 import org.andy.code.eRechnung.CreateXRechnungXML;
 import org.andy.code.eRechnung.CreateZUGFeRDpdf;
 import org.andy.code.main.LoadData;
+import org.andy.code.misc.BD;
 import org.andy.code.qr.ZxingQR;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -240,11 +241,11 @@ public class ExcelBill{
 			if(rechnung.getSkonto1() == 1) { // Skontovereinbarung
 				reSkontoText.setCellValue(DataExportHelper.getTextZahlZiel().get(2));
 				reSkonto1.setCellValue(DataExportHelper.getTextZahlZiel().get(3)
-						.replace("{Skontowert-1}", rechnung.getSkonto1wert().multiply(new BigDecimal("100.00")).setScale(1, RoundingMode.HALF_UP).toString())
+						.replace("{Skontowert-1}", rechnung.getSkonto1wert().multiply(BD.HUNDRED).setScale(1, RoundingMode.HALF_UP).toString())
 						.replace("{Skontotage-1}", String.valueOf(rechnung.getSkonto1tage())));
 				if(rechnung.getSkonto2() == 1) {
 					reSkonto2.setCellValue(DataExportHelper.getTextZahlZiel().get(4)
-							.replace("{Skontowert-2}", rechnung.getSkonto2wert().multiply(new BigDecimal("100.00")).setScale(1, RoundingMode.HALF_UP).toString())
+							.replace("{Skontowert-2}", rechnung.getSkonto2wert().multiply(BD.HUNDRED).setScale(1, RoundingMode.HALF_UP).toString())
 							.replace("{Skontotage-2}", String.valueOf(rechnung.getSkonto2tage())));
 				} else {
 					reSkonto2.setCellValue(" ");

@@ -23,7 +23,7 @@ import javax.swing.border.TitledBorder;
 
 import org.andy.code.dataStructure.entitiyMaster.Bank;
 import org.andy.code.dataStructure.repositoryMaster.BankRepository;
-import org.andy.gui.main.JFoverview;
+import org.andy.gui.main.MainWindow;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -68,8 +68,8 @@ public class BankPanel extends JPanel {
 
     private void buildPanel() {
     	int x = 10, y = 45; // Variablen für automatische Positionierung
-    	int btnWidth = JFoverview.getButtonx();
-    	int btnHeight = JFoverview.getButtony();
+    	int btnWidth = MainWindow.getButtonx();
+    	int btnHeight = MainWindow.getButtony();
     	
         String[] labels = { "Bankname", "IBAN", "BIC", "Kontoinhaber" };
         JLabel[] lblFields = new JLabel[labels.length];

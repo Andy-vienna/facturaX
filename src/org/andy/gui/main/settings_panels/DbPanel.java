@@ -20,7 +20,7 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import org.andy.code.main.LoadData;
-import org.andy.gui.main.JFoverview;
+import org.andy.gui.main.MainWindow;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -86,8 +86,8 @@ public class DbPanel extends JPanel {
 			logger.error("error creating button - " + e1);
 		}
 		btnDBEdit.setEnabled(true);
-		btnDBEdit.setBounds(410, 20, JFoverview.getButtonx(), JFoverview.getButtony());
-		btnDBOK.setBounds(410, 70, JFoverview.getButtonx(), JFoverview.getButtony());
+		btnDBEdit.setBounds(410, 20, MainWindow.getButtonx(), MainWindow.getButtony());
+		btnDBOK.setBounds(410, 70, MainWindow.getButtonx(), MainWindow.getButtony());
 
 		add(lbl01);
 		add(lbl02);

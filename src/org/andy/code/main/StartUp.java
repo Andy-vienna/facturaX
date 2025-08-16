@@ -1,25 +1,34 @@
 package org.andy.code.main;
 
 import static org.andy.toolbox.crypto.License.getLicense;
+
+import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ServerSocket;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.andy.gui.main.JFmainLogIn;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+
+import org.andy.code.dataStructure.entitiyMaster.User;
+import org.andy.code.dataStructure.repositoryMaster.UserRepository;
+import org.andy.gui.main.MainWindow;
+import org.andy.gui.main.LoginWindow;
+import org.andy.gui.misc.MyFlatTabbedPaneUI;
+
+import com.formdev.flatlaf.FlatIntelliJLaf;
 
 public class StartUp {
 	
-	static final Logger logger = LogManager.getLogger(StartUp.class);
-	@SuppressWarnings("unused")
-	private static ServerSocket lockSocket;
+	private static org.apache.logging.log4j.Logger logger;
 
-	public static final String APP_NAME = "FacturaX v2 ";
+	private static java.nio.channels.FileChannel LOCK_CH;
+    private static java.nio.channels.FileLock LOCK;
+    private static java.nio.file.Path LOCK_PATH;
+
+	public static final String APP_NAME = "FacturaX v2";
 	public static String APP_VERSION = null;
 	private static String APP_LICENSE = null;
 	private static int APP_MODE = 0;
@@ -33,53 +42,112 @@ public class StartUp {
 	// ###################################################################################################################################################
 
 	public static void main(String[] args) {
-		
-		if (isAlreadyRunning()) {
-			System.err.println("Beende: eine Instanz läuft bereits");
-			System.exit(99); // 99 = eine Instanz läuft bereits
-		}
+        // 1) Logging konfigurieren
+        System.setProperty("log4j.configurationFile", "log4j2.xml");
+        logger = org.apache.logging.log4j.LogManager.getLogger(StartUp.class);
 
-		try {
-			APP_MODE = getLicense(LoadData.getFileLicense());
-		} catch (NoSuchAlgorithmException | IOException e) {
-			logger.error("error reading license" + e);
-		}
-		switch (APP_MODE) {
-		case 0 -> APP_LICENSE = "unlizensiertes Produkt";
-		case 1 -> APP_LICENSE = "Lizenz DEMO";
-		case 2 -> APP_LICENSE = "Lizenz OK";
-		}
+        // 2) Globale Fehlerbehandlung
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+            logger.error("Uncaught in " + t.getName(), e);
+            System.exit(98);
+        });
+        
+        // 3) Instanzprüfung
+        if (!acquireSingleInstanceLock()) {
+            System.err.println("Beende: eine Instanz läuft bereits.");
+            System.exit(99);
+        }
 
-		System.setProperty("log4j.configurationFile", "log4j2.xml");
+        // 4) Lizenz einlesen
+        try {
+            APP_MODE = getLicense(LoadData.getFileLicense());
+        } catch (java.security.NoSuchAlgorithmException | java.io.IOException e) {
+            logger.error("error reading license", e);
+            APP_MODE = 0;
+        }
+        APP_LICENSE = switch (APP_MODE) {
+            case 1 -> "Lizenz DEMO";
+            case 2 -> "Lizenz OK";
+            default -> "unlizensiertes Produkt";
+        };
 
-		dateNow = LocalDate.now();
-		dtNow = dateNow.format(dfDate);
-		APP_VERSION = getVersion();
+        // 5) Version lesen
+        APP_VERSION = getVersion();
 
-		LoadData.LoadProgSettings(); // Einstellungen laden
-		JFmainLogIn.loadLogIn(); // Anmeldefenster einblenden
-	}
+        // 6) Einstellungen laden
+        LoadData.LoadProgSettings();
+
+        // 7) UI auf EDT starten
+        SwingUtilities.invokeLater(() -> {
+            try {
+                FlatIntelliJLaf.setup();
+                UIManager.setLookAndFeel(new FlatIntelliJLaf());
+
+                UIManager.put("Button.arc", 10);
+                UIManager.put("Component.arc", 10);
+                UIManager.put("TextComponent.arc", 10);
+                UIManager.put("ProgressBar.arc", 10);
+                UIManager.put("TabbedPaneUI", MyFlatTabbedPaneUI.class.getName());
+                UIManager.put("TabbedPane.tabType", "card");
+                UIManager.put("TabbedPane.cardTabSelectionHeight", 0);
+                UIManager.put("MenuBar.selectionBackground", Color.LIGHT_GRAY);
+                UIManager.put("MenuBar.hoverBackground", Color.LIGHT_GRAY);
+                UIManager.put("MenuBar.underlineSelectionColor", Color.LIGHT_GRAY);
+                UIManager.put("MenuBar.underlineSelectionBackground", Color.LIGHT_GRAY);
+                UIManager.put("MenuItem.selectionBackground", Color.LIGHT_GRAY);
+                UIManager.put("MenuItem.hoverBackground", Color.LIGHT_GRAY);
+                UIManager.put("MenuItem.underlineSelectionColor", Color.LIGHT_GRAY);
+                UIManager.put("MenuItem.underlineSelectionBackground", Color.LIGHT_GRAY);
+                UIManager.put("TableHeader.background", new Color(255,248,220));
+                UIManager.put("TableHeader.foreground", Color.BLACK);
+
+            } catch (Exception ex) {
+                logger.error("cannot load FlatIntelliJLaf theme", ex);
+            }
+
+            // hier erst Fenster erzeugen
+            new LoginWindow(new UserRepository(), new LoginWindow.AuthCallback() {
+            	@Override
+                public void onSuccess(User u) { MainWindow.loadGUI(u.getId(), u.getRoles()); }
+                public void onCancel() { System.exit(0); }
+            }).show();
+        });
+
+        // 8) Shutdown-Hook für Aufräumen
+        Runtime.getRuntime().addShutdownHook(new Thread(StartUp::releaseSingleInstanceLock));
+    }
 	
 	// ###################################################################################################################################################
 	// Hilfsmethoden
 	// ###################################################################################################################################################
 	
-	private static boolean isAlreadyRunning() {
-		try {
-			lockSocket = new ServerSocket(54556);
-			return false;
-		} catch (IOException e) {
-			logger.info("OrderManager ist bereits gestartet.");
-			return true;
-		}
-	}
+	private static boolean acquireSingleInstanceLock() {
+        try {
+            LOCK_PATH = java.nio.file.Paths.get(System.getProperty("user.home"), ".facturax", "app.lock");
+            java.nio.file.Files.createDirectories(LOCK_PATH.getParent());
+            LOCK_CH = java.nio.channels.FileChannel.open(
+                    LOCK_PATH,
+                    java.nio.file.StandardOpenOption.CREATE,
+                    java.nio.file.StandardOpenOption.WRITE);
+            LOCK = LOCK_CH.tryLock();               // entscheidend: OS-Lock
+            return LOCK != null;
+        } catch (Exception e) {
+            // z.B. AccessDenied bei bereits gehaltenem Lock
+            return false;
+        }
+    }
 
+    private static void releaseSingleInstanceLock() {
+        try { if (LOCK != null && LOCK.isValid()) LOCK.release(); } catch (Exception ignore) {}
+        try { if (LOCK_CH != null && LOCK_CH.isOpen()) LOCK_CH.close(); } catch (Exception ignore) {}
+        try { if (LOCK_PATH != null) java.nio.file.Files.deleteIfExists(LOCK_PATH); } catch (Exception ignore) {}
+    }
+	
 	// ###################################################################################################################################################
 	// Getter und Setter
 	// ###################################################################################################################################################
-
+    
 	public static String getVersion() {
-
 		InputStream input = StartUp.class.getClassLoader().getResourceAsStream("version.properties");
 		Properties properties = new Properties();
 		try (input) {
@@ -90,9 +158,8 @@ public class StartUp {
 			input.close();
 			return properties.getProperty("version");
 		} catch (IOException e) {
-			return "Fehler beim Laden der Version";
+			return "0.0.0";
 		}
-
 	}
 
 	public static String getAPP_LICENSE() {

@@ -20,7 +20,7 @@ import javax.swing.border.TitledBorder;
 
 import org.andy.code.dataStructure.entitiyMaster.Owner;
 import org.andy.code.dataStructure.repositoryMaster.OwnerRepository;
-import org.andy.gui.main.JFoverview;
+import org.andy.gui.main.MainWindow;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -60,8 +60,8 @@ public class OwnerPanel extends JPanel {
 
     private void buildPanel() {
     	int x = 10, y = 20; // Variablen für automatische Positionierung
-    	int btnWidth = JFoverview.getButtonx();
-    	int btnHeight = JFoverview.getButtony();
+    	int btnWidth = MainWindow.getButtonx();
+    	int btnHeight = MainWindow.getButtony();
     	
         String[] labels = { "Name", "Adresse", "PLZ", "Ort", "Land", "USt.-Id", "Kontakt Name", "Kontakt Telefon", "Kontakt E-Mail", "Währung", "Steuer-Id" };
         JLabel[] lblFields = new JLabel[labels.length];

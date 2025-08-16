@@ -17,7 +17,7 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import org.andy.code.main.LoadData;
-import org.andy.gui.main.JFoverview;
+import org.andy.gui.main.MainWindow;
 import org.andy.toolbox.misc.Tools;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -119,8 +119,8 @@ public class QrPanel extends JPanel {
 		}
 
 		btnQREdit.setEnabled(true);
-		btnQREdit.setBounds(260, 220, JFoverview.getButtonx(), JFoverview.getButtony());
-		btnQROK.setBounds(260, 270, JFoverview.getButtonx(), JFoverview.getButtony());
+		btnQREdit.setBounds(260, 220, MainWindow.getButtonx(), MainWindow.getButtony());
+		btnQROK.setBounds(260, 270, MainWindow.getButtonx(), MainWindow.getButtony());
 
 		add(lbl01);
 		add(lbl02);

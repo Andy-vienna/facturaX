@@ -2,6 +2,8 @@ package org.andy.gui.main.overview_panels.edit_panels.factory;
 
 import static org.andy.toolbox.misc.CreateObject.createButton;
 import static org.andy.toolbox.misc.Tools.FormatIBAN;
+import static org.andy.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
+import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -43,7 +45,9 @@ import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
 import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
-import org.andy.gui.main.JFoverview;
+import org.andy.code.misc.BD;
+import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
+import org.andy.gui.main.MainWindow;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.gui.misc.CommaHelper;
 import org.andy.gui.misc.RoundedBorder;
@@ -191,7 +195,7 @@ public class BillCreatePanel extends EditPanel {
         txtReferenz.getDocument().addDocumentListener(bgFlipOnNonEmpty(txtReferenz));
 
         JButton btnDoExport = createButton("<html>Rechnung<br>erstellen</html>", "edit.png");
-        btnDoExport.setBounds(1545,305, JFoverview.getButtonx(), JFoverview.getButtony());
+        btnDoExport.setBounds(1545,305, MainWindow.getButtonx(), MainWindow.getButtony());
         btnDoExport.setEnabled(true);
         add(btnDoExport);
         
@@ -310,7 +314,7 @@ public class BillCreatePanel extends EditPanel {
         String s = txtEP[i].getText().trim();
         if (s.isEmpty()) { bdEinzel[i]=null; txtGP[i].setText(""); return; }
         try {
-            bdEinzel[i] = new BigDecimal(s);
+            bdEinzel[i] = parseStringToBigDecimalSafe(s, LocaleFormat.EU);
             onQtyOrEPChanged(i);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Eingabe inkorrekt …", "Rechnung", JOptionPane.ERROR_MESSAGE);
@@ -321,8 +325,8 @@ public class BillCreatePanel extends EditPanel {
     private void onQtyOrEPChanged(int i) {
         if (isEmpty(txtEP[i]) || isEmpty(txtAnz[i])) { txtAnz[i].setBackground(Color.PINK); txtGP[i].setText(""); return; }
         try {
-            bdAnzahl[i] = new BigDecimal(txtAnz[i].getText());
-            if (bdEinzel[i] == null) bdEinzel[i] = new BigDecimal(txtEP[i].getText());
+            bdAnzahl[i] = parseStringToBigDecimalSafe(txtAnz[i].getText(), LocaleFormat.EU);
+            if (bdEinzel[i] == null) bdEinzel[i] = parseStringToBigDecimalSafe(txtEP[i].getText(), LocaleFormat.EU);
             bdSumme[i]  = bdEinzel[i].multiply(bdAnzahl[i]).setScale(2, RoundingMode.HALF_UP);
             txtGP[i].setText(bdSumme[i].toString());
             txtAnz[i].setBackground(Color.WHITE);
@@ -353,7 +357,7 @@ public class BillCreatePanel extends EditPanel {
 
         Rechnung r = new Rechnung();
         r.setIdNummer(nextAnNummer());
-        r.setJahr(Integer.parseInt(LoadData.getStrAktGJ()));
+        r.setJahr(parseStringToIntSafe(LoadData.getStrAktGJ()));
         r.setDatum(dateOrToday(datePicker));
         Kunde k = kunden.get(cmbKunde.getSelectedIndex());
         Bank  b = banken.get(cmbBank.getSelectedIndex());
@@ -363,17 +367,17 @@ public class BillCreatePanel extends EditPanel {
         r.setRevCharge(chkRevCharge.isSelected()?1:0);
         r.setPage2(0);
         r.setSkonto1(chkSkonto1.isSelected()?1:0);
-        r.setSkonto1tage(txtSkontoTage1.getText().equals("")?0:Integer.parseInt(txtSkontoTage1.getText()));
-        r.setSkonto1wert(txtSkontoTage1.getText().equals("")?BigDecimal.ZERO:new BigDecimal(txtSkontoWert1.getText()).divide(new BigDecimal("100.00")));
+        r.setSkonto1tage(txtSkontoTage1.getText().equals("")?0:parseStringToIntSafe(txtSkontoTage1.getText()));
+        r.setSkonto1wert(txtSkontoTage1.getText().equals("")?BD.ZERO:parseStringToBigDecimalSafe(txtSkontoWert1.getText(), LocaleFormat.EU).divide(BD.HUNDRED));
         r.setSkonto2(chkSkonto2.isSelected()?1:0);
-        r.setSkonto2tage(txtSkontoTage2.getText().equals("")?0:Integer.parseInt(txtSkontoTage2.getText()));
-        r.setSkonto2wert(txtSkontoTage2.getText().equals("")?BigDecimal.ZERO:new BigDecimal(txtSkontoWert2.getText()).divide(new BigDecimal("100.00")));
+        r.setSkonto2tage(txtSkontoTage2.getText().equals("")?0:parseStringToIntSafe(txtSkontoTage2.getText()));
+        r.setSkonto2wert(txtSkontoTage2.getText().equals("")?BD.ZERO:parseStringToBigDecimalSafe(txtSkontoWert2.getText(), LocaleFormat.EU).divide(BD.HUNDRED));
 
         int posCount = countFilledPositions();
         r.setAnzPos(BigDecimal.valueOf(posCount));
 
-        BigDecimal ustFaktor = new BigDecimal(k.getTaxvalue()).divide(new BigDecimal("100"));
-        BigDecimal netto = BigDecimal.ZERO; BigDecimal ust = BigDecimal.ZERO; BigDecimal brutto = BigDecimal.ZERO;
+        BigDecimal ustFaktor = parseStringToBigDecimalSafe(k.getTaxvalue(), LocaleFormat.EU).divide(BD.HUNDRED);
+        BigDecimal netto = BD.ZERO; BigDecimal ust = BD.ZERO; BigDecimal brutto = BD.ZERO;
         for (int i=0;i<POS_COUNT;i++) {
             if (sPosText[i]==null || bdAnzahl[i]==null || bdEinzel[i]==null) continue;
             setRechnungsPosition(r, i, sPosText[i], bdAnzahl[i], bdEinzel[i]);
@@ -396,7 +400,7 @@ public class BillCreatePanel extends EditPanel {
         r.setState(1); // erstellt
 
         rechnungRepository.save(r);
-        JFoverview.actScreen();
+        MainWindow.actScreen();
     }
 
 	//###################################################################################################################################################
@@ -508,7 +512,7 @@ public class BillCreatePanel extends EditPanel {
     }
 
     private String nextAnNummer() {
-        int max = rechnungRepository.findMaxNummerByJahr(Integer.parseInt(LoadData.getStrAktGJ()));
+        int max = rechnungRepository.findMaxNummerByJahr(parseStringToIntSafe(LoadData.getStrAktGJ()));
         return "RE-" + LoadData.getStrAktGJ() + "-" + String.format("%04d", max + 1);
     }
 

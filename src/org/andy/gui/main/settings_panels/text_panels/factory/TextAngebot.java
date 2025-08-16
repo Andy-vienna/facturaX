@@ -1,7 +1,9 @@
 package org.andy.gui.main.settings_panels.text_panels.factory;
 
+import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
 import static org.andy.toolbox.misc.CreateObject.applyHighlighting;
 import static org.andy.toolbox.misc.CreateObject.createButton;
+
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -168,7 +170,7 @@ public class TextAngebot extends TextPanel  {
 	//###################################################################################################################################################
     
     private void handleButtonClick(int index, JTextPane txtPane) {
-        int dataId = Integer.parseInt(labelList.get(index).getText());
+        int dataId = parseStringToIntSafe(labelList.get(index).getText());
         TextRepository repo = new TextRepository();
         Text text = repo.findById(dataId);
         text.setTextAngebot(txtPane.getText());

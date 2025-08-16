@@ -1,5 +1,7 @@
 package org.andy.code.main.overview.table;
 
+import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
+
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -13,11 +15,12 @@ import java.util.Locale;
 import org.andy.code.dataStructure.entitiyProductive.Einkauf;
 import org.andy.code.dataStructure.repositoryProductive.EinkaufRepository;
 import org.andy.code.main.LoadData;
+import org.andy.code.misc.BD;
 
 public class LoadPurchase {
 	
-	private static BigDecimal bdNetto = BigDecimal.ZERO;
-	private static BigDecimal bdBrutto = BigDecimal.ZERO;
+	private static BigDecimal bdNetto = BD.ZERO;
+	private static BigDecimal bdBrutto = BD.ZERO;
 	
 	//###################################################################################################################################################
 	// public Teil
@@ -37,11 +40,11 @@ public class LoadPurchase {
 		DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Locale.GERMANY);
 		DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
 		
-		bdNetto = BigDecimal.ZERO; bdBrutto = BigDecimal.ZERO;
+		bdNetto = BD.ZERO; bdBrutto = BD.ZERO;
 
 		EinkaufRepository einkaufRepository = new EinkaufRepository();
 	    List<Einkauf> einkaufListe = new ArrayList<>();
-	    einkaufListe.addAll(einkaufRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ())));
+	    einkaufListe.addAll(einkaufRepository.findAllByJahr(parseStringToIntSafe(LoadData.getStrAktGJ())));
 		
 		String[][] sTemp = new String [einkaufListe.size() + 1][10]; // 1 Zeile mehr für neuen Beleg
 		
@@ -59,12 +62,15 @@ public class LoadPurchase {
 	        String brutto = df.format(einkauf.getBrutto()) + " " + currency.getCurrencyCode();
 	        
 	        String status = null;
-	        if (einkauf.getStatus() == 1) {
-	        	status = "ja";
-	        } else {
-	        	status = "nein";
+	        switch(einkauf.getStatus()) {
+	        case 0 -> status = "nein";
+	        case 1 -> status = "angezahlt";
+	        case 2 -> status = "ja";
+	        case 3 -> status = "ja, Skonto 1";
+	        case 4 -> status = "ja, Skonto 2";
+	        default -> status = "unbekannt";
 	        }
-	        
+
 			sTemp[i][0] = datum;
 			sTemp[i][1] = einkauf.getId();
 			sTemp[i][2] = einkauf.getKredName();

@@ -1,5 +1,8 @@
 package org.andy.code.main.overview.result;
 
+import static org.andy.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
+import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
@@ -18,6 +21,8 @@ import org.andy.code.main.LoadData;
 import org.andy.code.main.overview.table.LoadExpenses;
 import org.andy.code.main.overview.table.LoadPurchase;
 import org.andy.code.main.overview.table.LoadSvTax;
+import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
+import org.andy.code.misc.BD;
 import org.andy.gui.main.result_panels.TaxPanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,7 +33,7 @@ public class TaxData {
 	
 	private static NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.GERMANY);
 
-	private static BigDecimal bdSVYear = BigDecimal.ZERO;
+	private static BigDecimal bdSVYear = BD.ZERO;
 	
 	private static String[][] arrTaxValues = new String[2][25];
 	private static String[][] arrGwbValues = new String[2][10];
@@ -52,25 +57,25 @@ public class TaxData {
 		List<BigDecimal> GwbStufe = new ArrayList<>();
 		List<BigDecimal> TaxStufe = new ArrayList<>();
 		
-		BigDecimal netto = BigDecimal.ZERO;
-		BigDecimal bdVorGwb = BigDecimal.ZERO;
-		BigDecimal bdErgYear = BigDecimal.ZERO;
-		BigDecimal bdOeffiP = new BigDecimal(arrTaxValues[1][23].toString().replace(",", ".")).multiply(new BigDecimal("-1")).setScale(2, RoundingMode.HALF_UP);
-		BigDecimal bdAPausch = new BigDecimal(arrTaxValues[1][24].toString().replace(",", ".")).multiply(new BigDecimal("-1")).setScale(2, RoundingMode.HALF_UP);
-		BigDecimal bdExpenses = BigDecimal.ZERO;
-		BigDecimal bdGwbTotal = BigDecimal.ZERO;
-		BigDecimal bdGwbTotalNeg = BigDecimal.ZERO;
-		BigDecimal bdTaxTotal = BigDecimal.ZERO;
+		BigDecimal netto = BD.ZERO;
+		BigDecimal bdVorGwb = BD.ZERO;
+		BigDecimal bdErgYear = BD.ZERO;
+		BigDecimal bdOeffiP = parseStringToBigDecimalSafe(arrTaxValues[1][23], LocaleFormat.EU).multiply(BD.M_ONE).setScale(2, RoundingMode.HALF_UP);
+		BigDecimal bdAPausch = parseStringToBigDecimalSafe(arrTaxValues[1][24], LocaleFormat.EU).multiply(BD.M_ONE).setScale(2, RoundingMode.HALF_UP);
+		BigDecimal bdExpenses = BD.ZERO;
+		BigDecimal bdGwbTotal = BD.ZERO;
+		BigDecimal bdGwbTotalNeg = BD.ZERO;
+		BigDecimal bdTaxTotal = BD.ZERO;
 		BigDecimal[] bdSVQ = new BigDecimal[4];
 		bdSVQ = LoadSvTax.getBdSVQ(); // Quartalswerte der SV-Vorschreibungen
 		
 		for (int i = 0; i < bdSVQ.length; i++) {
-			bdSVYear = bdSVYear.add(bdSVQ[i].multiply(new BigDecimal("-1")));
+			bdSVYear = bdSVYear.add(bdSVQ[i].multiply(BD.M_ONE));
 		}
 		
 		RechnungRepository rechnungRepository = new RechnungRepository();
 	    List<Rechnung> rechnungListe = new ArrayList<>();
-		rechnungListe.addAll(rechnungRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ()))); // Rechnungen nach GJ laden
+		rechnungListe.addAll(rechnungRepository.findAllByJahr(parseStringToIntSafe(LoadData.getStrAktGJ()))); // Rechnungen nach GJ laden
 		
 		try {
 			for(int x = 1; x < rechnungListe.size(); x++) {
@@ -81,14 +86,14 @@ public class TaxData {
 			}
 			
 			BigDecimal bdBA = LoadPurchase.getBdNetto().add(LoadExpenses.getBdNetto()); // Betriebsausgaben netto komplett
-			bdExpenses = bdBA.multiply(new BigDecimal("-1")).setScale(2, RoundingMode.HALF_UP); // Betriebsausgaben netto negativ
+			bdExpenses = bdBA.multiply(BD.M_ONE).setScale(2, RoundingMode.HALF_UP); // Betriebsausgaben netto negativ
 			
 			bdVorGwb = netto.add(bdSVYear).add(bdOeffiP).add(bdAPausch).add(bdExpenses); // VorGWB wird aus der Summe der Einnahmen, SV, öffentlicher Pauschale, APauschale und Ausgaben netto berechnet
 			
 			GwbStufe = calcGWB(panel, bdVorGwb); // Berechnung der GWB-Stufen
 			
-			bdGwbTotal = GwbStufe.stream().reduce(BigDecimal.ZERO, BigDecimal::add); // Summe der GWB-Stufen
-			bdGwbTotalNeg = bdGwbTotal.multiply(new BigDecimal("-1")).setScale(2, RoundingMode.HALF_UP); // GWB negativ
+			bdGwbTotal = GwbStufe.stream().reduce(BD.ZERO, BigDecimal::add); // Summe der GWB-Stufen
+			bdGwbTotalNeg = bdGwbTotal.multiply(BD.M_ONE).setScale(2, RoundingMode.HALF_UP); // GWB negativ
 			
 			bdErgYear = netto.add(bdSVYear).add(bdOeffiP).add(bdAPausch).add(bdExpenses).add(bdGwbTotalNeg); // Ergebnis wird aus der Summe der Einnahmen, SV, öffentlicher Pauschale, APauschale, Ausgaben netto und GWB negativ berechnet
 
@@ -104,42 +109,42 @@ public class TaxData {
 			logger.error("error in calculating revenue sum - " + e1);
 		}
 		
-		panel.setTxtP109aEin(Double.valueOf(netto.toString().replace(",", ".")));
-		panel.setTxtP109aSVS(0, Double.valueOf(bdSVYear.toString().replace(",", ".")));
+		panel.setTxtP109aEin(Double.valueOf(netto.toString()));
+		panel.setTxtP109aSVS(0, Double.valueOf(bdSVYear.toString()));
 		for (int i= 0; i < bdSVQ.length; i++) {
-			panel.setTxtP109aSVS(i + 1, Double.valueOf(bdSVQ[i].toString().replace(",", ".")));
+			panel.setTxtP109aSVS(i + 1, Double.valueOf(bdSVQ[i].toString()));
 		}
-		panel.setTxtP109aOeffiP(Double.valueOf(bdOeffiP.toString().replace(",", ".")));
-		panel.setTxtP109aAPausch(Double.valueOf(bdAPausch.toString().replace(",", ".")));
-		panel.setTxtP109aExpenses(Double.valueOf(bdExpenses.toString().replace(",", ".")));
+		panel.setTxtP109aOeffiP(Double.valueOf(bdOeffiP.toString()));
+		panel.setTxtP109aAPausch(Double.valueOf(bdAPausch.toString()));
+		panel.setTxtP109aExpenses(Double.valueOf(bdExpenses.toString()));
 
-		panel.setTxtVorGWB(Double.valueOf(bdVorGwb.toString().replace(",", ".")));
-		panel.setTxtGwbStufen(0, Double.valueOf(GwbStufe.get(0).toString().replace(",", ".")));
-		panel.setTxtGwbStufen(1, Double.valueOf(GwbStufe.get(1).toString().replace(",", ".")));
-		panel.setTxtGwbStufen(2, Double.valueOf(GwbStufe.get(2).toString().replace(",", ".")));
-		panel.setTxtGwbStufen(3, Double.valueOf(GwbStufe.get(3).toString().replace(",", ".")));
-		panel.setTxtGwbTotal(Double.valueOf(bdGwbTotal.toString().replace(",", ".")));
+		panel.setTxtVorGWB(Double.valueOf(bdVorGwb.toString()));
+		panel.setTxtGwbStufen(0, Double.valueOf(GwbStufe.get(0).toString()));
+		panel.setTxtGwbStufen(1, Double.valueOf(GwbStufe.get(1).toString()));
+		panel.setTxtGwbStufen(2, Double.valueOf(GwbStufe.get(2).toString()));
+		panel.setTxtGwbStufen(3, Double.valueOf(GwbStufe.get(3).toString()));
+		panel.setTxtGwbTotal(Double.valueOf(bdGwbTotal.toString()));
 		
-		panel.setTxtP109aGrundfrei(Double.valueOf(bdGwbTotalNeg.toString().replace(",", ".")));
-		panel.setTxtP109aErgebnis(Double.valueOf(bdErgYear.toString().replace(",", ".")));
+		panel.setTxtP109aGrundfrei(Double.valueOf(bdGwbTotalNeg.toString()));
+		panel.setTxtP109aErgebnis(Double.valueOf(bdErgYear.toString()));
 		
-		panel.setTxtE1VorSt(Double.valueOf(bdErgYear.toString().replace(",", "."))); // Gewinn vor Steuer für E1 wird aus dem Ergebnis der P109a übernommen
-		panel.setTxtE1Stufen(0, Double.valueOf(TaxStufe.get(0).toString().replace(",", "."))); // Summe Stufe 1
-		panel.setTxtE1Stufen(1, Double.valueOf(TaxStufe.get(1).toString().replace(",", "."))); // Summe Stufe 2
-		panel.setTxtE1Stufen(2, Double.valueOf(TaxStufe.get(2).toString().replace(",", "."))); // Summe Stufe 3
-		panel.setTxtE1Stufen(3, Double.valueOf(TaxStufe.get(3).toString().replace(",", "."))); // Summe Stufe 4
-		panel.setTxtE1Stufen(4, Double.valueOf(TaxStufe.get(4).toString().replace(",", "."))); // Summe Stufe 5
-		panel.setTxtE1Stufen(5, Double.valueOf(TaxStufe.get(5).toString().replace(",", "."))); // Summe Stufe 6
-		panel.setTxtE1Stufen(6, Double.valueOf(TaxStufe.get(6).toString().replace(",", "."))); // Summe Stufe 7
+		panel.setTxtE1VorSt(Double.valueOf(bdErgYear.toString())); // Gewinn vor Steuer für E1 wird aus dem Ergebnis der P109a übernommen
+		panel.setTxtE1Stufen(0, Double.valueOf(TaxStufe.get(0).toString())); // Summe Stufe 1
+		panel.setTxtE1Stufen(1, Double.valueOf(TaxStufe.get(1).toString())); // Summe Stufe 2
+		panel.setTxtE1Stufen(2, Double.valueOf(TaxStufe.get(2).toString())); // Summe Stufe 3
+		panel.setTxtE1Stufen(3, Double.valueOf(TaxStufe.get(3).toString())); // Summe Stufe 4
+		panel.setTxtE1Stufen(4, Double.valueOf(TaxStufe.get(4).toString())); // Summe Stufe 5
+		panel.setTxtE1Stufen(5, Double.valueOf(TaxStufe.get(5).toString())); // Summe Stufe 6
+		panel.setTxtE1Stufen(6, Double.valueOf(TaxStufe.get(6).toString())); // Summe Stufe 7
 		
-		panel.setTxtE1Tax(0, Double.valueOf(TaxStufe.get(7).toString().replace(",", "."))); // voraussichtliche Steuer in Stufe 1
-		panel.setTxtE1Tax(1, Double.valueOf(TaxStufe.get(8).toString().replace(",", "."))); // voraussichtliche Steuer in Stufe 2
-		panel.setTxtE1Tax(2, Double.valueOf(TaxStufe.get(9).toString().replace(",", "."))); // voraussichtliche Steuer in Stufe 3
-		panel.setTxtE1Tax(3, Double.valueOf(TaxStufe.get(10).toString().replace(",", "."))); // voraussichtliche Steuer in Stufe 4
-		panel.setTxtE1Tax(4, Double.valueOf(TaxStufe.get(11).toString().replace(",", "."))); // voraussichtliche Steuer in Stufe 5
-		panel.setTxtE1Tax(5, Double.valueOf(TaxStufe.get(12).toString().replace(",", "."))); // voraussichtliche Steuer in Stufe 6
-		panel.setTxtE1Tax(6, Double.valueOf(TaxStufe.get(13).toString().replace(",", "."))); // voraussichtliche Steuer in Stufe 7
-		panel.setTxtE1Summe(Double.valueOf(bdTaxTotal.toString().replace(",", "."))); // voraussichtliche Einkommensteuer gesamt
+		panel.setTxtE1Tax(0, Double.valueOf(TaxStufe.get(7).toString())); // voraussichtliche Steuer in Stufe 1
+		panel.setTxtE1Tax(1, Double.valueOf(TaxStufe.get(8).toString())); // voraussichtliche Steuer in Stufe 2
+		panel.setTxtE1Tax(2, Double.valueOf(TaxStufe.get(9).toString())); // voraussichtliche Steuer in Stufe 3
+		panel.setTxtE1Tax(3, Double.valueOf(TaxStufe.get(10).toString())); // voraussichtliche Steuer in Stufe 4
+		panel.setTxtE1Tax(4, Double.valueOf(TaxStufe.get(11).toString())); // voraussichtliche Steuer in Stufe 5
+		panel.setTxtE1Tax(5, Double.valueOf(TaxStufe.get(12).toString())); // voraussichtliche Steuer in Stufe 6
+		panel.setTxtE1Tax(6, Double.valueOf(TaxStufe.get(13).toString())); // voraussichtliche Steuer in Stufe 7
+		panel.setTxtE1Summe(Double.valueOf(bdTaxTotal.toString())); // voraussichtliche Einkommensteuer gesamt
 		
 		ArrayList<BigDecimal> tmpListe = new ArrayList<>(); // Liste für §109a Formular erzeugen und in Setter schreiben
 		tmpListe.add(netto); // Einnahmen
@@ -161,27 +166,27 @@ public class TaxData {
 	
 	private static List<BigDecimal> calcGWB(TaxPanel panel, BigDecimal bdVorGwb) {
 
-		BigDecimal rest1 = BigDecimal.ZERO;
-		BigDecimal tmp1 = BigDecimal.ZERO;
-		BigDecimal rest2 = BigDecimal.ZERO;
-		BigDecimal tmp2 = BigDecimal.ZERO;
-		BigDecimal rest3 = BigDecimal.ZERO;
-		BigDecimal tmp3 = BigDecimal.ZERO;
-		BigDecimal tmp4 = BigDecimal.ZERO;
+		BigDecimal rest1 = BD.ZERO;
+		BigDecimal tmp1 = BD.ZERO;
+		BigDecimal rest2 = BD.ZERO;
+		BigDecimal tmp2 = BD.ZERO;
+		BigDecimal rest3 = BD.ZERO;
+		BigDecimal tmp3 = BD.ZERO;
+		BigDecimal tmp4 = BD.ZERO;
 		
-		BigDecimal bdGwbTmp1 = new BigDecimal(arrGwbValues[1][2].toString().replace(",", "."));
-		BigDecimal bdGwbVal1 = new BigDecimal(arrGwbValues[1][3].toString().replace(",", ".")).multiply(new BigDecimal("100")).setScale(0, RoundingMode.HALF_UP);
-		BigDecimal bdGwbTmp2 = new BigDecimal(arrGwbValues[1][4].toString().replace(",", "."));
-		BigDecimal bdGwbVal2 = new BigDecimal(arrGwbValues[1][5].toString().replace(",", ".")).multiply(new BigDecimal("100")).setScale(0, RoundingMode.HALF_UP);
-		BigDecimal bdGwbTmp3 = new BigDecimal(arrGwbValues[1][6].toString().replace(",", "."));
-		BigDecimal bdGwbVal3 = new BigDecimal(arrGwbValues[1][7].toString().replace(",", ".")).multiply(new BigDecimal("100")).setScale(0, RoundingMode.HALF_UP);
-		BigDecimal bdGwbTmp4 = new BigDecimal(arrGwbValues[1][8].toString().replace(",", "."));
-		BigDecimal bdGwbVal4 = new BigDecimal(arrGwbValues[1][9].toString().replace(",", ".")).multiply(new BigDecimal("100")).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdGwbTmp1 = parseStringToBigDecimalSafe(arrGwbValues[1][2], LocaleFormat.EU);
+		BigDecimal bdGwbVal1 = parseStringToBigDecimalSafe(arrGwbValues[1][3], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdGwbTmp2 = parseStringToBigDecimalSafe(arrGwbValues[1][4], LocaleFormat.EU);
+		BigDecimal bdGwbVal2 = parseStringToBigDecimalSafe(arrGwbValues[1][5], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdGwbTmp3 = parseStringToBigDecimalSafe(arrGwbValues[1][6], LocaleFormat.EU);
+		BigDecimal bdGwbVal3 = parseStringToBigDecimalSafe(arrGwbValues[1][7], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdGwbTmp4 = parseStringToBigDecimalSafe(arrGwbValues[1][8], LocaleFormat.EU);
+		BigDecimal bdGwbVal4 = parseStringToBigDecimalSafe(arrGwbValues[1][9], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
 		
-		Double dTmp1 = Double.valueOf(bdGwbTmp1.toString().replace(",", "."));
-		Double dTmp2 = Double.valueOf(bdGwbTmp2.toString().replace(",", "."));
-		Double dTmp3 = Double.valueOf(bdGwbTmp3.toString().replace(",", "."));
-		Double dTmp4 = Double.valueOf(bdGwbTmp4.toString().replace(",", "."));
+		Double dTmp1 = Double.valueOf(bdGwbTmp1.toString());
+		Double dTmp2 = Double.valueOf(bdGwbTmp2.toString());
+		Double dTmp3 = Double.valueOf(bdGwbTmp3.toString());
+		Double dTmp4 = Double.valueOf(bdGwbTmp4.toString());
 		
 		String sTmpd1 = currencyFormat.format(dTmp1);
 		String sTmpd2 = currencyFormat.format(dTmp2);
@@ -202,32 +207,32 @@ public class TaxData {
 		
 		if(bdVorGwb.compareTo(bdGwbTmp1) >= 0) { // wenn VorGWB größer oder gleich GWB Stufe 1
 			rest1 = bdVorGwb.subtract(bdGwbTmp1);
-			tmp1 = bdGwbTmp1.multiply(new BigDecimal(arrGwbValues[1][3].toString().replace(",", "."))).setScale(2, RoundingMode.HALF_UP);
+			tmp1 = bdGwbTmp1.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][3], LocaleFormat.EU)).setScale(2, RoundingMode.HALF_UP);
 		} else {
-			rest1 = BigDecimal.ZERO;
-			tmp1 = bdVorGwb.multiply(new BigDecimal(arrGwbValues[1][3].toString().replace(",", "."))).setScale(2, RoundingMode.HALF_UP);
+			rest1 = BD.ZERO;
+			tmp1 = bdVorGwb.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][3], LocaleFormat.EU)).setScale(2, RoundingMode.HALF_UP);
 		}
 		
 		if(rest1.compareTo(bdGwbTmp2) >= 0) { // wenn Rest größer oder gleich GWB Stufe 2
 			rest2 = rest1.subtract(bdGwbTmp2);
-			tmp2 = bdGwbTmp2.multiply(new BigDecimal(arrGwbValues[1][5].toString().replace(",", "."))).setScale(2, RoundingMode.HALF_UP);
+			tmp2 = bdGwbTmp2.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][5], LocaleFormat.EU)).setScale(2, RoundingMode.HALF_UP);
 		} else {
-			rest2 = BigDecimal.ZERO;
-			tmp2 = rest1.multiply(new BigDecimal(arrGwbValues[1][5].toString().replace(",", "."))).setScale(2, RoundingMode.HALF_UP);
+			rest2 = BD.ZERO;
+			tmp2 = rest1.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][5], LocaleFormat.EU)).setScale(2, RoundingMode.HALF_UP);
 		}
 		
 		if(rest2.compareTo(bdGwbTmp3) >= 0) { // wenn Rest größer oder gleich GWB Stufe 3
 			rest3 = rest2.subtract(bdGwbTmp3);
-			tmp3 = bdGwbTmp3.multiply(new BigDecimal(arrGwbValues[1][7].toString().replace(",", "."))).setScale(2, RoundingMode.HALF_UP);
+			tmp3 = bdGwbTmp3.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][7], LocaleFormat.EU)).setScale(2, RoundingMode.HALF_UP);
 		} else {
-			rest3 = BigDecimal.ZERO;
-			tmp3 = rest2.multiply(new BigDecimal(arrGwbValues[1][7].toString().replace(",", "."))).setScale(2, RoundingMode.HALF_UP);
+			rest3 = BD.ZERO;
+			tmp3 = rest2.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][7], LocaleFormat.EU)).setScale(2, RoundingMode.HALF_UP);
 		}
 		
 		if(rest3.compareTo(bdGwbTmp4) >= 0) { // wenn Rest größer oder gleich GWB Stufe 4
-			tmp4 = bdGwbTmp4.multiply(new BigDecimal(arrGwbValues[1][9].toString().replace(",", "."))).setScale(2, RoundingMode.HALF_UP);
+			tmp4 = bdGwbTmp4.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][9], LocaleFormat.EU)).setScale(2, RoundingMode.HALF_UP);
 		} else {
-			tmp4 = rest3.multiply(new BigDecimal(arrGwbValues[1][9].toString().replace(",", "."))).setScale(2, RoundingMode.HALF_UP);
+			tmp4 = rest3.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][9], LocaleFormat.EU)).setScale(2, RoundingMode.HALF_UP);
 		}
 		
 		liste.add(tmp1); // GWB Stufe 1
@@ -241,50 +246,50 @@ public class TaxData {
 	
 	private static List<BigDecimal> calcTAX(TaxPanel panel, BigDecimal bdVorTax){
 
-		BigDecimal rest1 = BigDecimal.ZERO;
-		BigDecimal rest2 = BigDecimal.ZERO;
-		BigDecimal rest3 = BigDecimal.ZERO;
-		BigDecimal rest4 = BigDecimal.ZERO;
-		BigDecimal rest5 = BigDecimal.ZERO;
-		BigDecimal rest6 = BigDecimal.ZERO;
-		BigDecimal rest7 = BigDecimal.ZERO;
+		BigDecimal rest1 = BD.ZERO;
+		BigDecimal rest2 = BD.ZERO;
+		BigDecimal rest3 = BD.ZERO;
+		BigDecimal rest4 = BD.ZERO;
+		BigDecimal rest5 = BD.ZERO;
+		BigDecimal rest6 = BD.ZERO;
+		BigDecimal rest7 = BD.ZERO;
 		
-		BigDecimal bdTaxVon1 = new BigDecimal(arrTaxValues[1][2].toString().replace(",", "."));
-		BigDecimal bdTaxBis1 = new BigDecimal(arrTaxValues[1][3].toString().replace(",", "."));
-		BigDecimal bdTaxVal1 = new BigDecimal(arrTaxValues[1][4].toString().replace(",", ".")).multiply(new BigDecimal("100")).setScale(0, RoundingMode.HALF_UP);
-		BigDecimal bdTaxVon2 = new BigDecimal(arrTaxValues[1][5].toString().replace(",", "."));
-		BigDecimal bdTaxBis2 = new BigDecimal(arrTaxValues[1][6].toString().replace(",", "."));
-		BigDecimal bdTaxVal2 = new BigDecimal(arrTaxValues[1][7].toString().replace(",", ".")).multiply(new BigDecimal("100")).setScale(0, RoundingMode.HALF_UP);
-		BigDecimal bdTaxVon3 = new BigDecimal(arrTaxValues[1][8].toString().replace(",", "."));
-		BigDecimal bdTaxBis3 = new BigDecimal(arrTaxValues[1][9].toString().replace(",", "."));
-		BigDecimal bdTaxVal3 = new BigDecimal(arrTaxValues[1][10].toString().replace(",", ".")).multiply(new BigDecimal("100")).setScale(0, RoundingMode.HALF_UP);
-		BigDecimal bdTaxVon4 = new BigDecimal(arrTaxValues[1][11].toString().replace(",", "."));
-		BigDecimal bdTaxBis4 = new BigDecimal(arrTaxValues[1][12].toString().replace(",", "."));
-		BigDecimal bdTaxVal4 = new BigDecimal(arrTaxValues[1][13].toString().replace(",", ".")).multiply(new BigDecimal("100")).setScale(0, RoundingMode.HALF_UP);
-		BigDecimal bdTaxVon5 = new BigDecimal(arrTaxValues[1][14].toString().replace(",", "."));
-		BigDecimal bdTaxBis5 = new BigDecimal(arrTaxValues[1][15].toString().replace(",", "."));
-		BigDecimal bdTaxVal5 = new BigDecimal(arrTaxValues[1][16].toString().replace(",", ".")).multiply(new BigDecimal("100")).setScale(0, RoundingMode.HALF_UP);
-		BigDecimal bdTaxVon6 = new BigDecimal(arrTaxValues[1][17].toString().replace(",", "."));
-		BigDecimal bdTaxBis6 = new BigDecimal(arrTaxValues[1][18].toString().replace(",", "."));
-		BigDecimal bdTaxVal6 = new BigDecimal(arrTaxValues[1][19].toString().replace(",", ".")).multiply(new BigDecimal("100")).setScale(0, RoundingMode.HALF_UP);
-		BigDecimal bdTaxVon7 = new BigDecimal(arrTaxValues[1][20].toString().replace(",", "."));
-		BigDecimal bdTaxBis7 = new BigDecimal(arrTaxValues[1][21].toString().replace(",", "."));
-		BigDecimal bdTaxVal7 = new BigDecimal(arrTaxValues[1][22].toString().replace(",", ".")).multiply(new BigDecimal("100")).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdTaxVon1 = parseStringToBigDecimalSafe(arrTaxValues[1][2], LocaleFormat.EU);
+		BigDecimal bdTaxBis1 = parseStringToBigDecimalSafe(arrTaxValues[1][3], LocaleFormat.EU);
+		BigDecimal bdTaxVal1 = parseStringToBigDecimalSafe(arrTaxValues[1][4], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdTaxVon2 = parseStringToBigDecimalSafe(arrTaxValues[1][5], LocaleFormat.EU);
+		BigDecimal bdTaxBis2 = parseStringToBigDecimalSafe(arrTaxValues[1][6], LocaleFormat.EU);
+		BigDecimal bdTaxVal2 = parseStringToBigDecimalSafe(arrTaxValues[1][7], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdTaxVon3 = parseStringToBigDecimalSafe(arrTaxValues[1][8], LocaleFormat.EU);
+		BigDecimal bdTaxBis3 = parseStringToBigDecimalSafe(arrTaxValues[1][9], LocaleFormat.EU);
+		BigDecimal bdTaxVal3 = parseStringToBigDecimalSafe(arrTaxValues[1][10], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdTaxVon4 = parseStringToBigDecimalSafe(arrTaxValues[1][11], LocaleFormat.EU);
+		BigDecimal bdTaxBis4 = parseStringToBigDecimalSafe(arrTaxValues[1][12], LocaleFormat.EU);
+		BigDecimal bdTaxVal4 = parseStringToBigDecimalSafe(arrTaxValues[1][13], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdTaxVon5 = parseStringToBigDecimalSafe(arrTaxValues[1][14], LocaleFormat.EU);
+		BigDecimal bdTaxBis5 = parseStringToBigDecimalSafe(arrTaxValues[1][15], LocaleFormat.EU);
+		BigDecimal bdTaxVal5 = parseStringToBigDecimalSafe(arrTaxValues[1][16], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdTaxVon6 = parseStringToBigDecimalSafe(arrTaxValues[1][17], LocaleFormat.EU);
+		BigDecimal bdTaxBis6 = parseStringToBigDecimalSafe(arrTaxValues[1][18], LocaleFormat.EU);
+		BigDecimal bdTaxVal6 = parseStringToBigDecimalSafe(arrTaxValues[1][19], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdTaxVon7 = parseStringToBigDecimalSafe(arrTaxValues[1][20], LocaleFormat.EU);
+		BigDecimal bdTaxBis7 = parseStringToBigDecimalSafe(arrTaxValues[1][21], LocaleFormat.EU);
+		BigDecimal bdTaxVal7 = parseStringToBigDecimalSafe(arrTaxValues[1][22], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
 
-		Double dTmp1 = Double.valueOf(bdTaxVon1.toString().replace(",", "."));
-		Double dTmp2 = Double.valueOf(bdTaxBis1.toString().replace(",", "."));
-		Double dTmp3 = Double.valueOf(bdTaxVon2.toString().replace(",", "."));
-		Double dTmp4 = Double.valueOf(bdTaxBis2.toString().replace(",", "."));
-		Double dTmp5 = Double.valueOf(bdTaxVon3.toString().replace(",", "."));
-		Double dTmp6 = Double.valueOf(bdTaxBis3.toString().replace(",", "."));
-		Double dTmp7 = Double.valueOf(bdTaxVon4.toString().replace(",", "."));
-		Double dTmp8 = Double.valueOf(bdTaxBis4.toString().replace(",", "."));
-		Double dTmp9 = Double.valueOf(bdTaxVon5.toString().replace(",", "."));
-		Double dTmp10 = Double.valueOf(bdTaxBis5.toString().replace(",", "."));
-		Double dTmp11 = Double.valueOf(bdTaxVon6.toString().replace(",", "."));
-		Double dTmp12 = Double.valueOf(bdTaxBis6.toString().replace(",", "."));
-		Double dTmp13 = Double.valueOf(bdTaxVon7.toString().replace(",", "."));
-		Double dTmp14 = Double.valueOf(bdTaxBis7.toString().replace(",", "."));
+		Double dTmp1 = Double.valueOf(bdTaxVon1.toString());
+		Double dTmp2 = Double.valueOf(bdTaxBis1.toString());
+		Double dTmp3 = Double.valueOf(bdTaxVon2.toString());
+		Double dTmp4 = Double.valueOf(bdTaxBis2.toString());
+		Double dTmp5 = Double.valueOf(bdTaxVon3.toString());
+		Double dTmp6 = Double.valueOf(bdTaxBis3.toString());
+		Double dTmp7 = Double.valueOf(bdTaxVon4.toString());
+		Double dTmp8 = Double.valueOf(bdTaxBis4.toString());
+		Double dTmp9 = Double.valueOf(bdTaxVon5.toString());
+		Double dTmp10 = Double.valueOf(bdTaxBis5.toString());
+		Double dTmp11 = Double.valueOf(bdTaxVon6.toString());
+		Double dTmp12 = Double.valueOf(bdTaxBis6.toString());
+		Double dTmp13 = Double.valueOf(bdTaxVon7.toString());
+		Double dTmp14 = Double.valueOf(bdTaxBis7.toString());
 		
 		String sTmpd1 = currencyFormat.format(dTmp1), sTmpd2 = currencyFormat.format(dTmp2);
 		String sTmpd3 = currencyFormat.format(dTmp3), sTmpd4 = currencyFormat.format(dTmp4);
@@ -323,7 +328,7 @@ public class TaxData {
 			rest2 = bdTaxBis2.subtract(bdTaxVon2);
 			rest1 = bdTaxBis1.subtract(bdTaxVon1);
 		} else if(bdVorTax.compareTo(bdTaxVon6) >= 1) { // wenn VorTax größer oder gleich Stufe 6 von
-			rest7 = new BigDecimal("0.00");
+			rest7 = BD.ZERO;
 			rest6 = bdVorTax.subtract(bdTaxVon6);
 			rest5 = bdTaxBis5.subtract(bdTaxVon5);
 			rest4 = bdTaxBis4.subtract(bdTaxVon4);
@@ -331,44 +336,44 @@ public class TaxData {
 			rest2 = bdTaxBis2.subtract(bdTaxVon2);
 			rest1 = bdTaxBis1.subtract(bdTaxVon1);
 		} else if(bdVorTax.compareTo(bdTaxVon5) >= 1) { // wenn VorTax größer oder gleich Stufe 5 von
-			rest7 = new BigDecimal("0.00");
-			rest6 = new BigDecimal("0.00");
+			rest7 = BD.ZERO;
+			rest6 = BD.ZERO;
 			rest5 = bdVorTax.subtract(bdTaxVon5);
 			rest4 = bdTaxBis4.subtract(bdTaxVon4);
 			rest3 = bdTaxBis3.subtract(bdTaxVon3);
 			rest2 = bdTaxBis2.subtract(bdTaxVon2);
 			rest1 = bdTaxBis1.subtract(bdTaxVon1);
 		} else if(bdVorTax.compareTo(bdTaxVon4) >= 1) { // wenn VorTax größer oder gleich Stufe 4 von
-			rest7 = new BigDecimal("0.00");
-			rest6 = new BigDecimal("0.00");
-			rest5 = new BigDecimal("0.00");
+			rest7 = BD.ZERO;
+			rest6 = BD.ZERO;
+			rest5 = BD.ZERO;
 			rest4 = bdVorTax.subtract(bdTaxVon4);
 			rest3 = bdTaxBis3.subtract(bdTaxVon3);
 			rest2 = bdTaxBis2.subtract(bdTaxVon2);
 			rest1 = bdTaxBis1.subtract(bdTaxVon1);
 		} else if(bdVorTax.compareTo(bdTaxVon3) >= 1) { // wenn VorTax größer oder gleich Stufe 3 von
-			rest7 = new BigDecimal("0.00");
-			rest6 = new BigDecimal("0.00");
-			rest5 = new BigDecimal("0.00");
-			rest4 = new BigDecimal("0.00");
+			rest7 = BD.ZERO;
+			rest6 = BD.ZERO;
+			rest5 = BD.ZERO;
+			rest4 = BD.ZERO;
 			rest3 = bdVorTax.subtract(bdTaxVon3);
 			rest2 = bdTaxBis2.subtract(bdTaxVon2);
 			rest1 = bdTaxBis1.subtract(bdTaxVon1);
 		} else if(bdVorTax.compareTo(bdTaxVon2) >= 1) { // wenn VorTax größer oder gleich Stufe 2 von
-			rest7 = new BigDecimal("0.00");
-			rest6 = new BigDecimal("0.00");
-			rest5 = new BigDecimal("0.00");
-			rest4 = new BigDecimal("0.00");
-			rest3 = new BigDecimal("0.00");
+			rest7 = BD.ZERO;
+			rest6 = BD.ZERO;
+			rest5 = BD.ZERO;
+			rest4 = BD.ZERO;
+			rest3 = BD.ZERO;
 			rest2 = bdVorTax.subtract(bdTaxVon2);
 			rest1 = bdTaxBis1.subtract(bdTaxVon1);
 		} else if(bdVorTax.compareTo(bdTaxVon1) >= 1) { // wenn VorTax größer oder gleich Stufe 1 von
-			rest7 = new BigDecimal("0.00");
-			rest6 = new BigDecimal("0.00");
-			rest5 = new BigDecimal("0.00");
-			rest4 = new BigDecimal("0.00");
-			rest3 = new BigDecimal("0.00");
-			rest2 = new BigDecimal("0.00");
+			rest7 = BD.ZERO;
+			rest6 = BD.ZERO;
+			rest5 = BD.ZERO;
+			rest4 = BD.ZERO;
+			rest3 = BD.ZERO;
+			rest2 = BD.ZERO;
 			rest1 = bdVorTax.subtract(bdTaxVon1);
 		}
 		
@@ -379,13 +384,13 @@ public class TaxData {
 		liste.add(rest5); // Wert Stufe 5
 		liste.add(rest6); // Wert Stufe 6
 		liste.add(rest7); // Wert Stufe 7
-		liste.add(rest1.multiply(new BigDecimal(arrTaxValues[1][4].toString().replace(",", ".")))); // Steuer Stufe 1
-		liste.add(rest2.multiply(new BigDecimal(arrTaxValues[1][7].toString().replace(",", ".")))); // Steuer Stufe 2
-		liste.add(rest3.multiply(new BigDecimal(arrTaxValues[1][10].toString().replace(",", ".")))); // Steuer Stufe 3
-		liste.add(rest4.multiply(new BigDecimal(arrTaxValues[1][13].toString().replace(",", ".")))); // Steuer Stufe 4
-		liste.add(rest5.multiply(new BigDecimal(arrTaxValues[1][16].toString().replace(",", ".")))); // Steuer Stufe 5
-		liste.add(rest6.multiply(new BigDecimal(arrTaxValues[1][19].toString().replace(",", ".")))); // Steuer Stufe 6
-		liste.add(rest7.multiply(new BigDecimal(arrTaxValues[1][22].toString().replace(",", ".")))); // Steuer Stufe 7
+		liste.add(rest1.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][4], LocaleFormat.EU))); // Steuer Stufe 1
+		liste.add(rest2.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][7], LocaleFormat.EU))); // Steuer Stufe 2
+		liste.add(rest3.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][10], LocaleFormat.EU))); // Steuer Stufe 3
+		liste.add(rest4.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][13], LocaleFormat.EU))); // Steuer Stufe 4
+		liste.add(rest5.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][16], LocaleFormat.EU))); // Steuer Stufe 5
+		liste.add(rest6.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][19], LocaleFormat.EU))); // Steuer Stufe 6
+		liste.add(rest7.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][22], LocaleFormat.EU))); // Steuer Stufe 7
 		
 		return liste;
 		

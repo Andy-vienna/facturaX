@@ -1,12 +1,14 @@
 package org.andy.gui.main.settings_panels;
 
+import static org.andy.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
+import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
 import static org.andy.toolbox.misc.CreateObject.createButton;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +24,8 @@ import javax.swing.text.AbstractDocument;
 
 import org.andy.code.dataStructure.entitiyMaster.Tax;
 import org.andy.code.dataStructure.repositoryMaster.TaxRepository;
-import org.andy.gui.main.JFoverview;
+import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
+import org.andy.gui.main.MainWindow;
 import org.andy.gui.misc.CommaHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -68,8 +71,8 @@ public class TaxTablePanel extends JPanel {
 
     private void buildPanel() {
     	int x = 10, y = 20; // Variablen für automatische Positionierung
-    	int btnWidth = JFoverview.getButtonx();
-    	int btnHeight = JFoverview.getButtony();
+    	int btnWidth = MainWindow.getButtonx();
+    	int btnHeight = MainWindow.getButtony();
     	
     	JLabel lblJahr = new JLabel("Jahr");
     	lblJahr.setBounds(x, y, 120, 25);
@@ -259,30 +262,30 @@ public class TaxTablePanel extends JPanel {
     		fillFields(txtFields);
     		fillFields(txtFieldsP);
     		Tax tax = new Tax();
-    		tax.setYear(Integer.parseInt(txtJahr.getText()));
-    		tax.setVon_1(new BigDecimal(txtFields[0].getText()));
-    		tax.setBis_1(new BigDecimal(txtFields[1].getText()));
-    		tax.setTax_1(new BigDecimal(txtFields[2].getText()));
-    		tax.setVon_2(new BigDecimal(txtFields[3].getText()));
-    		tax.setBis_2(new BigDecimal(txtFields[4].getText()));
-    		tax.setTax_2(new BigDecimal(txtFields[5].getText()));
-    		tax.setVon_3(new BigDecimal(txtFields[6].getText()));
-    		tax.setBis_3(new BigDecimal(txtFields[7].getText()));
-    		tax.setTax_3(new BigDecimal(txtFields[8].getText()));
-    		tax.setVon_4(new BigDecimal(txtFields[9].getText()));
-    		tax.setBis_4(new BigDecimal(txtFields[10].getText()));
-    		tax.setTax_4(new BigDecimal(txtFields[11].getText()));
-    		tax.setVon_5(new BigDecimal(txtFields[12].getText()));
-    		tax.setBis_5(new BigDecimal(txtFields[13].getText()));
-    		tax.setTax_5(new BigDecimal(txtFields[14].getText()));
-    		tax.setVon_6(new BigDecimal(txtFields[15].getText()));
-    		tax.setBis_6(new BigDecimal(txtFields[16].getText()));
-    		tax.setTax_6(new BigDecimal(txtFields[17].getText()));
-    		tax.setVon_7(new BigDecimal(txtFields[18].getText()));
-    		tax.setBis_7(new BigDecimal(txtFields[19].getText()));
-    		tax.setTax_7(new BigDecimal(txtFields[20].getText()));
-    		tax.setOeP(new BigDecimal(txtFieldsP[0].getText()));
-    		tax.setApP(new BigDecimal(txtFieldsP[1].getText()));
+    		tax.setYear(parseStringToIntSafe(txtJahr.getText()));
+    		tax.setVon_1(parseStringToBigDecimalSafe(txtFields[0].getText(), LocaleFormat.EU));
+    		tax.setBis_1(parseStringToBigDecimalSafe(txtFields[1].getText(), LocaleFormat.EU));
+    		tax.setTax_1(parseStringToBigDecimalSafe(txtFields[2].getText(), LocaleFormat.EU));
+    		tax.setVon_2(parseStringToBigDecimalSafe(txtFields[3].getText(), LocaleFormat.EU));
+    		tax.setBis_2(parseStringToBigDecimalSafe(txtFields[4].getText(), LocaleFormat.EU));
+    		tax.setTax_2(parseStringToBigDecimalSafe(txtFields[5].getText(), LocaleFormat.EU));
+    		tax.setVon_3(parseStringToBigDecimalSafe(txtFields[6].getText(), LocaleFormat.EU));
+    		tax.setBis_3(parseStringToBigDecimalSafe(txtFields[7].getText(), LocaleFormat.EU));
+    		tax.setTax_3(parseStringToBigDecimalSafe(txtFields[8].getText(), LocaleFormat.EU));
+    		tax.setVon_4(parseStringToBigDecimalSafe(txtFields[9].getText(), LocaleFormat.EU));
+    		tax.setBis_4(parseStringToBigDecimalSafe(txtFields[10].getText(), LocaleFormat.EU));
+    		tax.setTax_4(parseStringToBigDecimalSafe(txtFields[11].getText(), LocaleFormat.EU));
+    		tax.setVon_5(parseStringToBigDecimalSafe(txtFields[12].getText(), LocaleFormat.EU));
+    		tax.setBis_5(parseStringToBigDecimalSafe(txtFields[13].getText(), LocaleFormat.EU));
+    		tax.setTax_5(parseStringToBigDecimalSafe(txtFields[14].getText(), LocaleFormat.EU));
+    		tax.setVon_6(parseStringToBigDecimalSafe(txtFields[15].getText(), LocaleFormat.EU));
+    		tax.setBis_6(parseStringToBigDecimalSafe(txtFields[16].getText(), LocaleFormat.EU));
+    		tax.setTax_6(parseStringToBigDecimalSafe(txtFields[17].getText(), LocaleFormat.EU));
+    		tax.setVon_7(parseStringToBigDecimalSafe(txtFields[18].getText(), LocaleFormat.EU));
+    		tax.setBis_7(parseStringToBigDecimalSafe(txtFields[19].getText(), LocaleFormat.EU));
+    		tax.setTax_7(parseStringToBigDecimalSafe(txtFields[20].getText(), LocaleFormat.EU));
+    		tax.setOeP(parseStringToBigDecimalSafe(txtFieldsP[0].getText(), LocaleFormat.EU));
+    		tax.setApP(parseStringToBigDecimalSafe(txtFieldsP[1].getText(), LocaleFormat.EU));
     		
     		taxRepository.insert(tax);
     		rebuild();
@@ -293,30 +296,30 @@ public class TaxTablePanel extends JPanel {
     	@Override
         public void actionPerformed(ActionEvent actionEvent) {
     		Tax tax = new Tax();
-    		tax.setYear(Integer.parseInt((String) cmbSelect.getSelectedItem()));
-    		tax.setVon_1(new BigDecimal(txtFields[0].getText()));
-    		tax.setBis_1(new BigDecimal(txtFields[1].getText()));
-    		tax.setTax_1(new BigDecimal(txtFields[2].getText()));
-    		tax.setVon_2(new BigDecimal(txtFields[3].getText()));
-    		tax.setBis_2(new BigDecimal(txtFields[4].getText()));
-    		tax.setTax_2(new BigDecimal(txtFields[5].getText()));
-    		tax.setVon_3(new BigDecimal(txtFields[6].getText()));
-    		tax.setBis_3(new BigDecimal(txtFields[7].getText()));
-    		tax.setTax_3(new BigDecimal(txtFields[8].getText()));
-    		tax.setVon_4(new BigDecimal(txtFields[9].getText()));
-    		tax.setBis_4(new BigDecimal(txtFields[10].getText()));
-    		tax.setTax_4(new BigDecimal(txtFields[11].getText()));
-    		tax.setVon_5(new BigDecimal(txtFields[12].getText()));
-    		tax.setBis_5(new BigDecimal(txtFields[13].getText()));
-    		tax.setTax_5(new BigDecimal(txtFields[14].getText()));
-    		tax.setVon_6(new BigDecimal(txtFields[15].getText()));
-    		tax.setBis_6(new BigDecimal(txtFields[16].getText()));
-    		tax.setTax_6(new BigDecimal(txtFields[17].getText()));
-    		tax.setVon_7(new BigDecimal(txtFields[18].getText()));
-    		tax.setBis_7(new BigDecimal(txtFields[19].getText()));
-    		tax.setTax_7(new BigDecimal(txtFields[20].getText()));
-    		tax.setOeP(new BigDecimal(txtFieldsP[0].getText()));
-    		tax.setApP(new BigDecimal(txtFieldsP[1].getText()));
+    		tax.setYear(parseStringToIntSafe((String) cmbSelect.getSelectedItem()));
+    		tax.setVon_1(parseStringToBigDecimalSafe(txtFields[0].getText(), LocaleFormat.EU));
+    		tax.setBis_1(parseStringToBigDecimalSafe(txtFields[1].getText(), LocaleFormat.EU));
+    		tax.setTax_1(parseStringToBigDecimalSafe(txtFields[2].getText(), LocaleFormat.EU));
+    		tax.setVon_2(parseStringToBigDecimalSafe(txtFields[3].getText(), LocaleFormat.EU));
+    		tax.setBis_2(parseStringToBigDecimalSafe(txtFields[4].getText(), LocaleFormat.EU));
+    		tax.setTax_2(parseStringToBigDecimalSafe(txtFields[5].getText(), LocaleFormat.EU));
+    		tax.setVon_3(parseStringToBigDecimalSafe(txtFields[6].getText(), LocaleFormat.EU));
+    		tax.setBis_3(parseStringToBigDecimalSafe(txtFields[7].getText(), LocaleFormat.EU));
+    		tax.setTax_3(parseStringToBigDecimalSafe(txtFields[8].getText(), LocaleFormat.EU));
+    		tax.setVon_4(parseStringToBigDecimalSafe(txtFields[9].getText(), LocaleFormat.EU));
+    		tax.setBis_4(parseStringToBigDecimalSafe(txtFields[10].getText(), LocaleFormat.EU));
+    		tax.setTax_4(parseStringToBigDecimalSafe(txtFields[11].getText(), LocaleFormat.EU));
+    		tax.setVon_5(parseStringToBigDecimalSafe(txtFields[12].getText(), LocaleFormat.EU));
+    		tax.setBis_5(parseStringToBigDecimalSafe(txtFields[13].getText(), LocaleFormat.EU));
+    		tax.setTax_5(parseStringToBigDecimalSafe(txtFields[14].getText(), LocaleFormat.EU));
+    		tax.setVon_6(parseStringToBigDecimalSafe(txtFields[15].getText(), LocaleFormat.EU));
+    		tax.setBis_6(parseStringToBigDecimalSafe(txtFields[16].getText(), LocaleFormat.EU));
+    		tax.setTax_6(parseStringToBigDecimalSafe(txtFields[17].getText(), LocaleFormat.EU));
+    		tax.setVon_7(parseStringToBigDecimalSafe(txtFields[18].getText(), LocaleFormat.EU));
+    		tax.setBis_7(parseStringToBigDecimalSafe(txtFields[19].getText(), LocaleFormat.EU));
+    		tax.setTax_7(parseStringToBigDecimalSafe(txtFields[20].getText(), LocaleFormat.EU));
+    		tax.setOeP(parseStringToBigDecimalSafe(txtFieldsP[0].getText(), LocaleFormat.EU));
+    		tax.setApP(parseStringToBigDecimalSafe(txtFieldsP[1].getText(), LocaleFormat.EU));
     		
     		taxRepository.update(tax);
     		rebuild();

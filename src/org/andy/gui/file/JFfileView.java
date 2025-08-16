@@ -1,6 +1,7 @@
 package org.andy.gui.file;
 
 import static org.andy.code.dataStructure.HibernateUtil.getSessionFactoryDb2;
+import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
 import static org.andy.toolbox.misc.SelectFile.chooseFile;
 import static org.andy.toolbox.misc.SelectFile.choosePath;
 import static org.andy.toolbox.misc.SelectFile.getNotSelected;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -646,7 +648,7 @@ public class JFfileView extends JFrame {
 
 	private static int aktJahr() {
 	    // falls du das Geschäftsjahr als String hast (z. B. "2025"):
-	    return Integer.parseInt(LoadData.getStrAktGJ());
+	    return parseStringToIntSafe(LoadData.getStrAktGJ());
 	}
 
 	private static void setNameAndData(FileStore fs, String typ, String name, byte[] data) {

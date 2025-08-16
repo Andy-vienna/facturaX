@@ -28,10 +28,10 @@ public class AngebotRepository {
     }
     
     public Integer findMaxNummerByJahr(int jahr) {
+    	String prefix = "AN-" + jahr + "-";
+    	int prefixLength = ("AN-" + jahr + "-").length();
         try (Session session = HibernateUtil.getSessionFactoryDb2().openSession()) {
-        	String prefix = "AN-" + jahr + "-";
-        	int prefixLength = ("AN-" + jahr + "-").length();
-            return session.createQuery(
+            Integer maxNummer = session.createQuery(
             		"SELECT CAST(SUBSTRING(r.idNummer, :prefixLen + 1) AS int) " +
                             "FROM Angebot r " +
                             "WHERE r.jahr = :jahr AND r.idNummer LIKE :prefix " +
@@ -42,6 +42,7 @@ public class AngebotRepository {
                     .setParameter("prefixLen", prefixLength)
                     .setMaxResults(1)
                     .uniqueResult();
+            return (maxNummer == null ? 0 : maxNummer);
         }
     }
 

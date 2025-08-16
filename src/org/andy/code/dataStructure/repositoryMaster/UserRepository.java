@@ -13,6 +13,15 @@ public class UserRepository {
             return session.createQuery("FROM User", User.class).list();
         }
     }
+    
+    public User findById(String id){
+    	try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
+            return session.createQuery(
+                    "FROM User r WHERE r.id = :id", User.class)
+                    .setParameter("id", id)
+                    .getSingleResult();
+        }
+    }
 
     public void insert(User user) {
         try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {

@@ -31,7 +31,7 @@ public class RechnungRepository {
         try (Session session = HibernateUtil.getSessionFactoryDb2().openSession()) {
         	String prefix = "RE-" + jahr + "-";
         	int prefixLength = ("RE-" + jahr + "-").length();
-            return session.createQuery(
+            Integer maxNummer = session.createQuery(
             		"SELECT CAST(SUBSTRING(r.idNummer, :prefixLen + 1) AS int) " +
                             "FROM Rechnung r " +
                             "WHERE r.jahr = :jahr AND r.idNummer LIKE :prefix " +
@@ -42,6 +42,7 @@ public class RechnungRepository {
                     .setParameter("prefixLen", prefixLength)
                     .setMaxResults(1)
                     .uniqueResult();
+            return (maxNummer == null ? 0 : maxNummer);
         }
     }
 

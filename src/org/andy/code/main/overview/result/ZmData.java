@@ -1,5 +1,7 @@
 package org.andy.code.main.overview.result;
 
+import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
+
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -15,6 +17,7 @@ import org.andy.code.dataStructure.entitiyProductive.Rechnung;
 import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
 import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
 import org.andy.code.main.LoadData;
+import org.andy.code.misc.BD;
 import org.andy.gui.main.result_panels.ZmPanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,7 +49,7 @@ public class ZmData {
 		
 		RechnungRepository rechnungRepository = new RechnungRepository();
 	    List<Rechnung> rechnungListe = new ArrayList<>();
-		rechnungListe.addAll(rechnungRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ()))); // Rechnungen nach GJ laden
+		rechnungListe.addAll(rechnungRepository.findAllByJahr(parseStringToIntSafe(LoadData.getStrAktGJ()))); // Rechnungen nach GJ laden
 		
 	    List<Map<String, Statistik>> mapProQuartal = new ArrayList<>();
 	    for (int i = 0; i < 4; i++) {
@@ -105,7 +108,7 @@ public class ZmData {
 
 class Statistik {
 	long anzahl = 0;
-	BigDecimal summe = BigDecimal.ZERO;
+	BigDecimal summe = BD.ZERO;
 
 	void add(BigDecimal betrag) {
 		anzahl++;

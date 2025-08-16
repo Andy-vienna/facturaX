@@ -1,5 +1,7 @@
 package org.andy.gui.main.overview_panels.edit_panels.factory;
 
+import static org.andy.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
+import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
 import static org.andy.toolbox.misc.CreateObject.createButton;
 import static org.andy.toolbox.misc.Tools.FormatIBAN;
 
@@ -24,11 +26,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import com.github.lgooddatepicker.components.DatePicker;
-import com.github.lgooddatepicker.components.DatePickerSettings;
 
 import org.andy.code.dataStructure.entitiyMaster.Artikel;
 import org.andy.code.dataStructure.entitiyMaster.Bank;
@@ -40,9 +37,16 @@ import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
 import org.andy.code.dataStructure.repositoryProductive.AngebotRepository;
 import org.andy.code.main.LoadData;
 import org.andy.code.main.StartUp;
-import org.andy.gui.main.JFoverview;
+import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
+import org.andy.code.misc.BD;
+import org.andy.gui.main.MainWindow;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.gui.misc.RoundedBorder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.github.lgooddatepicker.components.DatePicker;
+import com.github.lgooddatepicker.components.DatePickerSettings;
 
 public class OfferCreatePanel extends EditPanel {
 	
@@ -182,7 +186,7 @@ public class OfferCreatePanel extends EditPanel {
         chkPage2.setBounds(1130,130,390,25); add(chkPage2);
 
         JButton btnDoExport = createButton("<html>Angebot<br>erstellen</html>", "edit.png");
-        btnDoExport.setBounds(1545,305, JFoverview.getButtonx(), JFoverview.getButtony());
+        btnDoExport.setBounds(1545,305, MainWindow.getButtonx(), MainWindow.getButtony());
         btnDoExport.setEnabled(true);
         add(btnDoExport);
 
@@ -287,7 +291,7 @@ public class OfferCreatePanel extends EditPanel {
         String s = txtEP[i].getText().trim();
         if (s.isEmpty()) { bdEinzel[i]=null; txtGP[i].setText(""); return; }
         try {
-            bdEinzel[i] = new BigDecimal(s);
+            bdEinzel[i] = parseStringToBigDecimalSafe(s, LocaleFormat.EU);
             onQtyOrEPChanged(i);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Eingabe inkorrekt …", "Angebot", JOptionPane.ERROR_MESSAGE);
@@ -298,8 +302,8 @@ public class OfferCreatePanel extends EditPanel {
     private void onQtyOrEPChanged(int i) {
         if (isEmpty(txtEP[i]) || isEmpty(txtAnz[i])) { txtAnz[i].setBackground(Color.PINK); txtGP[i].setText(""); return; }
         try {
-            bdAnzahl[i] = new BigDecimal(txtAnz[i].getText());
-            if (bdEinzel[i] == null) bdEinzel[i] = new BigDecimal(txtEP[i].getText());
+            bdAnzahl[i] = parseStringToBigDecimalSafe(txtAnz[i].getText(), LocaleFormat.EU);
+            if (bdEinzel[i] == null) bdEinzel[i] = parseStringToBigDecimalSafe(txtEP[i].getText(), LocaleFormat.EU);
             bdSumme[i]  = bdEinzel[i].multiply(bdAnzahl[i]).setScale(2, RoundingMode.HALF_UP);
             txtGP[i].setText(bdSumme[i].toString());
             txtAnz[i].setBackground(Color.WHITE);
@@ -318,7 +322,7 @@ public class OfferCreatePanel extends EditPanel {
 
         Angebot a = new Angebot();
         a.setIdNummer(nextAnNummer());
-        a.setJahr(Integer.parseInt(LoadData.getStrAktGJ()));
+        a.setJahr(parseStringToIntSafe(LoadData.getStrAktGJ()));
         a.setDatum(dateOrToday(datePicker));
         Kunde k = kunden.get(cmbKunde.getSelectedIndex());
         Bank  b = banken.get(cmbBank.getSelectedIndex());
@@ -331,20 +335,20 @@ public class OfferCreatePanel extends EditPanel {
         int posCount = countFilledPositions();
         a.setAnzPos(BigDecimal.valueOf(posCount));
 
-        BigDecimal netto = BigDecimal.ZERO;
+        BigDecimal netto = BD.ZERO;
         for (int i=0;i<POS_COUNT;i++) {
             if (sPosText[i]==null || bdAnzahl[i]==null || bdEinzel[i]==null) continue;
             setAngebotPosition(a, i, sPosText[i], bdAnzahl[i], bdEinzel[i]);
             netto = netto.add(bdEinzel[i].multiply(bdAnzahl[i]));
         }
         a.setNetto(netto.setScale(2, RoundingMode.HALF_UP));
-        a.setUst(BigDecimal.ZERO);
-        a.setBrutto(BigDecimal.ZERO);
+        a.setUst(BD.ZERO);
+        a.setBrutto(BD.ZERO);
         a.setlZeitr(" ");
         a.setState(1); // erstellt
 
         angebotRepository.save(a);
-        JFoverview.actScreen();
+        MainWindow.actScreen();
     }
 
 	//###################################################################################################################################################
@@ -456,7 +460,7 @@ public class OfferCreatePanel extends EditPanel {
     }
 
     private String nextAnNummer() {
-        int max = angebotRepository.findMaxNummerByJahr(Integer.parseInt(LoadData.getStrAktGJ()));
+        int max = angebotRepository.findMaxNummerByJahr(parseStringToIntSafe(LoadData.getStrAktGJ()));
         return "AN-" + LoadData.getStrAktGJ() + "-" + String.format("%04d", max + 1);
     }
 

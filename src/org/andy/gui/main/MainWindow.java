@@ -15,33 +15,52 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Rectangle;
 import java.awt.Window;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import javax.swing.*;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import org.andy.code.dataExport.ExcelBill;
 import org.andy.code.dataExport.ExcelOffer;
 import org.andy.code.dataStructure.entitiyMaster.Kunde;
 import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
-import org.andy.code.main.*;
-import org.andy.code.main.overview.result.ZmData;
+import org.andy.code.main.LoadData;
+import org.andy.code.main.StartUp;
 import org.andy.code.main.overview.result.TaxData;
 import org.andy.code.main.overview.result.UStData;
+import org.andy.code.main.overview.result.ZmData;
 import org.andy.code.main.overview.table.LoadBill;
 import org.andy.code.main.overview.table.LoadExpenses;
 import org.andy.code.main.overview.table.LoadOffer;
 import org.andy.code.main.overview.table.LoadPurchase;
 import org.andy.code.main.overview.table.LoadSvTax;
+import org.andy.code.misc.BD;
 import org.andy.gui.file.JFfileView;
 import org.andy.gui.main.overview_panels.SumPanel;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
@@ -51,10 +70,19 @@ import org.andy.gui.main.overview_panels.edit_panels.factory.ExpensesPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.OfferPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.PurchasePanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.SvTaxPanel;
-import org.andy.gui.main.result_panels.ZmPanel;
 import org.andy.gui.main.result_panels.TaxPanel;
 import org.andy.gui.main.result_panels.UStPanel;
-import org.andy.gui.main.settings_panels.*;
+import org.andy.gui.main.result_panels.ZmPanel;
+import org.andy.gui.main.settings_panels.ArtikelPanel;
+import org.andy.gui.main.settings_panels.BankPanel;
+import org.andy.gui.main.settings_panels.DbPanel;
+import org.andy.gui.main.settings_panels.GwbTablePanel;
+import org.andy.gui.main.settings_panels.KundePanel;
+import org.andy.gui.main.settings_panels.OwnerPanel;
+import org.andy.gui.main.settings_panels.PfadPanel;
+import org.andy.gui.main.settings_panels.QrPanel;
+import org.andy.gui.main.settings_panels.TaxTablePanel;
+import org.andy.gui.main.settings_panels.UserPanel;
 import org.andy.gui.main.settings_panels.text_panels.TextPanelFactory;
 import org.andy.gui.main.table_panels.CreatePanel;
 import org.andy.gui.main.table_panels.CreateTable;
@@ -63,13 +91,16 @@ import org.andy.gui.misc.RoundedBorder;
 import org.andy.gui.misc.WrapLayout;
 import org.andy.gui.offer.JFconfirmA;
 import org.andy.gui.reminder.JFreminder;
-import org.andy.toolbox.misc.*;
+import org.andy.toolbox.misc.SetFrameIcon;
+import org.andy.toolbox.misc.SetMenuIcon;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-public class JFoverview extends JFrame {
-	private static volatile JFoverview instance; // Instanz bilden
+public class MainWindow extends JFrame {
+	private static volatile MainWindow instance; // Instanz bilden
 
     private static final long serialVersionUID = 1L;
-    private static final Logger logger = LogManager.getLogger(JFoverview.class);
+    private static final Logger logger = LogManager.getLogger(MainWindow.class);
 
     private static final String[] HEADER_AN = { "AN-Nummer", "Status", "Datum", "Referenz", "Kunde", "Netto" };
     private static final String[] HEADER_RE = { "RE-Nummer", "Status", "Datum", "Leistungszeitraum", "Referenz", "Kunde", "Netto", "USt.", "Brutto" };
@@ -115,23 +146,14 @@ public class JFoverview extends JFrame {
 
     // Rollen
     enum Role { NONE, USER, SUPERUSER, FINANCIALUSER, ADMIN }
+    private static String u, r;
     
 	//###################################################################################################################################################
 	// public Teil
 	//###################################################################################################################################################
-
-    /*public static void loadGUI() {
-        EventQueue.invokeLater(() -> {
-            try {
-                JFoverview f = new JFoverview();
-                f.setVisible(true);
-            } catch (Exception e) {
-                logger.fatal("loadGUI fehlgeschlagen", e);
-            }
-        });
-    }*/
     
-    public static void loadGUI() {
+    public static void loadGUI(String u, String r) {
+    	MainWindow.u = u; MainWindow.r = r;
         if (SwingUtilities.isEventDispatchThread()) {
             ensureInstanceEDT().setVisible(true);
         } else {
@@ -149,14 +171,14 @@ public class JFoverview extends JFrame {
 	// private Teil
 	//###################################################################################################################################################
     
-    private static JFoverview ensureInstanceEDT() {
+    private static MainWindow ensureInstanceEDT() {
         if (!SwingUtilities.isEventDispatchThread())
             throw new IllegalStateException("Aufruf muss auf dem EDT erfolgen");
-        if (instance == null) instance = new JFoverview();
+        if (instance == null) instance = new MainWindow();
         return instance;
     }
 
-    private JFoverview() {
+    private MainWindow() {
         try {
             setIconImage(SetFrameIcon.getFrameIcon("icon.png"));
         } catch (IOException e) {
@@ -164,7 +186,7 @@ public class JFoverview extends JFrame {
         }
         sLic = StartUp.getAPP_LICENSE();
         iLic = StartUp.getAPP_MODE();
-        role = roleFromLogin();
+        role = roleFromLogin(r);
 
         setTitle("FacturaX v2 (" + StartUp.APP_VERSION + ") - Wirtschaftsjahr " + LoadData.getStrAktGJ() + " - " + sLic);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -218,7 +240,14 @@ public class JFoverview extends JFrame {
         // Actions
         exit.addActionListener(_ -> System.exit(0));
         aktualisieren.addActionListener(_ -> updScreen());
-        info.addActionListener(_ -> JFinfo.loadFrame());
+        info.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Component c = (Component) e.getSource();
+	        	Window owner = SwingUtilities.getWindowAncestor(c);
+	        	InfoDialog.show(owner, StartUp.APP_NAME, StartUp.APP_VERSION);
+	        	//InfoDialog.show(SwingUtilities.getWindowAncestor(null), StartUp.APP_NAME, StartUp.APP_VERSION)
+			}
+		});
     }
 
     //###################################################################################################################################################
@@ -233,9 +262,9 @@ public class JFoverview extends JFrame {
                 doAngebotPanel(false);
                 doRechnungPanel(false);
                 tabPanel.addTab("Angebote", pageAN);
-                tabPanel.setIconAt(0, new ImageIcon(JFoverview.class.getResource("/org/resources/icons/offer.png")));
+                tabPanel.setIconAt(0, new ImageIcon(MainWindow.class.getResource("/org/resources/icons/offer.png")));
                 tabPanel.addTab("Rechnungen", pageRE);
-                tabPanel.setIconAt(1, new ImageIcon(JFoverview.class.getResource("/org/resources/icons/invoice.png")));
+                tabPanel.setIconAt(1, new ImageIcon(MainWindow.class.getResource("/org/resources/icons/invoice.png")));
             }
             case SUPERUSER -> {
                 doAngebotPanel(false);
@@ -246,23 +275,23 @@ public class JFoverview extends JFrame {
                 tabPanel.addTab("Rechnungen", pageRE);
                 tabPanel.addTab("Einkauf", pagePU);
                 tabPanel.addTab("Betriebsausgaben", pageEX);
-                tabPanel.setIconAt(0, new ImageIcon(JFoverview.class.getResource("/org/resources/icons/offer.png")));
-                tabPanel.setIconAt(1, new ImageIcon(JFoverview.class.getResource("/org/resources/icons/invoice.png")));
-                tabPanel.setIconAt(2, new ImageIcon(JFoverview.class.getResource("/org/resources/icons/purchase.png")));
-                tabPanel.setIconAt(3, new ImageIcon(JFoverview.class.getResource("/org/resources/icons/expenses.png")));
+                tabPanel.setIconAt(0, new ImageIcon(MainWindow.class.getResource("/org/resources/icons/offer.png")));
+                tabPanel.setIconAt(1, new ImageIcon(MainWindow.class.getResource("/org/resources/icons/invoice.png")));
+                tabPanel.setIconAt(2, new ImageIcon(MainWindow.class.getResource("/org/resources/icons/purchase.png")));
+                tabPanel.setIconAt(3, new ImageIcon(MainWindow.class.getResource("/org/resources/icons/expenses.png")));
             }
             case FINANCIALUSER -> {
                 doSvsTaxPanel();
                 doJahresergebnis();
                 tabPanel.addTab("SV und Steuer", pageST);
                 tabPanel.addTab("Jahresergebnis", pageOv);
-                tabPanel.setIconAt(0, new ImageIcon(JFoverview.class.getResource("/org/resources/icons/tax.png")));
-                tabPanel.setIconAt(1, new ImageIcon(JFoverview.class.getResource("/org/resources/icons/result.png")));
+                tabPanel.setIconAt(0, new ImageIcon(MainWindow.class.getResource("/org/resources/icons/tax.png")));
+                tabPanel.setIconAt(1, new ImageIcon(MainWindow.class.getResource("/org/resources/icons/result.png")));
             }
             case ADMIN -> {
                 doEinstellungen();
                 tabPanel.addTab("Einstellungen", pageAdmin);
-                tabPanel.setIconAt(0, new ImageIcon(JFoverview.class.getResource("/org/resources/icons/config.png")));
+                tabPanel.setIconAt(0, new ImageIcon(MainWindow.class.getResource("/org/resources/icons/config.png")));
             }
             default -> System.exit(2);
         }
@@ -554,11 +583,14 @@ public class JFoverview extends JFrame {
     // Statusbar
 
     private void buildStatusBar() {
+    	var dateNow = java.time.LocalDate.now(java.time.ZoneId.systemDefault());
+        var dfDate = java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        var dtNow = dateNow.format(dfDate);
         String sStatus = String.format(
                 "<html><b>%s</b> | %s | Angemeldeter Benutzer: <font color='blue'><b>%s</b> (%s)</font>"
                         + " | Master-DB: <font color='blue'><b>%s</b></font>"
                         + " | Produktiv-DB: <font color='blue'><b>%s</b></font></html>",
-                StartUp.getDtNow(), sLic, LoadData.getStrAktUser(), JFmainLogIn.getUserRights(),
+                dtNow, sLic, u, role,
                 LoadData.getStrDBNameSource(), LoadData.getStrDBNameDest());
 
         lblState = new JLabel(sStatus);
@@ -585,7 +617,7 @@ public class JFoverview extends JFrame {
         txtWirtschaftsjahr.setFont(new Font("Tahoma", Font.BOLD, 12));
         txtWirtschaftsjahr.setForeground(Color.BLACK);
 
-        JPanel status = new JPanel(new BorderLayout(8, 0));
+        JPanel status = new JPanel(new BorderLayout(1, 0));
         status.add(lblState, BorderLayout.CENTER);
         status.add(txtWirtschaftsjahr, BorderLayout.EAST);
         contentPane.add(status, BorderLayout.SOUTH);
@@ -735,7 +767,7 @@ public class JFoverview extends JFrame {
         } else {
             if (purchasePanel instanceof PurchasePanel pup) {
                 pup.setsTitel("vorhandenen Einkaufsbeleg (Rechnungs-Nr. = " + table.getValueAt(row, 1) + ") bearbeiten");
-                pup.setBtnText(1, "<html>bezahlt<br>setzen</html>");
+                pup.setBtnText(1, "<html>Status<br>setzen</html>");
                 pup.setTxtFields(table.getValueAt(row, 1).toString());
                 pup.setIcon();
                 pup.setFile(false);
@@ -834,8 +866,8 @@ public class JFoverview extends JFrame {
         contentPane.repaint();
     }
 
-    private Role roleFromLogin() {
-        return switch (JFmainLogIn.getUserRights()) {
+    private Role roleFromLogin(String r) {
+        return switch (r) {
             case "user" -> Role.USER;
             case "superuser" -> Role.SUPERUSER;
             case "financialuser" -> Role.FINANCIALUSER;
@@ -887,8 +919,8 @@ public class JFoverview extends JFrame {
     }
     
     private int prozent(BigDecimal open, BigDecimal closed) {
-        if (open == null) open = BigDecimal.ZERO;
-        if (closed == null) closed = BigDecimal.ZERO;
+        if (open == null) open = BD.ZERO;
+        if (closed == null) closed = BD.ZERO;
         BigDecimal sum = open.add(closed);
         if (sum.signum() <= 0) return 0;
         return open.multiply(BigDecimal.valueOf(100))
@@ -902,8 +934,8 @@ public class JFoverview extends JFrame {
 
     static class TableANcr extends DefaultTableCellRenderer {
         private static final long serialVersionUID = 1L;
-        private final JFoverview ctx;
-        TableANcr(JFoverview ctx) { this.ctx = ctx; }
+        private final MainWindow ctx;
+        TableANcr(MainWindow ctx) { this.ctx = ctx; }
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -926,8 +958,8 @@ public class JFoverview extends JFrame {
 
     static class TableREcr extends DefaultTableCellRenderer {
         private static final long serialVersionUID = 1L;
-        private final JFoverview ctx;
-        TableREcr(JFoverview ctx) { this.ctx = ctx; }
+        private final MainWindow ctx;
+        TableREcr(MainWindow ctx) { this.ctx = ctx; }
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -971,12 +1003,12 @@ public class JFoverview extends JFrame {
                     long daysBetween = ChronoUnit.DAYS.between(dateNow, datePay);
                     int daysPayable = Math.toIntExact(daysBetween);
 
-                    String bezahlt = String.valueOf(table.getValueAt(row, 8));
-                    if ("nein".equals(bezahlt)) {
-                        if (daysPayable < 0) setBackground(Color.RED);
-                        else if (daysPayable < 3) setBackground(Color.PINK);
-                    } else if ("ja".equals(bezahlt)) {
-                        setBackground(new Color(152,251,152));
+                    String s = String.valueOf(table.getValueAt(row, 8));
+                    switch(s) {
+                    case "nein" -> { if (daysPayable < 0) setBackground(Color.RED); else if (daysPayable < 3) setBackground(Color.PINK);}
+                    case "angezahlt" -> setBackground(Color.CYAN);
+                    case "ja" -> setBackground(new Color(152,251,152));
+                    case "ja, Skonto 1", "ja, Skonto 2" -> setBackground(new Color(155,205,155));
                     }
                 } catch (Exception e) {
                     logger.error("PU render date error", e);

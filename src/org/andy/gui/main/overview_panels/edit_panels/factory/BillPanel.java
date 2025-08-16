@@ -1,6 +1,8 @@
 package org.andy.gui.main.overview_panels.edit_panels.factory;
 
+import static org.andy.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
 import static org.andy.toolbox.misc.CreateObject.createButton;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -34,7 +36,9 @@ import org.andy.code.dataStructure.entitiyProductive.Rechnung;
 import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
 import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
 import org.andy.code.main.StartUp;
-import org.andy.gui.main.JFoverview;
+import org.andy.code.misc.BD;
+import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
+import org.andy.gui.main.MainWindow;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.gui.misc.CommaHelper;
 import org.andy.gui.misc.RoundedBorder;
@@ -78,9 +82,9 @@ public class BillPanel extends EditPanel {
 	private JButton[] btnFields = new JButton[3];
 	
 	private String[] sDatum = new String[2];
-	BigDecimal bdNetto = BigDecimal.ZERO, bdTax = BigDecimal.ZERO, bdBrutto = BigDecimal.ZERO;
+	BigDecimal bdNetto = BD.ZERO, bdTax = BD.ZERO, bdBrutto = BD.ZERO;
 	private String id = null;
-	private BigDecimal bdTaxRate = BigDecimal.ZERO;
+	private BigDecimal bdTaxRate = BD.ZERO;
 	
 	//###################################################################################################################################################
 	// public Teil
@@ -250,9 +254,9 @@ public class BillPanel extends EditPanel {
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}
-		btnFields[0].setBounds(1625, 260, JFoverview.getButtonx(), JFoverview.getButtony());
-		btnFields[1].setBounds(1625, 320, JFoverview.getButtonx(), JFoverview.getButtony());
-		btnFields[2].setBounds(1625, 70, JFoverview.getButtonx(), JFoverview.getButtony());
+		btnFields[0].setBounds(1625, 260, MainWindow.getButtonx(), MainWindow.getButtony());
+		btnFields[1].setBounds(1625, 320, MainWindow.getButtonx(), MainWindow.getButtony());
+		btnFields[2].setBounds(1625, 70, MainWindow.getButtonx(), MainWindow.getButtony());
 		btnFields[2].setVisible(false);
 		add(btnFields[0]);
 		add(btnFields[1]);
@@ -368,8 +372,8 @@ public class BillPanel extends EditPanel {
 	//###################################################################################################################################################
     
     private void calcValue() throws ParseException {
-    	BigDecimal bdEP = BigDecimal.ZERO; BigDecimal bdAnz = BigDecimal.ZERO; BigDecimal bdGP = BigDecimal.ZERO;
-    	bdNetto = BigDecimal.ZERO;
+    	BigDecimal bdEP = BD.ZERO; BigDecimal bdAnz = BD.ZERO; BigDecimal bdGP = BD.ZERO;
+    	bdNetto = BD.ZERO;
     	for (int i = 0; i < this.txtFieldsPos.length; i++) {
 			this.txtFieldsGP[i].setText("");
 		}
@@ -382,8 +386,8 @@ public class BillPanel extends EditPanel {
 	    		String anz = this.txtFieldsAnz[i].getText();
 	    		String ep = this.txtFieldsEP[i].getText();
 	    		
-	    		bdAnz = new BigDecimal(anz.trim()).setScale(2, RoundingMode.HALF_UP);
-	    	    bdEP = new BigDecimal(ep.trim()).setScale(2, RoundingMode.HALF_UP);
+	    		bdAnz = parseStringToBigDecimalSafe(anz, LocaleFormat.EU).setScale(2, RoundingMode.HALF_UP);
+	    		bdEP = parseStringToBigDecimalSafe(ep, LocaleFormat.EU).setScale(2, RoundingMode.HALF_UP);
 	        	bdGP = bdAnz.multiply(bdEP).setScale(2, RoundingMode.HALF_UP);
 	
 	        	bdNetto = bdNetto.add(bdGP).setScale(2, RoundingMode.HALF_UP);
@@ -391,7 +395,7 @@ public class BillPanel extends EditPanel {
     		}
 		}
     	txtFieldsSum[0].setValue(Double.parseDouble(bdNetto.toString()));
-    	bdTax = bdNetto.multiply(bdTaxRate.divide(new BigDecimal("100"))).setScale(2, RoundingMode.HALF_UP);
+    	bdTax = bdNetto.multiply(bdTaxRate.divide(BD.HUNDRED)).setScale(2, RoundingMode.HALF_UP);
     	txtFieldsSum[1].setValue(Double.parseDouble(bdTax.toString()));
     	bdBrutto = bdNetto.add(bdTax).setScale(2, RoundingMode.HALF_UP);
     	txtFieldsSum[2].setValue(Double.parseDouble(bdBrutto.toString()));	
@@ -399,7 +403,7 @@ public class BillPanel extends EditPanel {
     
     private void updateTable() {
     	
-    	BigDecimal anzPos = BigDecimal.ZERO;
+    	BigDecimal anzPos = BD.ZERO;
     	String[] sPosText = new String[13];
     	BigDecimal[] bdAnzahl = new BigDecimal[this.txtFieldsPos.length];
     	BigDecimal[] bdEinzel = new BigDecimal[this.txtFieldsPos.length];
@@ -410,9 +414,9 @@ public class BillPanel extends EditPanel {
     	for (int i = 0; i < this.txtFieldsPos.length; i++) {
     		if (!this.txtFieldsPos[i].getText().isEmpty()) {
 				sPosText[i] = this.txtFieldsPos[i].getText();
-				bdAnzahl[i] = new BigDecimal(this.txtFieldsAnz[i].getText()).setScale(2, RoundingMode.HALF_UP);
-				bdEinzel[i] = new BigDecimal(this.txtFieldsEP[i].getText()).setScale(2, RoundingMode.HALF_UP);
-				anzPos = anzPos.add(BigDecimal.ONE); // Anzahl der Positionen
+				bdAnzahl[i] = parseStringToBigDecimalSafe(this.txtFieldsAnz[i].getText(), LocaleFormat.EU).setScale(2, RoundingMode.HALF_UP);
+				bdEinzel[i] = parseStringToBigDecimalSafe(this.txtFieldsEP[i].getText(), LocaleFormat.EU).setScale(2, RoundingMode.HALF_UP);
+				anzPos = anzPos.add(BD.ONE); // Anzahl der Positionen
     		}
 		}
     	
@@ -446,7 +450,7 @@ public class BillPanel extends EditPanel {
     	rechnung.setBrutto(BigDecimal.valueOf(brutto));
     	
     	rechnungRepository.update(rechnung); // Hibernate update
-    	JFoverview.actScreen();
+    	MainWindow.actScreen();
     }
     
     private void updateState() {
@@ -454,9 +458,9 @@ public class BillPanel extends EditPanel {
         Rechnung rechnung = rechnungRepository.findById(id);
         switch (cmbState.getSelectedIndex()) {
 		case 1: // storniert
-			rechnung.setNetto(BigDecimal.ZERO);
-			rechnung.setUst(BigDecimal.ZERO);
-			rechnung.setBrutto(BigDecimal.ZERO);
+			rechnung.setNetto(BD.ZERO);
+			rechnung.setUst(BD.ZERO);
+			rechnung.setBrutto(BD.ZERO);
 			rechnung.setState(0);
 			break;
 		case 2: // bezahlt
@@ -472,18 +476,18 @@ public class BillPanel extends EditPanel {
 			break;
 		}
         rechnungRepository.update(rechnung); // Hibernate update
-        JFoverview.actScreen();
+        MainWindow.actScreen();
     }
     
     private void updateSkonto(Rechnung r, int stufe) {
     	KundeRepository kundeRepository = new KundeRepository();
     	List<Kunde> kundeListe = kundeRepository.findAll();
-    	BigDecimal oldNetto = BigDecimal.ZERO, skonto = BigDecimal.ZERO, taxRate = BigDecimal.ZERO;
-    	BigDecimal newNetto = BigDecimal.ZERO, newUSt = BigDecimal.ZERO, newBrutto = BigDecimal.ZERO;
+    	BigDecimal oldNetto = BD.ZERO, skonto = BD.ZERO, taxRate = BD.ZERO;
+    	BigDecimal newNetto = BD.ZERO, newUSt = BD.ZERO, newBrutto = BD.ZERO;
     	for (int i = 0; i < kundeListe.size(); i++) {
     		Kunde k = kundeListe.get(i);
     		if (k.getId().equals(r.getIdKunde())){
-    			taxRate = new BigDecimal(k.getTaxvalue()).divide(new BigDecimal("100.00"));
+    			taxRate = parseStringToBigDecimalSafe(k.getTaxvalue(), LocaleFormat.EU).divide(BD.HUNDRED);
     		}
     	}
     	switch(stufe) {
@@ -542,9 +546,9 @@ public class BillPanel extends EditPanel {
     	ep.add(rechnung.getePreis09()); ep.add(rechnung.getePreis10()); ep.add(rechnung.getePreis11()); ep.add(rechnung.getePreis12());
     	
     	
-    	this.id = null; this.bdTaxRate = BigDecimal.ZERO;
-    	bdNetto = BigDecimal.ZERO;
-    	bdTaxRate = new BigDecimal(TaxVal.trim());
+    	this.id = null; this.bdTaxRate = BD.ZERO;
+    	bdNetto = BD.ZERO;
+    	bdTaxRate = parseStringToBigDecimalSafe(TaxVal, LocaleFormat.EU);
 
     	if (id != null && !id.isEmpty()) {
 			this.id = id;
@@ -581,17 +585,17 @@ public class BillPanel extends EditPanel {
 			
 		}
 		txtFieldsSum[0].setValue(Double.parseDouble(bdNetto.toString()));
-    	bdTax = bdNetto.multiply(bdTaxRate.divide(new BigDecimal("100"))).setScale(2, RoundingMode.HALF_UP);
+    	bdTax = bdNetto.multiply(bdTaxRate.divide(BD.HUNDRED)).setScale(2, RoundingMode.HALF_UP);
     	txtFieldsSum[1].setValue(Double.parseDouble(bdTax.toString()));
     	bdBrutto = bdNetto.add(bdTax).setScale(2, RoundingMode.HALF_UP);
     	txtFieldsSum[2].setValue(Double.parseDouble(bdBrutto.toString()));
     	
     	if (rechnung.getSkonto1() == 1) {chkSkonto1.setSelected(true);} else {chkSkonto1.setSelected(false);}
     	txtSkontoTage1.setText(String.valueOf(rechnung.getSkonto1tage()));
-    	txtSkontoWert1.setText(rechnung.getSkonto1wert().multiply(new BigDecimal("100")).setScale(1, RoundingMode.HALF_UP).toString());
+    	txtSkontoWert1.setText(rechnung.getSkonto1wert().multiply(BD.HUNDRED).setScale(1, RoundingMode.HALF_UP).toString());
     	if (rechnung.getSkonto2() == 1) {chkSkonto2.setSelected(true);} else {chkSkonto2.setSelected(false);}
     	txtSkontoTage2.setText(String.valueOf(rechnung.getSkonto2tage()));
-    	txtSkontoWert2.setText(rechnung.getSkonto2wert().multiply(new BigDecimal("100")).setScale(1, RoundingMode.HALF_UP).toString());
+    	txtSkontoWert2.setText(rechnung.getSkonto2wert().multiply(BD.HUNDRED).setScale(1, RoundingMode.HALF_UP).toString());
 
     	switch(rechnung.getState()) {
     	case 1:

@@ -53,6 +53,18 @@ public class Einkauf {
 
     @Column(name = "anzahlung", nullable = false, precision = 9, scale = 2)
     private BigDecimal anzahlung;
+    
+    @Column(name = "Skonto1Tage", nullable = false)
+	private int skonto1tage;
+	
+	@Column(name = "Skonto1Wert", precision = 9, scale = 3, nullable = false)
+	private BigDecimal skonto1wert;
+	
+	@Column(name = "Skonto2Tage", nullable = false)
+	private int skonto2tage;
+	
+	@Column(name = "Skonto2Wert", precision = 9, scale = 3, nullable = false)
+	private BigDecimal skonto2wert;
 
     @Column(name = "zahlungsziel", nullable = false)
     private LocalDate zahlungsziel;
@@ -213,5 +225,29 @@ public class Einkauf {
     public void setStatus(int status) {
         this.status = status;
     }
+	public int getSkonto1tage() {
+		return skonto1tage;
+	}
+	public void setSkonto1tage(int skonto1tage) {
+		this.skonto1tage = skonto1tage;
+	}
+	public BigDecimal getSkonto1wert() {
+		return skonto1wert;
+	}
+	public void setSkonto1wert(BigDecimal skonto1wert) {
+		this.skonto1wert = skonto1wert;
+	}
+	public int getSkonto2tage() {
+		return skonto2tage;
+	}
+	public void setSkonto2tage(int skonto2tage) {
+		this.skonto2tage = skonto2tage;
+	}
+	public BigDecimal getSkonto2wert() {
+		return skonto2wert;
+	}
+	public void setSkonto2wert(BigDecimal skonto2wert) {
+		this.skonto2wert = skonto2wert;
+	}
 }
 

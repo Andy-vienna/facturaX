@@ -28,7 +28,7 @@ import javax.swing.border.TitledBorder;
 
 import org.andy.code.dataStructure.entitiyMaster.User;
 import org.andy.code.dataStructure.repositoryMaster.UserRepository;
-import org.andy.gui.main.JFoverview;
+import org.andy.gui.main.MainWindow;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -76,8 +76,8 @@ public class UserPanel extends JPanel {
 
     private void buildPanel() {
     	int x = 10, y = 20; // Variablen für automatische Positionierung
-    	int btnWidth = JFoverview.getButtonx();
-    	int btnHeight = JFoverview.getButtony();
+    	int btnWidth = MainWindow.getButtonx();
+    	int btnHeight = MainWindow.getButtony();
     	
     	String[] roles = {"", "user", "superuser", "financialuser", "admin"};
     	String[] label = {"vorh. User", "Username", "Kennwort alt", "Kennwort neu", "Kennw. wiederh.", "Benutzerrolle"};

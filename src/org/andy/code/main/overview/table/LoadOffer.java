@@ -1,5 +1,7 @@
 package org.andy.code.main.overview.table;
 
+import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
+
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -13,11 +15,12 @@ import java.util.Locale;
 import org.andy.code.dataStructure.entitiyProductive.Angebot;
 import org.andy.code.dataStructure.repositoryProductive.AngebotRepository;
 import org.andy.code.main.LoadData;
+import org.andy.code.misc.BD;
 
 public class LoadOffer {
     
-    private static BigDecimal sumOpen = BigDecimal.ZERO;
-    private static BigDecimal sumOrdered = BigDecimal.ZERO;
+    private static BigDecimal sumOpen = BD.ZERO;
+    private static BigDecimal sumOrdered = BD.ZERO;
 	
 	//###################################################################################################################################################
 	// public Teil
@@ -37,11 +40,11 @@ public class LoadOffer {
 		DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Locale.GERMANY);
 		DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
 		
-		sumOpen = BigDecimal.ZERO; sumOrdered = BigDecimal.ZERO;
+		sumOpen = BD.ZERO; sumOrdered = BD.ZERO;
 		
 		AngebotRepository angebotRepository = new AngebotRepository();
 	    List<Angebot> angebotListe = new ArrayList<>();
-		angebotListe.addAll(angebotRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ())));
+		angebotListe.addAll(angebotRepository.findAllByJahr(parseStringToIntSafe(LoadData.getStrAktGJ())));
 		
 		String[][] sTemp = new String [angebotListe.size()][6];
 		

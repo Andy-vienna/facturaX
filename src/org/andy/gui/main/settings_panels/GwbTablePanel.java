@@ -1,12 +1,14 @@
 package org.andy.gui.main.settings_panels;
 
 import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
+import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +24,8 @@ import javax.swing.text.AbstractDocument;
 
 import org.andy.code.dataStructure.entitiyMaster.Gwb;
 import org.andy.code.dataStructure.repositoryMaster.GwbRepository;
-import org.andy.gui.main.JFoverview;
+import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
+import org.andy.gui.main.MainWindow;
 import org.andy.gui.misc.CommaHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,8 +70,8 @@ public class GwbTablePanel extends JPanel {
 
     private void buildPanel() {
     	int x = 10, y = 20; // Variablen für automatische Positionierung
-    	int btnWidth = JFoverview.getButtonx();
-    	int btnHeight = JFoverview.getButtony();
+    	int btnWidth = MainWindow.getButtonx();
+    	int btnHeight = MainWindow.getButtony();
     	
     	JLabel lblJahr = new JLabel("Jahr");
     	lblJahr.setBounds(x, y, 120, 25);
@@ -200,15 +203,15 @@ public class GwbTablePanel extends JPanel {
         public void actionPerformed(ActionEvent actionEvent) {
     		fillFields(txtFields);
     		Gwb gwb = new Gwb();
-    		gwb.setYear(Integer.parseInt(txtJahr.getText()));
-    		gwb.setBis_1(new BigDecimal(txtFields[0].getText()));
-    		gwb.setVal_1(new BigDecimal(txtFields[1].getText()));
-    		gwb.setWeitere_2(new BigDecimal(txtFields[2].getText()));
-    		gwb.setVal_2(new BigDecimal(txtFields[3].getText()));
-    		gwb.setWeitere_3(new BigDecimal(txtFields[4].getText()));
-    		gwb.setVal_3(new BigDecimal(txtFields[5].getText()));
-    		gwb.setWeitere_4(new BigDecimal(txtFields[6].getText()));
-    		gwb.setVal_4(new BigDecimal(txtFields[7].getText()));
+    		gwb.setYear(parseStringToIntSafe(txtJahr.getText()));
+    		gwb.setBis_1(parseStringToBigDecimalSafe(txtFields[0].getText(), LocaleFormat.EU));
+    		gwb.setVal_1(parseStringToBigDecimalSafe(txtFields[1].getText(), LocaleFormat.EU));
+    		gwb.setWeitere_2(parseStringToBigDecimalSafe(txtFields[2].getText(), LocaleFormat.EU));
+    		gwb.setVal_2(parseStringToBigDecimalSafe(txtFields[3].getText(), LocaleFormat.EU));
+    		gwb.setWeitere_3(parseStringToBigDecimalSafe(txtFields[4].getText(), LocaleFormat.EU));
+    		gwb.setVal_3(parseStringToBigDecimalSafe(txtFields[5].getText(), LocaleFormat.EU));
+    		gwb.setWeitere_4(parseStringToBigDecimalSafe(txtFields[6].getText(), LocaleFormat.EU));
+    		gwb.setVal_4(parseStringToBigDecimalSafe(txtFields[7].getText(), LocaleFormat.EU));
     		
     		gwbRepository.insert(gwb);
     		rebuild();
@@ -219,15 +222,15 @@ public class GwbTablePanel extends JPanel {
     	@Override
         public void actionPerformed(ActionEvent actionEvent) {
     		Gwb gwb = new Gwb();
-    		gwb.setYear(Integer.parseInt((String) cmbSelect.getSelectedItem()));
-    		gwb.setBis_1(new BigDecimal(txtFields[0].getText()));
-    		gwb.setVal_1(new BigDecimal(txtFields[1].getText()));
-    		gwb.setWeitere_2(new BigDecimal(txtFields[2].getText()));
-    		gwb.setVal_2(new BigDecimal(txtFields[3].getText()));
-    		gwb.setWeitere_3(new BigDecimal(txtFields[4].getText()));
-    		gwb.setVal_3(new BigDecimal(txtFields[5].getText()));
-    		gwb.setWeitere_4(new BigDecimal(txtFields[6].getText()));
-    		gwb.setVal_4(new BigDecimal(txtFields[7].getText()));
+    		gwb.setYear(parseStringToIntSafe((String) cmbSelect.getSelectedItem()));
+    		gwb.setBis_1(parseStringToBigDecimalSafe(txtFields[0].getText(), LocaleFormat.EU));
+    		gwb.setVal_1(parseStringToBigDecimalSafe(txtFields[1].getText(), LocaleFormat.EU));
+    		gwb.setWeitere_2(parseStringToBigDecimalSafe(txtFields[2].getText(), LocaleFormat.EU));
+    		gwb.setVal_2(parseStringToBigDecimalSafe(txtFields[3].getText(), LocaleFormat.EU));
+    		gwb.setWeitere_3(parseStringToBigDecimalSafe(txtFields[4].getText(), LocaleFormat.EU));
+    		gwb.setVal_3(parseStringToBigDecimalSafe(txtFields[5].getText(), LocaleFormat.EU));
+    		gwb.setWeitere_4(parseStringToBigDecimalSafe(txtFields[6].getText(), LocaleFormat.EU));
+    		gwb.setVal_4(parseStringToBigDecimalSafe(txtFields[7].getText(), LocaleFormat.EU));
     		
     		gwbRepository.update(gwb);
     		rebuild();

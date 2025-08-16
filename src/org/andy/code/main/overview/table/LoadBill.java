@@ -1,5 +1,7 @@
 package org.andy.code.main.overview.table;
 
+import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
+
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -13,11 +15,12 @@ import java.util.Locale;
 import org.andy.code.dataStructure.entitiyProductive.Rechnung;
 import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
 import org.andy.code.main.LoadData;
+import org.andy.code.misc.BD;
 
 public class LoadBill {
     
-    private static BigDecimal sumOpen = BigDecimal.ZERO;
-    private static BigDecimal sumPayed = BigDecimal.ZERO;
+    private static BigDecimal sumOpen = BD.ZERO;
+    private static BigDecimal sumPayed = BD.ZERO;
 	
 	//###################################################################################################################################################
 	// public Teil
@@ -37,11 +40,11 @@ public class LoadBill {
 		DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Locale.GERMANY);
 		DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
 		
-		sumOpen = BigDecimal.ZERO; sumPayed = BigDecimal.ZERO;
+		sumOpen = BD.ZERO; sumPayed = BD.ZERO;
 		
 		RechnungRepository rechnungRepository = new RechnungRepository();
 	    List<Rechnung> rechnungListe = new ArrayList<>();
-		rechnungListe.addAll(rechnungRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ())));
+		rechnungListe.addAll(rechnungRepository.findAllByJahr(parseStringToIntSafe(LoadData.getStrAktGJ())));
 		
 		String[][] sTemp = new String [rechnungListe.size()][9];
 

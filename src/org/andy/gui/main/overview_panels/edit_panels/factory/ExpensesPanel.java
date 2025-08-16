@@ -1,5 +1,7 @@
 package org.andy.gui.main.overview_panels.edit_panels.factory;
 
+import static org.andy.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
+import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
 import static org.andy.toolbox.misc.CreateObject.createButton;
 import static org.andy.toolbox.misc.SelectFile.chooseFile;
 import static org.andy.toolbox.misc.SelectFile.choosePath;
@@ -14,10 +16,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -31,8 +33,9 @@ import javax.swing.text.AbstractDocument;
 import org.andy.code.dataStructure.entitiyProductive.Ausgaben;
 import org.andy.code.dataStructure.repositoryProductive.AusgabenRepository;
 import org.andy.code.main.LoadData;
+import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
 import org.andy.gui.file.JFfileView;
-import org.andy.gui.main.JFoverview;
+import org.andy.gui.main.MainWindow;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.gui.misc.CommaHelper;
 import org.andy.gui.misc.RoundedBorder;
@@ -148,7 +151,7 @@ public class ExpensesPanel extends EditPanel {
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}
-		btnFields[1].setBounds(660, 145, JFoverview.getButtonx(), JFoverview.getButtony());
+		btnFields[1].setBounds(660, 145, MainWindow.getButtonx(), MainWindow.getButtony());
 		add(btnFields[1]);
 		
 		setPreferredSize(new Dimension(1000, 20 + 6 * 25 + 50));
@@ -198,7 +201,7 @@ public class ExpensesPanel extends EditPanel {
  			public void actionPerformed(ActionEvent e) {
  				if (neuBeleg) {
  					
- 					ausgaben.setJahr(Integer.parseInt(LoadData.getStrAktGJ()));
+ 					ausgaben.setJahr(parseStringToIntSafe(LoadData.getStrAktGJ()));
  	 				
  	 				boolean bResult = checkInput();
  	 				if (!bResult) {
@@ -209,14 +212,14 @@ public class ExpensesPanel extends EditPanel {
  					ausgaben.setDatum(datePicker.getDate());
  					ausgaben.setArt(txtFields[0].getText());
  					ausgaben.setSteuersatz(txtFields[1].getText());
- 					ausgaben.setNetto(new BigDecimal(txtFields[2].getText()));
- 					ausgaben.setSteuer(new BigDecimal(txtFields[3].getText()));
- 					ausgaben.setBrutto(new BigDecimal(txtFields[4].getText()));
+ 					ausgaben.setNetto(parseStringToBigDecimalSafe(txtFields[2].getText(), LocaleFormat.EU));
+ 					ausgaben.setSteuer(parseStringToBigDecimalSafe(txtFields[3].getText(), LocaleFormat.EU));
+ 					ausgaben.setBrutto(parseStringToBigDecimalSafe(txtFields[4].getText(), LocaleFormat.EU));
  					
  					ausgabenRepository.save(ausgaben);
  					
  					neuBeleg = false;
- 	 				JFoverview.actScreen();
+ 	 				MainWindow.actScreen();
  				}
  			}
  		});
@@ -228,7 +231,7 @@ public class ExpensesPanel extends EditPanel {
     private JTextField makeField(int x, int y, int w, int h, boolean bold, Color bg) {
         JTextField t = new JTextField();
         t.setBounds(x, y, w, h);
-        t.setHorizontalAlignment(SwingConstants.RIGHT);
+        t.setHorizontalAlignment(SwingConstants.LEFT);
         t.setFocusable(true);
         if (bold) t.setFont(new Font("Tahoma", Font.BOLD, 11));
         if (bg != null) t.setBackground(bg);

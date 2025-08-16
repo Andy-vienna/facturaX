@@ -1,13 +1,13 @@
 package org.andy.gui.main.settings_panels;
 
 import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -25,7 +25,8 @@ import javax.swing.text.AbstractDocument;
 
 import org.andy.code.dataStructure.entitiyMaster.Artikel;
 import org.andy.code.dataStructure.repositoryMaster.ArtikelRepository;
-import org.andy.gui.main.JFoverview;
+import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
+import org.andy.gui.main.MainWindow;
 import org.andy.gui.misc.CommaHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -70,8 +71,8 @@ public class ArtikelPanel extends JPanel {
 
     private void buildPanel() {
     	int x = 10, y = 45; // Variablen für automatische Positionierung
-    	int btnWidth = JFoverview.getButtonx();
-    	int btnHeight = JFoverview.getButtony();
+    	int btnWidth = MainWindow.getButtonx();
+    	int btnHeight = MainWindow.getButtony();
     	
         String[] labels = { "Artikelnummer", "Text", "Wert (EUR)" };
         JLabel[] lblFields = new JLabel[labels.length];
@@ -202,7 +203,7 @@ public class ArtikelPanel extends JPanel {
         Artikel a = new Artikel();
         a.setId(fields[0].getText().trim());
         a.setText(fields[1].getText().trim());
-        a.setWert(new BigDecimal(fields[2].getText().trim()));
+        a.setWert(parseStringToBigDecimalSafe(fields[2].getText(), LocaleFormat.EU));
         return a;
     }
     

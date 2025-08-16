@@ -1,5 +1,8 @@
 package org.andy.code.main.overview.result;
 
+import static org.andy.code.misc.ArithmeticHelper.parseBigDecimalToStringSafe;
+import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -15,7 +18,7 @@ import org.andy.code.dataStructure.repositoryProductive.AusgabenRepository;
 import org.andy.code.dataStructure.repositoryProductive.EinkaufRepository;
 import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
 import org.andy.code.main.LoadData;
-import org.andy.code.misc.parseBigDecimal;
+import org.andy.code.misc.BD;
 import org.andy.gui.main.result_panels.UStPanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,24 +52,24 @@ public final class UStData {
 		
 		RechnungRepository rechnungRepository = new RechnungRepository();
 	    List<Rechnung> rechnungListe = new ArrayList<>();
-		rechnungListe.addAll(rechnungRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ()))); // Rechnungen nach GJ laden
+		rechnungListe.addAll(rechnungRepository.findAllByJahr(parseStringToIntSafe(LoadData.getStrAktGJ()))); // Rechnungen nach GJ laden
 		
 		EinkaufRepository einkaufRepository = new EinkaufRepository();
 	    List<Einkauf> einkaufListe = new ArrayList<>();
-	    einkaufListe.addAll(einkaufRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ()))); // Einkäufe nach GJ laden
+	    einkaufListe.addAll(einkaufRepository.findAllByJahr(parseStringToIntSafe(LoadData.getStrAktGJ()))); // Einkäufe nach GJ laden
 	    
 	    AusgabenRepository ausgabenRepository = new AusgabenRepository();
 	    List<Ausgaben> ausgabenListe = new ArrayList<>();
-		ausgabenListe.addAll(ausgabenRepository.findAllByJahr(Integer.parseInt(LoadData.getStrAktGJ()))); // Betriebsausgebane nach GJ laden
+		ausgabenListe.addAll(ausgabenRepository.findAllByJahr(parseStringToIntSafe(LoadData.getStrAktGJ()))); // Betriebsausgebane nach GJ laden
 		
 		// Initialisieren
 		for (int i = 0; i < 4; i++) {
-			bdKz000[i] = bdKz021[i] = bdKz022[i] = bdKz060[i] = BigDecimal.ZERO;
-			tmpKz021[i] = tmpKz022[i] = BigDecimal.ZERO;
-			tmp20[i] = tmp10[i] = tmp13[i] = zahlLast[i] = BigDecimal.ZERO;
+			bdKz000[i] = bdKz021[i] = bdKz022[i] = bdKz060[i] = BD.ZERO;
+			tmpKz021[i] = tmpKz022[i] = BD.ZERO;
+			tmp20[i] = tmp10[i] = tmp13[i] = zahlLast[i] = BD.ZERO;
 		}
 		for (int i = 0; i < 5; i++) {
-			tmpUst20[i] = BigDecimal.ZERO;
+			tmpUst20[i] = BD.ZERO;
 		}
 
 		// Berechnung Bemessungsgrundlage (Ausgangsrechnungen Inland | Ausgangsrechnungen Ausland)
@@ -77,7 +80,7 @@ public final class UStData {
 				BigDecimal bdTax = rechnung.getUst();
 				BigDecimal bdVal = rechnung.getNetto();
 				if (quartal >= 0 && quartal < 4) {
-					if (bdTax.compareTo(BigDecimal.ZERO) == 0) {
+					if (bdTax.compareTo(BD.ZERO) == 0) {
 						tmpKz021[quartal] = tmpKz021[quartal].add(bdVal);
 					} else {
 						tmpKz022[quartal] = tmpKz022[quartal].add(bdVal);
@@ -88,7 +91,7 @@ public final class UStData {
 				bdKz000[i] = tmpKz021[i].add(tmpKz022[i]); // Kz.000 = Summe der Bemessungsgrundlage
 				bdKz021[i] = tmpKz021[i]; // Kz.021 = Innergemeinschaftliche sonstige Leistungen
 				bdKz022[i] = tmpKz022[i]; // Kz.022 = zu versteuern mit Normalsteuersatz 20%
-				tmpUst20[i] = tmpKz022[i].multiply(new BigDecimal("0.2")); // USt 20% auf Kz.022
+				tmpUst20[i] = tmpKz022[i].multiply(BD.DOT_TWO); // USt 20% auf Kz.022
 			}
 			
 		} catch (NullPointerException e) {
@@ -139,9 +142,9 @@ public final class UStData {
 		}
 
 		// Zahllast & Jahreswerte berechnen
-		BigDecimal bdKz000year = BigDecimal.ZERO, bdKz021year = BigDecimal.ZERO, bdKz022year = BigDecimal.ZERO;
-		BigDecimal bdKz060year = BigDecimal.ZERO;
-		BigDecimal zahlLastYear = BigDecimal.ZERO;
+		BigDecimal bdKz000year = BD.ZERO, bdKz021year = BD.ZERO, bdKz022year = BD.ZERO;
+		BigDecimal bdKz060year = BD.ZERO;
+		BigDecimal zahlLastYear = BD.ZERO;
 
 		for (int i = 0; i < 4; i++) {
 			zahlLast[i] = tmpUst20[i].subtract(bdKz060[i]);
@@ -150,7 +153,7 @@ public final class UStData {
 			bdKz022year = bdKz022year.add(bdKz022[i]);
 			bdKz060year = bdKz060year.add(bdKz060[i]);
 		}
-		tmpUst20[4] = bdKz022year.multiply(new BigDecimal("0.2")); // USt 20% auf Kz.022 für das Jahr
+		tmpUst20[4] = bdKz022year.multiply(BD.DOT_TWO); // USt 20% auf Kz.022 für das Jahr
 		zahlLastYear = tmpUst20[4].subtract(bdKz060year);
 
 		// Ausgabe (je nach UI einfaches Array)
@@ -169,21 +172,21 @@ public final class UStData {
 	private static void setTxtFieldsQ(UStPanel panel, BigDecimal[] Kz000, BigDecimal[] Kz021, BigDecimal[] Kz022,
 			BigDecimal[] Kz060, BigDecimal[] zahlLast) {
 		for (int i = 0; i < 4; i++) { // Q1-Q4
-			panel.setFieldValue(0, i, Double.valueOf(parseBigDecimal.fromBD(Kz000[i])));
-			panel.setFieldValue(1, i, Double.valueOf(parseBigDecimal.fromBD(Kz021[i])));
-			panel.setFieldValue(2, i, Double.valueOf(parseBigDecimal.fromBD(Kz022[i])));
-			panel.setFieldValue(3, i, Double.valueOf(parseBigDecimal.fromBD(Kz060[i])));
-			panel.setZahllast(i, Double.valueOf(parseBigDecimal.fromBD(zahlLast[i])));
+			panel.setFieldValue(0, i, Double.valueOf(parseBigDecimalToStringSafe(Kz000[i])));
+			panel.setFieldValue(1, i, Double.valueOf(parseBigDecimalToStringSafe(Kz021[i])));
+			panel.setFieldValue(2, i, Double.valueOf(parseBigDecimalToStringSafe(Kz022[i])));
+			panel.setFieldValue(3, i, Double.valueOf(parseBigDecimalToStringSafe(Kz060[i])));
+			panel.setZahllast(i, Double.valueOf(parseBigDecimalToStringSafe(zahlLast[i])));
 		}
 	}
 
 	private static void setTxtFieldsYear(UStPanel panel, BigDecimal Kz000year, BigDecimal Kz021year, BigDecimal Kz022year, BigDecimal Kz060year,
 			BigDecimal zahlLastYear) {
-		panel.setFieldValue(0, 4, Double.valueOf(parseBigDecimal.fromBD(Kz000year)));
-		panel.setFieldValue(1, 4, Double.valueOf(parseBigDecimal.fromBD(Kz021year)));
-		panel.setFieldValue(2, 4, Double.valueOf(parseBigDecimal.fromBD(Kz022year)));
-		panel.setFieldValue(3, 4, Double.valueOf(parseBigDecimal.fromBD(Kz060year)));
-		panel.setZahllast(4, Double.valueOf(parseBigDecimal.fromBD(zahlLastYear)));
+		panel.setFieldValue(0, 4, Double.valueOf(parseBigDecimalToStringSafe(Kz000year)));
+		panel.setFieldValue(1, 4, Double.valueOf(parseBigDecimalToStringSafe(Kz021year)));
+		panel.setFieldValue(2, 4, Double.valueOf(parseBigDecimalToStringSafe(Kz022year)));
+		panel.setFieldValue(3, 4, Double.valueOf(parseBigDecimalToStringSafe(Kz060year)));
+		panel.setZahllast(4, Double.valueOf(parseBigDecimalToStringSafe(zahlLastYear)));
 	}
 
 }

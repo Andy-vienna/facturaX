@@ -21,7 +21,7 @@ import org.apache.logging.log4j.Logger;
 
 import org.andy.code.dataExport.ExcelMahnung;
 import org.andy.code.dataExport.ExcelReminder;
-import org.andy.gui.main.JFoverview;
+import org.andy.gui.main.MainWindow;
 import org.andy.toolbox.misc.SetFrameIcon;
 
 public class JFreminder extends JFrame {
@@ -155,7 +155,7 @@ public class JFreminder extends JFrame {
 					}
 				}
 
-				JFoverview.actScreen();
+				MainWindow.actScreen();
 				dispose();
 			}
 		});

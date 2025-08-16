@@ -1,5 +1,6 @@
 package org.andy.code.eRechnung;
 
+import static org.andy.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
 import static org.andy.toolbox.misc.Tools.cutBack;
 import static org.andy.toolbox.misc.Tools.cutFront;
 
@@ -17,6 +18,8 @@ import org.andy.code.dataStructure.entitiyMaster.Bank;
 import org.andy.code.dataStructure.entitiyMaster.Kunde;
 import org.andy.code.dataStructure.entitiyMaster.Owner;
 import org.andy.code.dataStructure.entitiyProductive.Rechnung;
+import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
+import org.andy.code.misc.BD;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mustangproject.BankDetails;
@@ -131,7 +134,7 @@ public class SetInvoiceEx {
 		String[] posText = ExcelBill.getsReTxt(); double[] posAnz = ExcelBill.getdAnz(); double[] posEp = ExcelBill.getdEp();
 		for(int x = 0; x < iAnz; x++) {
 			//new Item(new Product("Artikeltext", "Artikelbeschreibung", "C62", new BigDecimal(Steuersatz), new BigDecimal(E-Preis),  new BigDecimal(Menge))
-			position[x] = new Item(new Product(posText[x], "", "C62", new BigDecimal(RECV_TAX)), BigDecimal.valueOf(posEp[x]), BigDecimal.valueOf(posAnz[x]));
+			position[x] = new Item(new Product(posText[x], "", "C62", parseStringToBigDecimalSafe(RECV_TAX, LocaleFormat.EU)), BigDecimal.valueOf(posEp[x]), BigDecimal.valueOf(posAnz[x]));
 		}
 		Invoice iInv = new Invoice()
 				.setNumber(RE_NR) // Rechnungsnummer
@@ -151,12 +154,12 @@ public class SetInvoiceEx {
 			iInv.addItem(position[i]);
 		}
 		if(rechnung.getSkonto1() == 1 && rechnung.getSkonto2() == 0) { // Rechnung mit Skonto 1
-			BigDecimal skonto1 = rechnung.getSkonto1wert().multiply(new BigDecimal("100.00")).setScale(2, RoundingMode.HALF_UP);
+			BigDecimal skonto1 = rechnung.getSkonto1wert().multiply(BD.HUNDRED).setScale(2, RoundingMode.HALF_UP);
 			iInv.addCashDiscount(new CashDiscount(skonto1,rechnung.getSkonto1tage())); // Skonto 1
 		}
 		if(rechnung.getSkonto1() == 1 && rechnung.getSkonto2() == 1) { // Rechnung mit Skonto 2
-			BigDecimal skonto1 = rechnung.getSkonto1wert().multiply(new BigDecimal("100.00")).setScale(2, RoundingMode.HALF_UP);
-			BigDecimal skonto2 = rechnung.getSkonto2wert().multiply(new BigDecimal("100.00")).setScale(2, RoundingMode.HALF_UP);
+			BigDecimal skonto1 = rechnung.getSkonto1wert().multiply(BD.HUNDRED).setScale(2, RoundingMode.HALF_UP);
+			BigDecimal skonto2 = rechnung.getSkonto2wert().multiply(BD.HUNDRED).setScale(2, RoundingMode.HALF_UP);
 			iInv.addCashDiscount(new CashDiscount(skonto1,rechnung.getSkonto1tage())); // Skonto 1
 			iInv.addCashDiscount(new CashDiscount(skonto2,rechnung.getSkonto2tage())); // Skonto 2
 		}

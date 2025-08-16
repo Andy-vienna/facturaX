@@ -29,7 +29,7 @@ import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
 import org.andy.code.dataExport.ExcelConfirmation;
 import org.andy.code.main.StartUp;
-import org.andy.gui.main.JFoverview;
+import org.andy.gui.main.MainWindow;
 import org.andy.gui.misc.RoundedBorder;
 import org.andy.org.eclipse.wb.swing.FocusTraversalOnArray;
 
@@ -173,7 +173,7 @@ public class JFconfirmA extends JFrame {
 					logger.error("JFconfirmA(String vZelleA) - " + e1);
 				}
 
-				JFoverview.actScreen();
+				MainWindow.actScreen();
 				dispose();
 			}
 		});
