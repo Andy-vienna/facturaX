@@ -242,7 +242,7 @@ public class SvTaxPanel extends EditPanel {
  					} else {
  						svsteuer.setBezeichnung(cmbBezeichnung.getSelectedItem().toString());
  					}
- 					svsteuer.setZahllast(parseStringToBigDecimalSafe(txtFields[1].getText(), LocaleFormat.EU));
+ 					svsteuer.setZahllast(parseStringToBigDecimalSafe(txtFields[1].getText(), LocaleFormat.AUTO));
  					svsteuer.setZahlungsziel(datePicker[1].getDate());
  					svsteuer.setStatus(0);
  					

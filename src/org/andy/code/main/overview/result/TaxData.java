@@ -60,8 +60,8 @@ public class TaxData {
 		BigDecimal netto = BD.ZERO;
 		BigDecimal bdVorGwb = BD.ZERO;
 		BigDecimal bdErgYear = BD.ZERO;
-		BigDecimal bdOeffiP = parseStringToBigDecimalSafe(arrTaxValues[1][23], LocaleFormat.EU).multiply(BD.M_ONE).setScale(2, RoundingMode.HALF_UP);
-		BigDecimal bdAPausch = parseStringToBigDecimalSafe(arrTaxValues[1][24], LocaleFormat.EU).multiply(BD.M_ONE).setScale(2, RoundingMode.HALF_UP);
+		BigDecimal bdOeffiP = parseStringToBigDecimalSafe(arrTaxValues[1][23], LocaleFormat.AUTO).multiply(BD.M_ONE).setScale(2, RoundingMode.HALF_UP);
+		BigDecimal bdAPausch = parseStringToBigDecimalSafe(arrTaxValues[1][24], LocaleFormat.AUTO).multiply(BD.M_ONE).setScale(2, RoundingMode.HALF_UP);
 		BigDecimal bdExpenses = BD.ZERO;
 		BigDecimal bdGwbTotal = BD.ZERO;
 		BigDecimal bdGwbTotalNeg = BD.ZERO;
@@ -174,14 +174,14 @@ public class TaxData {
 		BigDecimal tmp3 = BD.ZERO;
 		BigDecimal tmp4 = BD.ZERO;
 		
-		BigDecimal bdGwbTmp1 = parseStringToBigDecimalSafe(arrGwbValues[1][2], LocaleFormat.EU);
-		BigDecimal bdGwbVal1 = parseStringToBigDecimalSafe(arrGwbValues[1][3], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
-		BigDecimal bdGwbTmp2 = parseStringToBigDecimalSafe(arrGwbValues[1][4], LocaleFormat.EU);
-		BigDecimal bdGwbVal2 = parseStringToBigDecimalSafe(arrGwbValues[1][5], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
-		BigDecimal bdGwbTmp3 = parseStringToBigDecimalSafe(arrGwbValues[1][6], LocaleFormat.EU);
-		BigDecimal bdGwbVal3 = parseStringToBigDecimalSafe(arrGwbValues[1][7], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
-		BigDecimal bdGwbTmp4 = parseStringToBigDecimalSafe(arrGwbValues[1][8], LocaleFormat.EU);
-		BigDecimal bdGwbVal4 = parseStringToBigDecimalSafe(arrGwbValues[1][9], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdGwbTmp1 = parseStringToBigDecimalSafe(arrGwbValues[1][2], LocaleFormat.AUTO);
+		BigDecimal bdGwbVal1 = parseStringToBigDecimalSafe(arrGwbValues[1][3], LocaleFormat.AUTO).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdGwbTmp2 = parseStringToBigDecimalSafe(arrGwbValues[1][4], LocaleFormat.AUTO);
+		BigDecimal bdGwbVal2 = parseStringToBigDecimalSafe(arrGwbValues[1][5], LocaleFormat.AUTO).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdGwbTmp3 = parseStringToBigDecimalSafe(arrGwbValues[1][6], LocaleFormat.AUTO);
+		BigDecimal bdGwbVal3 = parseStringToBigDecimalSafe(arrGwbValues[1][7], LocaleFormat.AUTO).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdGwbTmp4 = parseStringToBigDecimalSafe(arrGwbValues[1][8], LocaleFormat.AUTO);
+		BigDecimal bdGwbVal4 = parseStringToBigDecimalSafe(arrGwbValues[1][9], LocaleFormat.AUTO).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
 		
 		Double dTmp1 = Double.valueOf(bdGwbTmp1.toString());
 		Double dTmp2 = Double.valueOf(bdGwbTmp2.toString());
@@ -207,32 +207,32 @@ public class TaxData {
 		
 		if(bdVorGwb.compareTo(bdGwbTmp1) >= 0) { // wenn VorGWB größer oder gleich GWB Stufe 1
 			rest1 = bdVorGwb.subtract(bdGwbTmp1);
-			tmp1 = bdGwbTmp1.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][3], LocaleFormat.EU)).setScale(2, RoundingMode.HALF_UP);
+			tmp1 = bdGwbTmp1.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][3], LocaleFormat.AUTO)).setScale(2, RoundingMode.HALF_UP);
 		} else {
 			rest1 = BD.ZERO;
-			tmp1 = bdVorGwb.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][3], LocaleFormat.EU)).setScale(2, RoundingMode.HALF_UP);
+			tmp1 = bdVorGwb.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][3], LocaleFormat.AUTO)).setScale(2, RoundingMode.HALF_UP);
 		}
 		
 		if(rest1.compareTo(bdGwbTmp2) >= 0) { // wenn Rest größer oder gleich GWB Stufe 2
 			rest2 = rest1.subtract(bdGwbTmp2);
-			tmp2 = bdGwbTmp2.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][5], LocaleFormat.EU)).setScale(2, RoundingMode.HALF_UP);
+			tmp2 = bdGwbTmp2.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][5], LocaleFormat.AUTO)).setScale(2, RoundingMode.HALF_UP);
 		} else {
 			rest2 = BD.ZERO;
-			tmp2 = rest1.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][5], LocaleFormat.EU)).setScale(2, RoundingMode.HALF_UP);
+			tmp2 = rest1.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][5], LocaleFormat.AUTO)).setScale(2, RoundingMode.HALF_UP);
 		}
 		
 		if(rest2.compareTo(bdGwbTmp3) >= 0) { // wenn Rest größer oder gleich GWB Stufe 3
 			rest3 = rest2.subtract(bdGwbTmp3);
-			tmp3 = bdGwbTmp3.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][7], LocaleFormat.EU)).setScale(2, RoundingMode.HALF_UP);
+			tmp3 = bdGwbTmp3.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][7], LocaleFormat.AUTO)).setScale(2, RoundingMode.HALF_UP);
 		} else {
 			rest3 = BD.ZERO;
-			tmp3 = rest2.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][7], LocaleFormat.EU)).setScale(2, RoundingMode.HALF_UP);
+			tmp3 = rest2.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][7], LocaleFormat.AUTO)).setScale(2, RoundingMode.HALF_UP);
 		}
 		
 		if(rest3.compareTo(bdGwbTmp4) >= 0) { // wenn Rest größer oder gleich GWB Stufe 4
-			tmp4 = bdGwbTmp4.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][9], LocaleFormat.EU)).setScale(2, RoundingMode.HALF_UP);
+			tmp4 = bdGwbTmp4.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][9], LocaleFormat.AUTO)).setScale(2, RoundingMode.HALF_UP);
 		} else {
-			tmp4 = rest3.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][9], LocaleFormat.EU)).setScale(2, RoundingMode.HALF_UP);
+			tmp4 = rest3.multiply(parseStringToBigDecimalSafe(arrGwbValues[1][9], LocaleFormat.AUTO)).setScale(2, RoundingMode.HALF_UP);
 		}
 		
 		liste.add(tmp1); // GWB Stufe 1
@@ -254,27 +254,27 @@ public class TaxData {
 		BigDecimal rest6 = BD.ZERO;
 		BigDecimal rest7 = BD.ZERO;
 		
-		BigDecimal bdTaxVon1 = parseStringToBigDecimalSafe(arrTaxValues[1][2], LocaleFormat.EU);
-		BigDecimal bdTaxBis1 = parseStringToBigDecimalSafe(arrTaxValues[1][3], LocaleFormat.EU);
-		BigDecimal bdTaxVal1 = parseStringToBigDecimalSafe(arrTaxValues[1][4], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
-		BigDecimal bdTaxVon2 = parseStringToBigDecimalSafe(arrTaxValues[1][5], LocaleFormat.EU);
-		BigDecimal bdTaxBis2 = parseStringToBigDecimalSafe(arrTaxValues[1][6], LocaleFormat.EU);
-		BigDecimal bdTaxVal2 = parseStringToBigDecimalSafe(arrTaxValues[1][7], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
-		BigDecimal bdTaxVon3 = parseStringToBigDecimalSafe(arrTaxValues[1][8], LocaleFormat.EU);
-		BigDecimal bdTaxBis3 = parseStringToBigDecimalSafe(arrTaxValues[1][9], LocaleFormat.EU);
-		BigDecimal bdTaxVal3 = parseStringToBigDecimalSafe(arrTaxValues[1][10], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
-		BigDecimal bdTaxVon4 = parseStringToBigDecimalSafe(arrTaxValues[1][11], LocaleFormat.EU);
-		BigDecimal bdTaxBis4 = parseStringToBigDecimalSafe(arrTaxValues[1][12], LocaleFormat.EU);
-		BigDecimal bdTaxVal4 = parseStringToBigDecimalSafe(arrTaxValues[1][13], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
-		BigDecimal bdTaxVon5 = parseStringToBigDecimalSafe(arrTaxValues[1][14], LocaleFormat.EU);
-		BigDecimal bdTaxBis5 = parseStringToBigDecimalSafe(arrTaxValues[1][15], LocaleFormat.EU);
-		BigDecimal bdTaxVal5 = parseStringToBigDecimalSafe(arrTaxValues[1][16], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
-		BigDecimal bdTaxVon6 = parseStringToBigDecimalSafe(arrTaxValues[1][17], LocaleFormat.EU);
-		BigDecimal bdTaxBis6 = parseStringToBigDecimalSafe(arrTaxValues[1][18], LocaleFormat.EU);
-		BigDecimal bdTaxVal6 = parseStringToBigDecimalSafe(arrTaxValues[1][19], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
-		BigDecimal bdTaxVon7 = parseStringToBigDecimalSafe(arrTaxValues[1][20], LocaleFormat.EU);
-		BigDecimal bdTaxBis7 = parseStringToBigDecimalSafe(arrTaxValues[1][21], LocaleFormat.EU);
-		BigDecimal bdTaxVal7 = parseStringToBigDecimalSafe(arrTaxValues[1][22], LocaleFormat.EU).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdTaxVon1 = parseStringToBigDecimalSafe(arrTaxValues[1][2], LocaleFormat.AUTO);
+		BigDecimal bdTaxBis1 = parseStringToBigDecimalSafe(arrTaxValues[1][3], LocaleFormat.AUTO);
+		BigDecimal bdTaxVal1 = parseStringToBigDecimalSafe(arrTaxValues[1][4], LocaleFormat.AUTO).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdTaxVon2 = parseStringToBigDecimalSafe(arrTaxValues[1][5], LocaleFormat.AUTO);
+		BigDecimal bdTaxBis2 = parseStringToBigDecimalSafe(arrTaxValues[1][6], LocaleFormat.AUTO);
+		BigDecimal bdTaxVal2 = parseStringToBigDecimalSafe(arrTaxValues[1][7], LocaleFormat.AUTO).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdTaxVon3 = parseStringToBigDecimalSafe(arrTaxValues[1][8], LocaleFormat.AUTO);
+		BigDecimal bdTaxBis3 = parseStringToBigDecimalSafe(arrTaxValues[1][9], LocaleFormat.AUTO);
+		BigDecimal bdTaxVal3 = parseStringToBigDecimalSafe(arrTaxValues[1][10], LocaleFormat.AUTO).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdTaxVon4 = parseStringToBigDecimalSafe(arrTaxValues[1][11], LocaleFormat.AUTO);
+		BigDecimal bdTaxBis4 = parseStringToBigDecimalSafe(arrTaxValues[1][12], LocaleFormat.AUTO);
+		BigDecimal bdTaxVal4 = parseStringToBigDecimalSafe(arrTaxValues[1][13], LocaleFormat.AUTO).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdTaxVon5 = parseStringToBigDecimalSafe(arrTaxValues[1][14], LocaleFormat.AUTO);
+		BigDecimal bdTaxBis5 = parseStringToBigDecimalSafe(arrTaxValues[1][15], LocaleFormat.AUTO);
+		BigDecimal bdTaxVal5 = parseStringToBigDecimalSafe(arrTaxValues[1][16], LocaleFormat.AUTO).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdTaxVon6 = parseStringToBigDecimalSafe(arrTaxValues[1][17], LocaleFormat.AUTO);
+		BigDecimal bdTaxBis6 = parseStringToBigDecimalSafe(arrTaxValues[1][18], LocaleFormat.AUTO);
+		BigDecimal bdTaxVal6 = parseStringToBigDecimalSafe(arrTaxValues[1][19], LocaleFormat.AUTO).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
+		BigDecimal bdTaxVon7 = parseStringToBigDecimalSafe(arrTaxValues[1][20], LocaleFormat.AUTO);
+		BigDecimal bdTaxBis7 = parseStringToBigDecimalSafe(arrTaxValues[1][21], LocaleFormat.AUTO);
+		BigDecimal bdTaxVal7 = parseStringToBigDecimalSafe(arrTaxValues[1][22], LocaleFormat.AUTO).multiply(BD.HUNDRED).setScale(0, RoundingMode.HALF_UP);
 
 		Double dTmp1 = Double.valueOf(bdTaxVon1.toString());
 		Double dTmp2 = Double.valueOf(bdTaxBis1.toString());
@@ -384,13 +384,13 @@ public class TaxData {
 		liste.add(rest5); // Wert Stufe 5
 		liste.add(rest6); // Wert Stufe 6
 		liste.add(rest7); // Wert Stufe 7
-		liste.add(rest1.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][4], LocaleFormat.EU))); // Steuer Stufe 1
-		liste.add(rest2.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][7], LocaleFormat.EU))); // Steuer Stufe 2
-		liste.add(rest3.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][10], LocaleFormat.EU))); // Steuer Stufe 3
-		liste.add(rest4.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][13], LocaleFormat.EU))); // Steuer Stufe 4
-		liste.add(rest5.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][16], LocaleFormat.EU))); // Steuer Stufe 5
-		liste.add(rest6.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][19], LocaleFormat.EU))); // Steuer Stufe 6
-		liste.add(rest7.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][22], LocaleFormat.EU))); // Steuer Stufe 7
+		liste.add(rest1.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][4], LocaleFormat.AUTO))); // Steuer Stufe 1
+		liste.add(rest2.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][7], LocaleFormat.AUTO))); // Steuer Stufe 2
+		liste.add(rest3.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][10], LocaleFormat.AUTO))); // Steuer Stufe 3
+		liste.add(rest4.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][13], LocaleFormat.AUTO))); // Steuer Stufe 4
+		liste.add(rest5.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][16], LocaleFormat.AUTO))); // Steuer Stufe 5
+		liste.add(rest6.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][19], LocaleFormat.AUTO))); // Steuer Stufe 6
+		liste.add(rest7.multiply(parseStringToBigDecimalSafe(arrTaxValues[1][22], LocaleFormat.AUTO))); // Steuer Stufe 7
 		
 		return liste;
 		

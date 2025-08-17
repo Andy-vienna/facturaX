@@ -305,15 +305,15 @@ public class PurchasePanel extends EditPanel {
  	 				einkauf.setKredUid(value);
  	 				einkauf.setWaehrung(txtFieldsCol1[7].getText().trim());
  	 				einkauf.setSteuersatz(txtFieldsCol2a[0].getText().trim());
- 	 				einkauf.setNetto(parseStringToBigDecimalSafe(txtFieldsCol2a[1].getText(), LocaleFormat.EU));
- 	 				einkauf.setUst(parseStringToBigDecimalSafe(txtFieldsCol2a[2].getText(), LocaleFormat.EU));
- 	 				einkauf.setBrutto(parseStringToBigDecimalSafe(txtFieldsCol2a[3].getText(), LocaleFormat.EU));
+ 	 				einkauf.setNetto(parseStringToBigDecimalSafe(txtFieldsCol2a[1].getText(), LocaleFormat.AUTO));
+ 	 				einkauf.setUst(parseStringToBigDecimalSafe(txtFieldsCol2a[2].getText(), LocaleFormat.AUTO));
+ 	 				einkauf.setBrutto(parseStringToBigDecimalSafe(txtFieldsCol2a[3].getText(), LocaleFormat.AUTO));
  	 				einkauf.setZahlungsziel(datePicker[1].getDate());
  	 				
  	 				int Tage1 = ArithmeticHelper.parseStringToIntSafe(txtFieldsSkonto[0].getText());
- 	 				BigDecimal bdVal1 = parseStringToBigDecimalSafe(txtFieldsSkonto[1].getText(), LocaleFormat.EU).divide(BD.HUNDRED);
+ 	 				BigDecimal bdVal1 = parseStringToBigDecimalSafe(txtFieldsSkonto[1].getText(), LocaleFormat.AUTO).divide(BD.HUNDRED);
  	 				int Tage2 = ArithmeticHelper.parseStringToIntSafe(txtFieldsSkonto[2].getText());
- 	 				BigDecimal bdVal2 = parseStringToBigDecimalSafe(txtFieldsSkonto[3].getText(), LocaleFormat.EU).divide(BD.HUNDRED);
+ 	 				BigDecimal bdVal2 = parseStringToBigDecimalSafe(txtFieldsSkonto[3].getText(), LocaleFormat.AUTO).divide(BD.HUNDRED);
  	 				
  	 				einkauf.setSkonto1tage(Tage1);
  	 				einkauf.setSkonto1wert(bdVal1);
@@ -337,7 +337,7 @@ public class PurchasePanel extends EditPanel {
                     							if(einkauf.getSteuersatz().equals("0")) {
                     								bdust = BD.ZERO;
                     							} else {
-                    								bdust = bdnetto.multiply(parseStringToBigDecimalSafe(einkauf.getSteuersatz(), LocaleFormat.EU).divide(BD.HUNDRED));
+                    								bdust = bdnetto.multiply(parseStringToBigDecimalSafe(einkauf.getSteuersatz(), LocaleFormat.AUTO).divide(BD.HUNDRED));
                     							}
                     							bdbrutto = bdnetto.add(bdust);
                     							einkauf.setNetto(bdnetto); einkauf.setUst(bdust); einkauf.setBrutto(bdbrutto);
@@ -347,7 +347,7 @@ public class PurchasePanel extends EditPanel {
 												if(einkauf.getSteuersatz().equals("0")) {
                     								bdust = BD.ZERO;
                     							} else {
-                    								bdust = bdnetto.multiply(parseStringToBigDecimalSafe(einkauf.getSteuersatz(), LocaleFormat.EU).divide(BD.HUNDRED));
+                    								bdust = bdnetto.multiply(parseStringToBigDecimalSafe(einkauf.getSteuersatz(), LocaleFormat.AUTO).divide(BD.HUNDRED));
                     							}
 												bdbrutto = bdnetto.add(bdust);
 												einkauf.setNetto(bdnetto); einkauf.setUst(bdust); einkauf.setBrutto(bdbrutto);

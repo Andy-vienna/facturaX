@@ -1029,7 +1029,20 @@ public class MainWindow extends JFrame {
             label.setHorizontalAlignment((column == 0) ? SwingConstants.CENTER
                     : ((column >= 2 && column <= 5) ? SwingConstants.RIGHT : SwingConstants.LEFT));
             setBackground(row % 2 < 1 ? new Color(176,226,255,100) : Color.WHITE);
-            if (table.getValueAt(row, 0) == null) setBackground(new Color(238,210,238));
+            Object v0 = table.getValueAt(row, 0);
+            if (v0 != null) {
+                try {
+		            if (table.getValueAt(row, 2).toString().contains("-")) {
+		            	setForeground(Color.RED);
+		            } else {
+		            	setForeground(Color.BLACK);
+		            }
+                } catch (Exception e) {
+                    logger.error("ST render date error", e);
+                }
+            } else {
+                setBackground(new Color(238,210,238));
+            }
             return label;
         }
     }

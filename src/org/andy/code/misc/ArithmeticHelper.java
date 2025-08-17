@@ -8,15 +8,15 @@ public final class ArithmeticHelper {
 
     private ArithmeticHelper() {}
     
-    private static final Pattern EU_PATTERN = Pattern.compile("^[+-]?(?:\\d{1,3}(?:\\.\\d{3})+|\\d+)(?:,\\d+)?$");
-    private static final Pattern US_PATTERN = Pattern.compile("^[+-]?(?:\\d{1,3}(?:,\\d{3})+|\\d+)(?:\\.\\d+)?$");
+    private static final Pattern EU_PATTERN = Pattern.compile("^[+-]?(?:\\d{1,3}(?:\\.\\d{3})*|\\d+)(?:,\\d+)?$");
+    private static final Pattern US_PATTERN = Pattern.compile("^[+-]?(?:\\d{1,3}(?:,\\d{3})*|\\d+)(?:\\.\\d+)?$");
 
     //###################################################################################################################################################
     // String -> Zahl
     //###################################################################################################################################################
     
     public enum LocaleFormat {
-        EU, US
+        EU, US, AUTO
     }
 
     public static int parseStringToIntSafe(String s) {
@@ -51,11 +51,15 @@ public final class ArithmeticHelper {
             switch (format) {
                 case EU:
                     if (!EU_PATTERN.matcher(s).matches()) return BD.ZERO;
-                    s = s.replace(".", "").replace(',', '.');
+                    s = s.replace(".", "").replace(',', '.'); // Tausender weg, Dezimal=.
                     break;
                 case US:
                     if (!US_PATTERN.matcher(s).matches()) return BD.ZERO;
-                    s = s.replace(",", "");
+                    s = s.replace(",", ""); // Tausender weg, Dezimal=.
+                    break;
+                case AUTO:
+                    s = normalizeAuto(s);   // erkennt Dezimaltrenner automatisch
+                    if (s == null) return BD.ZERO;
                     break;
                 default:
                     return BD.ZERO;
@@ -81,6 +85,36 @@ public final class ArithmeticHelper {
     public static String parseBigDecimalToStringSafe(BigDecimal bd) {
         if (bd == null) return "0.00";
         return bd.toPlainString();
+    }
+    
+    //###################################################################################################################################################
+    // Hilfsmethoden
+    //###################################################################################################################################################
+    
+    private static String normalizeAuto(String raw) {
+        // Regel: rechter der beiden Trenner ist Dezimaltrenner
+        boolean hasComma = raw.indexOf(',') >= 0;
+        boolean hasDot   = raw.indexOf('.') >= 0;
+
+        if (hasComma && hasDot) {
+            int lastComma = raw.lastIndexOf(',');
+            int lastDot   = raw.lastIndexOf('.');
+            char decimal = (lastComma > lastDot) ? ',' : '.';
+            char thousand = (decimal == ',') ? '.' : ',';
+            String t = raw.replace(String.valueOf(thousand), ""); // Tausender weg
+            t = t.replace(decimal, '.');                          // Dezimal → '.'
+            return t;
+        } else if (hasComma) {
+            // Nur Komma vorhanden → vermutlich EU: Dezimal=Komma
+            return raw.replace(".", "").replace(',', '.');
+        } else if (hasDot) {
+            // Nur Punkt vorhanden → vermutlich US/DB: Dezimal=Punkt
+            // Falls Punkt Tausender war, ist das nicht unterscheidbar; akzeptieren.
+            return raw.replace(",", "");
+        } else {
+            // Nur Ziffern und Vorzeichen
+            return raw;
+        }
     }
     
 }

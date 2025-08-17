@@ -212,9 +212,9 @@ public class ExpensesPanel extends EditPanel {
  					ausgaben.setDatum(datePicker.getDate());
  					ausgaben.setArt(txtFields[0].getText());
  					ausgaben.setSteuersatz(txtFields[1].getText());
- 					ausgaben.setNetto(parseStringToBigDecimalSafe(txtFields[2].getText(), LocaleFormat.EU));
- 					ausgaben.setSteuer(parseStringToBigDecimalSafe(txtFields[3].getText(), LocaleFormat.EU));
- 					ausgaben.setBrutto(parseStringToBigDecimalSafe(txtFields[4].getText(), LocaleFormat.EU));
+ 					ausgaben.setNetto(parseStringToBigDecimalSafe(txtFields[2].getText(), LocaleFormat.AUTO));
+ 					ausgaben.setSteuer(parseStringToBigDecimalSafe(txtFields[3].getText(), LocaleFormat.AUTO));
+ 					ausgaben.setBrutto(parseStringToBigDecimalSafe(txtFields[4].getText(), LocaleFormat.AUTO));
  					
  					ausgabenRepository.save(ausgaben);
  					

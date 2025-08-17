@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
@@ -54,7 +55,7 @@ public class StartUp {
         
         // 3) Instanzprüfung
         if (!acquireSingleInstanceLock()) {
-            System.err.println("Beende: eine Instanz läuft bereits.");
+        	JOptionPane.showMessageDialog(null, "Es läuft bereits eine Instanz von FacturaX v2", "FacturaX v2", JOptionPane.ERROR_MESSAGE);
             System.exit(99);
         }
 
@@ -132,7 +133,6 @@ public class StartUp {
             LOCK = LOCK_CH.tryLock();               // entscheidend: OS-Lock
             return LOCK != null;
         } catch (Exception e) {
-            // z.B. AccessDenied bei bereits gehaltenem Lock
             return false;
         }
     }

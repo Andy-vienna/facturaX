@@ -134,7 +134,7 @@ public class SetInvoiceEx {
 		String[] posText = ExcelBill.getsReTxt(); double[] posAnz = ExcelBill.getdAnz(); double[] posEp = ExcelBill.getdEp();
 		for(int x = 0; x < iAnz; x++) {
 			//new Item(new Product("Artikeltext", "Artikelbeschreibung", "C62", new BigDecimal(Steuersatz), new BigDecimal(E-Preis),  new BigDecimal(Menge))
-			position[x] = new Item(new Product(posText[x], "", "C62", parseStringToBigDecimalSafe(RECV_TAX, LocaleFormat.EU)), BigDecimal.valueOf(posEp[x]), BigDecimal.valueOf(posAnz[x]));
+			position[x] = new Item(new Product(posText[x], "", "C62", parseStringToBigDecimalSafe(RECV_TAX, LocaleFormat.AUTO)), BigDecimal.valueOf(posEp[x]), BigDecimal.valueOf(posAnz[x]));
 		}
 		Invoice iInv = new Invoice()
 				.setNumber(RE_NR) // Rechnungsnummer

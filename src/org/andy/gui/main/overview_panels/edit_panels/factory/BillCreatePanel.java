@@ -314,7 +314,7 @@ public class BillCreatePanel extends EditPanel {
         String s = txtEP[i].getText().trim();
         if (s.isEmpty()) { bdEinzel[i]=null; txtGP[i].setText(""); return; }
         try {
-            bdEinzel[i] = parseStringToBigDecimalSafe(s, LocaleFormat.EU);
+            bdEinzel[i] = parseStringToBigDecimalSafe(s, LocaleFormat.AUTO);
             onQtyOrEPChanged(i);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Eingabe inkorrekt …", "Rechnung", JOptionPane.ERROR_MESSAGE);
@@ -325,8 +325,8 @@ public class BillCreatePanel extends EditPanel {
     private void onQtyOrEPChanged(int i) {
         if (isEmpty(txtEP[i]) || isEmpty(txtAnz[i])) { txtAnz[i].setBackground(Color.PINK); txtGP[i].setText(""); return; }
         try {
-            bdAnzahl[i] = parseStringToBigDecimalSafe(txtAnz[i].getText(), LocaleFormat.EU);
-            if (bdEinzel[i] == null) bdEinzel[i] = parseStringToBigDecimalSafe(txtEP[i].getText(), LocaleFormat.EU);
+            bdAnzahl[i] = parseStringToBigDecimalSafe(txtAnz[i].getText(), LocaleFormat.AUTO);
+            if (bdEinzel[i] == null) bdEinzel[i] = parseStringToBigDecimalSafe(txtEP[i].getText(), LocaleFormat.AUTO);
             bdSumme[i]  = bdEinzel[i].multiply(bdAnzahl[i]).setScale(2, RoundingMode.HALF_UP);
             txtGP[i].setText(bdSumme[i].toString());
             txtAnz[i].setBackground(Color.WHITE);
@@ -368,15 +368,15 @@ public class BillCreatePanel extends EditPanel {
         r.setPage2(0);
         r.setSkonto1(chkSkonto1.isSelected()?1:0);
         r.setSkonto1tage(txtSkontoTage1.getText().equals("")?0:parseStringToIntSafe(txtSkontoTage1.getText()));
-        r.setSkonto1wert(txtSkontoTage1.getText().equals("")?BD.ZERO:parseStringToBigDecimalSafe(txtSkontoWert1.getText(), LocaleFormat.EU).divide(BD.HUNDRED));
+        r.setSkonto1wert(txtSkontoTage1.getText().equals("")?BD.ZERO:parseStringToBigDecimalSafe(txtSkontoWert1.getText(), LocaleFormat.AUTO).divide(BD.HUNDRED));
         r.setSkonto2(chkSkonto2.isSelected()?1:0);
         r.setSkonto2tage(txtSkontoTage2.getText().equals("")?0:parseStringToIntSafe(txtSkontoTage2.getText()));
-        r.setSkonto2wert(txtSkontoTage2.getText().equals("")?BD.ZERO:parseStringToBigDecimalSafe(txtSkontoWert2.getText(), LocaleFormat.EU).divide(BD.HUNDRED));
+        r.setSkonto2wert(txtSkontoTage2.getText().equals("")?BD.ZERO:parseStringToBigDecimalSafe(txtSkontoWert2.getText(), LocaleFormat.AUTO).divide(BD.HUNDRED));
 
         int posCount = countFilledPositions();
         r.setAnzPos(BigDecimal.valueOf(posCount));
 
-        BigDecimal ustFaktor = parseStringToBigDecimalSafe(k.getTaxvalue(), LocaleFormat.EU).divide(BD.HUNDRED);
+        BigDecimal ustFaktor = parseStringToBigDecimalSafe(k.getTaxvalue(), LocaleFormat.AUTO).divide(BD.HUNDRED);
         BigDecimal netto = BD.ZERO; BigDecimal ust = BD.ZERO; BigDecimal brutto = BD.ZERO;
         for (int i=0;i<POS_COUNT;i++) {
             if (sPosText[i]==null || bdAnzahl[i]==null || bdEinzel[i]==null) continue;

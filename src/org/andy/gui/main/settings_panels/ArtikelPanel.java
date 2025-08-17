@@ -203,7 +203,7 @@ public class ArtikelPanel extends JPanel {
         Artikel a = new Artikel();
         a.setId(fields[0].getText().trim());
         a.setText(fields[1].getText().trim());
-        a.setWert(parseStringToBigDecimalSafe(fields[2].getText(), LocaleFormat.EU));
+        a.setWert(parseStringToBigDecimalSafe(fields[2].getText(), LocaleFormat.AUTO));
         return a;
     }
     

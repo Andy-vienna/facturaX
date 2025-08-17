@@ -37,7 +37,7 @@ public final class LoginWindow {
         this.userRepository = Objects.requireNonNull(repo);
         this.callback = Objects.requireNonNull(cb);
 
-        BufferedImage bg = loadImage("/icons/hintergrund.jpg");
+        BufferedImage bg = loadImage("/icons/hintergrund_450.jpg");
         JPanel root = new BackgroundPanel(bg);
 
         root.setLayout(new GridBagLayout());
@@ -50,12 +50,12 @@ public final class LoginWindow {
         c.weighty = 1;                 // Platz oberhalb aufnehmen
         c.anchor  = GridBagConstraints.SOUTH;   // Panel nach unten
         c.fill    = GridBagConstraints.HORIZONTAL;
-        c.insets  = new Insets(0, 0, 80, 0);    // Abstand zum unteren Rand
+        c.insets  = new Insets(0, 0, 25, 0);    // Abstand zum unteren Rand
         root.add(form, c);
 
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame.setContentPane(root);
-        frame.setSize(900, 520);
+        frame.setSize(450, 265); //(850, 500);
         frame.setLocationRelativeTo(null);
         frame.setUndecorated(true);
         setAppIcon(frame, "/icons/icon.png");
@@ -77,7 +77,7 @@ public final class LoginWindow {
         p.setOpaque(false);
 
         GridBagConstraints gc = new GridBagConstraints();
-        gc.insets = new Insets(6, 6, 6, 6);
+        gc.insets = new Insets(6, 6, 1, 6);
         gc.anchor = GridBagConstraints.SOUTH;
         gc.fill = GridBagConstraints.HORIZONTAL;
 

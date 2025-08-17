@@ -291,7 +291,7 @@ public class OfferCreatePanel extends EditPanel {
         String s = txtEP[i].getText().trim();
         if (s.isEmpty()) { bdEinzel[i]=null; txtGP[i].setText(""); return; }
         try {
-            bdEinzel[i] = parseStringToBigDecimalSafe(s, LocaleFormat.EU);
+            bdEinzel[i] = parseStringToBigDecimalSafe(s, LocaleFormat.AUTO);
             onQtyOrEPChanged(i);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Eingabe inkorrekt …", "Angebot", JOptionPane.ERROR_MESSAGE);
@@ -302,8 +302,8 @@ public class OfferCreatePanel extends EditPanel {
     private void onQtyOrEPChanged(int i) {
         if (isEmpty(txtEP[i]) || isEmpty(txtAnz[i])) { txtAnz[i].setBackground(Color.PINK); txtGP[i].setText(""); return; }
         try {
-            bdAnzahl[i] = parseStringToBigDecimalSafe(txtAnz[i].getText(), LocaleFormat.EU);
-            if (bdEinzel[i] == null) bdEinzel[i] = parseStringToBigDecimalSafe(txtEP[i].getText(), LocaleFormat.EU);
+            bdAnzahl[i] = parseStringToBigDecimalSafe(txtAnz[i].getText(), LocaleFormat.AUTO);
+            if (bdEinzel[i] == null) bdEinzel[i] = parseStringToBigDecimalSafe(txtEP[i].getText(), LocaleFormat.AUTO);
             bdSumme[i]  = bdEinzel[i].multiply(bdAnzahl[i]).setScale(2, RoundingMode.HALF_UP);
             txtGP[i].setText(bdSumme[i].toString());
             txtAnz[i].setBackground(Color.WHITE);

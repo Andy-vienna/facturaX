@@ -386,8 +386,8 @@ public class BillPanel extends EditPanel {
 	    		String anz = this.txtFieldsAnz[i].getText();
 	    		String ep = this.txtFieldsEP[i].getText();
 	    		
-	    		bdAnz = parseStringToBigDecimalSafe(anz, LocaleFormat.EU).setScale(2, RoundingMode.HALF_UP);
-	    		bdEP = parseStringToBigDecimalSafe(ep, LocaleFormat.EU).setScale(2, RoundingMode.HALF_UP);
+	    		bdAnz = parseStringToBigDecimalSafe(anz, LocaleFormat.AUTO).setScale(2, RoundingMode.HALF_UP);
+	    		bdEP = parseStringToBigDecimalSafe(ep, LocaleFormat.AUTO).setScale(2, RoundingMode.HALF_UP);
 	        	bdGP = bdAnz.multiply(bdEP).setScale(2, RoundingMode.HALF_UP);
 	
 	        	bdNetto = bdNetto.add(bdGP).setScale(2, RoundingMode.HALF_UP);
@@ -414,8 +414,8 @@ public class BillPanel extends EditPanel {
     	for (int i = 0; i < this.txtFieldsPos.length; i++) {
     		if (!this.txtFieldsPos[i].getText().isEmpty()) {
 				sPosText[i] = this.txtFieldsPos[i].getText();
-				bdAnzahl[i] = parseStringToBigDecimalSafe(this.txtFieldsAnz[i].getText(), LocaleFormat.EU).setScale(2, RoundingMode.HALF_UP);
-				bdEinzel[i] = parseStringToBigDecimalSafe(this.txtFieldsEP[i].getText(), LocaleFormat.EU).setScale(2, RoundingMode.HALF_UP);
+				bdAnzahl[i] = parseStringToBigDecimalSafe(this.txtFieldsAnz[i].getText(), LocaleFormat.AUTO).setScale(2, RoundingMode.HALF_UP);
+				bdEinzel[i] = parseStringToBigDecimalSafe(this.txtFieldsEP[i].getText(), LocaleFormat.AUTO).setScale(2, RoundingMode.HALF_UP);
 				anzPos = anzPos.add(BD.ONE); // Anzahl der Positionen
     		}
 		}
@@ -487,7 +487,7 @@ public class BillPanel extends EditPanel {
     	for (int i = 0; i < kundeListe.size(); i++) {
     		Kunde k = kundeListe.get(i);
     		if (k.getId().equals(r.getIdKunde())){
-    			taxRate = parseStringToBigDecimalSafe(k.getTaxvalue(), LocaleFormat.EU).divide(BD.HUNDRED);
+    			taxRate = parseStringToBigDecimalSafe(k.getTaxvalue(), LocaleFormat.AUTO).divide(BD.HUNDRED);
     		}
     	}
     	switch(stufe) {
@@ -548,7 +548,7 @@ public class BillPanel extends EditPanel {
     	
     	this.id = null; this.bdTaxRate = BD.ZERO;
     	bdNetto = BD.ZERO;
-    	bdTaxRate = parseStringToBigDecimalSafe(TaxVal, LocaleFormat.EU);
+    	bdTaxRate = parseStringToBigDecimalSafe(TaxVal, LocaleFormat.AUTO);
 
     	if (id != null && !id.isEmpty()) {
 			this.id = id;
