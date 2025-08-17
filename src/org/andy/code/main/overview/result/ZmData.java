@@ -16,9 +16,9 @@ import org.andy.code.dataStructure.entitiyMaster.Kunde;
 import org.andy.code.dataStructure.entitiyProductive.Rechnung;
 import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
 import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
-import org.andy.code.main.LoadData;
+import org.andy.code.main.LadeEinstellungen;
 import org.andy.code.misc.BD;
-import org.andy.gui.main.result_panels.ZmPanel;
+import org.andy.gui.main.result_panels.ZMeldungPanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,7 +30,7 @@ public class ZmData {
 	// public Teil
 	//###################################################################################################################################################
 	
-	public static void RecState(ZmPanel panel) {
+	public static void RecState(ZMeldungPanel panel) {
 		setValues(panel);
 	}
 	
@@ -38,7 +38,7 @@ public class ZmData {
 	// private Teil
 	//###################################################################################################################################################
 	
-	private static void setValues(ZmPanel panel) {
+	private static void setValues(ZMeldungPanel panel) {
 		NumberFormat nf = NumberFormat.getNumberInstance(Locale.GERMANY);
 		nf.setMinimumFractionDigits(2);
 		nf.setMaximumFractionDigits(2);
@@ -49,7 +49,7 @@ public class ZmData {
 		
 		RechnungRepository rechnungRepository = new RechnungRepository();
 	    List<Rechnung> rechnungListe = new ArrayList<>();
-		rechnungListe.addAll(rechnungRepository.findAllByJahr(parseStringToIntSafe(LoadData.getStrAktGJ()))); // Rechnungen nach GJ laden
+		rechnungListe.addAll(rechnungRepository.findAllByJahr(parseStringToIntSafe(LadeEinstellungen.getStrAktGJ()))); // Rechnungen nach GJ laden
 		
 	    List<Map<String, Statistik>> mapProQuartal = new ArrayList<>();
 	    for (int i = 0; i < 4; i++) {

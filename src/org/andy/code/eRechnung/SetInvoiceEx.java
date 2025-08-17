@@ -13,7 +13,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.andy.code.dataExport.ExcelBill;
+import org.andy.code.dataExport.ExcelRechnung;
 import org.andy.code.dataStructure.entitiyMaster.Bank;
 import org.andy.code.dataStructure.entitiyMaster.Kunde;
 import org.andy.code.dataStructure.entitiyMaster.Owner;
@@ -102,7 +102,7 @@ public class SetInvoiceEx {
 		String RECV_MAIL = kunde.geteBillMail();
 		String RECV_PHONE = kunde.geteBillPhone();
 		String RE_NR = rechnung.getIdNummer();
-		String TAX_NOTE = ExcelBill.getTaxNote();
+		String TAX_NOTE = ExcelRechnung.getTaxNote();
 		String BANK_IBAN = bank.getIban();
 		String BANK_BIC = bank.getBic();
 		String BANK_HOLDER = bank.getKtoName();
@@ -131,7 +131,7 @@ public class SetInvoiceEx {
 		end = dateInMilis(bisDate); // Lieferdatum (aus Leistungszeitraum von)
 
 		int iAnz = rechnung.getAnzPos().intValue();
-		String[] posText = ExcelBill.getsReTxt(); double[] posAnz = ExcelBill.getdAnz(); double[] posEp = ExcelBill.getdEp();
+		String[] posText = ExcelRechnung.getsReTxt(); double[] posAnz = ExcelRechnung.getdAnz(); double[] posEp = ExcelRechnung.getdEp();
 		for(int x = 0; x < iAnz; x++) {
 			//new Item(new Product("Artikeltext", "Artikelbeschreibung", "C62", new BigDecimal(Steuersatz), new BigDecimal(E-Preis),  new BigDecimal(Menge))
 			position[x] = new Item(new Product(posText[x], "", "C62", parseStringToBigDecimalSafe(RECV_TAX, LocaleFormat.AUTO)), BigDecimal.valueOf(posEp[x]), BigDecimal.valueOf(posAnz[x]));

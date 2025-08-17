@@ -17,7 +17,7 @@ import org.andy.code.dataStructure.entitiyMaster.Bank;
 import org.andy.code.dataStructure.entitiyMaster.Kunde;
 import org.andy.code.dataStructure.entitiyMaster.Owner;
 import org.andy.code.dataStructure.entitiyProductive.Rechnung;
-import org.andy.code.main.LoadData;
+import org.andy.code.main.LadeEinstellungen;
 import org.andy.code.main.StartUp;
 
 public class CreateZUGFeRDpdf {
@@ -35,11 +35,11 @@ public class CreateZUGFeRDpdf {
 		int dialogButton = 0;
 		dialogButton = JOptionPane.showConfirmDialog (null, "Soll eine Anlage angefügt werden ?","Attachment", dialogButton);
 		if(dialogButton == JOptionPane.YES_OPTION) {
-			sAttachment[0] = chooseFile(LoadData.getWorkPath());
+			sAttachment[0] = chooseFile(LadeEinstellungen.getWorkPath());
 			for(int num = 1; num < 10; num++) {
 				dialogButton = JOptionPane.showConfirmDialog (null, num + "/10 Anlagen vorhanden, soll eine weitere angefügt werden ?","Attachment", dialogButton);
 				if(dialogButton == JOptionPane.YES_OPTION) {
-					sAttachment[num] = chooseFile(LoadData.getWorkPath());
+					sAttachment[num] = chooseFile(LadeEinstellungen.getWorkPath());
 				}
 				if(dialogButton == JOptionPane.NO_OPTION) {
 					break;

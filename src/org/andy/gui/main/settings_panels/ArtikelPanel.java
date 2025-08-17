@@ -26,7 +26,7 @@ import javax.swing.text.AbstractDocument;
 import org.andy.code.dataStructure.entitiyMaster.Artikel;
 import org.andy.code.dataStructure.repositoryMaster.ArtikelRepository;
 import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
-import org.andy.gui.main.MainWindow;
+import org.andy.gui.main.HauptFenster;
 import org.andy.gui.misc.CommaHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -71,8 +71,8 @@ public class ArtikelPanel extends JPanel {
 
     private void buildPanel() {
     	int x = 10, y = 45; // Variablen für automatische Positionierung
-    	int btnWidth = MainWindow.getButtonx();
-    	int btnHeight = MainWindow.getButtony();
+    	int btnWidth = HauptFenster.getButtonx();
+    	int btnHeight = HauptFenster.getButtony();
     	
         String[] labels = { "Artikelnummer", "Text", "Wert (EUR)" };
         JLabel[] lblFields = new JLabel[labels.length];

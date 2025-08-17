@@ -17,7 +17,7 @@ import org.andy.code.dataStructure.entitiyProductive.Rechnung;
 import org.andy.code.dataStructure.repositoryProductive.AusgabenRepository;
 import org.andy.code.dataStructure.repositoryProductive.EinkaufRepository;
 import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
-import org.andy.code.main.LoadData;
+import org.andy.code.main.LadeEinstellungen;
 import org.andy.code.misc.BD;
 import org.andy.gui.main.result_panels.UStPanel;
 import org.apache.logging.log4j.LogManager;
@@ -52,15 +52,15 @@ public final class UStData {
 		
 		RechnungRepository rechnungRepository = new RechnungRepository();
 	    List<Rechnung> rechnungListe = new ArrayList<>();
-		rechnungListe.addAll(rechnungRepository.findAllByJahr(parseStringToIntSafe(LoadData.getStrAktGJ()))); // Rechnungen nach GJ laden
+		rechnungListe.addAll(rechnungRepository.findAllByJahr(parseStringToIntSafe(LadeEinstellungen.getStrAktGJ()))); // Rechnungen nach GJ laden
 		
 		EinkaufRepository einkaufRepository = new EinkaufRepository();
 	    List<Einkauf> einkaufListe = new ArrayList<>();
-	    einkaufListe.addAll(einkaufRepository.findAllByJahr(parseStringToIntSafe(LoadData.getStrAktGJ()))); // Einkäufe nach GJ laden
+	    einkaufListe.addAll(einkaufRepository.findAllByJahr(parseStringToIntSafe(LadeEinstellungen.getStrAktGJ()))); // Einkäufe nach GJ laden
 	    
 	    AusgabenRepository ausgabenRepository = new AusgabenRepository();
 	    List<Ausgaben> ausgabenListe = new ArrayList<>();
-		ausgabenListe.addAll(ausgabenRepository.findAllByJahr(parseStringToIntSafe(LoadData.getStrAktGJ()))); // Betriebsausgebane nach GJ laden
+		ausgabenListe.addAll(ausgabenRepository.findAllByJahr(parseStringToIntSafe(LadeEinstellungen.getStrAktGJ()))); // Betriebsausgebane nach GJ laden
 		
 		// Initialisieren
 		for (int i = 0; i < 4; i++) {

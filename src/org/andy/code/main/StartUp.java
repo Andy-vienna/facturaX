@@ -15,8 +15,8 @@ import javax.swing.UIManager;
 
 import org.andy.code.dataStructure.entitiyMaster.User;
 import org.andy.code.dataStructure.repositoryMaster.UserRepository;
-import org.andy.gui.main.MainWindow;
-import org.andy.gui.main.LoginWindow;
+import org.andy.gui.main.HauptFenster;
+import org.andy.gui.main.AnmeldeFenster;
 import org.andy.gui.misc.MyFlatTabbedPaneUI;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
@@ -61,7 +61,7 @@ public class StartUp {
 
         // 4) Lizenz einlesen
         try {
-            APP_MODE = getLicense(LoadData.getFileLicense());
+            APP_MODE = getLicense(LadeEinstellungen.getFileLicense());
         } catch (java.security.NoSuchAlgorithmException | java.io.IOException e) {
             logger.error("error reading license", e);
             APP_MODE = 0;
@@ -76,7 +76,7 @@ public class StartUp {
         APP_VERSION = getVersion();
 
         // 6) Einstellungen laden
-        LoadData.LoadProgSettings();
+        LadeEinstellungen.LoadProgSettings();
 
         // 7) UI auf EDT starten
         SwingUtilities.invokeLater(() -> {
@@ -107,9 +107,9 @@ public class StartUp {
             }
 
             // hier erst Fenster erzeugen
-            new LoginWindow(new UserRepository(), new LoginWindow.AuthCallback() {
+            new AnmeldeFenster(new UserRepository(), new AnmeldeFenster.AuthCallback() {
             	@Override
-                public void onSuccess(User u) { MainWindow.loadGUI(u.getId(), u.getRoles()); }
+                public void onSuccess(User u) { HauptFenster.loadGUI(u.getId(), u.getRoles()); }
                 public void onCancel() { System.exit(0); }
             }).show();
         });

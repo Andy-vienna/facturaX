@@ -11,7 +11,7 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-import org.andy.code.main.LoadData;
+import org.andy.code.main.LadeEinstellungen;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
@@ -46,9 +46,9 @@ public class ExcelP109a {
 	
 	private static void setData(ArrayList<BigDecimal> listContent) {
 		
-		sExcelIn = LoadData.getTplP109a();
-		sExcelOut = LoadData.getWorkPath() + "\\Mitteilung_nach_P109a_" + LoadData.getStrAktGJ() + ".xlsx";
-		sPdfOut = LoadData.getWorkPath() + "\\Mitteilung_nach_P109a_" + LoadData.getStrAktGJ() + ".pdf";
+		sExcelIn = LadeEinstellungen.getTplP109a();
+		sExcelOut = LadeEinstellungen.getWorkPath() + "\\Mitteilung_nach_P109a_" + LadeEinstellungen.getStrAktGJ() + ".xlsx";
+		sPdfOut = LadeEinstellungen.getWorkPath() + "\\Mitteilung_nach_P109a_" + LadeEinstellungen.getStrAktGJ() + ".pdf";
 		
 		//#######################################################################
 		// Rechnungs-Excel erzeugen
@@ -89,13 +89,13 @@ public class ExcelP109a {
 			ArrayList<String> editOwner = new ArrayList<>();
 		    Footer footer = ws.getFooter();
 
-			editOwner = DataExportHelper.ownerData();
+			editOwner = ExcelHelper.ownerData();
 
 			// Schrift: Arial 9, Farbe: Grau 50% (#7F7F7F)
 			String style = "&\"Arial,Regular\"&9&K7F7F7F";
 
-			footer.setLeft(style + DataExportHelper.getFooterLeft());
-			footer.setCenter(style + DataExportHelper.getFooterCenter());
+			footer.setLeft(style + ExcelHelper.getFooterLeft());
+			footer.setCenter(style + ExcelHelper.getFooterCenter());
 
 			XSSFRichTextString OwnerText = new XSSFRichTextString();
 
@@ -119,8 +119,8 @@ public class ExcelP109a {
 			// Zellwerte beschreiben
 			//#######################################################################
 			owner.setCellValue(OwnerText); //Name
-			taxID.setCellValue("Steuernummer: " + DataExportHelper.getSteuerNummer()); //Steuernummer
-			year.setCellValue(LoadData.getStrAktGJ()); //Wirtschaftsjahr
+			taxID.setCellValue("Steuernummer: " + ExcelHelper.getSteuerNummer()); //Steuernummer
+			year.setCellValue(LadeEinstellungen.getStrAktGJ()); //Wirtschaftsjahr
 			
 			P109In.setCellValue(listContent.get(0).doubleValue()); //Einkünfte aus selbstständiger Arbeit
 			P109SVSQ1.setCellValue(listContent.get(1).doubleValue()); //SV-Beiträge 1. Quartal
@@ -151,7 +151,7 @@ public class ExcelP109a {
 		//#######################################################################
 		// PDF-A1 Datei erzeugen
 		//#######################################################################
-		SaveAsPdf.toPDF(sExcelOut, sPdfOut);
+		ErzeugePDF.toPDF(sExcelOut, sPdfOut);
 		
 		//#######################################################################
 		// Ursprungs-Excel löschen

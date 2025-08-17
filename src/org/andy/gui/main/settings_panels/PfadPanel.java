@@ -15,7 +15,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
-import org.andy.code.main.LoadData;
+import org.andy.code.main.LadeEinstellungen;
 import org.andy.toolbox.misc.SelectFile;
 
 public class PfadPanel extends JPanel {
@@ -110,7 +110,7 @@ public class PfadPanel extends JPanel {
 	                }
 	                if (chosenPath != null) {
 	                    setters[index].accept(chosenPath);
-	                    LoadData.setPrpAppSettings(propertyKeys[index], chosenPath);
+	                    LadeEinstellungen.setPrpAppSettings(propertyKeys[index], chosenPath);
 	                    txtFields[index].setText(chosenPath);
 	                }
 	            }
@@ -142,27 +142,27 @@ public class PfadPanel extends JPanel {
     // Get-Methoden (als Function<Void, String>)
     @SuppressWarnings("unchecked")
     Function<Void, String>[] getters = new Function[] {
-        _ -> LoadData.getTplOffer(),
-        _ -> LoadData.getTplConfirmation(),
-        _ -> LoadData.getTplBill(),
-        _ -> LoadData.getTplReminder(),
-        _ -> LoadData.getTplMahnung(),
-        _ -> LoadData.getTplP109a(),
-        _ -> LoadData.getWorkPath(),
-        _ -> LoadData.getBackupPath()
+        _ -> LadeEinstellungen.getTplOffer(),
+        _ -> LadeEinstellungen.getTplConfirmation(),
+        _ -> LadeEinstellungen.getTplBill(),
+        _ -> LadeEinstellungen.getTplReminder(),
+        _ -> LadeEinstellungen.getTplMahnung(),
+        _ -> LadeEinstellungen.getTplP109a(),
+        _ -> LadeEinstellungen.getWorkPath(),
+        _ -> LadeEinstellungen.getBackupPath()
     };
 
     // Set-Methoden (als Consumer<String>)
     @SuppressWarnings("unchecked")
     Consumer<String>[] setters = new Consumer[] {
-        (Consumer<String>) val -> LoadData.setTplOffer(val),
-        (Consumer<String>) val -> LoadData.setTplConfirmation(val),
-        (Consumer<String>) val -> LoadData.setTplBill(val),
-        (Consumer<String>) val -> LoadData.setTplReminder(val),
-        (Consumer<String>) val -> LoadData.setTplMahnung(val),
-        (Consumer<String>) val -> LoadData.setTplP109a(val),
-        (Consumer<String>) val -> LoadData.setWorkPath(val),
-        (Consumer<String>) val -> LoadData.setBackupPath(val)
+        (Consumer<String>) val -> LadeEinstellungen.setTplOffer(val),
+        (Consumer<String>) val -> LadeEinstellungen.setTplConfirmation(val),
+        (Consumer<String>) val -> LadeEinstellungen.setTplBill(val),
+        (Consumer<String>) val -> LadeEinstellungen.setTplReminder(val),
+        (Consumer<String>) val -> LadeEinstellungen.setTplMahnung(val),
+        (Consumer<String>) val -> LadeEinstellungen.setTplP109a(val),
+        (Consumer<String>) val -> LadeEinstellungen.setWorkPath(val),
+        (Consumer<String>) val -> LadeEinstellungen.setBackupPath(val)
     };
 
 }

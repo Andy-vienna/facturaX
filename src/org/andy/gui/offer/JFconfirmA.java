@@ -27,9 +27,9 @@ import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
 import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
 import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
-import org.andy.code.dataExport.ExcelConfirmation;
+import org.andy.code.dataExport.ExcelAuftragsbestätigung;
 import org.andy.code.main.StartUp;
-import org.andy.gui.main.MainWindow;
+import org.andy.gui.main.HauptFenster;
 import org.andy.gui.misc.RoundedBorder;
 import org.andy.org.eclipse.wb.swing.FocusTraversalOnArray;
 
@@ -166,14 +166,14 @@ public class JFconfirmA extends JFrame {
 					return;
 				}
 				try {
-					ExcelConfirmation.abExport(vZelleA);
+					ExcelAuftragsbestätigung.abExport(vZelleA);
 				} catch (IOException e1) {
 					logger.error("JFconfirmA(String vZelleA) - " + e);
 				} catch (Exception e1) {
 					logger.error("JFconfirmA(String vZelleA) - " + e1);
 				}
 
-				MainWindow.actScreen();
+				HauptFenster.actScreen();
 				dispose();
 			}
 		});

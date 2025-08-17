@@ -33,10 +33,10 @@ import javax.swing.text.AbstractDocument;
 
 import org.andy.code.dataStructure.entitiyProductive.SVSteuer;
 import org.andy.code.dataStructure.repositoryProductive.SVSteuerRepository;
-import org.andy.code.main.LoadData;
+import org.andy.code.main.LadeEinstellungen;
 import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
 import org.andy.gui.file.JFfileView;
-import org.andy.gui.main.MainWindow;
+import org.andy.gui.main.HauptFenster;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.gui.misc.CommaHelper;
 import org.andy.gui.misc.RoundedBorder;
@@ -177,7 +177,7 @@ public class SvTaxPanel extends EditPanel {
 			logger.error("error creating button - " + e1);
 		}
 		btnFields[1].setEnabled(true);
-		btnFields[1].setBounds(660, 120, MainWindow.getButtonx(), MainWindow.getButtony());
+		btnFields[1].setBounds(660, 120, HauptFenster.getButtonx(), HauptFenster.getButtony());
 		add(btnFields[1]);
 		
 		setPreferredSize(new Dimension(1000, 20 + 5 * 25 + 50));
@@ -190,7 +190,7 @@ public class SvTaxPanel extends EditPanel {
 			public void mouseClicked(MouseEvent e) {
 				if(lblFileTyp.getIcon() != null) {
 					String outputPath;
-					outputPath = choosePath(LoadData.getWorkPath());
+					outputPath = choosePath(LadeEinstellungen.getWorkPath());
 					Path path = Paths.get(outputPath);
 					if (outputPath.equals(getNotSelected())) {
 						return; // nichts ausgewählt
@@ -207,7 +207,7 @@ public class SvTaxPanel extends EditPanel {
 	    btnFields[0].addActionListener(new ActionListener() {
  			@Override
  			public void actionPerformed(ActionEvent e) {
- 				String FileNamePath = chooseFile(LoadData.getWorkPath());
+ 				String FileNamePath = chooseFile(LadeEinstellungen.getWorkPath());
  				File fn = new File(FileNamePath);
  				String FileName = fn.getName();
  				txtFile.setText(FileName);
@@ -227,7 +227,7 @@ public class SvTaxPanel extends EditPanel {
  			public void actionPerformed(ActionEvent e) {
  				if (neuBeleg) {
  					
- 					svsteuer.setJahr(parseStringToIntSafe(LoadData.getStrAktGJ()));
+ 					svsteuer.setJahr(parseStringToIntSafe(LadeEinstellungen.getStrAktGJ()));
  	 				
  	 				boolean bResult = checkInput();
  	 				if (!bResult) {
@@ -253,7 +253,7 @@ public class SvTaxPanel extends EditPanel {
  					svsteuerRepository.update(svsteuer);
  				}
  				neuBeleg = false;
- 				MainWindow.actScreen();
+ 				HauptFenster.actScreen();
  			}
  		});
 	}

@@ -32,7 +32,7 @@ import javax.swing.border.BevelBorder;
 import org.andy.code.dataStructure.entitiyMaster.Kunde;
 import org.andy.code.dataStructure.entitiyProductive.FileStore;
 import org.andy.code.dataStructure.repositoryProductive.FileStoreRepository;
-import org.andy.code.main.LoadData;
+import org.andy.code.main.LadeEinstellungen;
 import org.andy.code.main.StartUp;
 import org.andy.toolbox.misc.SetFrameIcon;
 import org.apache.logging.log4j.LogManager;
@@ -206,7 +206,7 @@ public class JFfileView extends JFrame {
 
 		    // Senden (Mail-Template abhängig vom Typ/Index)
 		    btnSendMail[i].addActionListener(_ -> {
-		        String completeFileName = getFileForMail(typ, sNummer, LoadData.getWorkPath());
+		        String completeFileName = getFileForMail(typ, sNummer, LadeEinstellungen.getWorkPath());
 		        String fileName = completeFileName;
 		        try { fileName = cutFromRight(completeFileName, '\\'); } 
 		        catch (IOException ex) { logger.error("error cutting filename", ex); }
@@ -254,7 +254,7 @@ public class JFfileView extends JFrame {
 
 			// Datei als Anhang hinzufügen
 			Dispatch attachments = Dispatch.get(mail, "Attachments").toDispatch();
-			Dispatch.call(attachments, "Add", LoadData.getWorkPath() + "\\" + sSubject);
+			Dispatch.call(attachments, "Add", LadeEinstellungen.getWorkPath() + "\\" + sSubject);
 
 			// E-Mail senden
 			Dispatch.call(mail, "Send");
@@ -267,11 +267,11 @@ public class JFfileView extends JFrame {
 			outlook.safeRelease();
 		}
 
-		boolean bLocked = isLocked(LoadData.getWorkPath() + "\\" + sSubject);
+		boolean bLocked = isLocked(LadeEinstellungen.getWorkPath() + "\\" + sSubject);
 		while(bLocked) {
 			System.out.println("warte auf Dateien ...");
 		}
-		File MailFile = new File(LoadData.getWorkPath() + "\\" + sSubject);
+		File MailFile = new File(LadeEinstellungen.getWorkPath() + "\\" + sSubject);
 		if(MailFile.delete()) {
 
 		}else {
@@ -553,7 +553,7 @@ public class JFfileView extends JFrame {
 	//###################################################################################################################################################
 
 	private static void upsertFileHibernate(String typ, String id) {
-	    String filePath = chooseFile(LoadData.getWorkPath());
+	    String filePath = chooseFile(LadeEinstellungen.getWorkPath());
 	    if (filePath.equals(getNotSelected())) return;
 
 	    File f = new File(filePath);
@@ -613,7 +613,7 @@ public class JFfileView extends JFrame {
 
 	private static String exportFileHibernate(String typ, String id, String targetDirOrNull) throws IOException {
 	    // Zielpfad bestimmen
-	    String dir = targetDirOrNull != null ? targetDirOrNull : choosePath(LoadData.getWorkPath());
+	    String dir = targetDirOrNull != null ? targetDirOrNull : choosePath(LadeEinstellungen.getWorkPath());
 	    if (dir == null || dir.equals(getNotSelected())) return getNotSelected();
 	    Path outDir = Paths.get(dir);
 
@@ -648,7 +648,7 @@ public class JFfileView extends JFrame {
 
 	private static int aktJahr() {
 	    // falls du das Geschäftsjahr als String hast (z. B. "2025"):
-	    return parseStringToIntSafe(LoadData.getStrAktGJ());
+	    return parseStringToIntSafe(LadeEinstellungen.getStrAktGJ());
 	}
 
 	private static void setNameAndData(FileStore fs, String typ, String name, byte[] data) {

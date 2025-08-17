@@ -23,7 +23,7 @@ import javax.swing.border.TitledBorder;
 
 import org.andy.code.dataStructure.entitiyMaster.Kunde;
 import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
-import org.andy.gui.main.MainWindow;
+import org.andy.gui.main.HauptFenster;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -69,8 +69,8 @@ public class KundePanel extends JPanel {
 
     private void buildPanel() {
     	int x = 10, y = 45; // Variablen für automatische Positionierung
-    	int btnWidth = MainWindow.getButtonx();
-    	int btnHeight = MainWindow.getButtony();
+    	int btnWidth = HauptFenster.getButtonx();
+    	int btnHeight = HauptFenster.getButtony();
     	
         String[] labels = { "Kunden-Nr.", "Name", "Strasse", "PLZ", "Ort", "Land", "Pronomen", "Ansprechpartner",
         		"USt.-ID", "Steuersatz", "Rabattschlüssel", "Zahlungsziel", "Leitweg-ID", "eBill-Typ", "E-Mail", "Telefon" };

@@ -32,9 +32,9 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class ExcelMahnung{
+public class ExcelZahlungserinnerung{
 
-	private static final Logger logger = LogManager.getLogger(ExcelMahnung.class);
+	private static final Logger logger = LogManager.getLogger(ExcelZahlungserinnerung.class);
 
 	private static final int COLUMN_A = 0;
 	private static final int COLUMN_B = 1;
@@ -42,18 +42,15 @@ public class ExcelMahnung{
 	private static final int COLUMN_F = 5;
 
 	//###################################################################################################################################################
-	// Mahnung erzeugen und als pdf exportieren
+	// Zahlungserinnerung erzeugen und als pdf exportieren
 	//###################################################################################################################################################
 
-	public static void mahnungExport(String sNr, int iStufe) throws Exception {
+	public static void reminderExport(String sNr) throws Exception {
 
-		if(iStufe < 1 || iStufe > 2) {
-			return;
-		}
-
-		String sExcelIn = LadeEinstellungen.getTplMahnung();
-		String sExcelOut = LadeEinstellungen.getWorkPath() + "Mahnung_" + String.valueOf(iStufe) + "_" + sNr + ".xlsx";
-		String sPdfOut = LadeEinstellungen.getWorkPath() + "Mahnung_" + String.valueOf(iStufe) + "_" + sNr + ".pdf";
+		new ArrayList<>();
+		String sExcelIn = LadeEinstellungen.getTplReminder();
+		String sExcelOut = LadeEinstellungen.getWorkPath() + "Zahlungserinnerung_" + sNr + ".xlsx";
+		String sPdfOut = LadeEinstellungen.getWorkPath() + "Zahlungserinnerung_" + sNr + ".pdf";
 
 		Rechnung rechnung = ExcelHelper.loadRechnung(sNr);
 		Kunde kunde = ExcelHelper.kundeData(rechnung.getIdKunde());
@@ -70,7 +67,7 @@ public class ExcelMahnung{
 			fileOut = new FileOutputStream(sExcelOut);
 
 			XSSFWorkbook wb = new XSSFWorkbook(inputStream);
-			Sheet ws = wb.getSheet("Mahnung");
+			Sheet ws = wb.getSheet("Zahlungserinnerung");
 
 			//#######################################################################
 			// Owner-Informationen in die Excel-Datei schreiben
@@ -149,39 +146,20 @@ public class ExcelMahnung{
 			remDate.setCellValue(StartUp.getDtNow());
 			remDuty.setCellValue(kunde.getPerson());
 			
-			remHeader.setCellValue(ExcelHelper.getTextMahnung().get(0)
-					.replace("{NrMahn}", String.valueOf(iStufe))
-					.replace("{RE}", rechnung.getIdNummer())
-					.replace("{Datum}", rechnung.getDatum().toString()));
+			remHeader.setCellValue(ExcelHelper.getTextZahlErin().get(0).replace("{RE}", rechnung.getIdNummer()).replace("{Datum}", rechnung.getDatum().toString()));
 
 			if(kunde.getPronomen().equals("Herr")) {
-				remAnrede.setCellValue(ExcelHelper.getTextMahnung().get(1).replace("{Name}", kunde.getPerson()));
+				remAnrede.setCellValue(ExcelHelper.getTextZahlErin().get(1).replace("{Name}", kunde.getPerson()));
 			}else if(kunde.getPronomen().equals("Frau")) {
-				remAnrede.setCellValue(ExcelHelper.getTextMahnung().get(2).replace("{Name}", kunde.getPerson()));
+				remAnrede.setCellValue(ExcelHelper.getTextZahlErin().get(2).replace("{Name}", kunde.getPerson()));
 			}else {
-				remAnrede.setCellValue(ExcelHelper.getTextMahnung().get(3));
-			}
-			
-			switch(iStufe) {
-			case 1:
-				remText1.setCellValue(ExcelHelper.getTextMahnung().get(4)
-						.replace("{Datum}", rechnung.getDatum().toString())
-						.replace("{Wert}", rechnung.getBrutto().toString()));
-				remText2.setCellValue(ExcelHelper.getTextMahnung().get(6));
-				remText3.setCellValue(ExcelHelper.getTextMahnung().get(8));
-				remText4.setCellValue(ExcelHelper.getTextMahnung().get(10));
-				break;
-			case 2:
-				remText1.setCellValue(ExcelHelper.getTextMahnung().get(5)
-						.replace("{Datum}", rechnung.getDatum().toString())
-						.replace("{Wert}", rechnung.getBrutto().toString()));
-				remText2.setCellValue(ExcelHelper.getTextMahnung().get(7));
-				remText3.setCellValue(ExcelHelper.getTextMahnung().get(9)
-						.replace("{Spesen}", "40,00"));
-				remText4.setCellValue(ExcelHelper.getTextMahnung().get(11));
-				break;
+				remAnrede.setCellValue(ExcelHelper.getTextZahlErin().get(3));
 			}
 
+			remText1.setCellValue(ExcelHelper.getTextZahlErin().get(4).replace("{Datum}", rechnung.getDatum().toString()).replace("{Wert}", rechnung.getBrutto().toString()));
+			remText2.setCellValue(ExcelHelper.getTextZahlErin().get(5));
+			remText3.setCellValue(ExcelHelper.getTextZahlErin().get(6));
+			remText4.setCellValue(ExcelHelper.getTextZahlErin().get(7).replace("{Datum}", rechnung.getDatum().toString()));
 			remGruss.setCellValue(ExcelHelper.getTextZahlErin().get(8));
 			remName.setCellValue(ExcelHelper.getTextZahlErin().get(9).replace("{OwnerName}", ExcelHelper.getKontaktName()));
 
@@ -221,18 +199,10 @@ public class ExcelMahnung{
 		FileStoreRepository fileStoreRepository = new FileStoreRepository();
 		FileStore fileStore = fileStoreRepository.findById(rechnung.getIdNummer()); // Tabelleneintrag mit Hibernate lesen
 		
-		Path path = Paths.get(FileNamePath);
+		fileStore.setZeFileName(FileName);
 		
-		switch(iStufe) {
-		case 1:
-			fileStore.setM1FileName(FileName);
-			fileStore.setM1PdfFile(Files.readAllBytes(path)); // ByteArray für Dateiinhalt
-			break;
-		case 2:
-			fileStore.setM2FileName(FileName);
-			fileStore.setM2PdfFile(Files.readAllBytes(path)); // ByteArray für Dateiinhalt
-			break;
-		}
+		Path path = Paths.get(FileNamePath);
+		fileStore.setZePdfFile(Files.readAllBytes(path)); // ByteArray für Dateiinhalt
 		
 		fileStoreRepository.update(fileStore); // Datei in DB speichern
 		
@@ -240,10 +210,10 @@ public class ExcelMahnung{
 		// Status der Rechnung ändern
 		//#######################################################################
 		
-		rechnung.setState(rechnung.getState() + 100); // Zustand Mahnstufe x setzen
+		rechnung.setState(rechnung.getState() + 200); // Zustand Zahlungserinnerung setzen
 		RechnungRepository rechnungRepository = new RechnungRepository();
 		rechnungRepository.update(rechnung);
-				
+		
 		//#######################################################################
 		// Ursprungs-Excel und -pdf löschen
 		//#######################################################################

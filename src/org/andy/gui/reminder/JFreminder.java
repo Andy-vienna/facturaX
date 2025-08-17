@@ -20,8 +20,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.andy.code.dataExport.ExcelMahnung;
-import org.andy.code.dataExport.ExcelReminder;
-import org.andy.gui.main.MainWindow;
+import org.andy.code.dataExport.ExcelZahlungserinnerung;
+import org.andy.gui.main.HauptFenster;
 import org.andy.toolbox.misc.SetFrameIcon;
 
 public class JFreminder extends JFrame {
@@ -123,7 +123,7 @@ public class JFreminder extends JFrame {
 				if (radio1.isSelected()) {
 					try {
 						try {
-							ExcelReminder.reminderExport(sId);
+							ExcelZahlungserinnerung.reminderExport(sId);
 						} catch (IOException e1) {
 							logger.error("error creating payment reminder - " + e1);
 						}
@@ -155,7 +155,7 @@ public class JFreminder extends JFrame {
 					}
 				}
 
-				MainWindow.actScreen();
+				HauptFenster.actScreen();
 				dispose();
 			}
 		});
