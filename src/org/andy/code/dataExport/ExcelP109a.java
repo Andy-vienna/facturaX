@@ -11,7 +11,7 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
@@ -46,9 +46,9 @@ public class ExcelP109a {
 	
 	private static void setData(ArrayList<BigDecimal> listContent) {
 		
-		sExcelIn = LadeEinstellungen.getTplP109a();
-		sExcelOut = LadeEinstellungen.getWorkPath() + "\\Mitteilung_nach_P109a_" + LadeEinstellungen.getStrAktGJ() + ".xlsx";
-		sPdfOut = LadeEinstellungen.getWorkPath() + "\\Mitteilung_nach_P109a_" + LadeEinstellungen.getStrAktGJ() + ".pdf";
+		sExcelIn = Einstellungen.getTplP109a();
+		sExcelOut = Einstellungen.getWorkPath() + "\\Mitteilung_nach_P109a_" + Einstellungen.getStrAktGJ() + ".xlsx";
+		sPdfOut = Einstellungen.getWorkPath() + "\\Mitteilung_nach_P109a_" + Einstellungen.getStrAktGJ() + ".pdf";
 		
 		//#######################################################################
 		// Rechnungs-Excel erzeugen
@@ -120,7 +120,7 @@ public class ExcelP109a {
 			//#######################################################################
 			owner.setCellValue(OwnerText); //Name
 			taxID.setCellValue("Steuernummer: " + ExcelHelper.getSteuerNummer()); //Steuernummer
-			year.setCellValue(LadeEinstellungen.getStrAktGJ()); //Wirtschaftsjahr
+			year.setCellValue(Einstellungen.getStrAktGJ()); //Wirtschaftsjahr
 			
 			P109In.setCellValue(listContent.get(0).doubleValue()); //Einkünfte aus selbstständiger Arbeit
 			P109SVSQ1.setCellValue(listContent.get(1).doubleValue()); //SV-Beiträge 1. Quartal

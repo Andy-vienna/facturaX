@@ -21,9 +21,8 @@ import org.andy.code.dataStructure.entitiyProductive.Angebot;
 import org.andy.code.dataStructure.entitiyProductive.FileStore;
 import org.andy.code.dataStructure.repositoryProductive.AngebotRepository;
 import org.andy.code.dataStructure.repositoryProductive.FileStoreRepository;
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 import org.andy.code.qr.ZxingQR;
-import org.andy.gui.offer.JFconfirmA;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -64,11 +63,11 @@ public class ExcelAuftragsbestätigung{
 	// Angebotbestätigung erzeugen und als pdf exportieren
 	//###################################################################################################################################################
 
-	public static void abExport(String sNr) throws Exception {
+	public static void abExport(String sNr, String confNr, String confDate, String startDate) throws Exception {
 
-		String sExcelIn = LadeEinstellungen.getTplConfirmation();
-		String sExcelOut = LadeEinstellungen.getWorkPath() + "Auftragsbestätigung_" + sNr.replace("AN", "AB") + ".xlsx";
-		String sPdfOut = LadeEinstellungen.getWorkPath() + "Auftragsbestätigung_" + sNr.replace("AN", "AB") + ".pdf";
+		String sExcelIn = Einstellungen.getTplConfirmation();
+		String sExcelOut = Einstellungen.getWorkPath() + "Auftragsbestätigung_" + sNr.replace("AN", "AB") + ".xlsx";
+		String sPdfOut = Einstellungen.getWorkPath() + "Auftragsbestätigung_" + sNr.replace("AN", "AB") + ".pdf";
 
 		final Cell abPos[] = new Cell[13];
 		final Cell abText[] = new Cell[13];
@@ -195,8 +194,8 @@ public class ExcelAuftragsbestätigung{
 			
 			abSumme.setCellValue(angebot.getNetto().doubleValue());
 			abText1.setCellValue(ExcelHelper.getTextOrderConfirm().get(0).replace("{AN}", angebot.getIdNummer())
-					.replace("{Best-Nr}", JFconfirmA.getsConfNr()).replace("{Datum}", JFconfirmA.getsConfDatum()));
-			abText2.setCellValue(ExcelHelper.getTextOrderConfirm().get(1).replace("{Datum}", JFconfirmA.getsConfStart()));
+					.replace("{Best-Nr}", confNr).replace("{Datum}", confDate));
+			abText2.setCellValue(ExcelHelper.getTextOrderConfirm().get(1).replace("{Datum}", startDate));
 			abText3.setCellValue(ExcelHelper.getTextOrderConfirm().get(2).replace("{Tage}", kunde.getZahlungsziel()));
 			abText4.setCellValue(ExcelHelper.getTextOrderConfirm().get(3));
 			

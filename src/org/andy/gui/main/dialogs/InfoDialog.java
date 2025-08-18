@@ -1,4 +1,4 @@
-package org.andy.gui.main;
+package org.andy.gui.main.dialogs;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -32,7 +32,7 @@ public final class InfoDialog extends JDialog {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setContentPane(buildContent(appName, appVersion));
         pack();
-        setMinimumSize(new Dimension(200, 380));
+        setMinimumSize(new Dimension(250, 400));
         setLocationRelativeTo(owner);
         getRootPane().setDefaultButton(closeButton);
         bindEscToClose();
@@ -93,8 +93,7 @@ public final class InfoDialog extends JDialog {
         return root;
     }
 
-    @SuppressWarnings("serial")
-	private void bindEscToClose() {
+    private void bindEscToClose() {
         JRootPane rp = getRootPane();
         InputMap im = rp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = rp.getActionMap();

@@ -16,7 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 import org.andy.gui.main.HauptFenster;
 import org.andy.toolbox.misc.Tools;
 import org.apache.logging.log4j.LogManager;
@@ -53,7 +53,7 @@ public class QrCodePanel extends JPanel {
 	//###################################################################################################################################################
 
     private void buildPanel() {
-    	String[] sQRschema = LadeEinstellungen.getStrQRschema().split("/"); // Properties Eintrag zerlegen
+    	String[] sQRschema = Einstellungen.getStrQRschema().split("/"); // Properties Eintrag zerlegen
 
 		if (sQRschema.length != 10) {
 			sQRschema = new String[] { "BCD","002","1","SCT","{BIC}","{KI}","{IBAN}","EUR{SUM}","","{RENR}" };
@@ -190,15 +190,15 @@ public class QrCodePanel extends JPanel {
 		btnQROK.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				LadeEinstellungen.setStrQRschema(txtQRbcd.getText() + "/" + textQRversion.getText() + "/" + textQRcode.getText()
+				Einstellungen.setStrQRschema(txtQRbcd.getText() + "/" + textQRversion.getText() + "/" + textQRcode.getText()
 				+ "/" + textQRsct.getText() + "/" + txtQRbic.getText() + "/" + txtQRki.getText() + "/"
 				+ txtQRiban.getText() + "/" + txtQReursum.getText() + "/" + textQRzweck.getText() + "/"
 				+ textQRref.getText() + "/" + textQRtext.getText() + "/" + textQRanzeige.getText());
 
-				LadeEinstellungen.setPrpAppSettings("qrschema", LadeEinstellungen.getStrQRschema());
+				Einstellungen.setPrpAppSettings("qrschema", Einstellungen.getStrQRschema());
 
 				try {
-					Tools.saveSettingsApp(LadeEinstellungen.getPrpAppSettings());
+					Tools.saveSettingsApp(Einstellungen.getPrpAppSettings());
 				} catch (IOException e1) {
 					logger.error("JFsettings() - " + e1);
 				}
@@ -217,7 +217,7 @@ public class QrCodePanel extends JPanel {
 				btnQROK.setEnabled(false);
 				btnQREdit.setEnabled(true);
 
-				LadeEinstellungen.setbFinished(true);
+				Einstellungen.setbFinished(true);
 			}
 		});
 		

@@ -14,7 +14,7 @@ import java.util.Locale;
 
 import org.andy.code.dataStructure.entitiyProductive.Ausgaben;
 import org.andy.code.dataStructure.repositoryProductive.AusgabenRepository;
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 import org.andy.code.misc.BD;
 
 public class LadeAusgaben {
@@ -46,7 +46,7 @@ public class LadeAusgaben {
 
 		AusgabenRepository ausgabenRepository = new AusgabenRepository();
 	    List<Ausgaben> ausgabenListe = new ArrayList<>();
-		ausgabenListe.addAll(ausgabenRepository.findAllByJahr(parseStringToIntSafe(LadeEinstellungen.getStrAktGJ())));
+		ausgabenListe.addAll(ausgabenRepository.findAllByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ())));
 		
 		String[][] sTemp = new String [ausgabenListe.size() + 1][6];
 		belegID = new int[ausgabenListe.size()];

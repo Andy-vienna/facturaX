@@ -14,7 +14,7 @@ import org.andy.code.dataStructure.entitiyProductive.Einkauf;
 import org.andy.code.dataStructure.entitiyProductive.FileStore;
 import org.andy.code.dataStructure.entitiyProductive.Rechnung;
 import org.andy.code.dataStructure.entitiyProductive.SVSteuer;
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.hibernate.SessionFactory;
@@ -55,7 +55,7 @@ public class HibernateUtil {
         //settings.put("hibernate.dialect", "org.hibernate.dialect.SQLServerDialect");
 
         // ---- HikariCP-Einstellungen (DB1) ----
-        settings.put("hibernate.hikari.jdbcUrl", LadeEinstellungen.getsMasterData());
+        settings.put("hibernate.hikari.jdbcUrl", Einstellungen.getsMasterData());
         settings.put("hibernate.hikari.username", "sa");
         settings.put("hibernate.hikari.password", "P@ssw0rd");
 
@@ -101,7 +101,7 @@ public class HibernateUtil {
         //settings.put("hibernate.dialect", "org.hibernate.dialect.SQLServerDialect");
 
         // ---- HikariCP-Einstellungen (DB2) ----
-        settings.put("hibernate.hikari.jdbcUrl", LadeEinstellungen.getsProductiveData());
+        settings.put("hibernate.hikari.jdbcUrl", Einstellungen.getsProductiveData());
         settings.put("hibernate.hikari.username", "sa");
         settings.put("hibernate.hikari.password", "P@ssw0rd");
 

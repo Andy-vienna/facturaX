@@ -18,7 +18,7 @@ import org.andy.code.dataStructure.entitiyProductive.FileStore;
 import org.andy.code.dataStructure.entitiyProductive.Rechnung;
 import org.andy.code.dataStructure.repositoryProductive.FileStoreRepository;
 import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 import org.andy.code.main.StartUp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,9 +51,9 @@ public class ExcelMahnung{
 			return;
 		}
 
-		String sExcelIn = LadeEinstellungen.getTplMahnung();
-		String sExcelOut = LadeEinstellungen.getWorkPath() + "Mahnung_" + String.valueOf(iStufe) + "_" + sNr + ".xlsx";
-		String sPdfOut = LadeEinstellungen.getWorkPath() + "Mahnung_" + String.valueOf(iStufe) + "_" + sNr + ".pdf";
+		String sExcelIn = Einstellungen.getTplMahnung();
+		String sExcelOut = Einstellungen.getWorkPath() + "Mahnung_" + String.valueOf(iStufe) + "_" + sNr + ".xlsx";
+		String sPdfOut = Einstellungen.getWorkPath() + "Mahnung_" + String.valueOf(iStufe) + "_" + sNr + ".pdf";
 
 		Rechnung rechnung = ExcelHelper.loadRechnung(sNr);
 		Kunde kunde = ExcelHelper.kundeData(rechnung.getIdKunde());

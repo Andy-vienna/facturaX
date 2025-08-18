@@ -13,9 +13,9 @@ import javax.swing.JOptionPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class LadeEinstellungen {
+public class Einstellungen {
 
-	private static final Logger logger = LogManager.getLogger(LadeEinstellungen.class);
+	private static final Logger logger = LogManager.getLogger(Einstellungen.class);
 
 	private static final String FILE_LICENSE = System.getProperty("user.dir") + "\\license.lic";
 	private static Properties prpDBSettings = new Properties();
@@ -129,10 +129,10 @@ public class LadeEinstellungen {
 		// ------------------------------------------------------------------------------
 		// Datenbank Connection strings für Hibernate
 		// ------------------------------------------------------------------------------
-		sMasterData = "jdbc:sqlserver://" + LadeEinstellungen.strDBComputer + ":" + LadeEinstellungen.strDBPort + ";databaseName="
-				+ LadeEinstellungen.strDBNameSource + ";encrypt=" + LadeEinstellungen.strDBencrypted + ";trustServerCertificate=" + LadeEinstellungen.strDBServerCert;
-		sProductiveData = "jdbc:sqlserver://" + LadeEinstellungen.strDBComputer + ":" + LadeEinstellungen.strDBPort + ";databaseName="
-				+ LadeEinstellungen.strDBNameDest + ";encrypt=" + LadeEinstellungen.strDBencrypted + ";trustServerCertificate=" + LadeEinstellungen.strDBServerCert;
+		sMasterData = "jdbc:sqlserver://" + Einstellungen.strDBComputer + ":" + Einstellungen.strDBPort + ";databaseName="
+				+ Einstellungen.strDBNameSource + ";encrypt=" + Einstellungen.strDBencrypted + ";trustServerCertificate=" + Einstellungen.strDBServerCert;
+		sProductiveData = "jdbc:sqlserver://" + Einstellungen.strDBComputer + ":" + Einstellungen.strDBPort + ";databaseName="
+				+ Einstellungen.strDBNameDest + ";encrypt=" + Einstellungen.strDBencrypted + ";trustServerCertificate=" + Einstellungen.strDBServerCert;
 	}
 
 	// ###################################################################################################################################################
@@ -144,7 +144,7 @@ public class LadeEinstellungen {
 		try {
 			strAktGJ = year;
 			prpAppSettings.setProperty("year", strAktGJ);
-			saveSettingsApp(LadeEinstellungen.getPrpAppSettings());
+			saveSettingsApp(Einstellungen.getPrpAppSettings());
 			return year;
 		} catch (IOException e1) {
 			logger.error("error writing financial year " + e1);
@@ -237,88 +237,88 @@ public class LadeEinstellungen {
 	}
 
 	public static void setBackupPath(String backupPath) {
-		LadeEinstellungen.backupPath = backupPath;
+		Einstellungen.backupPath = backupPath;
 	}
 
 	public static final void setPrpAppSettings(String sKey, String sEntry) {
-		LadeEinstellungen.prpAppSettings.setProperty(sKey, sEntry);
+		Einstellungen.prpAppSettings.setProperty(sKey, sEntry);
 		try {
-			saveSettingsApp(LadeEinstellungen.getPrpAppSettings());
+			saveSettingsApp(Einstellungen.getPrpAppSettings());
 		} catch (IOException e) {
 			logger.error("error writing settings to file " + e);
 		}
 	}
 
 	public static void setPrpDBSettings(String sKey, String sEntry) {
-		LadeEinstellungen.prpDBSettings.setProperty(sKey, sEntry);
+		Einstellungen.prpDBSettings.setProperty(sKey, sEntry);
 	}
 
 	public static void setStrAktGJ(String strAktGJ) {
-		LadeEinstellungen.strAktGJ = strAktGJ;
+		Einstellungen.strAktGJ = strAktGJ;
 	}
 
 	public static void setStrAktUser(String strAktUser) {
-		LadeEinstellungen.strAktUser = strAktUser;
+		Einstellungen.strAktUser = strAktUser;
 	}
 
 	public static void setStrDBComputer(String strDBComputer) {
-		LadeEinstellungen.strDBComputer = strDBComputer;
+		Einstellungen.strDBComputer = strDBComputer;
 	}
 
 	public static void setStrDBencrypted(String strDBencrypted) {
-		LadeEinstellungen.strDBencrypted = strDBencrypted;
+		Einstellungen.strDBencrypted = strDBencrypted;
 	}
 
 	public static void setStrDBNameDest(String strDBNameDest) {
-		LadeEinstellungen.strDBNameDest = strDBNameDest;
+		Einstellungen.strDBNameDest = strDBNameDest;
 	}
 
 	public static void setStrDBNameSource(String strDBNameSource) {
-		LadeEinstellungen.strDBNameSource = strDBNameSource;
+		Einstellungen.strDBNameSource = strDBNameSource;
 	}
 
 	public static void setStrDBPort(String strDBPort) {
-		LadeEinstellungen.strDBPort = strDBPort;
+		Einstellungen.strDBPort = strDBPort;
 	}
 
 	public static void setStrDBServerCert(String strDBServerCert) {
-		LadeEinstellungen.strDBServerCert = strDBServerCert;
+		Einstellungen.strDBServerCert = strDBServerCert;
 	}
 
 	public static void setStrQRschema(String strQRschema) {
-		LadeEinstellungen.strQRschema = strQRschema;
+		Einstellungen.strQRschema = strQRschema;
 	}
 
 	public static void setTplBill(String tplBill) {
-		LadeEinstellungen.tplBill = tplBill;
+		Einstellungen.tplBill = tplBill;
 	}
 
 	public static void setTplConfirmation(String tplConfirmation) {
-		LadeEinstellungen.tplConfirmation = tplConfirmation;
+		Einstellungen.tplConfirmation = tplConfirmation;
 	}
 
 	public static void setTplOffer(String tplOffer) {
-		LadeEinstellungen.tplOffer = tplOffer;
+		Einstellungen.tplOffer = tplOffer;
 	}
 
 	public static void setTplReminder(String tplReminder) {
-		LadeEinstellungen.tplReminder = tplReminder;
+		Einstellungen.tplReminder = tplReminder;
 	}
 	
 	public static void setTplMahnung(String tplMahnung) {
-		LadeEinstellungen.tplMahnung = tplMahnung;
+		Einstellungen.tplMahnung = tplMahnung;
 	}
 	
 	public static void setTplP109a(String tplP109a) {
-		LadeEinstellungen.tplP109a = tplP109a;
+		Einstellungen.tplP109a = tplP109a;
 	}
 
 	public static void setWorkPath(String workPath) {
-		LadeEinstellungen.workPath = workPath;
+		Einstellungen.workPath = workPath;
 	}
 
 	public static void setbFinished(boolean bFinished) {
-		LadeEinstellungen.bFinished = bFinished;
+		Einstellungen.bFinished = bFinished;
 	}
 
 	public static String getsMasterData() {

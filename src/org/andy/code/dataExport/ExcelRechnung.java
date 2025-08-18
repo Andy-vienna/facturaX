@@ -27,9 +27,9 @@ import org.andy.code.dataStructure.entitiyProductive.FileStore;
 import org.andy.code.dataStructure.entitiyProductive.Rechnung;
 import org.andy.code.dataStructure.repositoryProductive.FileStoreRepository;
 import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
-import org.andy.code.eRechnung.CreateXRechnungXML;
-import org.andy.code.eRechnung.CreateZUGFeRDpdf;
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.eRechnung.XRechnungXML;
+import org.andy.code.eRechnung.ZUGFeRDpdf;
+import org.andy.code.main.Einstellungen;
 import org.andy.code.misc.BD;
 import org.andy.code.qr.ZxingQR;
 import org.apache.commons.io.IOUtils;
@@ -79,9 +79,9 @@ public class ExcelRechnung{
 
 	public static void reExport(String sNr) throws Exception {
 		
-		String sExcelIn = LadeEinstellungen.getTplBill();
-		String sExcelOut = LadeEinstellungen.getWorkPath() + "Rechnung_" + sNr + ".xlsx";
-		String sPdfOut = LadeEinstellungen.getWorkPath() + "Rechnung_" + sNr + ".pdf";
+		String sExcelIn = Einstellungen.getTplBill();
+		String sExcelOut = Einstellungen.getWorkPath() + "Rechnung_" + sNr + ".xlsx";
+		String sPdfOut = Einstellungen.getWorkPath() + "Rechnung_" + sNr + ".pdf";
 
 		DecimalFormat formatter = new DecimalFormat("#.##");
 
@@ -264,7 +264,7 @@ public class ExcelRechnung{
 			//#######################################################################
 			String sBrutto = formatter.format(rechnung.getBrutto());
 			try {
-				ZxingQR.makeQR(LadeEinstellungen.getStrQRschema(), bank.getKtoName(), bank.getIban(), bank.getBic(), sBrutto.replace(",", "."), sNr);
+				ZxingQR.makeQR(Einstellungen.getStrQRschema(), bank.getKtoName(), bank.getIban(), bank.getBic(), sBrutto.replace(",", "."), sNr);
 			} catch (WriterException e) {
 				logger.error("makeQR(...) - " + e);
 			} catch (IOException e) {
@@ -319,10 +319,10 @@ public class ExcelRechnung{
 		
 		switch(kunde.geteBillTyp()) {
 		case ZUGFeRD:
-			sFile = LadeEinstellungen.getWorkPath() + "Rechnung_" + sNr + "_ZUGFeRD.pdf";
+			sFile = Einstellungen.getWorkPath() + "Rechnung_" + sNr + "_ZUGFeRD.pdf";
 
 			try {
-				CreateZUGFeRDpdf.generateZUGFeRDpdf(rechnung, bank, kunde, ExcelHelper.getOwner(), sPdfOut, sFile);
+				ZUGFeRDpdf.generateZUGFeRDpdf(rechnung, bank, kunde, ExcelHelper.getOwner(), sPdfOut, sFile);
 			} catch (ParseException | IOException e) {
 				logger.error("error generating zugferd - " + e);
 			}
@@ -330,10 +330,10 @@ public class ExcelRechnung{
 			break;
 
 		case XRECHNUNG:
-			sFile = LadeEinstellungen.getWorkPath() + "Rechnung_" + sNr + "_XRechnung.xml";
+			sFile = Einstellungen.getWorkPath() + "Rechnung_" + sNr + "_XRechnung.xml";
 
 			try {
-				CreateXRechnungXML.generateXRechnungXML(rechnung, bank, kunde, ExcelHelper.getOwner(), sFile);
+				XRechnungXML.generateXRechnungXML(rechnung, bank, kunde, ExcelHelper.getOwner(), sFile);
 			} catch (ParseException | IOException e) {
 				logger.error("error generating xrechnung - " + e);
 			}

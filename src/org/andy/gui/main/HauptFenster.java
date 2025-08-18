@@ -50,18 +50,21 @@ import org.andy.code.dataExport.ExcelRechnung;
 import org.andy.code.dataExport.ExcelAngebot;
 import org.andy.code.dataStructure.entitiyMaster.Kunde;
 import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 import org.andy.code.main.StartUp;
-import org.andy.code.main.overview.result.SteuerData;
-import org.andy.code.main.overview.result.UStData;
-import org.andy.code.main.overview.result.ZmData;
+import org.andy.code.main.overview.result.SteuerDaten;
+import org.andy.code.main.overview.result.UStDaten;
+import org.andy.code.main.overview.result.ZMeldungDaten;
 import org.andy.code.main.overview.table.LadeRechnung;
 import org.andy.code.main.overview.table.LadeAusgaben;
 import org.andy.code.main.overview.table.LadeAngebot;
 import org.andy.code.main.overview.table.LadeEinkauf;
 import org.andy.code.main.overview.table.LadeSvTax;
 import org.andy.code.misc.BD;
-import org.andy.gui.file.JFfileView;
+import org.andy.gui.main.dialogs.ABDialog;
+import org.andy.gui.main.dialogs.DateianzeigeDialog;
+import org.andy.gui.main.dialogs.InfoDialog;
+import org.andy.gui.main.dialogs.MahnstufeDialog;
 import org.andy.gui.main.overview_panels.SummenPanel;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanelFactory;
@@ -89,8 +92,6 @@ import org.andy.gui.main.table_panels.ErzeugeTabelle;
 import org.andy.gui.misc.BusyDialog;
 import org.andy.gui.misc.RoundedBorder;
 import org.andy.gui.misc.WrapLayout;
-import org.andy.gui.offer.JFconfirmA;
-import org.andy.gui.reminder.JFreminder;
 import org.andy.toolbox.misc.SetFrameIcon;
 import org.andy.toolbox.misc.SetMenuIcon;
 import org.apache.logging.log4j.LogManager;
@@ -188,7 +189,7 @@ public class HauptFenster extends JFrame {
         iLic = StartUp.getAPP_MODE();
         role = roleFromLogin(r);
 
-        setTitle("FacturaX v2 (" + StartUp.APP_VERSION + ") - Wirtschaftsjahr " + LadeEinstellungen.getStrAktGJ() + " - " + sLic);
+        setTitle("FacturaX v2 (" + StartUp.APP_VERSION + ") - Wirtschaftsjahr " + Einstellungen.getStrAktGJ() + " - " + sLic);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         Rectangle screenBounds = ge.getMaximumWindowBounds(); // liefert Arbeitsbereich ohne Taskleiste
@@ -350,7 +351,7 @@ public class HauptFenster extends JFrame {
         	        this::updScreen   // oder: this::actScreen, falls so benannt
         	    );
         	});
-            btn[2].addActionListener(_ -> { if (vZelleAN != null) { try { JFconfirmA.showDialog(vZelleAN); updScreen(); } catch (Exception ex) { logger.error("AN AB", ex); } }});
+            btn[2].addActionListener(_ -> { if (vZelleAN != null) { try { ABDialog.showDialog(vZelleAN); updScreen(); } catch (Exception ex) { logger.error("AN AB", ex); } }});
         }
 
         pageAN.removeAll();
@@ -379,7 +380,7 @@ public class HauptFenster extends JFrame {
 
         sPaneRE = new ErzeugeTabelle<>(sTempRE, HEADER_RE, new TableREcr(this));
         sPaneRE.getTable().addMouseListener(new MouseAdapter() {
-            @Override public void mouseClicked(MouseEvent e) { actionClickBill(sPaneRE.getTable(), e); }
+            @Override public void mouseClicked(MouseEvent e) { actionClickRE(sPaneRE.getTable(), e); }
         });
         sPaneRE.setColumnWidths(new int[] {120,120,120,200,650,200,150,150,150});
         sPaneRE.getTable().setAutoCreateRowSorter(true);
@@ -408,7 +409,7 @@ public class HauptFenster extends JFrame {
         	        this::updScreen
         	    );
         	});
-            btn[2].addActionListener(_ -> { if (vZelleRE != null) { JFreminder.showGUI(vZelleRE); updScreen(); }});
+            btn[2].addActionListener(_ -> { if (vZelleRE != null) { MahnstufeDialog.open(null, vZelleRE); updScreen(); }});
         }
 
         pageRE.removeAll();
@@ -506,9 +507,9 @@ public class HauptFenster extends JFrame {
         panelZM = new ZMeldungPanel(); panelZM.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         panelP109a = new SteuerPanel(); panelP109a.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
-        UStData.setValuesUVA(panelUSt);
-        ZmData.RecState(panelZM);
-        SteuerData.setValuesTax(panelP109a);
+        UStDaten.setValuesUVA(panelUSt);
+        ZMeldungDaten.RecState(panelZM);
+        SteuerDaten.setValuesTax(panelP109a);
 
         pageErg = new JPanel(new GridBagLayout());
         GridBagConstraints erg = new GridBagConstraints();
@@ -591,7 +592,7 @@ public class HauptFenster extends JFrame {
                         + " | Master-DB: <font color='blue'><b>%s</b></font>"
                         + " | Produktiv-DB: <font color='blue'><b>%s</b></font></html>",
                 dtNow, sLic, u, role,
-                LadeEinstellungen.getStrDBNameSource(), LadeEinstellungen.getStrDBNameDest());
+                Einstellungen.getStrDBNameSource(), Einstellungen.getStrDBNameDest());
 
         lblState = new JLabel(sStatus);
         lblState.setBorder(new RoundedBorder(10));
@@ -604,11 +605,11 @@ public class HauptFenster extends JFrame {
             default -> Color.PINK;
         });
 
-        txtWirtschaftsjahr = new JTextField(LadeEinstellungen.getStrAktGJ(), 8);
+        txtWirtschaftsjahr = new JTextField(Einstellungen.getStrAktGJ(), 8);
         txtWirtschaftsjahr.addActionListener(_ -> {
-            LadeEinstellungen.setStrAktGJ(txtWirtschaftsjahr.getText());
-            LadeEinstellungen.setPrpAppSettings("year", LadeEinstellungen.getStrAktGJ());
-            try { saveSettingsApp(LadeEinstellungen.getPrpAppSettings()); }
+            Einstellungen.setStrAktGJ(txtWirtschaftsjahr.getText());
+            Einstellungen.setPrpAppSettings("year", Einstellungen.getStrAktGJ());
+            try { saveSettingsApp(Einstellungen.getPrpAppSettings()); }
             catch (IOException ex) { logger.error("error writing financial year", ex); }
             updScreen();
         });
@@ -714,7 +715,7 @@ public class HauptFenster extends JFrame {
         }
     }
 
-    private void actionClickBill(JTable table, MouseEvent e) {
+    private void actionClickRE(JTable table, MouseEvent e) {
         int row = table.rowAtPoint(e.getPoint());
         int column = table.columnAtPoint(e.getPoint());
         if (row == -1 || column == -1) return;
@@ -883,7 +884,7 @@ public class HauptFenster extends JFrame {
 
     private void actionFile(String value, Kunde kunde) {
         if (value == null || kunde == null) return;
-        JFfileView.loadGUI(value, kunde);
+        DateianzeigeDialog.loadGUI(value, kunde);
     }
 
     private boolean isLeftSingle(MouseEvent e) {

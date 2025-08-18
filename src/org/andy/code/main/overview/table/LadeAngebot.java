@@ -14,7 +14,7 @@ import java.util.Locale;
 
 import org.andy.code.dataStructure.entitiyProductive.Angebot;
 import org.andy.code.dataStructure.repositoryProductive.AngebotRepository;
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 import org.andy.code.misc.BD;
 
 public class LadeAngebot {
@@ -44,7 +44,7 @@ public class LadeAngebot {
 		
 		AngebotRepository angebotRepository = new AngebotRepository();
 	    List<Angebot> angebotListe = new ArrayList<>();
-		angebotListe.addAll(angebotRepository.findAllByJahr(parseStringToIntSafe(LadeEinstellungen.getStrAktGJ())));
+		angebotListe.addAll(angebotRepository.findAllByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ())));
 		
 		String[][] sTemp = new String [angebotListe.size()][6];
 		

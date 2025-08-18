@@ -6,7 +6,7 @@ import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 
 import org.andy.code.dataExport.ExcelP109a;
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -67,12 +67,12 @@ public class SteuerPanel extends JPanel {
 
         // Labels
         String[] labels = {
-                "E/A-Rechnung ($109a Mitteilung) - " + LadeEinstellungen.getStrAktGJ(),
+                "E/A-Rechnung ($109a Mitteilung) - " + Einstellungen.getStrAktGJ(),
                 "Einkünfte aus selbstständiger Tätigkeit",
-                "SVS Vorschreibung Q1/" + LadeEinstellungen.getStrAktGJ(),
-                "SVS Vorschreibung Q2/" + LadeEinstellungen.getStrAktGJ(),
-                "SVS Vorschreibung Q3/" + LadeEinstellungen.getStrAktGJ(),
-                "SVS Vorschreibung Q4/" + LadeEinstellungen.getStrAktGJ(),
+                "SVS Vorschreibung Q1/" + Einstellungen.getStrAktGJ(),
+                "SVS Vorschreibung Q2/" + Einstellungen.getStrAktGJ(),
+                "SVS Vorschreibung Q3/" + Einstellungen.getStrAktGJ(),
+                "SVS Vorschreibung Q4/" + Einstellungen.getStrAktGJ(),
                 "50% Öffi-Pauschale",
                 "großes Arbeitsplatzpauschale",
                 "Betriebsausgaben netto",
@@ -175,7 +175,7 @@ public class SteuerPanel extends JPanel {
             add(lblE1Stufen[i]);
         }
 
-        lblE1Summe = new JLabel("vorauss. Einkommensteuer für das Jahr " + LadeEinstellungen.getStrAktGJ(), new ImageIcon(SteuerPanel.class.getResource("/icons/stern.png")), JLabel.LEFT);
+        lblE1Summe = new JLabel("vorauss. Einkommensteuer für das Jahr " + Einstellungen.getStrAktGJ(), new ImageIcon(SteuerPanel.class.getResource("/icons/stern.png")), JLabel.LEFT);
         lblE1Summe.setBounds(left5, 290, iWidth, iHeight);
         lblE1Summe.setFont(new Font("Tahoma", Font.BOLD, 11));
         lblE1Summe.setForeground(Color.BLUE);

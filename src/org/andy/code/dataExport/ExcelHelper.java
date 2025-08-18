@@ -15,7 +15,7 @@ import org.andy.code.dataStructure.repositoryMaster.OwnerRepository;
 import org.andy.code.dataStructure.repositoryMaster.TextRepository;
 import org.andy.code.dataStructure.repositoryProductive.AngebotRepository;
 import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 
 public class ExcelHelper {
 	
@@ -132,7 +132,7 @@ public class ExcelHelper {
 	    owTmp.add(owner.getUstid());
 	    
 	    senderOwner = owner.getName() + ", " + owner.getAdresse() + ", " + owner.getPlz() + " " + owner.getOrt();
-	    footerLeft = owner.getName() + " | Bearbeiter: " + LadeEinstellungen.getStrAktUser();
+	    footerLeft = owner.getName() + " | Bearbeiter: " + Einstellungen.getStrAktUser();
 		footerCenter = owner.getKontaktTel() + " | " + owner.getKontaktMail();
 		kontaktName = owner.getKontaktName();
 		steuerNummer = owner.getTaxid();

@@ -17,7 +17,7 @@ import org.andy.code.dataStructure.entitiyProductive.Rechnung;
 import org.andy.code.dataStructure.repositoryMaster.GwbRepository;
 import org.andy.code.dataStructure.repositoryMaster.TaxRepository;
 import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 import org.andy.code.main.overview.table.LadeAusgaben;
 import org.andy.code.main.overview.table.LadeEinkauf;
 import org.andy.code.main.overview.table.LadeSvTax;
@@ -27,9 +27,9 @@ import org.andy.gui.main.result_panels.SteuerPanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class SteuerData {
+public class SteuerDaten {
 	
-	private static final Logger logger = LogManager.getLogger(SteuerData.class);
+	private static final Logger logger = LogManager.getLogger(SteuerDaten.class);
 	
 	private static NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.GERMANY);
 
@@ -75,7 +75,7 @@ public class SteuerData {
 		
 		RechnungRepository rechnungRepository = new RechnungRepository();
 	    List<Rechnung> rechnungListe = new ArrayList<>();
-		rechnungListe.addAll(rechnungRepository.findAllByJahr(parseStringToIntSafe(LadeEinstellungen.getStrAktGJ()))); // Rechnungen nach GJ laden
+		rechnungListe.addAll(rechnungRepository.findAllByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()))); // Rechnungen nach GJ laden
 		
 		try {
 			for(int x = 1; x < rechnungListe.size(); x++) {
@@ -413,7 +413,7 @@ public class SteuerData {
 		
 		for (int x = 0; x < taxListe.size(); x++) {
 			Tax tax = taxListe.get(x);
-			if (String.valueOf(tax.getYear()).equals(LadeEinstellungen.getStrAktGJ())) {
+			if (String.valueOf(tax.getYear()).equals(Einstellungen.getStrAktGJ())) {
 				arrTaxValues[1][2] = tax.getVon_1().toString();
 				arrTaxValues[1][3] = tax.getBis_1().toString();
 				arrTaxValues[1][4] = tax.getTax_1().toString();
@@ -442,7 +442,7 @@ public class SteuerData {
 		
 		for ( int x = 0; x < gwbListe.size(); x++) {
 			Gwb gwb = gwbListe.get(x);
-			if (String.valueOf(gwb.getYear()).equals(LadeEinstellungen.getStrAktGJ())) {
+			if (String.valueOf(gwb.getYear()).equals(Einstellungen.getStrAktGJ())) {
 				arrGwbValues[1][2] = gwb.getBis_1().toString();
 				arrGwbValues[1][3] = gwb.getVal_1().toString();
 				arrGwbValues[1][4] = gwb.getWeitere_2().toString();

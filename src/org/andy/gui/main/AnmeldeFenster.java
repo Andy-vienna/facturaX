@@ -107,8 +107,7 @@ public final class AnmeldeFenster {
         return p;
     }
 
-    @SuppressWarnings("serial")
-	private void wireActions(JRootPane root) {
+    private void wireActions(JRootPane root) {
         // Enter = Login, Esc = Cancel
     	InputMap im = root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
     	ActionMap am = root.getActionMap();

@@ -30,9 +30,9 @@ import org.mustangproject.Item;
 import org.mustangproject.Product;
 import org.mustangproject.TradeParty;
 
-public class SetInvoiceEx {
+public class RechnungsDaten {
 
-	private static final Logger logger = LogManager.getLogger(SetInvoiceEx.class);
+	private static final Logger logger = LogManager.getLogger(RechnungsDaten.class);
 
 	private static String[] SENDER = new String[11];
 	

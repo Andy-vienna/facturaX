@@ -40,7 +40,7 @@ import org.andy.code.dataStructure.entitiyProductive.Angebot;
 import org.andy.code.dataStructure.entitiyProductive.FileStore;
 import org.andy.code.dataStructure.repositoryProductive.AngebotRepository;
 import org.andy.code.dataStructure.repositoryProductive.FileStoreRepository;
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 import org.andy.code.qr.ZxingQR;
 
 public class ExcelAngebot{
@@ -65,9 +65,9 @@ public class ExcelAngebot{
 
 	public static void anExport(String sNr) throws Exception {
 
-		String sExcelIn = LadeEinstellungen.getTplOffer();
-		String sExcelOut = LadeEinstellungen.getWorkPath() + "Angebot_" + sNr + ".xlsx";
-		String sPdfOut = LadeEinstellungen.getWorkPath() + "Angebot_" + sNr + ".pdf";
+		String sExcelIn = Einstellungen.getTplOffer();
+		String sExcelOut = Einstellungen.getWorkPath() + "Angebot_" + sNr + ".xlsx";
+		String sPdfOut = Einstellungen.getWorkPath() + "Angebot_" + sNr + ".pdf";
 
 		final Cell anPos[] = new Cell[13];
 		final Cell anText[] = new Cell[13];

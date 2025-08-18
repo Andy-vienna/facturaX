@@ -18,7 +18,7 @@ import org.andy.code.dataStructure.entitiyProductive.FileStore;
 import org.andy.code.dataStructure.entitiyProductive.Rechnung;
 import org.andy.code.dataStructure.repositoryProductive.FileStoreRepository;
 import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 import org.andy.code.main.StartUp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,9 +48,9 @@ public class ExcelZahlungserinnerung{
 	public static void reminderExport(String sNr) throws Exception {
 
 		new ArrayList<>();
-		String sExcelIn = LadeEinstellungen.getTplReminder();
-		String sExcelOut = LadeEinstellungen.getWorkPath() + "Zahlungserinnerung_" + sNr + ".xlsx";
-		String sPdfOut = LadeEinstellungen.getWorkPath() + "Zahlungserinnerung_" + sNr + ".pdf";
+		String sExcelIn = Einstellungen.getTplReminder();
+		String sExcelOut = Einstellungen.getWorkPath() + "Zahlungserinnerung_" + sNr + ".xlsx";
+		String sPdfOut = Einstellungen.getWorkPath() + "Zahlungserinnerung_" + sNr + ".pdf";
 
 		Rechnung rechnung = ExcelHelper.loadRechnung(sNr);
 		Kunde kunde = ExcelHelper.kundeData(rechnung.getIdKunde());

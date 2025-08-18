@@ -1,4 +1,4 @@
-package org.andy.gui.file;
+package org.andy.gui.main.dialogs;
 
 import static org.andy.code.dataStructure.HibernateUtil.getSessionFactoryDb2;
 import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
@@ -32,7 +32,7 @@ import javax.swing.border.BevelBorder;
 import org.andy.code.dataStructure.entitiyMaster.Kunde;
 import org.andy.code.dataStructure.entitiyProductive.FileStore;
 import org.andy.code.dataStructure.repositoryProductive.FileStoreRepository;
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 import org.andy.code.main.StartUp;
 import org.andy.toolbox.misc.SetFrameIcon;
 import org.apache.logging.log4j.LogManager;
@@ -43,9 +43,9 @@ import org.hibernate.Transaction;
 import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.Dispatch;
 
-public class JFfileView extends JFrame {
+public class DateianzeigeDialog extends JFrame {
 
-	private static final Logger logger = LogManager.getLogger(JFfileView.class);
+	private static final Logger logger = LogManager.getLogger(DateianzeigeDialog.class);
 
 	private static final long serialVersionUID = 1L;
 
@@ -100,7 +100,7 @@ public class JFfileView extends JFrame {
 					sNummer = sID;
 					lKunde = kunde;
 					fileStore = fileStoreRepository.findById(sID); // Tabelleneintrag mit Hibernate lesen
-					JFfileView frame = new JFfileView();
+					DateianzeigeDialog frame = new DateianzeigeDialog();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					logger.fatal("loadGUI(String sID) fehlgeschlagen - " + e);
@@ -114,7 +114,7 @@ public class JFfileView extends JFrame {
 	// private Teil
 	//###################################################################################################################################################
 
-	private JFfileView() {
+	private DateianzeigeDialog() {
 
 		try {
 			setIconImage(SetFrameIcon.getFrameIcon("file.png"));
@@ -206,7 +206,7 @@ public class JFfileView extends JFrame {
 
 		    // Senden (Mail-Template abhängig vom Typ/Index)
 		    btnSendMail[i].addActionListener(_ -> {
-		        String completeFileName = getFileForMail(typ, sNummer, LadeEinstellungen.getWorkPath());
+		        String completeFileName = getFileForMail(typ, sNummer, Einstellungen.getWorkPath());
 		        String fileName = completeFileName;
 		        try { fileName = cutFromRight(completeFileName, '\\'); } 
 		        catch (IOException ex) { logger.error("error cutting filename", ex); }
@@ -254,7 +254,7 @@ public class JFfileView extends JFrame {
 
 			// Datei als Anhang hinzufügen
 			Dispatch attachments = Dispatch.get(mail, "Attachments").toDispatch();
-			Dispatch.call(attachments, "Add", LadeEinstellungen.getWorkPath() + "\\" + sSubject);
+			Dispatch.call(attachments, "Add", Einstellungen.getWorkPath() + "\\" + sSubject);
 
 			// E-Mail senden
 			Dispatch.call(mail, "Send");
@@ -267,11 +267,11 @@ public class JFfileView extends JFrame {
 			outlook.safeRelease();
 		}
 
-		boolean bLocked = isLocked(LadeEinstellungen.getWorkPath() + "\\" + sSubject);
+		boolean bLocked = isLocked(Einstellungen.getWorkPath() + "\\" + sSubject);
 		while(bLocked) {
 			System.out.println("warte auf Dateien ...");
 		}
-		File MailFile = new File(LadeEinstellungen.getWorkPath() + "\\" + sSubject);
+		File MailFile = new File(Einstellungen.getWorkPath() + "\\" + sSubject);
 		if(MailFile.delete()) {
 
 		}else {
@@ -327,19 +327,19 @@ public class JFfileView extends JFrame {
 		button.setFont(new Font("Tahoma", Font.BOLD, 11));
 		switch(btnText) {
 		case UPLOAD:
-			button.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/up.png")));
+			button.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/up.png")));
 			break;
 		case DOWNLOAD:
-			button.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/down.png")));
+			button.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/down.png")));
 			break;
 		case UPDATE:
-			button.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/update.png")));
+			button.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/update.png")));
 			break;
 		case DELETE:
-			button.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/delete.png")));
+			button.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/delete.png")));
 			break;
 		case SEND:
-			button.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/mail.png")));
+			button.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/mail.png")));
 			break;
 		}
 		return button;
@@ -406,64 +406,64 @@ public class JFfileView extends JFrame {
 		String typ = cutFromRight(fileName, '.');
 		switch(typ) {
 		case PDF:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/pdf.png")));
+			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/pdf.png")));
 			return 1;
 		case PNG:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/png.png")));
+			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/png.png")));
 			return 1;
 		case JPG:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/jpg.png")));
+			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/jpg.png")));
 			return 1;
 		case CSV:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/csv.png")));
+			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/csv.png")));
 			return 1;
 		case MSG:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/msg.png")));
+			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/msg.png")));
 			return 1;
 		case XML:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/xml.png")));
+			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/xml.png")));
 			return 1;
 		case XLSX:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/xlsx.png")));
+			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/xlsx.png")));
 			return 1;
 		case XLSM:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/xlsm.png")));
+			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/xlsm.png")));
 			return 1;
 		case RAR:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/rar.png")));
+			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/rar.png")));
 			return 1;
 		case ZIP:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/zip.png")));
+			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/zip.png")));
 			return 1;
 		case UPDF:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/pdf.png")));
+			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/pdf.png")));
 			return 1;
 		case UPNG:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/png.png")));
+			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/png.png")));
 			return 1;
 		case UJPG:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/jpg.png")));
+			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/jpg.png")));
 			return 1;
 		case UCSV:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/csv.png")));
+			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/csv.png")));
 			return 1;
 		case UMSG:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/msg.png")));
+			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/msg.png")));
 			return 1;
 		case UXML:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/xml.png")));
+			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/xml.png")));
 			return 1;
 		case UXLSX:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/xlsx.png")));
+			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/xlsx.png")));
 			return 1;
 		case UXLSM:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/xlsm.png")));
+			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/xlsm.png")));
 			return 1;
 		case URAR:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/rar.png")));
+			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/rar.png")));
 			return 1;
 		case UZIP:
-			lbl.setIcon(new ImageIcon(JFfileView.class.getResource("/org/resources/icons/zip.png")));
+			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/zip.png")));
 			return 1;
 		default:
 			lbl.setIcon(null);
@@ -553,7 +553,7 @@ public class JFfileView extends JFrame {
 	//###################################################################################################################################################
 
 	private static void upsertFileHibernate(String typ, String id) {
-	    String filePath = chooseFile(LadeEinstellungen.getWorkPath());
+	    String filePath = chooseFile(Einstellungen.getWorkPath());
 	    if (filePath.equals(getNotSelected())) return;
 
 	    File f = new File(filePath);
@@ -613,7 +613,7 @@ public class JFfileView extends JFrame {
 
 	private static String exportFileHibernate(String typ, String id, String targetDirOrNull) throws IOException {
 	    // Zielpfad bestimmen
-	    String dir = targetDirOrNull != null ? targetDirOrNull : choosePath(LadeEinstellungen.getWorkPath());
+	    String dir = targetDirOrNull != null ? targetDirOrNull : choosePath(Einstellungen.getWorkPath());
 	    if (dir == null || dir.equals(getNotSelected())) return getNotSelected();
 	    Path outDir = Paths.get(dir);
 
@@ -648,7 +648,7 @@ public class JFfileView extends JFrame {
 
 	private static int aktJahr() {
 	    // falls du das Geschäftsjahr als String hast (z. B. "2025"):
-	    return parseStringToIntSafe(LadeEinstellungen.getStrAktGJ());
+	    return parseStringToIntSafe(Einstellungen.getStrAktGJ());
 	}
 
 	private static void setNameAndData(FileStore fs, String typ, String name, byte[] data) {

@@ -61,7 +61,7 @@ public class StartUp {
 
         // 4) Lizenz einlesen
         try {
-            APP_MODE = getLicense(LadeEinstellungen.getFileLicense());
+            APP_MODE = getLicense(Einstellungen.getFileLicense());
         } catch (java.security.NoSuchAlgorithmException | java.io.IOException e) {
             logger.error("error reading license", e);
             APP_MODE = 0;
@@ -76,7 +76,7 @@ public class StartUp {
         APP_VERSION = getVersion();
 
         // 6) Einstellungen laden
-        LadeEinstellungen.LoadProgSettings();
+        Einstellungen.LoadProgSettings();
 
         // 7) UI auf EDT starten
         SwingUtilities.invokeLater(() -> {

@@ -33,10 +33,10 @@ import javax.swing.text.AbstractDocument;
 
 import org.andy.code.dataStructure.entitiyProductive.SVSteuer;
 import org.andy.code.dataStructure.repositoryProductive.SVSteuerRepository;
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
-import org.andy.gui.file.JFfileView;
 import org.andy.gui.main.HauptFenster;
+import org.andy.gui.main.dialogs.DateianzeigeDialog;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.gui.misc.CommaHelper;
 import org.andy.gui.misc.RoundedBorder;
@@ -190,7 +190,7 @@ public class SvTaxPanel extends EditPanel {
 			public void mouseClicked(MouseEvent e) {
 				if(lblFileTyp.getIcon() != null) {
 					String outputPath;
-					outputPath = choosePath(LadeEinstellungen.getWorkPath());
+					outputPath = choosePath(Einstellungen.getWorkPath());
 					Path path = Paths.get(outputPath);
 					if (outputPath.equals(getNotSelected())) {
 						return; // nichts ausgewählt
@@ -207,7 +207,7 @@ public class SvTaxPanel extends EditPanel {
 	    btnFields[0].addActionListener(new ActionListener() {
  			@Override
  			public void actionPerformed(ActionEvent e) {
- 				String FileNamePath = chooseFile(LadeEinstellungen.getWorkPath());
+ 				String FileNamePath = chooseFile(Einstellungen.getWorkPath());
  				File fn = new File(FileNamePath);
  				String FileName = fn.getName();
  				txtFile.setText(FileName);
@@ -227,7 +227,7 @@ public class SvTaxPanel extends EditPanel {
  			public void actionPerformed(ActionEvent e) {
  				if (neuBeleg) {
  					
- 					svsteuer.setJahr(parseStringToIntSafe(LadeEinstellungen.getStrAktGJ()));
+ 					svsteuer.setJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
  	 				
  	 				boolean bResult = checkInput();
  	 				if (!bResult) {
@@ -431,7 +431,7 @@ public class SvTaxPanel extends EditPanel {
 	
 	public void setIcon() {
 		try {
-			JFfileView.setFileIcon(lblFileTyp, txtFile.getText());
+			DateianzeigeDialog.setFileIcon(lblFileTyp, txtFile.getText());
 			lblFileTyp.setHorizontalAlignment(SwingConstants.CENTER);
 		} catch (IOException e) {
 			logger.error("setIcon() - " + e);

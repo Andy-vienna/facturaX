@@ -14,7 +14,7 @@ import java.util.Locale;
 
 import org.andy.code.dataStructure.entitiyProductive.Einkauf;
 import org.andy.code.dataStructure.repositoryProductive.EinkaufRepository;
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 import org.andy.code.misc.BD;
 
 public class LadeEinkauf {
@@ -44,7 +44,7 @@ public class LadeEinkauf {
 
 		EinkaufRepository einkaufRepository = new EinkaufRepository();
 	    List<Einkauf> einkaufListe = new ArrayList<>();
-	    einkaufListe.addAll(einkaufRepository.findAllByJahr(parseStringToIntSafe(LadeEinstellungen.getStrAktGJ())));
+	    einkaufListe.addAll(einkaufRepository.findAllByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ())));
 		
 		String[][] sTemp = new String [einkaufListe.size() + 1][10]; // 1 Zeile mehr für neuen Beleg
 		

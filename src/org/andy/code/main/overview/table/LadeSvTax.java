@@ -14,7 +14,7 @@ import java.util.Locale;
 
 import org.andy.code.dataStructure.entitiyProductive.SVSteuer;
 import org.andy.code.dataStructure.repositoryProductive.SVSteuerRepository;
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 import org.andy.code.misc.BD;
 
 public class LadeSvTax {
@@ -51,7 +51,7 @@ public class LadeSvTax {
 		
 		SVSteuerRepository svsteuerRepository = new SVSteuerRepository();
 	    List<SVSteuer> svsteuerListe = new ArrayList<>();
-	    svsteuerListe.addAll(svsteuerRepository.findAllByJahr(parseStringToIntSafe(LadeEinstellungen.getStrAktGJ())));
+	    svsteuerListe.addAll(svsteuerRepository.findAllByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ())));
 		
 		String[][] sTemp = new String [svsteuerListe.size() + 1][7];
 		belegID = new int[svsteuerListe.size()];

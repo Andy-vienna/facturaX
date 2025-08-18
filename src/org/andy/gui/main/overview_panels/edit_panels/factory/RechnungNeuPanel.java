@@ -43,7 +43,7 @@ import org.andy.code.dataStructure.repositoryMaster.ArtikelRepository;
 import org.andy.code.dataStructure.repositoryMaster.BankRepository;
 import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
 import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 import org.andy.code.main.StartUp;
 import org.andy.code.misc.BD;
 import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
@@ -357,7 +357,7 @@ public class RechnungNeuPanel extends EditPanel {
 
         Rechnung r = new Rechnung();
         r.setIdNummer(nextAnNummer());
-        r.setJahr(parseStringToIntSafe(LadeEinstellungen.getStrAktGJ()));
+        r.setJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
         r.setDatum(dateOrToday(datePicker));
         Kunde k = kunden.get(cmbKunde.getSelectedIndex());
         Bank  b = banken.get(cmbBank.getSelectedIndex());
@@ -512,8 +512,8 @@ public class RechnungNeuPanel extends EditPanel {
     }
 
     private String nextAnNummer() {
-        int max = rechnungRepository.findMaxNummerByJahr(parseStringToIntSafe(LadeEinstellungen.getStrAktGJ()));
-        return "RE-" + LadeEinstellungen.getStrAktGJ() + "-" + String.format("%04d", max + 1);
+        int max = rechnungRepository.findMaxNummerByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
+        return "RE-" + Einstellungen.getStrAktGJ() + "-" + String.format("%04d", max + 1);
     }
 
     private static void info(String msg){

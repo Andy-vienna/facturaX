@@ -14,7 +14,7 @@ import java.util.Locale;
 
 import org.andy.code.dataStructure.entitiyProductive.Rechnung;
 import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 import org.andy.code.misc.BD;
 
 public class LadeRechnung {
@@ -44,7 +44,7 @@ public class LadeRechnung {
 		
 		RechnungRepository rechnungRepository = new RechnungRepository();
 	    List<Rechnung> rechnungListe = new ArrayList<>();
-		rechnungListe.addAll(rechnungRepository.findAllByJahr(parseStringToIntSafe(LadeEinstellungen.getStrAktGJ())));
+		rechnungListe.addAll(rechnungRepository.findAllByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ())));
 		
 		String[][] sTemp = new String [rechnungListe.size()][9];
 

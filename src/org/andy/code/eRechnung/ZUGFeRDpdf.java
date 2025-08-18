@@ -17,10 +17,10 @@ import org.andy.code.dataStructure.entitiyMaster.Bank;
 import org.andy.code.dataStructure.entitiyMaster.Kunde;
 import org.andy.code.dataStructure.entitiyMaster.Owner;
 import org.andy.code.dataStructure.entitiyProductive.Rechnung;
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 import org.andy.code.main.StartUp;
 
-public class CreateZUGFeRDpdf {
+public class ZUGFeRDpdf {
 
 	private static String[] SENDER;
 
@@ -29,17 +29,17 @@ public class CreateZUGFeRDpdf {
 
 		String[] sAttachment = new String[10];
 
-		Invoice i = SetInvoiceEx.doInvoice(rechnung, bank, kunde, owner);
-		SENDER = SetInvoiceEx.getSENDER();
+		Invoice i = RechnungsDaten.doInvoice(rechnung, bank, kunde, owner);
+		SENDER = RechnungsDaten.getSENDER();
 
 		int dialogButton = 0;
 		dialogButton = JOptionPane.showConfirmDialog (null, "Soll eine Anlage angefügt werden ?","Attachment", dialogButton);
 		if(dialogButton == JOptionPane.YES_OPTION) {
-			sAttachment[0] = chooseFile(LadeEinstellungen.getWorkPath());
+			sAttachment[0] = chooseFile(Einstellungen.getWorkPath());
 			for(int num = 1; num < 10; num++) {
 				dialogButton = JOptionPane.showConfirmDialog (null, num + "/10 Anlagen vorhanden, soll eine weitere angefügt werden ?","Attachment", dialogButton);
 				if(dialogButton == JOptionPane.YES_OPTION) {
-					sAttachment[num] = chooseFile(LadeEinstellungen.getWorkPath());
+					sAttachment[num] = chooseFile(Einstellungen.getWorkPath());
 				}
 				if(dialogButton == JOptionPane.NO_OPTION) {
 					break;

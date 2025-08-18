@@ -1,7 +1,7 @@
 package org.andy.gui.main.result_panels;
 
 import javax.swing.*;
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 
 import java.awt.*;
 
@@ -56,7 +56,7 @@ public class ZMeldungPanel extends JPanel {
 
 	    // Spaltenlabels (Quartale + Jahr)
 	    for (int c = 0; c < cols; c++) {
-	        String colLabel = colLabels[c] + " - " + LadeEinstellungen.getStrAktGJ();
+	        String colLabel = colLabels[c] + " - " + Einstellungen.getStrAktGJ();
 	        lblCols[c] = new JLabel(colLabel);
 	        lblCols[c].setFont(new Font("Tahoma", Font.BOLD, 11));
 	        lblCols[c].setHorizontalAlignment(SwingConstants.CENTER);

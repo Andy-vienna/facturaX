@@ -19,7 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import org.andy.code.main.LadeEinstellungen;
+import org.andy.code.main.Einstellungen;
 import org.andy.gui.main.HauptFenster;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -60,10 +60,10 @@ public class DatenbankPanel extends JPanel {
 		JLabel lbl03 = new JLabel("database for MasterData");
 		JLabel lbl04 = new JLabel("database for ProductiveData");
 
-		JTextField textDBcomputer = new JTextField(LadeEinstellungen.getStrDBComputer());
-		JTextField textDBport = new JTextField(LadeEinstellungen.getStrDBPort());
-		JTextField textDBnameSource = new JTextField(LadeEinstellungen.getStrDBNameSource());
-		JTextField textDBnameDest = new JTextField(LadeEinstellungen.getStrDBNameDest());
+		JTextField textDBcomputer = new JTextField(Einstellungen.getStrDBComputer());
+		JTextField textDBport = new JTextField(Einstellungen.getStrDBPort());
+		JTextField textDBnameSource = new JTextField(Einstellungen.getStrDBNameSource());
+		JTextField textDBnameDest = new JTextField(Einstellungen.getStrDBNameDest());
 		JCheckBox chkEncryption = new JCheckBox("encrypt database");
 		JCheckBox chkServerCert = new JCheckBox("trust server certificate");
 
@@ -112,12 +112,12 @@ public class DatenbankPanel extends JPanel {
 		chkServerCert.setEnabled(false);
 		btnDBOK.setEnabled(false);
 
-		if (LadeEinstellungen.getStrDBencrypted().equals("true")) {
+		if (Einstellungen.getStrDBencrypted().equals("true")) {
 			chkEncryption.setSelected(true);
 		} else {
 			chkEncryption.setSelected(false);
 		}
-		if (LadeEinstellungen.getStrDBServerCert().equals("true")) {
+		if (Einstellungen.getStrDBServerCert().equals("true")) {
 			chkServerCert.setSelected(true);
 		} else {
 			chkServerCert.setSelected(false);
@@ -131,9 +131,9 @@ public class DatenbankPanel extends JPanel {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					LadeEinstellungen.setStrDBencrypted("true");
+					Einstellungen.setStrDBencrypted("true");
 				} else {
-					LadeEinstellungen.setStrDBencrypted("false");
+					Einstellungen.setStrDBencrypted("false");
 				}
 			}
 		});
@@ -142,9 +142,9 @@ public class DatenbankPanel extends JPanel {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					LadeEinstellungen.setStrDBServerCert("true");
+					Einstellungen.setStrDBServerCert("true");
 				} else {
-					LadeEinstellungen.setStrDBServerCert("false");
+					Einstellungen.setStrDBServerCert("false");
 				}
 			}
 		});
@@ -166,25 +166,25 @@ public class DatenbankPanel extends JPanel {
 		btnDBOK.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				LadeEinstellungen.setStrDBComputer(textDBcomputer.getText());
-				LadeEinstellungen.setStrDBPort(textDBport.getText());
-				LadeEinstellungen.setStrDBNameSource(textDBnameSource.getText());
-				LadeEinstellungen.setStrDBNameDest(textDBnameDest.getText());
+				Einstellungen.setStrDBComputer(textDBcomputer.getText());
+				Einstellungen.setStrDBPort(textDBport.getText());
+				Einstellungen.setStrDBNameSource(textDBnameSource.getText());
+				Einstellungen.setStrDBNameDest(textDBnameDest.getText());
 				
-				LadeEinstellungen.setPrpDBSettings("computer", LadeEinstellungen.getStrDBComputer());
-				LadeEinstellungen.setPrpDBSettings("port", LadeEinstellungen.getStrDBPort());
-				LadeEinstellungen.setPrpDBSettings("names", LadeEinstellungen.getStrDBNameSource());
-				LadeEinstellungen.setPrpDBSettings("named", LadeEinstellungen.getStrDBNameDest());
-				LadeEinstellungen.setPrpDBSettings("encrypt", LadeEinstellungen.getStrDBencrypted());
-				LadeEinstellungen.setPrpDBSettings("cert", LadeEinstellungen.getStrDBServerCert());
+				Einstellungen.setPrpDBSettings("computer", Einstellungen.getStrDBComputer());
+				Einstellungen.setPrpDBSettings("port", Einstellungen.getStrDBPort());
+				Einstellungen.setPrpDBSettings("names", Einstellungen.getStrDBNameSource());
+				Einstellungen.setPrpDBSettings("named", Einstellungen.getStrDBNameDest());
+				Einstellungen.setPrpDBSettings("encrypt", Einstellungen.getStrDBencrypted());
+				Einstellungen.setPrpDBSettings("cert", Einstellungen.getStrDBServerCert());
 
 				try {
-					saveSettingsDB(LadeEinstellungen.getPrpDBSettings());
+					saveSettingsDB(Einstellungen.getPrpDBSettings());
 				} catch (IOException e1) {
 					logger.error("JFsettings() - " + e1);
 				}
 
-				LadeEinstellungen.LoadProgSettings();
+				Einstellungen.LoadProgSettings();
 
 				textDBcomputer.setEnabled(false);
 				textDBport.setEnabled(false);

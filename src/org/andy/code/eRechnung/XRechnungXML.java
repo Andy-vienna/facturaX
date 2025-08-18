@@ -13,12 +13,12 @@ import org.mustangproject.Invoice;
 import org.mustangproject.ZUGFeRD.Profiles;
 import org.mustangproject.ZUGFeRD.ZUGFeRD2PullProvider;
 
-public class CreateXRechnungXML {
+public class XRechnungXML {
 
 	public static void generateXRechnungXML(Rechnung rechnung, Bank bank, Kunde kunde, Owner owner, String sXmlName) throws ParseException, IOException {
 		BufferedWriter writer = null;
 
-		Invoice i = SetInvoiceEx.doInvoice(rechnung, bank, kunde, owner);
+		Invoice i = RechnungsDaten.doInvoice(rechnung, bank, kunde, owner);
 
 		ZUGFeRD2PullProvider zf2p = new ZUGFeRD2PullProvider();
 		zf2p.setProfile(Profiles.getByName("XRechnung"));
