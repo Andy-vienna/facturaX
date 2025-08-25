@@ -64,10 +64,15 @@ public class ExcelAuftragsbestätigung{
 	//###################################################################################################################################################
 
 	public static void abExport(String sNr, String confNr, String confDate, String startDate) throws Exception {
-
+		String revNr = null;
 		String sExcelIn = Einstellungen.getTplConfirmation();
-		String sExcelOut = Einstellungen.getWorkPath() + "Auftragsbestätigung_" + sNr.replace("AN", "AB") + ".xlsx";
-		String sPdfOut = Einstellungen.getWorkPath() + "Auftragsbestätigung_" + sNr.replace("AN", "AB") + ".pdf";
+		if(sNr.contains("/")) {
+			revNr = sNr.replace("/", "rev");
+		} else {
+			revNr = sNr;
+		}
+		String sExcelOut = Einstellungen.getWorkPath() + "Auftragsbestätigung_" + revNr.replace("AN", "AB") + ".xlsx";
+		String sPdfOut = Einstellungen.getWorkPath() + "Auftragsbestätigung_" + revNr.replace("AN", "AB") + ".pdf";
 
 		final Cell abPos[] = new Cell[13];
 		final Cell abText[] = new Cell[13];

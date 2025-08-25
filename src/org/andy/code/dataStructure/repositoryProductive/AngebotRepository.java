@@ -28,22 +28,27 @@ public class AngebotRepository {
     }
     
     public Integer findMaxNummerByJahr(int jahr) {
-    	String prefix = "AN-" + jahr + "-";
-    	int prefixLength = ("AN-" + jahr + "-").length();
-        try (Session session = HibernateUtil.getSessionFactoryDb2().openSession()) {
-            Integer maxNummer = session.createQuery(
-            		"SELECT CAST(SUBSTRING(r.idNummer, :prefixLen + 1) AS int) " +
-                            "FROM Angebot r " +
-                            "WHERE r.jahr = :jahr AND r.idNummer LIKE :prefix " +
-                            "ORDER BY CAST(SUBSTRING(r.idNummer, :prefixLen + 1) AS int) DESC",
-                    Integer.class)
-            		.setParameter("jahr", jahr)
-                    .setParameter("prefix", prefix + "%")
-                    .setParameter("prefixLen", prefixLength)
-                    .setMaxResults(1)
-                    .uniqueResult();
-            return (maxNummer == null ? 0 : maxNummer);
-        }
+        String prefix = "AN-" + jahr + "-";
+        int prefixLength = prefix.length();
+
+        String sql =
+    	    "SELECT TRY_CAST(SUBSTRING(r.idNummer, :prefixLen + 1, " +
+    	    "  CASE WHEN CHARINDEX('/', r.idNummer) > 0 " +
+    	    "       THEN CHARINDEX('/', r.idNummer) - :prefixLen - 1 " +
+    	    "       ELSE LEN(r.idNummer) - :prefixLen END) AS int) AS num " +
+    	    "FROM [dbo].[tblAn] r " +        // <-- anpassen!
+    	    "WHERE r.jahr = :jahr AND r.idNummer LIKE :prefix " +
+    	    "ORDER BY num DESC";
+
+    	try (Session session = HibernateUtil.getSessionFactoryDb2().openSession()) {
+    	    Integer maxNummer = session.createNativeQuery(sql, Integer.class)
+    	        .setParameter("jahr", jahr)
+    	        .setParameter("prefix", prefix + "%")
+    	        .setParameter("prefixLen", prefixLength)
+    	        .setMaxResults(1)     // dann kein TOP in SQL verwenden
+    	        .uniqueResult();
+    	    return maxNummer == null ? 0 : maxNummer;
+    	}
     }
 
     public void save(Angebot angebot) {

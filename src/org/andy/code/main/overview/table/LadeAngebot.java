@@ -55,6 +55,7 @@ public class LadeAngebot {
 				case 0 -> "storniert";
 				case 1 -> "erstellt";
 				case 11 -> "gedruckt";
+				case 12 -> "revisioniert";
 				case 111 -> "bestellt";
 				case 211 -> "bestätigt";
 				default -> "-----";

@@ -64,10 +64,15 @@ public class ExcelAngebot{
 	//###################################################################################################################################################
 
 	public static void anExport(String sNr) throws Exception {
-
+		String revNr = null;
 		String sExcelIn = Einstellungen.getTplOffer();
-		String sExcelOut = Einstellungen.getWorkPath() + "Angebot_" + sNr + ".xlsx";
-		String sPdfOut = Einstellungen.getWorkPath() + "Angebot_" + sNr + ".pdf";
+		if(sNr.contains("/")) {
+			revNr = sNr.replace("/", "rev");
+		} else {
+			revNr = sNr;
+		}
+		String sExcelOut = Einstellungen.getWorkPath() + "Angebot_" + revNr + ".xlsx";
+		String sPdfOut = Einstellungen.getWorkPath() + "Angebot_" + revNr + ".pdf";
 
 		final Cell anPos[] = new Cell[13];
 		final Cell anText[] = new Cell[13];
@@ -151,6 +156,7 @@ public class ExcelAngebot{
 			Cell anTextPre1 = ws.getRow(11).getCell(COLUMN_A); //Einleitungstext
 			Cell anTextPre2 = ws.getRow(12).getCell(COLUMN_A); //Einleitungstext
 			Cell anTextPre3 = ws.getRow(13).getCell(COLUMN_A); //Einleitungstext
+			Cell anTextPre4 = ws.getRow(14).getCell(COLUMN_A); //Einleitungstext
 			ws.getRow(13).getCell(COLUMN_A);
 			
 			for(int i = 0; i < angebot.getAnzPos().intValue(); i++ ) { //Angebotspositionen B, C, D, F Zeile 17-28
@@ -190,13 +196,30 @@ public class ExcelAngebot{
 			}else {
 				anTextPre1.setCellValue(ExcelHelper.getTextAngebot().get(9));
 			}
-			anTextPre2.setCellValue(ExcelHelper.getTextAngebot().get(10));
-			if(angebot.getPage2() == 1) {
-				anTextPre3.setCellValue(ExcelHelper.getTextAngebot().get(11));
-			}else {
-				anTextPre3.setCellValue("");
+			
+			int idx = angebot.getIdNummer().indexOf('/');
+			String basis = idx < 0 ? angebot.getIdNummer() : angebot.getIdNummer().substring(0, idx); // bei Revision: urspr. Angebotsnummer
+			Integer rev = idx < 0 ? 0 : Integer.parseInt(angebot.getIdNummer().substring(idx + 1)); // bei Revision: Revisionsnummer
+			
+			if(angebot.getIdNummer().contains("/")) {
+				anTextPre2.setCellValue(ExcelHelper.getTextAngebot().get(12).replace("{Revision}", "Revision " + rev));
+				anTextPre3.setCellValue(ExcelHelper.getTextAngebot().get(13).replace("{Angebot-Nr}", basis));
+				if(angebot.getPage2() == 1) {
+					anTextPre4.setCellValue(ExcelHelper.getTextAngebot().get(11));
+				} else {
+					anTextPre4.setCellValue(" ");
+				}
+			} else {
+				anTextPre2.setCellValue(ExcelHelper.getTextAngebot().get(10));
+				if(angebot.getPage2() == 1) {
+					anTextPre3.setCellValue(ExcelHelper.getTextAngebot().get(11));
+					anTextPre4.setCellValue(" ");
+				} else {
+					anTextPre3.setCellValue(" ");
+					anTextPre4.setCellValue(" ");
+				}
 			}
-
+			
 			for(int i = 0; i < angebot.getAnzPos().intValue(); i++ ) {
 				anPos[i].setCellValue(String.valueOf(i + 1));
 				try {

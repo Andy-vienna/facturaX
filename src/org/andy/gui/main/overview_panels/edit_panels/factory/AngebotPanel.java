@@ -70,7 +70,7 @@ public class AngebotPanel extends EditPanel {
 	private JLabel lblState = null;
 	private JComboBox<String> cmbState = null;
 
-	private JButton[] btnFields = new JButton[3];
+	private JButton[] btnFields = new JButton[4];
 	
 	private String[] sDatum = new String[2];
 	BigDecimal bdNetto = BD.ZERO, bdTax = BD.ZERO, bdBrutto = BD.ZERO;
@@ -224,16 +224,16 @@ public class AngebotPanel extends EditPanel {
 			btnFields[0] = createButton("<html>neu<br>berechnen</html>", "calc.png");
 			btnFields[1] = createButton("<html>update</html>", "save.png");
 			btnFields[2] = createButton("<html>Status<br>setzen</html>", "save.png");
+			btnFields[3] = createButton("<html>Revision<br>anlegen</html>", "revision.png");
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}
 		btnFields[0].setBounds(1625, 260, HauptFenster.getButtonx(), HauptFenster.getButtony());
 		btnFields[1].setBounds(1625, 320, HauptFenster.getButtonx(), HauptFenster.getButtony());
 		btnFields[2].setBounds(1625, 70, HauptFenster.getButtonx(), HauptFenster.getButtony());
-		btnFields[2].setVisible(false);
-		add(btnFields[0]);
-		add(btnFields[1]);
-		add(btnFields[2]);
+		btnFields[3].setBounds(1625, 200, HauptFenster.getButtonx(), HauptFenster.getButtony());
+		btnFields[2].setVisible(false); btnFields[3].setVisible(false); btnFields[3].setEnabled(true);
+		add(btnFields[0]); add(btnFields[1]); add(btnFields[2]); add(btnFields[3]);
 		
 		setPreferredSize(new Dimension(1000, 70 + txtFieldsPos.length * 25 + 20));
 		
@@ -283,6 +283,13 @@ public class AngebotPanel extends EditPanel {
  			@Override
  			public void actionPerformed(ActionEvent e) {
  				updateState();
+ 			}
+ 		});
+	    
+	    btnFields[3].addActionListener(new ActionListener() {
+ 			@Override
+ 			public void actionPerformed(ActionEvent e) {
+ 				doRevision();
  			}
  		});
 	    
@@ -337,6 +344,7 @@ public class AngebotPanel extends EditPanel {
 		btnFields[0].setEnabled(b);
 		btnFields[1].setEnabled(false);
 		btnFields[2].setVisible(false);
+		btnFields[3].setVisible(false);
     }
     
 	//###################################################################################################################################################
@@ -439,6 +447,34 @@ public class AngebotPanel extends EditPanel {
         HauptFenster.actScreen();
     }
     
+    private void doRevision() {
+    	AngebotRepository angebotRepository = new AngebotRepository();
+    	Angebot angebot = angebotRepository.findById(id);
+    	String revisionNr = null;
+    	
+    	String angebotNr = angebot.getIdNummer();
+    	int slashIndex = angebotNr.lastIndexOf('/');
+        if (slashIndex >= 0) {
+            // Revision existiert -> Zahl inkrementieren
+            String basis = angebotNr.substring(0, slashIndex);
+            String revStr = angebotNr.substring(slashIndex + 1);
+            int rev = Integer.parseInt(revStr);
+            revisionNr = basis + "/" + (rev + 1);
+        } else {
+            // noch keine Revision -> /1 anhängen
+        	revisionNr = angebotNr + "/1";
+        }
+        
+        angebot.setState(12); // Status: revisioniert setzen
+        angebotRepository.update(angebot);
+    	
+        angebot.setIdNummer(revisionNr);
+        angebot.setState(1); // Status: erstellt
+        angebotRepository.save(angebot);
+        
+        HauptFenster.actScreen();
+    }
+    
 	//###################################################################################################################################################
 	// Getter und Setter für Felder
 	//###################################################################################################################################################
@@ -532,6 +568,7 @@ public class AngebotPanel extends EditPanel {
     		lblState.setVisible(true);
     		cmbState.setVisible(true);
     		btnFields[2].setVisible(true);
+    		btnFields[3].setVisible(true);
     	}
     }
 }

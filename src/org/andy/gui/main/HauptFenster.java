@@ -311,11 +311,12 @@ public class HauptFenster extends JFrame {
             offerPanel = EditPanelFactory.create("NA");
             btn[0] = createButton("zurück", "aktualisieren.png");
         } else {
-            btn = new JButton[3];
+            btn = new JButton[4];
             offerPanel = EditPanelFactory.create("AN");
             btn[0] = createButton("<html>neues<br>Angebot</html>", "new.png");
             btn[1] = createButton("<html>Angebot<br>drucken</html>", "print.png");
             btn[2] = createButton("<html>AB<br>drucken</html>", "print.png");
+            btn[3] = createButton("<html>Revision<br>anlegen</html>", "revision.png");
         }
         btn[0].setEnabled(true);
 
@@ -898,8 +899,10 @@ public class HauptFenster extends JFrame {
     private void setOfferButtonsByState(String state, JButton[] btn) {
         boolean print = "erstellt".equals(state);
         boolean confirm = "bestellt".equals(state);
+        boolean revision = "gedruckt".equals(state);
         btn[1].setEnabled(print);
         btn[2].setEnabled(confirm);
+        btn[3].setVisible(revision);
     }
 
     private void setBillButtonsByState(String state, JButton[] btn) {
@@ -949,6 +952,7 @@ public class HauptFenster extends JFrame {
                 switch (s[row][1]) {
                     case "storniert" -> setBackground(Color.PINK);
                     case "gedruckt" -> setBackground(new Color(175,238,238));
+                    case "revisioniert" -> setBackground(new Color(218,165,32));
                     case "bestellt" -> setBackground(new Color(37,204,196));
                     case "bestätigt" -> setBackground(new Color(152,251,152));
                 }
@@ -1023,6 +1027,7 @@ public class HauptFenster extends JFrame {
 
     static class TableEXcr extends DefaultTableCellRenderer {
         private static final long serialVersionUID = 1L;
+        private static final Logger logger = LogManager.getLogger(TableEXcr.class);
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -1039,7 +1044,7 @@ public class HauptFenster extends JFrame {
 		            	setForeground(Color.BLACK);
 		            }
                 } catch (Exception e) {
-                    logger.error("ST render date error", e);
+                    logger.error("EX render date error", e);
                 }
             } else {
                 setBackground(new Color(238,210,238));
@@ -1062,7 +1067,7 @@ public class HauptFenster extends JFrame {
             Object v0 = table.getValueAt(row, 0);
             if (v0 != null) {
                 try {
-                    DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                    DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy");
                     LocalDate dateNow = LocalDate.now();
                     LocalDate datePay = LocalDate.parse(table.getValueAt(row, 4).toString(), inputFormat);
                     int daysPayable = Math.toIntExact(ChronoUnit.DAYS.between(dateNow, datePay));

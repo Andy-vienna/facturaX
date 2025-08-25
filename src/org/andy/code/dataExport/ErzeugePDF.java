@@ -64,7 +64,7 @@ public class ErzeugePDF {
 		info.setTitle(sTitel + " " + sNr);
 		info.setSubject(sTitel);
 		info.setKeywords(sTitel + "," + sNr + "," + ExcelHelper.getKontaktName());
-		info.setCreator(StartUp.APP_NAME + StartUp.APP_VERSION);
+		info.setCreator(StartUp.APP_NAME);
 
 		// PDF speichern
 		document.saveToFile(sPdf);

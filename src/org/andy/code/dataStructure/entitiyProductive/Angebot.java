@@ -10,7 +10,7 @@ import java.time.LocalDate;
 public class Angebot {
 
 	@Id
-	@Column(name = "IdNummer", length = 12, nullable = false)
+	@Column(name = "IdNummer", nullable = false)
 	private String idNummer;
 
 	@Column(name = "Jahr", nullable = false)

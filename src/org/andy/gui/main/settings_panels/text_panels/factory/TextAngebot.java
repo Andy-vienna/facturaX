@@ -71,8 +71,8 @@ public class TextAngebot extends TextPanel  {
 				"Textbaustein Angebot A33", "Textbaustein Angebot A36", "Textbaustein Angebot A37",
 				"Textbaustein Angebot A39", "Textbaustein Angebot A40", "Textbaustein Angebot A44",
 				"Textbaustein Angebot A47", "Textbaustein Angebot QR-Code", "Textbaustein Angebot A12/a",
-				"Textbaustein Angebot A12/b", "Textbaustein Angebot A13", "Textbaustein Angebot A14",
-				"Textbaustein Angebot ...", "Textbaustein Angebot ...", "Textbaustein Angebot ..."};
+				"Textbaustein Angebot A12/b", "Textbaustein Angebot A13", "Textbaustein Angebot A14/A15 (rev)",
+				"Textbaustein Angebot A13 (rev)", "Textbaustein Angebot A14 (rev)", "Textbaustein Angebot ..."};
 
 		for (int i = 0; i < labels.length; i++) {
 
