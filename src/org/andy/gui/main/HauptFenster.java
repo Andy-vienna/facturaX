@@ -311,12 +311,13 @@ public class HauptFenster extends JFrame {
             offerPanel = EditPanelFactory.create("NA");
             btn[0] = createButton("zurück", "aktualisieren.png");
         } else {
-            btn = new JButton[4];
+            btn = new JButton[5];
             offerPanel = EditPanelFactory.create("AN");
             btn[0] = createButton("<html>neues<br>Angebot</html>", "new.png");
             btn[1] = createButton("<html>Angebot<br>drucken</html>", "print.png");
             btn[2] = createButton("<html>AB<br>drucken</html>", "print.png");
             btn[3] = createButton("<html>Revision<br>anlegen</html>", "revision.png");
+            btn[4] = createButton("<html>Editor</html>", "edit.png");
         }
         btn[0].setEnabled(true);
 

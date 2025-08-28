@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -34,6 +35,7 @@ import org.andy.code.main.StartUp;
 import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
 import org.andy.code.misc.BD;
 import org.andy.gui.main.HauptFenster;
+import org.andy.gui.main.overview_panels.edit_panels.AngebotSeite2Editor;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.gui.misc.CommaHelper;
 import org.andy.gui.misc.RoundedBorder;
@@ -69,13 +71,16 @@ public class AngebotPanel extends EditPanel {
 	
 	private JLabel lblState = null;
 	private JComboBox<String> cmbState = null;
+	private JCheckBox chkPage2;
 
-	private JButton[] btnFields = new JButton[4];
+	private JButton[] btnFields = new JButton[5];
 	
 	private String[] sDatum = new String[2];
 	BigDecimal bdNetto = BD.ZERO, bdTax = BD.ZERO, bdBrutto = BD.ZERO;
 	private String id = null;
 	private BigDecimal bdTaxRate = BD.ZERO;
+	
+	private AngebotSeite2Editor editor = new AngebotSeite2Editor();
 	
 	//###################################################################################################################################################
 	// public Teil
@@ -219,12 +224,16 @@ public class AngebotPanel extends EditPanel {
 	    cmbState.setVisible(false);
 	    add(cmbState);
 	    
+	    chkPage2 = new JCheckBox("<html>Beschreibung<br>hinzufügen/bearbeiten</html>)");
+        chkPage2.setBounds(1440,140,150,50); chkPage2.setEnabled(false); add(chkPage2);
+	    
 	    // Buttons
 		try {
 			btnFields[0] = createButton("<html>neu<br>berechnen</html>", "calc.png");
 			btnFields[1] = createButton("<html>update</html>", "save.png");
 			btnFields[2] = createButton("<html>Status<br>setzen</html>", "save.png");
 			btnFields[3] = createButton("<html>Revision<br>anlegen</html>", "revision.png");
+			btnFields[4] = createButton("<html>Editor</html>", "edit.png");
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}
@@ -232,8 +241,11 @@ public class AngebotPanel extends EditPanel {
 		btnFields[1].setBounds(1625, 320, HauptFenster.getButtonx(), HauptFenster.getButtony());
 		btnFields[2].setBounds(1625, 70, HauptFenster.getButtonx(), HauptFenster.getButtony());
 		btnFields[3].setBounds(1625, 200, HauptFenster.getButtonx(), HauptFenster.getButtony());
-		btnFields[2].setVisible(false); btnFields[3].setVisible(false); btnFields[3].setEnabled(true);
-		add(btnFields[0]); add(btnFields[1]); add(btnFields[2]); add(btnFields[3]);
+		btnFields[4].setBounds(1625, 140, HauptFenster.getButtonx(), HauptFenster.getButtony());
+		btnFields[2].setVisible(false);
+		btnFields[3].setEnabled(true); btnFields[3].setVisible(false);
+		btnFields[4].setEnabled(true); btnFields[4].setVisible(false);
+		add(btnFields[0]); add(btnFields[1]); add(btnFields[2]); add(btnFields[3]); add(btnFields[4]);
 		
 		setPreferredSize(new Dimension(1000, 70 + txtFieldsPos.length * 25 + 20));
 		
@@ -293,6 +305,15 @@ public class AngebotPanel extends EditPanel {
  			}
  		});
 	    
+	    btnFields[4].addActionListener(new ActionListener() {
+ 			@Override
+ 			public void actionPerformed(ActionEvent e) {
+ 				doText();
+ 			}
+ 		});
+	    
+	    chkPage2.addActionListener(_ -> btnFields[4].setVisible(chkPage2.isSelected()));
+	    
 	}
 	
 	//###################################################################################################################################################
@@ -341,10 +362,12 @@ public class AngebotPanel extends EditPanel {
 		}
 		lblState.setVisible(false);
 		cmbState.setVisible(false);
+		chkPage2.setEnabled(b);
 		btnFields[0].setEnabled(b);
 		btnFields[1].setEnabled(false);
 		btnFields[2].setVisible(false);
 		btnFields[3].setVisible(false);
+		btnFields[4].setEnabled(b);
     }
     
 	//###################################################################################################################################################
@@ -400,6 +423,11 @@ public class AngebotPanel extends EditPanel {
     	
     	angebot.setDatum(datePicker[0].getDate());
     	angebot.setRef(txtFieldsHead[0].getText());
+    	
+    	if (angebot.getPage2() == 1 || chkPage2.isSelected()) {
+    		angebot.setPage2(1);
+    		angebot.setBeschreibungHtml(editor.getHtml()); // Liefer- und Leistungsbeschreibung
+    	}
     	
     	angebot.setAnzPos(anzPos);
     	angebot.setArt01(sPosText[0]); angebot.setMenge01(bdAnzahl[0]); angebot.setePreis01(bdEinzel[0]);
@@ -475,6 +503,13 @@ public class AngebotPanel extends EditPanel {
         HauptFenster.actScreen();
     }
     
+    private void doText() {
+    	AngebotRepository angebotRepository = new AngebotRepository();
+    	Angebot angebot = angebotRepository.findById(id);
+    	editor.setHtml(angebot.getBeschreibungHtml());
+    	editor.setVisible(true);
+    }
+    
 	//###################################################################################################################################################
 	// Getter und Setter für Felder
 	//###################################################################################################################################################
@@ -536,6 +571,7 @@ public class AngebotPanel extends EditPanel {
 			this.txtFieldsSum[i].setValue(null);
 		}
 		btnFields[0].setEnabled(false);
+		btnFields[4].setVisible(false);
 		txtFieldsFocusable(false);
 		
     	this.datePicker[0].setDate(angebot.getDatum());
@@ -560,6 +596,15 @@ public class AngebotPanel extends EditPanel {
     	bdBrutto = bdNetto.add(bdTax).setScale(2, RoundingMode.HALF_UP);
     	txtFieldsSum[2].setValue(Double.parseDouble(bdBrutto.toString()));
     	
+    	if (angebot.getPage2() == 1) {
+    		editor.setHtml(angebot.getBeschreibungHtml());
+    		chkPage2.setSelected(true);
+    		btnFields[4].setVisible(true);
+    	} else {
+    		chkPage2.setSelected(false);
+    		btnFields[4].setVisible(false);
+    	}
+    	
     	switch(angebot.getState()) {
     	case 1:
     		txtFieldsFocusable(true);
@@ -567,6 +612,7 @@ public class AngebotPanel extends EditPanel {
     	case 11:
     		lblState.setVisible(true);
     		cmbState.setVisible(true);
+    		chkPage2.setEnabled(false);
     		btnFields[2].setVisible(true);
     		btnFields[3].setVisible(true);
     	}

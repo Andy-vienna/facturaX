@@ -61,24 +61,24 @@ public class PfadPanel extends JPanel {
 		
 		String[] propertyKeys = {
 				"templateoffer",
+				"templatedescription",
 				"templateconfirmation",
 				"templatebill",
 				"templatereminder",
 				"templatemahnung",
 				"templatep109a",
 				"work",
-				"backup"
 				};
 		
 		String labels[] = {
 				"Angebot Vorlage (Excel-Vorlage *.xlsx)",
+				"Leistungsbeschreibung Vorlage (pdf-Vorlage *.pdf)",
 				"Angebotsbestätigung Vorlage (Excel-Vorlage *.xlsx)",
 				"Rechnung Vorlage (Excel-Vorlage *.xlsx)",
 				"Zahlungserinnerung Vorlage (Excel-Vorlage *.xlsx)",
 				"Mahnung Vorlage (Excel-Vorlage *.xlsx",
 				"§109a (E/A-Rechnung) Vorlage (Excel-Vorlage *.xlsx",
 				"Arbeitsverzeichnis",
-				"Sicherungsverzeichnis"
 				};
 		
 		// Label Arrays
@@ -143,26 +143,26 @@ public class PfadPanel extends JPanel {
     @SuppressWarnings("unchecked")
     Function<Void, String>[] getters = new Function[] {
         _ -> Einstellungen.getTplOffer(),
+        _ -> Einstellungen.getTplDescription(),
         _ -> Einstellungen.getTplConfirmation(),
         _ -> Einstellungen.getTplBill(),
         _ -> Einstellungen.getTplReminder(),
         _ -> Einstellungen.getTplMahnung(),
         _ -> Einstellungen.getTplP109a(),
-        _ -> Einstellungen.getWorkPath(),
-        _ -> Einstellungen.getBackupPath()
+        _ -> Einstellungen.getWorkPath()
     };
 
     // Set-Methoden (als Consumer<String>)
     @SuppressWarnings("unchecked")
     Consumer<String>[] setters = new Consumer[] {
         (Consumer<String>) val -> Einstellungen.setTplOffer(val),
+        (Consumer<String>) val -> Einstellungen.setTplDescription(val),
         (Consumer<String>) val -> Einstellungen.setTplConfirmation(val),
         (Consumer<String>) val -> Einstellungen.setTplBill(val),
         (Consumer<String>) val -> Einstellungen.setTplReminder(val),
         (Consumer<String>) val -> Einstellungen.setTplMahnung(val),
         (Consumer<String>) val -> Einstellungen.setTplP109a(val),
-        (Consumer<String>) val -> Einstellungen.setWorkPath(val),
-        (Consumer<String>) val -> Einstellungen.setBackupPath(val)
+        (Consumer<String>) val -> Einstellungen.setWorkPath(val)
     };
 
 }

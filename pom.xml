@@ -135,12 +135,12 @@
 		<dependency>
 			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>7.0.8.Final</version>
+			<version>7.1.0.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-hikaricp</artifactId>
-			<version>7.0.8.Final</version>
+			<version>7.1.0.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>com.zaxxer</groupId>
@@ -158,14 +158,30 @@
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>mssql-jdbc</artifactId>
-			<version>12.10.0.jre11</version>
+			<version>13.2.0.jre11</version>
 			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-controls</artifactId>
+			<version>22.0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-web</artifactId>
+			<version>22.0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-swing</artifactId>
+			<version>22.0.2</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.formdev</groupId>
 			<artifactId>flatlaf</artifactId>
-			<version>3.6</version>
+			<version>3.6.1</version>
 		</dependency>
 
 		<dependency>
@@ -218,6 +234,13 @@
 			<groupId>org.apache.pdfbox</groupId>
 			<artifactId>pdfbox</artifactId>
 			<version>3.0.5</version>
+		</dependency>
+
+		<!-- Für Overlay/Merge kannst du wahlweise OpenPDF behalten -->
+		<dependency>
+			<groupId>com.github.librepdf</groupId>
+			<artifactId>openpdf</artifactId>
+			<version>1.3.42</version>
 		</dependency>
 
 		<dependency>

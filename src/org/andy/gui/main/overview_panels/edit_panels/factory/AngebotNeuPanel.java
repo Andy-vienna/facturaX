@@ -40,6 +40,7 @@ import org.andy.code.main.StartUp;
 import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
 import org.andy.code.misc.BD;
 import org.andy.gui.main.HauptFenster;
+import org.andy.gui.main.overview_panels.edit_panels.AngebotSeite2Editor;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.gui.misc.RoundedBorder;
 import org.apache.logging.log4j.LogManager;
@@ -89,6 +90,8 @@ public class AngebotNeuPanel extends EditPanel {
     private final BigDecimal[] bdEinzel = new BigDecimal[POS_COUNT];
     private final BigDecimal[] bdSumme  = new BigDecimal[POS_COUNT];
     private final String[] sPosText = new String[POS_COUNT];
+    
+    private AngebotSeite2Editor editor = new AngebotSeite2Editor();
 
     // Zustände
     private boolean kundeGewählt = false;
@@ -184,6 +187,11 @@ public class AngebotNeuPanel extends EditPanel {
         
         chkPage2 = new JCheckBox("Angebot mit Anlage (Beschreibung aus Seite 2 hinzufügen)");
         chkPage2.setBounds(1130,130,390,25); add(chkPage2);
+        
+        JButton btnPage2 = createButton("<html>Editor</html>", "edit.png");
+        btnPage2.setBounds(1130,165, HauptFenster.getButtonx(), HauptFenster.getButtony());
+        btnPage2.setEnabled(true); btnPage2.setVisible(false);
+        add(btnPage2);
 
         JButton btnDoExport = createButton("<html>Angebot<br>erstellen</html>", "edit.png");
         btnDoExport.setBounds(1545,305, HauptFenster.getButtonx(), HauptFenster.getButtony());
@@ -220,6 +228,8 @@ public class AngebotNeuPanel extends EditPanel {
         cmbKunde.addActionListener(_ -> onKundeChanged());
         cmbBank.addActionListener(_ -> onBankChanged());
 
+        chkPage2.addActionListener(_ -> btnPage2.setVisible(chkPage2.isSelected()));
+        btnPage2.addActionListener(_ -> doText());
         btnDoExport.addActionListener(_ -> doSave());
 
         setPreferredSize(new Dimension(1000, 390));
@@ -313,6 +323,11 @@ public class AngebotNeuPanel extends EditPanel {
             txtGP[i].setText("");
         }
     }
+    
+    private void doText() {
+    	editor.setHtml(editor.getStartText("Leistungsbeschreibung eingeben ..."));
+    	editor.setVisible(true);
+    }
 
     private void doSave() {
         if (!kundeGewählt) { info("Kunde nicht ausgewählt …"); return; }
@@ -331,6 +346,7 @@ public class AngebotNeuPanel extends EditPanel {
         a.setRef(txtReferenz.getText().trim());
         a.setRevCharge(chkRevCharge.isSelected()?1:0);
         a.setPage2(chkPage2.isSelected()?1:0);
+        if (chkPage2.isSelected()) { a.setBeschreibungHtml(editor.getHtml()); } // Liefer- und Leistungsbeschreibung
 
         int posCount = countFilledPositions();
         a.setAnzPos(BigDecimal.valueOf(posCount));
@@ -473,4 +489,9 @@ public class AngebotNeuPanel extends EditPanel {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	//###################################################################################################################################################
+	// Getter und Setter
+	//###################################################################################################################################################
+
 }

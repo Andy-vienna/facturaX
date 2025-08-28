@@ -2,6 +2,7 @@ package org.andy.code.dataExport;
 
 import static org.andy.toolbox.misc.Tools.FormatIBAN;
 import static org.andy.toolbox.misc.Tools.isLocked;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -33,7 +34,6 @@ import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.google.zxing.WriterException;
-
 import org.andy.code.dataStructure.entitiyMaster.Bank;
 import org.andy.code.dataStructure.entitiyMaster.Kunde;
 import org.andy.code.dataStructure.entitiyProductive.Angebot;
@@ -73,6 +73,7 @@ public class ExcelAngebot{
 		}
 		String sExcelOut = Einstellungen.getWorkPath() + "Angebot_" + revNr + ".xlsx";
 		String sPdfOut = Einstellungen.getWorkPath() + "Angebot_" + revNr + ".pdf";
+		String sPdfDesc = Einstellungen.getWorkPath() + "Leistungsbeschreibung_Angebot_" + revNr + ".pdf";
 
 		final Cell anPos[] = new Cell[13];
 		final Cell anText[] = new Cell[13];
@@ -294,7 +295,7 @@ public class ExcelAngebot{
 			logger.error("anExport(String sNr) - link.png konnte nicht gelöscht werden");
 		}
 		//#######################################################################
-		// Datei als pdf speichern und beide Dateien in die DB speichern
+		// Datei als pdf speichern
 		//#######################################################################
 		ErzeugePDF.toPDF(sExcelOut, sPdfOut);
 		ErzeugePDF.setPdfMetadata(sNr, "AN", sPdfOut);
@@ -304,32 +305,44 @@ public class ExcelAngebot{
 		while(bLockedXLSX || bLockedPDF) {
 			System.out.println("warte auf Datei ...");
 		}
-
-		//#######################################################################
-		// Datei in DB speichern
-		//#######################################################################
 		
-		String ExcelNamePath = sExcelOut;
-		String PdfNamePath = sPdfOut;
-		File ExcelFn = new File(ExcelNamePath);
-		File PdfFn = new File(PdfNamePath);
-		String ExcelName = ExcelFn.getName();
-		String PdfName = PdfFn.getName();
-		
+		//#######################################################################
+		// FileStore Entität instanzieren
+		//#######################################################################
 		FileStoreRepository fileStoreRepository = new FileStoreRepository();
 		FileStore fileStore = new FileStore();
 		
-		fileStore.setIdNummer(angebot.getIdNummer());
-		fileStore.setJahr(angebot.getJahr());
+		fileStore.setIdNummer(angebot.getIdNummer()); // Angebotsnummer als Index für fileStore schreiben
+		fileStore.setJahr(angebot.getJahr()); // Jahr in fileStore schreiben
+		
+		//#######################################################################
+		// wenn erforderlich Leistungsbeschreibung.pdf erzeugen
+		//#######################################################################
+		if (angebot.getPage2() == 1) {
+			ErzeugeLeistungsbeschreibung.doLeistungsbeschreibung(angebot, sPdfDesc);
+			String DescNamePath = sPdfDesc;
+			File DescFn = new File(DescNamePath);
+			
+			String DescName = DescFn.getName();
+			fileStore.setAddFileName01(DescName); // Dateiname übergeben
+			
+			Path DescPath = Paths.get(DescNamePath);
+			fileStore.setAddFile01(Files.readAllBytes(DescPath)); // ByteArray für Dateiinhalt
+		}
+		
+		//#######################################################################
+		// Datei in DB speichern
+		//#######################################################################
+		String PdfNamePath = sPdfOut;
+		File PdfFn = new File(PdfNamePath);
+		
+		String PdfName = PdfFn.getName();
 		fileStore.setAnFileName(PdfName);
-		fileStore.setAddFileName01(ExcelName);
 		
 		Path PdfPath = Paths.get(PdfNamePath);
-		Path ExcelPath = Paths.get(ExcelNamePath);
 		fileStore.setAnPdfFile(Files.readAllBytes(PdfPath)); // ByteArray für Dateiinhalt
-		fileStore.setAddFile01(Files.readAllBytes(ExcelPath)); // ByteArray für Dateiinhalt
 		
-		fileStoreRepository.save(fileStore); // Datei in DB speichern
+		fileStoreRepository.save(fileStore); // Datei(en) in DB speichern
 		
 		//#######################################################################
 		// Status des Angebots ändern
@@ -343,13 +356,15 @@ public class ExcelAngebot{
 		// Ursprungs-Excel und -pdf löschen
 		//#######################################################################
 		boolean bLockedpdf = isLocked(sPdfOut);
+		boolean bLockedDesc = isLocked(sPdfDesc);
 		boolean bLockedxlsx = isLocked(sExcelOut);
-		while(bLockedpdf || bLockedxlsx) {
+		while(bLockedpdf || bLockedDesc || bLockedxlsx) {
 			System.out.println("warte auf Dateien ...");
 		}
 		File xlFile = new File(sExcelOut);
 		File pdFile = new File(sPdfOut);
-		if(xlFile.delete() && pdFile.delete()) {
+		File descFile = new File(sPdfDesc);
+		if(xlFile.delete() && pdFile.delete() && descFile.delete()) {
 
 		}else {
 			logger.error("anExport(String sNr) - xlsx- und pdf-Datei konnte nicht gelöscht werden");

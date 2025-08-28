@@ -77,7 +77,7 @@ public final class AnmeldeFenster {
         p.setOpaque(false);
 
         GridBagConstraints gc = new GridBagConstraints();
-        gc.insets = new Insets(6, 6, 1, 6);
+        gc.insets = new Insets(2, 6, 1, 6);
         gc.anchor = GridBagConstraints.SOUTH;
         gc.fill = GridBagConstraints.HORIZONTAL;
 

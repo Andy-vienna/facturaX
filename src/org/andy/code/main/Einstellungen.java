@@ -25,13 +25,13 @@ public class Einstellungen {
 	private static String strAktGJ;
 
 	private static String tplOffer;
+	private static String tplDescription;
 	private static String tplConfirmation;
 	private static String tplBill;
 	private static String tplReminder;
 	private static String tplMahnung;
 	private static String tplP109a;
 	private static String workPath;
-	private static String backupPath;
 	private static String sMasterData;
 	private static String sProductiveData;
 
@@ -72,13 +72,13 @@ public class Einstellungen {
 			strAktGJ = prpAppSettings.getProperty("year");
 			strQRschema = prpAppSettings.getProperty("qrschema");
 			tplOffer = prpAppSettings.getProperty("templateoffer");
+			tplDescription = prpAppSettings.getProperty("templatedescription");
 			tplConfirmation = prpAppSettings.getProperty("templateconfirmation");
 			tplBill = prpAppSettings.getProperty("templatebill");
 			tplReminder = prpAppSettings.getProperty("templatereminder");
 			tplMahnung = prpAppSettings.getProperty("templatemahnung");
 			tplP109a = prpAppSettings.getProperty("templatep109a");
 			workPath = prpAppSettings.getProperty("work");
-			backupPath = prpAppSettings.getProperty("backup");
 		} catch (FileNotFoundException e) {
 			logger.error("Error loading app.properties", e);
 			JOptionPane.showMessageDialog(null, "Die Datei app.properties wurde nicht gefunden, starte mit Standardwerten.", "Fehler", JOptionPane.INFORMATION_MESSAGE);
@@ -156,10 +156,6 @@ public class Einstellungen {
 	// Getter und Setter
 	// ###################################################################################################################################################
 
-	public static final String getBackupPath() {
-		return backupPath;
-	}
-
 	public static String getFileLicense() {
 		return FILE_LICENSE;
 	}
@@ -219,6 +215,10 @@ public class Einstellungen {
 	public static String getTplOffer() {
 		return tplOffer;
 	}
+	
+	public static String getTplDescription() {
+		return tplDescription;
+	}
 
 	public static String getTplReminder() {
 		return tplReminder;
@@ -234,10 +234,6 @@ public class Einstellungen {
 
 	public static String getWorkPath() {
 		return workPath;
-	}
-
-	public static void setBackupPath(String backupPath) {
-		Einstellungen.backupPath = backupPath;
 	}
 
 	public static final void setPrpAppSettings(String sKey, String sEntry) {
@@ -299,6 +295,10 @@ public class Einstellungen {
 
 	public static void setTplOffer(String tplOffer) {
 		Einstellungen.tplOffer = tplOffer;
+	}
+	
+	public static void setTplDescription(String tplDescription) {
+		Einstellungen.tplDescription = tplDescription;
 	}
 
 	public static void setTplReminder(String tplReminder) {

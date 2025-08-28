@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import org.hibernate.annotations.Nationalized;
+
 @Entity
 @Table(name = "tblAn")
 public class Angebot {
@@ -36,6 +38,11 @@ public class Angebot {
 	
 	@Column(name = "Page2", nullable = false)
 	private int page2;
+	
+	@Lob
+    @Nationalized
+    @Column(name = "seite2_html", columnDefinition = "NVARCHAR(MAX)")
+    private String beschreibungHtml;
 
 	@Column(name = "IdBank", nullable = false)
 	private int idBank;
@@ -538,6 +545,14 @@ public class Angebot {
 
 	public void setePreis12(BigDecimal ePreis12) {
 		this.ePreis12 = ePreis12;
+	}
+
+	public String getBeschreibungHtml() {
+		return beschreibungHtml;
+	}
+
+	public void setBeschreibungHtml(String beschreibungHtml) {
+		this.beschreibungHtml = beschreibungHtml;
 	}
 
 }
