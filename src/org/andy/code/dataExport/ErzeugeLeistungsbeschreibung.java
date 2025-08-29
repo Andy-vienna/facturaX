@@ -72,7 +72,7 @@ public class ErzeugeLeistungsbeschreibung {
 
 			// Content skalieren
 			PdfImportedPage contPage = writer.getImportedPage(contR, i);
-			cb.addTemplate(contPage, 1, 0, 0, 1, 0, -90); // keine Skalierung, volle Seite, nur Abstand oben
+			cb.addTemplate(contPage, 1, 0, 0, 1, 0, 0); // keine Skalierung, volle Seite, nur Abstand oben
 		}
 
 		doc.close();
