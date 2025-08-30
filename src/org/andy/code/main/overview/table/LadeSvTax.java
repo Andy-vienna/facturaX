@@ -19,8 +19,8 @@ import org.andy.code.misc.BD;
 
 public class LadeSvTax {
 	
-	private static BigDecimal bdSV = BD.ZERO;
-	private static BigDecimal bdSteuer = BD.ZERO;
+	private static BigDecimal bdSV = BD.ZERO; private static BigDecimal bdSVoffen = BD.ZERO;
+	private static BigDecimal bdST = BD.ZERO; private static BigDecimal bdSToffen = BD.ZERO;
 	
 	private static BigDecimal[] bdSVQ = new BigDecimal[4];
 	
@@ -39,12 +39,14 @@ public class LadeSvTax {
 	//###################################################################################################################################################
 	
 	private static String[][] loadData(boolean reRun) {
+		
+		BigDecimal bdSvEing ,bdStEing;
 
 		Currency currency = Currency.getInstance("EUR");
 		DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Locale.GERMANY);
 		DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
 		
-		bdSV = BD.ZERO; bdSteuer = BD.ZERO;
+		bdSV = BD.ZERO; bdSVoffen = BD.ZERO; bdST = BD.ZERO; bdSToffen = BD.ZERO; bdSvEing = BD.ZERO; bdStEing = BD.ZERO;
 		for (int a = 0; a < bdSVQ.length; a++) {
 			 bdSVQ[a] = BD.ZERO;
 		}
@@ -68,10 +70,9 @@ public class LadeSvTax {
 	        String zahllast = df.format(svsteuer.getZahllast()) + " " + currency.getCurrencyCode();
 	        
 	        String status = null;
-	        if (svsteuer.getStatus() == 1) {
-	        	status = "ja";
-	        } else {
-	        	status = "nein";
+	        switch(svsteuer.getStatus()) {
+	        	case 0 -> status = "Zahllast";
+	        	case 10 -> status = "Eingang";
 	        }
 		
 	        sTemp[i][0] = datum;
@@ -85,16 +86,20 @@ public class LadeSvTax {
 	        belegID[i] = svsteuer.getId();
 			
 	        if (svsteuer.getOrganisation().contains("Sozialversicherung")) {
-	        	bdSV = bdSV.add(svsteuer.getZahllast());
+	        	if (status.equals("Zahllast")) bdSV = bdSV.add(svsteuer.getZahllast());
 	        	for (int x = 0; x < 4; x++) {
 	        	    String token = "Q" + (x + 1);
 	        	    if (svsteuer.getBezeichnung().contains(token)) {
 	        	        bdSVQ[x] = bdSVQ[x].add(svsteuer.getZahllast());
 	        	    }
 	        	}
+	        	if (status.equals("Eingang")) bdSvEing = bdSvEing.add(svsteuer.getZahllast()); 
+	        	bdSVoffen = bdSV.add(bdSvEing);
 	        }
 	        if (svsteuer.getOrganisation().contains("Finanzamt")) {
-	        	bdSteuer = bdSteuer.add(svsteuer.getZahllast());
+	        	if (status.equals("Zahllast")) bdST = bdST.add(svsteuer.getZahllast());
+	        	if (status.equals("Eingang")) bdStEing = bdStEing.add(svsteuer.getZahllast());
+	        	bdSToffen = bdST.add(bdStEing);
 	        }
 		}
 		return sTemp;
@@ -107,9 +112,17 @@ public class LadeSvTax {
 	public static BigDecimal getBdSV() {
 		return bdSV;
 	}
+	
+	public static BigDecimal getBdSVoffen() {
+		return bdSVoffen;
+	}
 
-	public static BigDecimal getBdSteuer() {
-		return bdSteuer;
+	public static BigDecimal getBdST() {
+		return bdST;
+	}
+	
+	public static BigDecimal getBdSToffen() {
+		return bdSToffen;
 	}
 
 	public static int[] getBelegID() {

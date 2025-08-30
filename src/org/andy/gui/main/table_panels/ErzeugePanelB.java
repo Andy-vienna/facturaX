@@ -8,10 +8,10 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import org.andy.gui.main.overview_panels.SummenPanel;
+import org.andy.gui.main.overview_panels.SummenPanelB;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 
-public class ErzeugePanel extends JPanel {
+public class ErzeugePanelB extends JPanel {
 	
 	// Serialisierungs-ID für die Klasse
 	private static final long serialVersionUID = 1L;
@@ -22,7 +22,7 @@ public class ErzeugePanel extends JPanel {
 	// public Teil
 	//###################################################################################################################################################
 	
-	public ErzeugePanel(ErzeugeTabelle<Object> sPane, EditPanel editPanel, JButton[] buttons, SummenPanel info) {
+	public ErzeugePanelB(ErzeugeTabelle<Object> sPane, EditPanel editPanel, JButton[] buttons, SummenPanelB info) {
 		this.buttons = buttons;
 		buildPanel(sPane, editPanel, buttons, info);
 	}
@@ -31,7 +31,7 @@ public class ErzeugePanel extends JPanel {
 	// private Teil
 	//###################################################################################################################################################
 	
-	private void buildPanel(ErzeugeTabelle<Object> sPane, EditPanel editPanel, JButton[] buttons, SummenPanel info) {
+	private void buildPanel(ErzeugeTabelle<Object> sPane, EditPanel editPanel, JButton[] buttons, SummenPanelB info) {
 
 		// Hauptlayout für das Panel
 	    this.setLayout(new GridBagLayout());
@@ -87,7 +87,7 @@ public class ErzeugePanel extends JPanel {
 	
 	//###################################################################################################################################################
 	
-	private JPanel createBottomPanel(JButton[] buttons, SummenPanel info) {
+	private JPanel createBottomPanel(JButton[] buttons, SummenPanelB info) {
 		int i = 0;
 
 		// Buttons und InfoPanel in einem BottomPanel anordnen

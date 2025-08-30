@@ -65,7 +65,8 @@ import org.andy.gui.main.dialogs.ABDialog;
 import org.andy.gui.main.dialogs.DateianzeigeDialog;
 import org.andy.gui.main.dialogs.InfoDialog;
 import org.andy.gui.main.dialogs.MahnstufeDialog;
-import org.andy.gui.main.overview_panels.SummenPanel;
+import org.andy.gui.main.overview_panels.SummenPanelA;
+import org.andy.gui.main.overview_panels.SummenPanelB;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanelFactory;
 import org.andy.gui.main.overview_panels.edit_panels.factory.RechnungPanel;
@@ -87,7 +88,8 @@ import org.andy.gui.main.settings_panels.QrCodePanel;
 import org.andy.gui.main.settings_panels.SteuertabellePanel;
 import org.andy.gui.main.settings_panels.BenutzerPanel;
 import org.andy.gui.main.settings_panels.text_panels.TextPanelFactory;
-import org.andy.gui.main.table_panels.ErzeugePanel;
+import org.andy.gui.main.table_panels.ErzeugePanelA;
+import org.andy.gui.main.table_panels.ErzeugePanelB;
 import org.andy.gui.main.table_panels.ErzeugeTabelle;
 import org.andy.gui.misc.BusyDialog;
 import org.andy.gui.misc.RoundedBorder;
@@ -103,12 +105,12 @@ public class HauptFenster extends JFrame {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LogManager.getLogger(HauptFenster.class);
 
-    private static final String[] HEADER_AN = { "AN-Nummer", "Status", "Datum", "Referenz", "Kunde", "Netto" };
-    private static final String[] HEADER_RE = { "RE-Nummer", "Status", "Datum", "Leistungszeitraum", "Referenz", "Kunde", "Netto", "USt.", "Brutto" };
-    private static final String[] HEADER_PU = { "RE-Datum","RE-Nummer", "Kreditor Name", "Kreditor Land", "Netto", "USt.", "Brutto", "Zahlungsziel", "bezahlt", "Dateiname" };
-    private static final String[] HEADER_EX = { "Datum", "Bezeichnung", "Netto (EUR)", "Steuer (EUR)", "Brutto (EUR)", "Dateiname" };
-    private static final String[] HEADER_ST = { "Datum", "Zahlungsempfänger", "Bezeichnung", "Zahllast", "Fälligkeit", "bezahlt", "Dateiname" };
-    private static final int BUTTONX = 130; private static final int BUTTONY = 50;
+    private final String[] HEADER_AN = { "AN-Nummer", "Status", "Datum", "Referenz", "Kunde", "Netto" };
+    private final String[] HEADER_RE = { "RE-Nummer", "Status", "Datum", "Leistungszeitraum", "Referenz", "Kunde", "Netto", "USt.", "Brutto" };
+    private final String[] HEADER_PU = { "RE-Datum","RE-Nummer", "Kreditor Name", "Land", "Steuersatz", "Netto", "USt.", "Brutto", "Zahlungsziel", "bezahlt", "Dateiname" };
+    private final String[] HEADER_EX = { "Datum", "Bezeichnung", "Land", "Steuersatz", "Netto (EUR)", "Steuer (EUR)", "Brutto (EUR)", "Dateiname" };
+    private final String[] HEADER_ST = { "Datum", "Zahlungsempfänger", "Bezeichnung", "Betrag", "Fälligkeit", "Art", "Dateiname" };
+    private final static int BUTTONX = 130; private static final int BUTTONY = 50;
 
     // Status/Session
     private String sLic;
@@ -131,13 +133,15 @@ public class HauptFenster extends JFrame {
 
     // Panels, Tabellen, Summen
     private EditPanel offerPanel, billPanel, purchasePanel, svTaxPanel, expensesPanel;
-    private SummenPanel infoAN, infoRE, infoPU, infoEX, infoST;
+    private SummenPanelA infoAN, infoRE;
+	private SummenPanelB infoPU, infoEX, infoST;
+	
     private UStPanel panelUSt;
     private ZMeldungPanel panelZM;
     private SteuerPanel panelP109a;
     private JScrollPane sPaneErg;
     private ErzeugeTabelle<Object> sPaneAN, sPaneRE, sPanePU, sPaneEX, sPaneST;
-    private ErzeugePanel panelOfferInfo, panelBillInfo;
+    private ErzeugePanelA panelOfferInfo, panelBillInfo;
 
     // Daten
     private String[][] sTempAN, sTempRE, sTempPU, sTempEX, sTempST;
@@ -245,7 +249,7 @@ public class HauptFenster extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				Component c = (Component) e.getSource();
 	        	Window owner = SwingUtilities.getWindowAncestor(c);
-	        	InfoDialog.show(owner, StartUp.APP_NAME, StartUp.APP_VERSION);
+	        	InfoDialog.show(owner, StartUp.APP_NAME, StartUp.APP_VERSION, StartUp.APP_BUILD);
 	        	//InfoDialog.show(SwingUtilities.getWindowAncestor(null), StartUp.APP_NAME, StartUp.APP_VERSION)
 			}
 		});
@@ -328,11 +332,11 @@ public class HauptFenster extends JFrame {
         sPaneAN.setColumnWidths(new int[] {200,200,200,750,300,200});
         sPaneAN.getTable().setAutoCreateRowSorter(true);
 
-        infoAN = new SummenPanel(new String[] {"Summe offen:", "Summe best.:"}, true);
+        infoAN = new SummenPanelA(new String[] {"Summe offen:", "Summe best.:"}, true);
         setSumAN();
         if (use) infoAN.setVisible(false);
 
-        panelOfferInfo = new ErzeugePanel(sPaneAN, offerPanel, btn, infoAN);
+        panelOfferInfo = new ErzeugePanelA(sPaneAN, offerPanel, btn, infoAN);
 
         // Actions
         btn[0].addActionListener(_ -> { if (!use) doAngebotPanel(true); else updScreen(); });
@@ -387,11 +391,11 @@ public class HauptFenster extends JFrame {
         sPaneRE.setColumnWidths(new int[] {120,120,120,200,650,200,150,150,150});
         sPaneRE.getTable().setAutoCreateRowSorter(true);
 
-        infoRE = new SummenPanel(new String[] {"Summe offen:", "Summe bez.:"}, true);
+        infoRE = new SummenPanelA(new String[] {"Summe offen:", "Summe bez.:"}, true);
         setSumRE();
         if (use) infoRE.setVisible(false);
 
-        panelBillInfo = new ErzeugePanel(sPaneRE, billPanel, btn, infoRE);
+        panelBillInfo = new ErzeugePanelA(sPaneRE, billPanel, btn, infoRE);
 
         btn[0].addActionListener(_ -> { if (!use) doRechnungPanel(true); else updScreen(); });
         if (!use) {
@@ -434,13 +438,13 @@ public class HauptFenster extends JFrame {
         sPanePU.getTable().addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) { actionClickPU(sPanePU.getTable(), e); }
         });
-        sPanePU.setColumnWidths(new int[] {100,150,400,80,100,100,100,150,80,400});
+        sPanePU.setColumnWidths(new int[] {100,150,400,50,100,100,100,100,150,80,400});
         sPanePU.getTable().setAutoCreateRowSorter(true);
 
-        infoPU = new SummenPanel(new String[] {"Netto:", "Brutto:"}, false);
+        infoPU = new SummenPanelB(4, new String[] {"Netto:", "Brutto:", "USt.AT 10%", "USt.AT 20%"});
         setSumPU();
 
-        ErzeugePanel cp = new ErzeugePanel(sPanePU, purchasePanel, null, infoPU);
+        ErzeugePanelB cp = new ErzeugePanelB(sPanePU, purchasePanel, null, infoPU);
         pagePU.removeAll();
         pagePU.add(cp, BorderLayout.CENTER);
         pagePU.revalidate(); pagePU.repaint();
@@ -461,13 +465,13 @@ public class HauptFenster extends JFrame {
         sPaneEX.getTable().addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) { actionClickEX(sPaneEX.getTable(), e); }
         });
-        sPaneEX.setColumnWidths(new int[] {100,650,150,150,150,650});
+        sPaneEX.setColumnWidths(new int[] {100,650,50,100,150,150,150,500});
         sPaneEX.getTable().setAutoCreateRowSorter(true);
 
-        infoEX = new SummenPanel(new String[] {"Netto:", "Brutto:"}, false);
+        infoEX = new SummenPanelB(5, new String[] {"Netto:", "Brutto:", "USt.AT 10%", "USt.AT 20%", "USt.EU sonst."});
         setSumEX();
 
-        ErzeugePanel cp = new ErzeugePanel(sPaneEX, expensesPanel, null, infoEX);
+        ErzeugePanelB cp = new ErzeugePanelB(sPaneEX, expensesPanel, null, infoEX);
         pageEX.removeAll();
         pageEX.add(cp, BorderLayout.CENTER);
         pageEX.revalidate(); pageEX.repaint();
@@ -491,10 +495,10 @@ public class HauptFenster extends JFrame {
         sPaneST.setColumnWidths(new int[] {120,450,450,120,120,80,500});
         sPaneST.getTable().setAutoCreateRowSorter(true);
 
-        infoST = new SummenPanel(new String[] {"SV:", "Steuer:"}, false);
+        infoST = new SummenPanelB(4, new String[] {"SV Gesamt:", "SV offen:", "Steuer Gesamt:", "Steuer offen:"});
         setSumST();
 
-        ErzeugePanel cp = new ErzeugePanel(sPaneST, svTaxPanel, null, infoST);
+        ErzeugePanelB cp = new ErzeugePanelB(sPaneST, svTaxPanel, null, infoST);
         pageST.removeAll();
         pageST.add(cp, BorderLayout.CENTER);
         pageST.revalidate(); pageST.repaint();
@@ -659,24 +663,26 @@ public class HauptFenster extends JFrame {
     }
 
     private void setSumPU() {
-        double dNetto = LadeEinkauf.getBdNetto().doubleValue();
-        double dBrutto = LadeEinkauf.getBdBrutto().doubleValue();
-        infoPU.setTxtSum(0, dNetto);
-        infoPU.setTxtSum(1, dBrutto);
+        double dNetto = LadeEinkauf.getBdNetto().doubleValue(); double dBrutto = LadeEinkauf.getBdBrutto().doubleValue();
+        double d10Proz = LadeEinkauf.getBd10Proz().doubleValue(); double d20Proz = LadeEinkauf.getBd20Proz().doubleValue();
+        infoPU.setTxtSum(0, dNetto); infoPU.setTxtSum(1, dBrutto);
+        infoPU.setTxtSum(2, d10Proz); infoPU.setTxtSum(3, d20Proz);
     }
 
     private void setSumEX() {
-        double dNetto = LadeAusgaben.getBdNetto().doubleValue();
-        double dBrutto = LadeAusgaben.getBdBrutto().doubleValue();
-        infoEX.setTxtSum(0, dNetto);
-        infoEX.setTxtSum(1, dBrutto);
+    	double dNetto = LadeAusgaben.getBdNetto().doubleValue(); double dBrutto = LadeAusgaben.getBdBrutto().doubleValue();
+        double d10Proz = LadeAusgaben.getBd10Proz().doubleValue(); double d20Proz = LadeAusgaben.getBd20Proz().doubleValue();
+        double dUstSonst = LadeAusgaben.getUstSonst().doubleValue();
+        infoEX.setTxtSum(0, dNetto); infoEX.setTxtSum(1, dBrutto);
+        infoEX.setTxtSum(2, d10Proz); infoEX.setTxtSum(3, d20Proz);
+        infoEX.setTxtSum(4, dUstSonst);;
     }
 
     private void setSumST() {
-        double dSv = LadeSvTax.getBdSV().doubleValue();
-        double dSteuer = LadeSvTax.getBdSteuer().doubleValue();
-        infoST.setTxtSum(0, dSv);
-        infoST.setTxtSum(1, dSteuer);
+        double dSv = LadeSvTax.getBdSV().doubleValue(); double dSvOffen = LadeSvTax.getBdSVoffen().doubleValue();
+        double dSt = LadeSvTax.getBdST().doubleValue(); double dStOffen = LadeSvTax.getBdSToffen().doubleValue();
+        infoST.setTxtSum(0, dSv); infoST.setTxtSum(1, dSvOffen);
+        infoST.setTxtSum(2, dSt); infoST.setTxtSum(3, dStOffen);
     }
 
     //###################################################################################################################################################
@@ -702,7 +708,7 @@ public class HauptFenster extends JFrame {
                 anp.setTxtFields(table.getValueAt(row, 0).toString(), kunde != null ? kunde.getTaxvalue() : null);
                 vZelleAN = table.getValueAt(row, 0).toString();
                 vStateAN = table.getValueAt(row, 1).toString();
-                if (panelOfferInfo instanceof ErzeugePanel cp) {
+                if (panelOfferInfo instanceof ErzeugePanelA cp) {
                     JButton[] btn = cp.getButtons();
                     setOfferButtonsByState(vStateAN, btn);
                 }
@@ -737,7 +743,7 @@ public class HauptFenster extends JFrame {
                 rep.setTxtFields(table.getValueAt(row, 0).toString(), kunde != null ? kunde.getTaxvalue() : null);
                 vZelleRE = table.getValueAt(row, 0).toString();
                 vStateRE = table.getValueAt(row, 1).toString();
-                if (panelBillInfo instanceof ErzeugePanel cp) {
+                if (panelBillInfo instanceof ErzeugePanelA cp) {
                     JButton[] btn = cp.getButtons();
                     setBillButtonsByState(vStateRE, btn);
                 }
@@ -813,7 +819,7 @@ public class HauptFenster extends JFrame {
         int[] belegID = LadeSvTax.getBelegID();
         if (table.getValueAt(row, column) == null) {
             if (svTaxPanel instanceof SvTaxPanel svp) {
-                svp.setsTitel("neuen Bescheid/Vorschreibung erfassen");
+                svp.setsTitel("neuen Beleg erfassen");
                 svp.setBtnText(1, "save");
                 svp.setTxtFields(0);
                 svp.setIcon();
@@ -821,8 +827,8 @@ public class HauptFenster extends JFrame {
             }
         } else {
             if (svTaxPanel instanceof SvTaxPanel svp) {
-                svp.setsTitel("vorhandenen Bescheid/Vorschreibung bearbeiten");
-                svp.setBtnText(1, "<html>bezahlt<br>setzen</html>");
+                svp.setsTitel("vorhandenen Beleg bearbeiten");
+                svp.setBtnText(1, null);
                 svp.setTxtFields(belegID[row]);
                 svp.setIcon();
                 svp.setFile(false);
@@ -996,8 +1002,8 @@ public class HauptFenster extends JFrame {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            label.setHorizontalAlignment((column == 0 || column == 1 || column == 3 || column == 7 || column == 8) ? SwingConstants.CENTER
-                    : ((column == 4 || column == 5 || column == 6 || column == 9) ? SwingConstants.RIGHT : SwingConstants.LEFT));
+            label.setHorizontalAlignment((column == 0 || column == 1 || column == 3 || column == 4 || column == 8 || column == 9) ? SwingConstants.CENTER
+                    : ((column == 5 || column == 6 || column == 7 || column == 10) ? SwingConstants.RIGHT : SwingConstants.LEFT));
             setBackground(row % 2 < 1 ? new Color(10,10,10,10) : Color.WHITE);
 
             Object v0 = table.getValueAt(row, 0);
@@ -1005,11 +1011,11 @@ public class HauptFenster extends JFrame {
                 try {
                     DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy");
                     LocalDate dateNow = LocalDate.now();
-                    LocalDate datePay = LocalDate.parse(table.getValueAt(row, 7).toString(), inputFormat);
+                    LocalDate datePay = LocalDate.parse(table.getValueAt(row, 8).toString(), inputFormat);
                     long daysBetween = ChronoUnit.DAYS.between(dateNow, datePay);
                     int daysPayable = Math.toIntExact(daysBetween);
 
-                    String s = String.valueOf(table.getValueAt(row, 8));
+                    String s = String.valueOf(table.getValueAt(row, 9));
                     switch(s) {
                     case "nein" -> { if (daysPayable < 0) setBackground(Color.RED); else if (daysPayable < 3) setBackground(Color.PINK);}
                     case "angezahlt" -> setBackground(Color.CYAN);
@@ -1033,13 +1039,13 @@ public class HauptFenster extends JFrame {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            label.setHorizontalAlignment((column == 0) ? SwingConstants.CENTER
-                    : ((column >= 2 && column <= 5) ? SwingConstants.RIGHT : SwingConstants.LEFT));
+            label.setHorizontalAlignment((column == 0) || (column == 2) || (column == 3) ? SwingConstants.CENTER
+                    : ((column >= 4 && column <= 7) ? SwingConstants.RIGHT : SwingConstants.LEFT));
             setBackground(row % 2 < 1 ? new Color(176,226,255,100) : Color.WHITE);
             Object v0 = table.getValueAt(row, 0);
             if (v0 != null) {
                 try {
-		            if (table.getValueAt(row, 2).toString().contains("-")) {
+		            if (table.getValueAt(row, 4).toString().contains("-")) {
 		            	setForeground(Color.RED);
 		            } else {
 		            	setForeground(Color.BLACK);
@@ -1074,10 +1080,10 @@ public class HauptFenster extends JFrame {
                     int daysPayable = Math.toIntExact(ChronoUnit.DAYS.between(dateNow, datePay));
 
                     String bezahlt = String.valueOf(table.getValueAt(row, 5));
-                    if ("nein".equals(bezahlt)) {
-                        if (daysPayable < 0) setBackground(Color.RED);
-                        else if (daysPayable < 3) setBackground(Color.PINK);
-                    } else if ("ja".equals(bezahlt)) {
+                    if ("Zahllast".equals(bezahlt)) {
+                        if (daysPayable < 0) setBackground(Color.PINK);
+                        else if (daysPayable < 3) setBackground(Color.ORANGE);
+                    } else if ("Eingang".equals(bezahlt)) {
                         setBackground(new Color(152,251,152));
                     }
                 } catch (Exception e) {

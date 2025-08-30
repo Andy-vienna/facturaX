@@ -19,8 +19,8 @@ import org.andy.code.misc.BD;
 
 public class LadeEinkauf {
 	
-	private static BigDecimal bdNetto = BD.ZERO;
-	private static BigDecimal bdBrutto = BD.ZERO;
+	private static BigDecimal bdNetto = BD.ZERO; private static BigDecimal bdBrutto = BD.ZERO;
+	private static BigDecimal bd10Proz = BD.ZERO; private static BigDecimal bd20Proz = BD.ZERO;
 	
 	//###################################################################################################################################################
 	// public Teil
@@ -40,13 +40,13 @@ public class LadeEinkauf {
 		DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Locale.GERMANY);
 		DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
 		
-		bdNetto = BD.ZERO; bdBrutto = BD.ZERO;
+		bdNetto = BD.ZERO; bdBrutto = BD.ZERO; bd10Proz = BD.ZERO; bd20Proz = BD.ZERO;
 
 		EinkaufRepository einkaufRepository = new EinkaufRepository();
 	    List<Einkauf> einkaufListe = new ArrayList<>();
 	    einkaufListe.addAll(einkaufRepository.findAllByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ())));
 		
-		String[][] sTemp = new String [einkaufListe.size() + 1][10]; // 1 Zeile mehr für neuen Beleg
+		String[][] sTemp = new String [einkaufListe.size() + 1][11]; // 1 Zeile mehr für neuen Beleg
 		
 		for (int i = 0; i < einkaufListe.size(); i++){
 			Einkauf einkauf = einkaufListe.get(i);
@@ -75,15 +75,20 @@ public class LadeEinkauf {
 			sTemp[i][1] = einkauf.getId();
 			sTemp[i][2] = einkauf.getKredName();
 			sTemp[i][3] = einkauf.getKredLand();
-			sTemp[i][4] = netto;
-			sTemp[i][5] = ust;
-			sTemp[i][6] = brutto;
-			sTemp[i][7] = datumZZ;
-			sTemp[i][8] = status;
-			sTemp[i][9] = einkauf.getDateiname();
+			sTemp[i][4] = einkauf.getSteuersatz();
+			sTemp[i][5] = netto;
+			sTemp[i][6] = ust;
+			sTemp[i][7] = brutto;
+			sTemp[i][8] = datumZZ;
+			sTemp[i][9] = status;
+			sTemp[i][10] = einkauf.getDateiname();
 			
 			bdNetto = bdNetto.add(einkauf.getNetto());
 			bdBrutto = bdBrutto.add(einkauf.getBrutto());
+			if (einkauf.getKredLand().equals("AT")) {
+				if (einkauf.getSteuersatz().equals("10")) bd10Proz = bd10Proz.add(einkauf.getUst());
+				if (einkauf.getSteuersatz().equals("20")) bd20Proz = bd20Proz.add(einkauf.getUst());
+			}
 		}
 		return sTemp;
 	}
@@ -98,6 +103,14 @@ public class LadeEinkauf {
 
 	public static BigDecimal getBdBrutto() {
 		return bdBrutto;
+	}
+	
+	public static BigDecimal getBd10Proz() {
+		return bd10Proz;
+	}
+
+	public static BigDecimal getBd20Proz() {
+		return bd20Proz;
 	}
 
 }

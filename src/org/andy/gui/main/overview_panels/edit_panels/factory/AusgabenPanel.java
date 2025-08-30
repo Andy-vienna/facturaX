@@ -16,6 +16,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,12 +30,15 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 
 import org.andy.code.dataStructure.entitiyProductive.Ausgaben;
 import org.andy.code.dataStructure.repositoryProductive.AusgabenRepository;
 import org.andy.code.main.Einstellungen;
 import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
+import org.andy.code.misc.BD;
 import org.andy.gui.main.HauptFenster;
 import org.andy.gui.main.dialogs.DateianzeigeDialog;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
@@ -58,7 +63,7 @@ public class AusgabenPanel extends EditPanel {
 	
 	private TitledBorder border;
 	private DatePicker datePicker = new DatePicker();
-	private JTextField[] txtFields = new JTextField[6];
+	private JTextField[] txtFields = new JTextField[7];
 	private JLabel lblFileTyp = new JLabel();
 	private JButton[] btnFields = new JButton[2];
 	
@@ -100,6 +105,7 @@ public class AusgabenPanel extends EditPanel {
 	    String[] labels = {
 	        "Belegdatum:",
 	        "Buchungstext des Beleges:",
+	        "Ursprungsland (2-Zeichen):",
 	        "Steuersatz (%):",
 	        "Betrag netto (EUR):",
 	        "Betrag Steuer (EUR):",
@@ -132,9 +138,17 @@ public class AusgabenPanel extends EditPanel {
 	    	txtFields[r] = makeField(210, 45 + r * 25, 400, 25, false, null);
 	    	add(txtFields[r]);
 	    }
-	    attachCommaToDot(txtFields[2]);
-        attachCommaToDot(txtFields[3]);
+	    attachCommaToDot(txtFields[3]);
+	    txtFields[3].getDocument().addDocumentListener(new DocumentListener() {
+	    	@Override
+	        public void insertUpdate(DocumentEvent e) { calcFields(); }
+	        @Override
+	        public void removeUpdate(DocumentEvent e) { calcFields(); }
+	        @Override
+	        public void changedUpdate(DocumentEvent e) { calcFields(); }
+	    });
         attachCommaToDot(txtFields[4]);
+        attachCommaToDot(txtFields[5]);
 	    
 	    // Anzeige Filetyp
 	    lblFileTyp.setHorizontalAlignment(SwingConstants.CENTER);
@@ -143,7 +157,7 @@ public class AusgabenPanel extends EditPanel {
 	    
 	    btnFields[0] = new JButton();
 	    btnFields[0].setToolTipText("");
-	    btnFields[0].setBounds(145, 170, 65, 25);
+	    btnFields[0].setBounds(145, 195, 65, 25);
 	    add(btnFields[0]);
 
 		try {
@@ -151,10 +165,10 @@ public class AusgabenPanel extends EditPanel {
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}
-		btnFields[1].setBounds(660, 145, HauptFenster.getButtonx(), HauptFenster.getButtony());
+		btnFields[1].setBounds(660, 170, HauptFenster.getButtonx(), HauptFenster.getButtony());
 		add(btnFields[1]);
 		
-		setPreferredSize(new Dimension(1000, 20 + 6 * 25 + 50));
+		setPreferredSize(new Dimension(1000, 20 + 7 * 25 + 50));
 	    
 	    // ------------------------------------------------------------------------------
  		// Action Listener für Buttons
@@ -184,7 +198,7 @@ public class AusgabenPanel extends EditPanel {
  				String FileNamePath = chooseFile(Einstellungen.getWorkPath());
  				File fn = new File(FileNamePath);
  				String FileName = fn.getName();
- 				txtFields[5].setText(FileName);
+ 				txtFields[6].setText(FileName);
  				ausgaben.setDateiname(FileName);
  				Path path = Paths.get(FileNamePath);
  				try {
@@ -205,16 +219,21 @@ public class AusgabenPanel extends EditPanel {
  	 				
  	 				boolean bResult = checkInput();
  	 				if (!bResult) {
- 	 					JOptionPane.showMessageDialog(null, "Eingaben unvollständig, Beleg kann nicht gespeichert werden", "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
+ 	 					if (txtFields[1].getText().length() != 2) {
+ 	 						JOptionPane.showMessageDialog(null, "Ländercode gemäß ISO 3166-1 alpha2 (2-stellig) eingeben", "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
+ 	 					} else {
+ 	 						JOptionPane.showMessageDialog(null, "Eingaben unvollständig, Beleg kann nicht gespeichert werden", "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
+ 	 					}
  	 					return;
  	 				}
  					
  					ausgaben.setDatum(datePicker.getDate());
  					ausgaben.setArt(txtFields[0].getText());
- 					ausgaben.setSteuersatz(txtFields[1].getText());
- 					ausgaben.setNetto(parseStringToBigDecimalSafe(txtFields[2].getText(), LocaleFormat.AUTO));
- 					ausgaben.setSteuer(parseStringToBigDecimalSafe(txtFields[3].getText(), LocaleFormat.AUTO));
- 					ausgaben.setBrutto(parseStringToBigDecimalSafe(txtFields[4].getText(), LocaleFormat.AUTO));
+ 					ausgaben.setLand(txtFields[1].getText());
+ 					ausgaben.setSteuersatz(txtFields[2].getText());
+ 					ausgaben.setNetto(parseStringToBigDecimalSafe(txtFields[3].getText(), LocaleFormat.AUTO));
+ 					ausgaben.setSteuer(parseStringToBigDecimalSafe(txtFields[4].getText(), LocaleFormat.AUTO));
+ 					ausgaben.setBrutto(parseStringToBigDecimalSafe(txtFields[5].getText(), LocaleFormat.AUTO));
  					
  					ausgabenRepository.save(ausgaben);
  					
@@ -247,7 +266,7 @@ public class AusgabenPanel extends EditPanel {
     	for (int i = 0; i < this.txtFields.length; i++) {
 			this.txtFields[i].setFocusable(b);
 		}
-    	txtFields[5].setFocusable(false);
+    	txtFields[6].setFocusable(false);
     }
     
     private boolean checkInput() {
@@ -255,8 +274,27 @@ public class AusgabenPanel extends EditPanel {
     	for (int i = 0; i < txtFields.length - 1; i++) {
     		if (txtFields[i].getText() == null || txtFields[i].getText().equals("")) return false;
     	}
+    	if (txtFields[1].getText().length() != 2) return false;
     	if (file == false) return false;
     	return true;
+    }
+    
+    private void calcFields() {
+    	BigDecimal tax = BD.ZERO; BigDecimal netto = BD.ZERO; BigDecimal ust = BD.ZERO;
+    	if (!txtFields[2].isFocusable()) return; // keine Prüfung, wenn Feld nicht fokussierbar
+    	try {
+    	    int value = Integer.parseInt(txtFields[2].getText().trim()); // Steuersatz als Ganzzahl eingegeben
+    	    if (value >= 0 && value <= 99) {
+    	        tax = new BigDecimal(value).divide(BD.HUNDRED); // Steuersatz
+    	        netto = new BigDecimal(txtFields[3].getText().trim()).setScale(2, RoundingMode.HALF_UP);
+    	        ust = netto.multiply(tax).setScale(2, RoundingMode.HALF_UP); txtFields[4].setText(ust.toString());
+    	        txtFields[5].setText(netto.add(ust).setScale(2, RoundingMode.HALF_UP).toString());
+    	    } else {
+    	    	JOptionPane.showMessageDialog(null, "Steuersatz ungültig", "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
+    	    }
+    	} catch (NumberFormatException e) {
+    	    // keine Zahl eingegeben
+    	}
     }
     
 	//###################################################################################################################################################
@@ -294,11 +332,12 @@ public class AusgabenPanel extends EditPanel {
     	this.datePicker.setDate(ausgaben.getDatum());
     	
     	this.txtFields[0].setText(ausgaben.getArt());
-    	this.txtFields[1].setText(ausgaben.getSteuersatz());
-    	this.txtFields[2].setText(ausgaben.getNetto().toString());
-    	this.txtFields[3].setText(ausgaben.getSteuer().toString());
-    	this.txtFields[4].setText(ausgaben.getBrutto().toString());
-    	this.txtFields[5].setText(ausgaben.getDateiname());
+    	this.txtFields[1].setText(ausgaben.getLand());
+    	this.txtFields[2].setText(ausgaben.getSteuersatz());
+    	this.txtFields[3].setText(ausgaben.getNetto().toString());
+    	this.txtFields[4].setText(ausgaben.getSteuer().toString());
+    	this.txtFields[5].setText(ausgaben.getBrutto().toString());
+    	this.txtFields[6].setText(ausgaben.getDateiname());
     	
     	txtFieldsFocusable(false);
     	neuBeleg = false;

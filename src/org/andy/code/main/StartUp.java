@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
+import java.util.jar.Manifest;
+
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -30,6 +32,7 @@ public class StartUp {
 
 	public static final String APP_NAME = "FacturaX v2";
 	public static String APP_VERSION = null;
+	public static String APP_BUILD = null;
 	private static String APP_LICENSE = null;
 	private static int APP_MODE = 0;
 
@@ -73,6 +76,11 @@ public class StartUp {
 
         // 5) Version lesen
         APP_VERSION = getVersion();
+        try {
+			APP_BUILD = getBuildTime();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 
         // 6) Einstellungen laden
         Einstellungen.LoadProgSettings();
@@ -141,12 +149,8 @@ public class StartUp {
         try { if (LOCK_CH != null && LOCK_CH.isOpen()) LOCK_CH.close(); } catch (Exception ignore) {}
         try { if (LOCK_PATH != null) java.nio.file.Files.deleteIfExists(LOCK_PATH); } catch (Exception ignore) {}
     }
-	
-	// ###################################################################################################################################################
-	// Getter und Setter
-	// ###################################################################################################################################################
     
-	public static String getVersion() {
+    private static String getVersion() {
 		InputStream input = StartUp.class.getClassLoader().getResourceAsStream("version.properties");
 		Properties properties = new Properties();
 		try (input) {
@@ -160,6 +164,19 @@ public class StartUp {
 			return "0.0.0";
 		}
 	}
+    
+    private static String getBuildTime() throws IOException {
+    	try (InputStream is = StartUp.class.getResourceAsStream("/META-INF/MANIFEST.MF")) {
+    	    if (is == null) return null; // kein Manifest gefunden
+    	    Manifest mf = new Manifest(is);
+    	    String build = mf.getMainAttributes().getValue("Built-Date");
+    	    return build;
+    	}
+    }
+	
+	// ###################################################################################################################################################
+	// Getter und Setter
+	// ###################################################################################################################################################
 
 	public static String getAPP_LICENSE() {
 		return APP_LICENSE;

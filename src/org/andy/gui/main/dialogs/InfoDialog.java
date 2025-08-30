@@ -27,10 +27,10 @@ public final class InfoDialog extends JDialog {
             </html>
             """;
 
-    public InfoDialog(Window owner, String appName, String appVersion) {
+    public InfoDialog(Window owner, String appName, String appVersion, String appBuild) {
         super(owner, "Über " + appName + " (" + appVersion + ")", ModalityType.APPLICATION_MODAL);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setContentPane(buildContent(appName, appVersion));
+        setContentPane(buildContent(appName, appVersion, appBuild));
         pack();
         setMinimumSize(new Dimension(250, 400));
         setLocationRelativeTo(owner);
@@ -43,7 +43,7 @@ public final class InfoDialog extends JDialog {
 
     private final JButton closeButton = new JButton("Schließen");
 
-    private JPanel buildContent(String appName, String appVersion) {
+    private JPanel buildContent(String appName, String appVersion, String appBuild) {
         JPanel root = new JPanel(new BorderLayout(16, 16));
         root.setBorder(new EmptyBorder(16, 8, 16, 8));
 
@@ -54,8 +54,11 @@ public final class InfoDialog extends JDialog {
         gc.insets = new Insets(6, 6, 6, 6);
         gc.gridx = 0; gc.weightx = 1; gc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel title = new JLabel(appName + " (" + appVersion + ")");
-        title.setFont(title.getFont().deriveFont(Font.BOLD, 24f));
+        JLabel title = new JLabel("<html>" +
+        		"<span style='font-size:24px; font-weight:bold;'>" + appName + " (" + appVersion + ") " + "</span>" +
+        		"<span style='font-size:12px; font-weight:plain;'>" + "(build " + appBuild + ")</span>" +
+        		"</html>");
+        //title.setFont(title.getFont().deriveFont(Font.BOLD, 24f));
         title.setForeground(new Color(20, 20, 20));
         gc.gridy = 0;
         right.add(title, gc);
@@ -112,7 +115,7 @@ public final class InfoDialog extends JDialog {
     }
 
     // Convenience
-    public static void show(Window owner, String appName, String appVersion) {
-        new InfoDialog(owner, appName, appVersion).setVisible(true);
+    public static void show(Window owner, String appName, String appVersion, String appBuild) {
+        new InfoDialog(owner, appName, appVersion, appBuild).setVisible(true);
     }
 }

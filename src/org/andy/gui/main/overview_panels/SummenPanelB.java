@@ -8,62 +8,67 @@ import java.text.NumberFormat;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 import javax.swing.text.NumberFormatter;
 
-public class SummenPanel extends JPanel {
+public class SummenPanelB extends JPanel {
 	
 	// Serialisierungs-ID für die Klasse
 	private static final long serialVersionUID = 1L;
 	
-	private JLabel[] lblSum = new JLabel[2];
-	private JLabel lblInfo = new JLabel();
-	private JFormattedTextField[] txtSum = new JFormattedTextField[2];
-	private JProgressBar progressBar = new JProgressBar();
+	private JLabel[] lblSum = null;
+	private JFormattedTextField[] txtSum = null;
 	
 	//###################################################################################################################################################
 	// public Teil
 	//###################################################################################################################################################
 
-    public SummenPanel(String[] labels, boolean showBar) {
+	
+    /** SummenPanel für n Summen (werden im Parameter 'anz' vorgegeben)
+     * @param labels
+     * 
+     */
+    public SummenPanelB(int anz, String[] labels) {
         setLayout(null);
-        buildSumPanel(labels, showBar);
+        buildSumPanel(anz, labels);
     }
     
 	//###################################################################################################################################################
 	// private Teil
 	//###################################################################################################################################################
     
-    private void buildSumPanel(String[] labels, boolean showBar) {
+    private void buildSumPanel(int anz, String[] labels) {
+    	
+    	int spaltenBreite = 200; int labelBreite = 80; int fieldBreite = 110; int feldHoehe = 25;
+    	lblSum = new JLabel[anz]; txtSum = new JFormattedTextField[anz];
+    	
+    	if (labels.length < anz) { // Prüfung, ob genügend Label-Texte vorgegeben werden
+    	    String[] tmp = new String[anz];
+    	    System.arraycopy(labels, 0, tmp, 0, labels.length); // alte Labels übernehmen
+    	    for (int i = labels.length; i < anz; i++) {
+    	        tmp[i] = "no Text"; // fehlende Einträge mit Defaultwert füllen
+    	    }
+    	    labels = tmp;
+    	}
 				
 		// Labels und Textfelder erstellen
-		for (int i = 0; i < lblSum.length; i++) {
-			lblSum[i] = new JLabel(labels[i]);
-			lblSum[i].setBounds(5, 0 + (i * 25), 80, 25);
-			add(lblSum[i]);
-			
-			txtSum[i] = makeField(85, 0 + (i * 25), 110, 25, true, Color.LIGHT_GRAY);
-			add(txtSum[i]);
-		}
+    	for (int i = 0; i < lblSum.length; i++) {
+    	    int spalte = i / 2;       // 0,1,2,...
+    	    int zeile  = i % 2;       // 0 oder 1
+
+    	    int xLabel = spalte * spaltenBreite + 5;
+    	    int xField = spalte * spaltenBreite + 85;
+    	    int y      = zeile * feldHoehe;
+
+    	    lblSum[i] = new JLabel(labels[i]);
+    	    lblSum[i].setBounds(xLabel, y, labelBreite, feldHoehe);
+    	    add(lblSum[i]);
+
+    	    txtSum[i] = makeField(xField, y, fieldBreite, feldHoehe, true, Color.LIGHT_GRAY);
+    	    add(txtSum[i]);
+    	}
 		
-		// Fortschrittsbalken
-		if (showBar) {
-			progressBar.setBounds(195, 2, 80, 46);
-			progressBar.setStringPainted(false);
-			progressBar.setOpaque(true);
-			add(progressBar);
-			
-			lblInfo.setBounds(275, 0, 50, 50);
-			lblInfo.setFont(new Font("Tahoma", Font.BOLD, 11));
-			lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
-			lblInfo.setVerticalAlignment(SwingConstants.CENTER);
-			add(lblInfo);
-			
-			setPreferredSize(new Dimension(325, 50));
-		} else {
-			setPreferredSize(new Dimension(195, 50));
-		}
+		setPreferredSize(new Dimension(200 * ((anz + 1) / 2), 50));
 		
 	}
     
@@ -89,16 +94,6 @@ public class SummenPanel extends JPanel {
     
     public void setTxtSum(int idx, Double value) {
 		this.txtSum[idx].setValue(value);
-	}
-
-	public void setProgressBar(int value) {
-		this.progressBar.setValue(value);
-		this.lblInfo.setText("<html>" + value + "%<br>offen</html>");
-		if(value < 30) {
-			progressBar.setForeground(Color.BLUE);
-		}else {
-			progressBar.setForeground(Color.RED);
-		}
 	}
 
 }

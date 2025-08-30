@@ -32,6 +32,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 
 import org.andy.code.dataStructure.entitiyProductive.Einkauf;
@@ -119,7 +121,7 @@ public class EinkaufPanel extends EditPanel {
 	        "Kreditor Straße:",
 	        "Kreditor PLZ:",
 	        "Kreditor Ort:",
-	        "Kreditor Land:",
+	        "Kreditor Land (2-Zeichen):",
 	        "Kreditor UID:",
 	        "Währung:"};
 	    String[] labelsCol2 = {
@@ -185,6 +187,14 @@ public class EinkaufPanel extends EditPanel {
 	    	add(txtFieldsCol2a[r]);
 	    	attachCommaToDot(txtFieldsCol2a[r]);
 	    }
+	    txtFieldsCol2a[1].getDocument().addDocumentListener(new DocumentListener() {
+	    	@Override
+	        public void insertUpdate(DocumentEvent e) { calcFields(); }
+	        @Override
+	        public void removeUpdate(DocumentEvent e) { calcFields(); }
+	        @Override
+	        public void changedUpdate(DocumentEvent e) { calcFields(); }
+	    });
 	    txtFieldsCol2a[4].setVisible(false); // Anzahlung wird aktuell nicht benötigt
 	    datePicker[1].setBounds(832, 145, 180, 25);
 	    for (int r = 0; r < txtFieldsCol2b.length; r++) {
@@ -286,7 +296,11 @@ public class EinkaufPanel extends EditPanel {
  	 				
  	 				boolean bResult = checkInput();
  	 				if (!bResult) {
- 	 					JOptionPane.showMessageDialog(null, "Eingaben unvollständig, Beleg kann nicht gespeichert werden", "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
+ 	 					if (txtFieldsCol1[5].getText().length() != 2) {
+ 	 						JOptionPane.showMessageDialog(null, "Ländercode gemäß ISO 3166-1 alpha2 (2-stellig) eingeben", "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
+ 	 					} else {
+ 	 						JOptionPane.showMessageDialog(null, "Eingaben unvollständig, Beleg kann nicht gespeichert werden", "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
+ 	 					}
  	 					return;
  	 				}
  	 				
@@ -299,8 +313,7 @@ public class EinkaufPanel extends EditPanel {
  	 				einkauf.setKredPlz(value);
  	 				value = (txtFieldsCol1[4].getText() != null) ? txtFieldsCol1[4].getText().trim() : "";
  	 				einkauf.setKredOrt(value);
- 	 				value = (txtFieldsCol1[5].getText() != null) ? txtFieldsCol1[5].getText().trim() : "";
- 	 				einkauf.setKredLand(value);
+ 	 				einkauf.setKredLand(txtFieldsCol1[5].getText());
  	 				value = (txtFieldsCol1[6].getText() != null) ? txtFieldsCol1[6].getText().trim() : "";
  	 				einkauf.setKredUid(value);
  	 				einkauf.setWaehrung(txtFieldsCol1[7].getText().trim());
@@ -398,11 +411,10 @@ public class EinkaufPanel extends EditPanel {
     private boolean checkInput() {
     	if (datePicker[0].getDate() == null) return false;
     	if (datePicker[1].getDate() == null) return false;
-    	System.out.println(txtFieldsCol1[0].getText() + txtFieldsCol1[1].getText() + txtFieldsCol1[7].getText());
     	if (txtFieldsCol1[0].getText() == null || txtFieldsCol1[0].getText().equals("")) return false;
     	if (txtFieldsCol1[1].getText() == null || txtFieldsCol1[1].getText().equals("")) return false;
+    	if (txtFieldsCol1[5].getText().length() !=2) return false;
     	if (txtFieldsCol1[7].getText() == null || txtFieldsCol1[7].getText().equals("")) return false;
-    	System.out.println(txtFieldsCol1[0].getText() + txtFieldsCol1[1].getText() + txtFieldsCol1[7].getText());
     	for (int i = 0; i < txtFieldsCol2a.length - 1; i++) {
     		if (txtFieldsCol2a[i].getText() == null || txtFieldsCol2a[i].getText().equals("")) return false;
     	}
@@ -410,6 +422,24 @@ public class EinkaufPanel extends EditPanel {
     	if (txtFieldsCol2b[1].getText() == null || txtFieldsCol2b[1].getText().equals("")) return false;
     	if (file == false) return false;
     	return true;
+    }
+    
+    private void calcFields() {
+    	BigDecimal tax = BD.ZERO; BigDecimal netto = BD.ZERO; BigDecimal ust = BD.ZERO;
+    	if (!txtFieldsCol2a[0].isFocusable()) return; // keine Prüfung, wenn Feld nicht fokussierbar
+    	try {
+    	    int value = Integer.parseInt(txtFieldsCol2a[0].getText().trim()); // Steuersatz als Ganzzahl eingegeben
+    	    if (value >= 0 && value <= 99) {
+    	        tax = new BigDecimal(value).divide(BD.HUNDRED); // Steuersatz
+    	        netto = new BigDecimal(txtFieldsCol2a[1].getText().trim()).setScale(2, RoundingMode.HALF_UP);
+    	        ust = netto.multiply(tax).setScale(2, RoundingMode.HALF_UP); txtFieldsCol2a[2].setText(ust.toString());
+    	        txtFieldsCol2a[3].setText(netto.add(ust).setScale(2, RoundingMode.HALF_UP).toString());
+    	    } else {
+    	    	JOptionPane.showMessageDialog(null, "Steuersatz ungültig", "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
+    	    }
+    	} catch (NumberFormatException e) {
+    	    // keine Zahl eingegeben
+    	}
     }
     
 	//###################################################################################################################################################

@@ -21,6 +21,9 @@ public class Ausgaben {
 
     @Column(name = "Art", nullable = false)
     private String art;
+    
+    @Column(name = "land", nullable = false)
+    private String land;
 
     @Column(name = "netto", precision = 9, scale = 2, nullable = false)
     private BigDecimal netto;
@@ -74,5 +77,11 @@ public class Ausgaben {
 
     public byte[] getDatei() { return datei; }
     public void setDatei(byte[] datei) { this.datei = datei; }
+	public String getLand() {
+		return land;
+	}
+	public void setLand(String land) {
+		this.land = land;
+	}
 }
 

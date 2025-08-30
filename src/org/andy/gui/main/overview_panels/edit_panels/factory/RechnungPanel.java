@@ -1,6 +1,7 @@
 package org.andy.gui.main.overview_panels.edit_panels.factory;
 
 import static org.andy.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
+import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
 import static org.andy.toolbox.misc.CreateObject.createButton;
 
 import java.awt.Color;
@@ -364,9 +365,11 @@ public class RechnungPanel extends EditPanel {
 		btnFields[0].setEnabled(b);
 		btnFields[1].setEnabled(false);
 		btnFields[2].setVisible(false);
-		lblSkonto1.setVisible(false); lblSkonto1a.setVisible(false); lblSkonto2.setVisible(false); lblSkonto2a.setVisible(false);
-        chkSkonto1.setVisible(false); txtSkontoTage1.setVisible(false); txtSkontoWert1.setVisible(false);
-        chkSkonto2.setVisible(false); txtSkontoTage2.setVisible(false); txtSkontoWert2.setVisible(false);
+		lblSkonto1.setVisible(b); lblSkonto1a.setVisible(b); lblSkonto2.setVisible(b); lblSkonto2a.setVisible(b);
+        chkSkonto1.setVisible(b); txtSkontoTage1.setVisible(b); txtSkontoWert1.setVisible(b);
+        chkSkonto2.setVisible(b); txtSkontoTage2.setVisible(b); txtSkontoWert2.setVisible(b);
+        chkSkonto1.setEnabled(b); txtSkontoTage1.setEnabled(b); txtSkontoWert1.setEnabled(b);
+        chkSkonto2.setEnabled(b); txtSkontoTage2.setEnabled(b); txtSkontoWert2.setEnabled(b);
     }
     
 	//###################################################################################################################################################
@@ -448,6 +451,13 @@ public class RechnungPanel extends EditPanel {
     	Number numberB = (Number) this.txtFieldsSum[2].getValue();
     	double brutto = numberB.doubleValue();
     	rechnung.setBrutto(BigDecimal.valueOf(brutto));
+    	
+    	rechnung.setSkonto1(chkSkonto1.isSelected()?1:0);
+    	rechnung.setSkonto1tage(txtSkontoTage1.getText().equals("")?0:parseStringToIntSafe(txtSkontoTage1.getText()));
+    	rechnung.setSkonto1wert(txtSkontoTage1.getText().equals("")?BD.ZERO:parseStringToBigDecimalSafe(txtSkontoWert1.getText(), LocaleFormat.AUTO).divide(BD.HUNDRED));
+    	rechnung.setSkonto2(chkSkonto2.isSelected()?1:0);
+    	rechnung.setSkonto2tage(txtSkontoTage2.getText().equals("")?0:parseStringToIntSafe(txtSkontoTage2.getText()));
+    	rechnung.setSkonto2wert(txtSkontoTage2.getText().equals("")?BD.ZERO:parseStringToBigDecimalSafe(txtSkontoWert2.getText(), LocaleFormat.AUTO).divide(BD.HUNDRED));
     	
     	rechnungRepository.update(rechnung); // Hibernate update
     	HauptFenster.actScreen();
