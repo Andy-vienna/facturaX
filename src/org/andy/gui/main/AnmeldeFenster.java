@@ -160,6 +160,7 @@ public final class AnmeldeFenster {
                             "Fehler bei der Anmeldung.",
                             "Anmeldung",
                             JOptionPane.ERROR_MESSAGE);
+                    System.out.println(ex);
                     passField.setText("");
                     loginBtn.setEnabled(true);
                     cancelBtn.setEnabled(true);

@@ -3,6 +3,7 @@ package org.andy.gui.main.overview_panels;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 import javax.swing.JFormattedTextField;
@@ -28,16 +29,16 @@ public class SummenPanelB extends JPanel {
      * @param labels
      * 
      */
-    public SummenPanelB(int anz, String[] labels) {
+    public SummenPanelB(int anz, String[] labels, boolean[] sym) {
         setLayout(null);
-        buildSumPanel(anz, labels);
+        buildSumPanel(anz, labels, sym);
     }
     
 	//###################################################################################################################################################
 	// private Teil
 	//###################################################################################################################################################
     
-    private void buildSumPanel(int anz, String[] labels) {
+    private void buildSumPanel(int anz, String[] labels, boolean[] sym) {
     	
     	int spaltenBreite = 200; int labelBreite = 80; int fieldBreite = 110; int feldHoehe = 25;
     	lblSum = new JLabel[anz]; txtSum = new JFormattedTextField[anz];
@@ -64,7 +65,7 @@ public class SummenPanelB extends JPanel {
     	    lblSum[i].setBounds(xLabel, y, labelBreite, feldHoehe);
     	    add(lblSum[i]);
 
-    	    txtSum[i] = makeField(xField, y, fieldBreite, feldHoehe, true, Color.LIGHT_GRAY);
+    	    txtSum[i] = makeField(xField, y, fieldBreite, feldHoehe, true, Color.LIGHT_GRAY, sym[i]);
     	    add(txtSum[i]);
     	}
 		
@@ -75,11 +76,24 @@ public class SummenPanelB extends JPanel {
 	//###################################################################################################################################################
 
     // Hilfsfunktion für Textfelder
-    private JFormattedTextField makeField(int x, int y, int w, int h, boolean bold, Color bg) {
+    private JFormattedTextField makeField(int x, int y, int w, int h, boolean bold, Color bg, boolean sym) {
+    	JFormattedTextField t = null;
         NumberFormatter formatter = new NumberFormatter(NumberFormat.getCurrencyInstance());
         formatter.setValueClass(Double.class);
         formatter.setAllowsInvalid(false);
-        JFormattedTextField t = new JFormattedTextField(formatter);
+        
+        DecimalFormat df = new DecimalFormat("#0.00");
+        df.setGroupingUsed(true); // Tausendertrennzeichen
+        NumberFormatter nf = new NumberFormatter(df);
+        nf.setValueClass(Double.class);
+        nf.setAllowsInvalid(false); // nur gültige Eingaben zulassen
+
+        if (sym) {
+        	t = new JFormattedTextField(formatter);
+        } else {
+        	t = new JFormattedTextField(nf);
+        }
+        
         t.setBounds(x, y, w, h);
         t.setHorizontalAlignment(SwingConstants.RIGHT);
         t.setFocusable(false);

@@ -19,7 +19,7 @@ public abstract class EditPanel extends JPanel {
                 TitledBorder.LEFT,
                 TitledBorder.TOP,
                 new Font("Arial", Font.BOLD, 12),
-                Color.DARK_GRAY
+                Color.BLUE
             ));
     }
 

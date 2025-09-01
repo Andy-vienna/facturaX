@@ -11,10 +11,11 @@ public final class InfoDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 
+	private final JButton closeButton = new JButton("Schließen");
 	private static final String TEXT_B_HTML =
             """
             <html style='font-family:sans-serif;'>
-              Copyright &copy; 2025 Andreas Fischer<br><br>
+              Copyright &copy; 2024-2025 Andreas Fischer<br><br>
               Licensed under the Apache License, Version 2.0 (the "License");<br>
               you may not use this file except in compliance with the License.<br>
               You may obtain a copy of the License at<br><br>
@@ -26,22 +27,31 @@ public final class InfoDialog extends JDialog {
 			  limitations under the License.
             </html>
             """;
+	
+	// ###################################################################################################################################################
+	// public Teil
+	// ###################################################################################################################################################
 
     public InfoDialog(Window owner, String appName, String appVersion, String appBuild) {
         super(owner, "Über " + appName + " (" + appVersion + ")", ModalityType.APPLICATION_MODAL);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setContentPane(buildContent(appName, appVersion, appBuild));
         pack();
-        setMinimumSize(new Dimension(250, 400));
+        setMinimumSize(new Dimension(250, 450));
         setLocationRelativeTo(owner);
         getRootPane().setDefaultButton(closeButton);
         bindEscToClose();
         setIconImage(loadImage("/org/resources/icons/icon.png", 32, 32));
     }
+    
+    // Convenience
+    public static void show(Window owner, String appName, String appVersion, String appBuild) {
+        new InfoDialog(owner, appName, appVersion, appBuild).setVisible(true);
+    }
 
-    // --------------------- UI ---------------------
-
-    private final JButton closeButton = new JButton("Schließen");
+	// ###################################################################################################################################################
+	// private Teil
+	// ###################################################################################################################################################
 
     private JPanel buildContent(String appName, String appVersion, String appBuild) {
         JPanel root = new JPanel(new BorderLayout(16, 16));
@@ -55,8 +65,8 @@ public final class InfoDialog extends JDialog {
         gc.gridx = 0; gc.weightx = 1; gc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel title = new JLabel("<html>" +
-        		"<span style='font-size:24px; font-weight:bold;'>" + appName + " (" + appVersion + ") " + "</span>" +
-        		"<span style='font-size:12px; font-weight:plain;'>" + "(build " + appBuild + ")</span>" +
+        		"<span style='font-size:24px; font-weight:bold;'>" + appName + " (" + appVersion + ") " + "</span><br>" +
+        		"<span style='font-size:8px; font-weight:bold; color:blue;'>" + "build: " + appBuild + "</span>" +
         		"</html>");
         //title.setFont(title.getFont().deriveFont(Font.BOLD, 24f));
         title.setForeground(new Color(20, 20, 20));
@@ -95,6 +105,10 @@ public final class InfoDialog extends JDialog {
 
         return root;
     }
+    
+	// ###################################################################################################################################################
+	// Hilfsmethoden
+	// ###################################################################################################################################################
 
     private void bindEscToClose() {
         JRootPane rp = getRootPane();
@@ -114,8 +128,4 @@ public final class InfoDialog extends JDialog {
         }
     }
 
-    // Convenience
-    public static void show(Window owner, String appName, String appVersion, String appBuild) {
-        new InfoDialog(owner, appName, appVersion, appBuild).setVisible(true);
-    }
 }

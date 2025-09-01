@@ -87,7 +87,7 @@ public class AngebotPanel extends EditPanel {
 	//###################################################################################################################################################
 	
     public AngebotPanel() {
-        super("Angebotspositionen");
+        super("");
         initContent();
     }
 

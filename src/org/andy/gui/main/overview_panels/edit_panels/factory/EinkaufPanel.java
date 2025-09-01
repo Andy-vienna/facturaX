@@ -42,6 +42,7 @@ import org.andy.code.main.Einstellungen;
 import org.andy.code.misc.ArithmeticHelper;
 import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
 import org.andy.code.misc.BD;
+import org.andy.code.misc.CodeListen;
 import org.andy.gui.main.HauptFenster;
 import org.andy.gui.main.dialogs.DateianzeigeDialog;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
@@ -63,6 +64,11 @@ public class EinkaufPanel extends EditPanel {
 	
 	JPanel panel = new JPanel();
 	private Border b;
+	
+	private CodeListen cl = new CodeListen();
+	private JComboBox<String> cmbLand = new JComboBox<>();
+	private JComboBox<String> cmbCurr = new JComboBox<>();
+	private String iso2code; private String currency3code;
 	
 	private TitledBorder border;
 	private DemoPanel[] panelDate = new DemoPanel[2];
@@ -177,9 +183,26 @@ public class EinkaufPanel extends EditPanel {
 	    }
 		datePicker[0].setBounds(212, 20, 180, 25);
 		
+		cmbLand = new JComboBox<>(cl.getCountries().toArray(new String[0]));
+		cmbLand.setBounds(210, 170, 200, 25);
+		cmbLand.addActionListener(_ -> doCountry());
+		cmbLand.setEnabled(false);
+		add(cmbLand);
+		
+		cmbCurr = new JComboBox<>(cl.getCurrencies().toArray(new String[0]));
+		cmbCurr.setBounds(210, 220, 200, 25);
+		cmbCurr.addActionListener(_ -> doCurrency());
+		cmbCurr.setEnabled(false);
+		add(cmbCurr);
+		
 		// Textfelder
 	    for (int r = 0; r < txtFieldsCol1.length; r++) {
-	    	txtFieldsCol1[r] = makeField(210, 45 + r * 25, 400, 25, false, null);
+	    	if (r == 5 || r == 7) {
+	    		txtFieldsCol1[r] = makeField(410, 45 + r * 25, 200, 25, false, null);
+	    		txtFieldsCol1[r].setFocusable(false);
+	    	} else {
+	    		txtFieldsCol1[r] = makeField(210, 45 + r * 25, 400, 25, false, null);
+	    	}
 	    	add(txtFieldsCol1[r]);
 	    }
 	    for (int r = 0; r < txtFieldsCol2a.length; r++) {
@@ -296,11 +319,7 @@ public class EinkaufPanel extends EditPanel {
  	 				
  	 				boolean bResult = checkInput();
  	 				if (!bResult) {
- 	 					if (txtFieldsCol1[5].getText().length() != 2) {
- 	 						JOptionPane.showMessageDialog(null, "Ländercode gemäß ISO 3166-1 alpha2 (2-stellig) eingeben", "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
- 	 					} else {
- 	 						JOptionPane.showMessageDialog(null, "Eingaben unvollständig, Beleg kann nicht gespeichert werden", "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
- 	 					}
+ 	 					JOptionPane.showMessageDialog(null, "Eingaben unvollständig, Beleg kann nicht gespeichert werden", "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
  	 					return;
  	 				}
  	 				
@@ -313,10 +332,10 @@ public class EinkaufPanel extends EditPanel {
  	 				einkauf.setKredPlz(value);
  	 				value = (txtFieldsCol1[4].getText() != null) ? txtFieldsCol1[4].getText().trim() : "";
  	 				einkauf.setKredOrt(value);
- 	 				einkauf.setKredLand(txtFieldsCol1[5].getText());
+ 	 				einkauf.setKredLand(iso2code);
  	 				value = (txtFieldsCol1[6].getText() != null) ? txtFieldsCol1[6].getText().trim() : "";
  	 				einkauf.setKredUid(value);
- 	 				einkauf.setWaehrung(txtFieldsCol1[7].getText().trim());
+ 	 				einkauf.setWaehrung(currency3code);
  	 				einkauf.setSteuersatz(txtFieldsCol2a[0].getText().trim());
  	 				einkauf.setNetto(parseStringToBigDecimalSafe(txtFieldsCol2a[1].getText(), LocaleFormat.AUTO));
  	 				einkauf.setUst(parseStringToBigDecimalSafe(txtFieldsCol2a[2].getText(), LocaleFormat.AUTO));
@@ -395,9 +414,12 @@ public class EinkaufPanel extends EditPanel {
     private void txtFieldsFocusable(boolean b) {
     	this.datePicker[0].setEnabled(b);
     	this.datePicker[1].setEnabled(b);
+    	this.cmbLand.setEnabled(b); this.cmbCurr.setEnabled(b);
+    	this.cmbLand.setSelectedIndex(0); this.cmbCurr.setSelectedIndex(0);
     	for (int i = 0; i < this.txtFieldsCol1.length; i++) {
 			this.txtFieldsCol1[i].setFocusable(b);
 		}
+    	this.txtFieldsCol1[5].setFocusable(false); this.txtFieldsCol1[7].setFocusable(false);
 		for (int i = 0; i < this.txtFieldsCol2a.length; i++) {
 			this.txtFieldsCol2a[i].setFocusable(b);
 		}
@@ -413,7 +435,7 @@ public class EinkaufPanel extends EditPanel {
     	if (datePicker[1].getDate() == null) return false;
     	if (txtFieldsCol1[0].getText() == null || txtFieldsCol1[0].getText().equals("")) return false;
     	if (txtFieldsCol1[1].getText() == null || txtFieldsCol1[1].getText().equals("")) return false;
-    	if (txtFieldsCol1[5].getText().length() !=2) return false;
+    	if (txtFieldsCol1[5].getText() == null || txtFieldsCol1[5].getText().equals("")) return false;
     	if (txtFieldsCol1[7].getText() == null || txtFieldsCol1[7].getText().equals("")) return false;
     	for (int i = 0; i < txtFieldsCol2a.length - 1; i++) {
     		if (txtFieldsCol2a[i].getText() == null || txtFieldsCol2a[i].getText().equals("")) return false;
@@ -440,6 +462,21 @@ public class EinkaufPanel extends EditPanel {
     	} catch (NumberFormatException e) {
     	    // keine Zahl eingegeben
     	}
+    }
+    
+    private void doCountry() {
+    	if (cmbLand.getSelectedIndex() == 0) return;
+    	iso2code = cmbLand.getSelectedItem().toString().substring(0,2);
+    	String ctry = cl.getCountryFromCode(iso2code);
+    	
+    	this.txtFieldsCol1[5].setText(ctry);
+    }
+    
+    private void doCurrency() {
+    	if (cmbCurr.getSelectedIndex() == 0) return;
+    	currency3code = cmbCurr.getSelectedItem().toString().substring(0,3);
+    	
+    	this.txtFieldsCol1[7].setText(currency3code);
     }
     
 	//###################################################################################################################################################
@@ -497,7 +534,7 @@ public class EinkaufPanel extends EditPanel {
 		this.txtFieldsCol1[2].setText(einkauf.getKredStrasse());
 		this.txtFieldsCol1[3].setText(einkauf.getKredPlz());
 		this.txtFieldsCol1[4].setText(einkauf.getKredOrt());
-		this.txtFieldsCol1[5].setText(einkauf.getKredLand());
+		this.txtFieldsCol1[5].setText(cl.getCountryFromCode(einkauf.getKredLand()));
 		this.txtFieldsCol1[6].setText(einkauf.getKredUid());
 		this.txtFieldsCol1[7].setText(einkauf.getWaehrung());
 		

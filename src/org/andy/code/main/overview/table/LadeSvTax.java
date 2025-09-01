@@ -89,7 +89,7 @@ public class LadeSvTax {
 	        	if (status.equals("Zahllast")) bdSV = bdSV.add(svsteuer.getZahllast());
 	        	for (int x = 0; x < 4; x++) {
 	        	    String token = "Q" + (x + 1);
-	        	    if (svsteuer.getBezeichnung().contains(token)) {
+	        	    if (svsteuer.getBezeichnung().contains(token) && status.equals("Zahllast")) {
 	        	        bdSVQ[x] = bdSVQ[x].add(svsteuer.getZahllast());
 	        	    }
 	        	}

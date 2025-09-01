@@ -5,7 +5,10 @@ import static org.andy.toolbox.crypto.License.getLicense;
 import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 import java.util.jar.Manifest;
@@ -76,11 +79,7 @@ public class StartUp {
 
         // 5) Version lesen
         APP_VERSION = getVersion();
-        try {
-			APP_BUILD = getBuildTime();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+        APP_BUILD = getBuildTime();
 
         // 6) Einstellungen laden
         Einstellungen.LoadProgSettings();
@@ -165,12 +164,18 @@ public class StartUp {
 		}
 	}
     
-    private static String getBuildTime() throws IOException {
+    // Bild-Date-and-Time aus Manifest lesen
+    private static String getBuildTime() {
     	try (InputStream is = StartUp.class.getResourceAsStream("/META-INF/MANIFEST.MF")) {
     	    if (is == null) return null; // kein Manifest gefunden
     	    Manifest mf = new Manifest(is);
     	    String build = mf.getMainAttributes().getValue("Built-Date");
-    	    return build;
+    	    Instant instant = Instant.parse(build); // Formattierer für Date-and-Time
+    	    ZonedDateTime local = instant.atZone(ZoneId.systemDefault());
+    	    String formatted = local.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
+    	    return formatted;
+    	} catch (IOException e) {
+    		return "no manifest found";
     	}
     }
 	

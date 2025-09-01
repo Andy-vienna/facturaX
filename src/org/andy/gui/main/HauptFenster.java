@@ -315,13 +315,11 @@ public class HauptFenster extends JFrame {
             offerPanel = EditPanelFactory.create("NA");
             btn[0] = createButton("zurück", "aktualisieren.png");
         } else {
-            btn = new JButton[5];
+            btn = new JButton[3];
             offerPanel = EditPanelFactory.create("AN");
             btn[0] = createButton("<html>neues<br>Angebot</html>", "new.png");
             btn[1] = createButton("<html>Angebot<br>drucken</html>", "print.png");
             btn[2] = createButton("<html>AB<br>drucken</html>", "print.png");
-            btn[3] = createButton("<html>Revision<br>anlegen</html>", "revision.png");
-            btn[4] = createButton("<html>Editor</html>", "edit.png");
         }
         btn[0].setEnabled(true);
 
@@ -430,7 +428,7 @@ public class HauptFenster extends JFrame {
 
         purchasePanel = EditPanelFactory.create("PU");
         if (purchasePanel instanceof EinkaufPanel pup) {
-            pup.setsTitel("neuen Einkaufsbeleg erfassen");
+            pup.setsTitel("");
             pup.setBtnText(0, "..."); pup.setBtnText(1, "save");
         }
 
@@ -441,7 +439,8 @@ public class HauptFenster extends JFrame {
         sPanePU.setColumnWidths(new int[] {100,150,400,50,100,100,100,100,150,80,400});
         sPanePU.getTable().setAutoCreateRowSorter(true);
 
-        infoPU = new SummenPanelB(4, new String[] {"Netto:", "Brutto:", "USt.AT 10%", "USt.AT 20%"});
+        infoPU = new SummenPanelB(7, new String[] {"Netto:", "Brutto:", "USt.AT 10%", "USt.AT 20%", "USt.EU (EURO)", "USt.EU sonst.", "USt. Welt"},
+        							new boolean[] {true, true, true, true, true, false, false});
         setSumPU();
 
         ErzeugePanelB cp = new ErzeugePanelB(sPanePU, purchasePanel, null, infoPU);
@@ -457,7 +456,7 @@ public class HauptFenster extends JFrame {
 
         expensesPanel = EditPanelFactory.create("EX");
         if (expensesPanel instanceof AusgabenPanel ep) {
-            ep.setsTitel("neuen Beleg erfassen");
+            ep.setsTitel("");
             ep.setBtnText(0, "..."); ep.setBtnText(1, "save");
         }
 
@@ -468,7 +467,8 @@ public class HauptFenster extends JFrame {
         sPaneEX.setColumnWidths(new int[] {100,650,50,100,150,150,150,500});
         sPaneEX.getTable().setAutoCreateRowSorter(true);
 
-        infoEX = new SummenPanelB(5, new String[] {"Netto:", "Brutto:", "USt.AT 10%", "USt.AT 20%", "USt.EU sonst."});
+        infoEX = new SummenPanelB(7, new String[] {"Netto:", "Brutto:", "USt.AT 10%", "USt.AT 20%", "USt.EU (EURO)", "USt.EU sonst.", "USt. Welt"},
+									new boolean[] {true, true, true, true, true, false, false});
         setSumEX();
 
         ErzeugePanelB cp = new ErzeugePanelB(sPaneEX, expensesPanel, null, infoEX);
@@ -484,7 +484,7 @@ public class HauptFenster extends JFrame {
 
         svTaxPanel = EditPanelFactory.create("SVT");
         if (svTaxPanel instanceof SvTaxPanel svt) {
-            svt.setsTitel("neuen Beleg anlegen");
+            svt.setsTitel("");
             svt.setBtnText(0, "..."); svt.setBtnText(1, "save");
         }
 
@@ -495,7 +495,8 @@ public class HauptFenster extends JFrame {
         sPaneST.setColumnWidths(new int[] {120,450,450,120,120,80,500});
         sPaneST.getTable().setAutoCreateRowSorter(true);
 
-        infoST = new SummenPanelB(4, new String[] {"SV Gesamt:", "SV offen:", "Steuer Gesamt:", "Steuer offen:"});
+        infoST = new SummenPanelB(4, new String[] {"SV Gesamt:", "SV offen:", "Steuer Gesamt:", "Steuer offen:"},
+									new boolean[] {true, true, true, true});
         setSumST();
 
         ErzeugePanelB cp = new ErzeugePanelB(sPaneST, svTaxPanel, null, infoST);
@@ -665,17 +666,23 @@ public class HauptFenster extends JFrame {
     private void setSumPU() {
         double dNetto = LadeEinkauf.getBdNetto().doubleValue(); double dBrutto = LadeEinkauf.getBdBrutto().doubleValue();
         double d10Proz = LadeEinkauf.getBd10Proz().doubleValue(); double d20Proz = LadeEinkauf.getBd20Proz().doubleValue();
+        double dSonstEU = LadeEinkauf.getBdUstEU().doubleValue(); double dSonstEUnoEURO = LadeEinkauf.getBdUstEUnoEURO().doubleValue();
+        double dUstWelt = LadeEinkauf.getBdUstNonEU().doubleValue();
         infoPU.setTxtSum(0, dNetto); infoPU.setTxtSum(1, dBrutto);
         infoPU.setTxtSum(2, d10Proz); infoPU.setTxtSum(3, d20Proz);
+        infoPU.setTxtSum(4, dSonstEU); infoPU.setTxtSum(5, dSonstEUnoEURO);
+        infoPU.setTxtSum(6, dUstWelt);
     }
 
     private void setSumEX() {
     	double dNetto = LadeAusgaben.getBdNetto().doubleValue(); double dBrutto = LadeAusgaben.getBdBrutto().doubleValue();
         double d10Proz = LadeAusgaben.getBd10Proz().doubleValue(); double d20Proz = LadeAusgaben.getBd20Proz().doubleValue();
-        double dUstSonst = LadeAusgaben.getUstSonst().doubleValue();
+        double dUstSonst = LadeAusgaben.getUstEU().doubleValue(); double dSonstEUnoEURO = LadeAusgaben.getBdUstEUnoEURO().doubleValue();
+        double dUstWelt = LadeAusgaben.getUstNonEU().doubleValue();
         infoEX.setTxtSum(0, dNetto); infoEX.setTxtSum(1, dBrutto);
         infoEX.setTxtSum(2, d10Proz); infoEX.setTxtSum(3, d20Proz);
-        infoEX.setTxtSum(4, dUstSonst);;
+        infoEX.setTxtSum(4, dUstSonst); ; infoEX.setTxtSum(5, dSonstEUnoEURO);
+        infoEX.setTxtSum(6, dUstWelt);
     }
 
     private void setSumST() {
@@ -906,10 +913,8 @@ public class HauptFenster extends JFrame {
     private void setOfferButtonsByState(String state, JButton[] btn) {
         boolean print = "erstellt".equals(state);
         boolean confirm = "bestellt".equals(state);
-        boolean revision = "gedruckt".equals(state);
         btn[1].setEnabled(print);
         btn[2].setEnabled(confirm);
-        btn[3].setVisible(revision);
     }
 
     private void setBillButtonsByState(String state, JButton[] btn) {

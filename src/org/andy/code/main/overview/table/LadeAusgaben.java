@@ -16,12 +16,14 @@ import org.andy.code.dataStructure.entitiyProductive.Ausgaben;
 import org.andy.code.dataStructure.repositoryProductive.AusgabenRepository;
 import org.andy.code.main.Einstellungen;
 import org.andy.code.misc.BD;
+import org.andy.code.misc.CodeListen;
 
 public class LadeAusgaben {
 	
 	private static BigDecimal bdNetto = BD.ZERO; private static BigDecimal bdBrutto = BD.ZERO;
 	private static BigDecimal bd10Proz = BD.ZERO; private static BigDecimal bd20Proz = BD.ZERO;
-	private static BigDecimal bdUstSonst = BD.ZERO;
+	private static BigDecimal bdUstEU = BD.ZERO; private static BigDecimal bdUstEUnoEURO = BD.ZERO;
+	private static BigDecimal bdUstNonEU = BD.ZERO;
 	
 	private static int[] belegID = null;
 	
@@ -43,7 +45,8 @@ public class LadeAusgaben {
 		DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Locale.GERMANY);
 		DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
 		
-		bdNetto = BD.ZERO; bdBrutto = BD.ZERO; bd10Proz = BD.ZERO; bd20Proz = BD.ZERO; bdUstSonst = BD.ZERO;
+		bdNetto = BD.ZERO; bdBrutto = BD.ZERO; bd10Proz = BD.ZERO; bd20Proz = BD.ZERO;
+		bdUstEU = BD.ZERO; bdUstEUnoEURO = BD.ZERO; bdUstNonEU = BD.ZERO;
 
 		AusgabenRepository ausgabenRepository = new AusgabenRepository();
 	    List<Ausgaben> ausgabenListe = new ArrayList<>();
@@ -76,11 +79,21 @@ public class LadeAusgaben {
 			
 			bdNetto = bdNetto.add(ausgaben.getNetto());
 			bdBrutto = bdBrutto.add(ausgaben.getBrutto());
-			if (ausgaben.getLand().equals("AT")) {
-				if (ausgaben.getSteuersatz().equals("10")) bd10Proz = bd10Proz.add(ausgaben.getSteuer());
-				if (ausgaben.getSteuersatz().equals("20")) bd20Proz = bd20Proz.add(ausgaben.getSteuer());
+			
+			CodeListen cl = new CodeListen();
+			boolean eu = cl.isEU(ausgaben.getLand()); boolean euro = cl.isEurozone(ausgaben.getLand());
+			
+			if (eu) {
+				if (ausgaben.getLand().equals("AT")) {
+					if (ausgaben.getSteuersatz().equals("10")) bd10Proz = bd10Proz.add(ausgaben.getSteuer());
+					if (ausgaben.getSteuersatz().equals("20")) bd20Proz = bd20Proz.add(ausgaben.getSteuer());
+				} else if (euro) {
+					bdUstEU = bdUstEU.add(ausgaben.getSteuer());
+				} else {
+					bdUstEUnoEURO = bdUstEUnoEURO.add(ausgaben.getSteuer());
+				}
 			} else {
-				bdUstSonst = bdUstSonst.add(ausgaben.getSteuer());
+				bdUstNonEU = bdUstNonEU.add(ausgaben.getSteuer());
 			}
 			
 		}
@@ -107,8 +120,16 @@ public class LadeAusgaben {
 		return bd20Proz;
 	}
 	
-	public static BigDecimal getUstSonst() {
-		return bdUstSonst;
+	public static BigDecimal getUstEU() {
+		return bdUstEU;
+	}
+	
+	public static BigDecimal getUstNonEU() {
+		return bdUstNonEU;
+	}
+	
+	public static BigDecimal getBdUstEUnoEURO() {
+		return bdUstEUnoEURO;
 	}
 
 	public static int[] getBelegID() {

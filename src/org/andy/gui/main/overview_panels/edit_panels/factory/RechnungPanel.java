@@ -92,7 +92,7 @@ public class RechnungPanel extends EditPanel {
 	//###################################################################################################################################################
 	
     public RechnungPanel() {
-        super("Rechnungspositionen");
+        super("");
         initContent();
     }
 

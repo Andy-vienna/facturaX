@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -39,6 +40,7 @@ import org.andy.code.dataStructure.repositoryProductive.AusgabenRepository;
 import org.andy.code.main.Einstellungen;
 import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
 import org.andy.code.misc.BD;
+import org.andy.code.misc.CodeListen;
 import org.andy.gui.main.HauptFenster;
 import org.andy.gui.main.dialogs.DateianzeigeDialog;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
@@ -61,9 +63,14 @@ public class AusgabenPanel extends EditPanel {
 	JPanel panel = new JPanel();
 	private Border b;
 	
+	private CodeListen cl = new CodeListen();
+	private JComboBox<String> cmbLand = new JComboBox<>();
+	private JComboBox<String> cmbCurr = new JComboBox<>();
+	private String iso2code; private String currency3code;
+	
 	private TitledBorder border;
 	private DatePicker datePicker = new DatePicker();
-	private JTextField[] txtFields = new JTextField[7];
+	private JTextField[] txtFields = new JTextField[8];
 	private JLabel lblFileTyp = new JLabel();
 	private JButton[] btnFields = new JButton[2];
 	
@@ -71,7 +78,7 @@ public class AusgabenPanel extends EditPanel {
 	private boolean neuBeleg = false;
 	
 	private AusgabenRepository ausgabenRepository = new AusgabenRepository();
-	private Ausgaben ausgaben = new Ausgaben();
+	private Ausgaben a = new Ausgaben();
 	
 	//###################################################################################################################################################
 	// public Teil
@@ -106,10 +113,11 @@ public class AusgabenPanel extends EditPanel {
 	        "Belegdatum:",
 	        "Buchungstext des Beleges:",
 	        "Ursprungsland (2-Zeichen):",
-	        "Steuersatz (%):",
-	        "Betrag netto (EUR):",
-	        "Betrag Steuer (EUR):",
-	        "Betrag brutto (EUR):",
+	        "Währung:",
+	        "USt.-Satz:",
+	        "Netto:",
+	        "USt.:",
+	        "Brutto:",
 	        "Dateianhang:"};
 		
 	    // Label Arrays
@@ -133,13 +141,30 @@ public class AusgabenPanel extends EditPanel {
 		datePicker.setBounds(212, 20, 180, 25);
 		add(datePicker);
 		
+		cmbLand = new JComboBox<>(cl.getCountries().toArray(new String[0]));
+		cmbLand.setBounds(210, 70, 200, 25);
+		cmbLand.addActionListener(_ -> doCountry());
+		cmbLand.setEnabled(false);
+		add(cmbLand);
+		
+		cmbCurr = new JComboBox<>(cl.getCurrencies().toArray(new String[0]));
+		cmbCurr.setBounds(210, 95, 200, 25);
+		cmbCurr.addActionListener(_ -> doCurrency());
+		cmbCurr.setEnabled(false);
+		add(cmbCurr);
+		
 		// Textfelder
 	    for (int r = 0; r < txtFields.length; r++) {
-	    	txtFields[r] = makeField(210, 45 + r * 25, 400, 25, false, null);
+	    	if (r == 1 || r == 2) {
+	    		txtFields[r] = makeField(410, 45 + r * 25, 200, 25, false, null);
+	    		txtFields[r].setFocusable(false);
+	    	}else {
+	    		txtFields[r] = makeField(210, 45 + r * 25, 400, 25, false, null);
+	    	}
 	    	add(txtFields[r]);
 	    }
-	    attachCommaToDot(txtFields[3]);
-	    txtFields[3].getDocument().addDocumentListener(new DocumentListener() {
+	    attachCommaToDot(txtFields[4]);
+	    txtFields[4].getDocument().addDocumentListener(new DocumentListener() {
 	    	@Override
 	        public void insertUpdate(DocumentEvent e) { calcFields(); }
 	        @Override
@@ -147,8 +172,8 @@ public class AusgabenPanel extends EditPanel {
 	        @Override
 	        public void changedUpdate(DocumentEvent e) { calcFields(); }
 	    });
-        attachCommaToDot(txtFields[4]);
         attachCommaToDot(txtFields[5]);
+        attachCommaToDot(txtFields[6]);
 	    
 	    // Anzeige Filetyp
 	    lblFileTyp.setHorizontalAlignment(SwingConstants.CENTER);
@@ -157,7 +182,7 @@ public class AusgabenPanel extends EditPanel {
 	    
 	    btnFields[0] = new JButton();
 	    btnFields[0].setToolTipText("");
-	    btnFields[0].setBounds(145, 195, 65, 25);
+	    btnFields[0].setBounds(145, 220, 65, 25);
 	    add(btnFields[0]);
 
 		try {
@@ -168,7 +193,9 @@ public class AusgabenPanel extends EditPanel {
 		btnFields[1].setBounds(660, 170, HauptFenster.getButtonx(), HauptFenster.getButtony());
 		add(btnFields[1]);
 		
-		setPreferredSize(new Dimension(1000, 20 + 7 * 25 + 50));
+		txtFieldsFocusable(false);
+		btnFields[0].setEnabled(false);
+		setPreferredSize(new Dimension(1000, 20 + 8 * 25 + 50));
 	    
 	    // ------------------------------------------------------------------------------
  		// Action Listener für Buttons
@@ -184,7 +211,7 @@ public class AusgabenPanel extends EditPanel {
 						return; // nichts ausgewählt
 					}
 					try {
-						ausgabenRepository.exportFileById(ausgaben.getId(), path);
+						ausgabenRepository.exportFileById(a.getId(), path);
 					} catch (Exception e1) {
 						logger.error("Fehler beim speichern der Datei " + outputPath + ": " + e1.getMessage());
 					}
@@ -198,11 +225,11 @@ public class AusgabenPanel extends EditPanel {
  				String FileNamePath = chooseFile(Einstellungen.getWorkPath());
  				File fn = new File(FileNamePath);
  				String FileName = fn.getName();
- 				txtFields[6].setText(FileName);
- 				ausgaben.setDateiname(FileName);
+ 				txtFields[7].setText(FileName);
+ 				a.setDateiname(FileName);
  				Path path = Paths.get(FileNamePath);
  				try {
-					ausgaben.setDatei(Files.readAllBytes(path)); // ByteArray für Dateiinhalt
+					a.setDatei(Files.readAllBytes(path)); // ByteArray für Dateiinhalt
 				} catch (IOException e1) {
 					logger.error("Fehler laden der Datei " + FileName + ": " + e1.getMessage());
 				}
@@ -215,27 +242,24 @@ public class AusgabenPanel extends EditPanel {
  			public void actionPerformed(ActionEvent e) {
  				if (neuBeleg) {
  					
- 					ausgaben.setJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
+ 					a.setJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
  	 				
  	 				boolean bResult = checkInput();
  	 				if (!bResult) {
- 	 					if (txtFields[1].getText().length() != 2) {
- 	 						JOptionPane.showMessageDialog(null, "Ländercode gemäß ISO 3166-1 alpha2 (2-stellig) eingeben", "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
- 	 					} else {
- 	 						JOptionPane.showMessageDialog(null, "Eingaben unvollständig, Beleg kann nicht gespeichert werden", "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
- 	 					}
+ 	 					JOptionPane.showMessageDialog(null, "Eingaben unvollständig, Beleg kann nicht gespeichert werden", "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
  	 					return;
  	 				}
  					
- 					ausgaben.setDatum(datePicker.getDate());
- 					ausgaben.setArt(txtFields[0].getText());
- 					ausgaben.setLand(txtFields[1].getText());
- 					ausgaben.setSteuersatz(txtFields[2].getText());
- 					ausgaben.setNetto(parseStringToBigDecimalSafe(txtFields[3].getText(), LocaleFormat.AUTO));
- 					ausgaben.setSteuer(parseStringToBigDecimalSafe(txtFields[4].getText(), LocaleFormat.AUTO));
- 					ausgaben.setBrutto(parseStringToBigDecimalSafe(txtFields[5].getText(), LocaleFormat.AUTO));
+ 					a.setDatum(datePicker.getDate());
+ 					a.setArt(txtFields[0].getText());
+ 					a.setLand(iso2code);
+ 					a.setWaehrung(currency3code);
+ 					a.setSteuersatz(txtFields[3].getText());
+ 					a.setNetto(parseStringToBigDecimalSafe(txtFields[4].getText(), LocaleFormat.AUTO));
+ 					a.setSteuer(parseStringToBigDecimalSafe(txtFields[5].getText(), LocaleFormat.AUTO));
+ 					a.setBrutto(parseStringToBigDecimalSafe(txtFields[6].getText(), LocaleFormat.AUTO));
  					
- 					ausgabenRepository.save(ausgaben);
+ 					ausgabenRepository.save(a);
  					
  					neuBeleg = false;
  	 				HauptFenster.actScreen();
@@ -263,10 +287,14 @@ public class AusgabenPanel extends EditPanel {
     
     private void txtFieldsFocusable(boolean b) {
     	this.datePicker.setEnabled(b);
+    	this.cmbLand.setEnabled(b); this.cmbCurr.setEnabled(b);
+    	this.cmbLand.setSelectedIndex(0); this.cmbCurr.setSelectedIndex(0);
     	for (int i = 0; i < this.txtFields.length; i++) {
 			this.txtFields[i].setFocusable(b);
 		}
-    	txtFields[6].setFocusable(false);
+    	this.txtFields[1].setFocusable(false);
+    	this.txtFields[2].setFocusable(false);
+    	this.txtFields[7].setFocusable(false);
     }
     
     private boolean checkInput() {
@@ -274,27 +302,41 @@ public class AusgabenPanel extends EditPanel {
     	for (int i = 0; i < txtFields.length - 1; i++) {
     		if (txtFields[i].getText() == null || txtFields[i].getText().equals("")) return false;
     	}
-    	if (txtFields[1].getText().length() != 2) return false;
     	if (file == false) return false;
     	return true;
     }
     
     private void calcFields() {
     	BigDecimal tax = BD.ZERO; BigDecimal netto = BD.ZERO; BigDecimal ust = BD.ZERO;
-    	if (!txtFields[2].isFocusable()) return; // keine Prüfung, wenn Feld nicht fokussierbar
+    	if (!txtFields[3].isFocusable()) return; // keine Prüfung, wenn Feld nicht fokussierbar
     	try {
-    	    int value = Integer.parseInt(txtFields[2].getText().trim()); // Steuersatz als Ganzzahl eingegeben
+    	    int value = Integer.parseInt(txtFields[3].getText().trim()); // Steuersatz als Ganzzahl eingegeben
     	    if (value >= 0 && value <= 99) {
     	        tax = new BigDecimal(value).divide(BD.HUNDRED); // Steuersatz
-    	        netto = new BigDecimal(txtFields[3].getText().trim()).setScale(2, RoundingMode.HALF_UP);
-    	        ust = netto.multiply(tax).setScale(2, RoundingMode.HALF_UP); txtFields[4].setText(ust.toString());
-    	        txtFields[5].setText(netto.add(ust).setScale(2, RoundingMode.HALF_UP).toString());
+    	        netto = new BigDecimal(txtFields[4].getText().trim()).setScale(2, RoundingMode.HALF_UP);
+    	        ust = netto.multiply(tax).setScale(2, RoundingMode.HALF_UP); txtFields[5].setText(ust.toString());
+    	        txtFields[6].setText(netto.add(ust).setScale(2, RoundingMode.HALF_UP).toString());
     	    } else {
     	    	JOptionPane.showMessageDialog(null, "Steuersatz ungültig", "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
     	    }
     	} catch (NumberFormatException e) {
     	    // keine Zahl eingegeben
     	}
+    }
+    
+    private void doCountry() {
+    	if (cmbLand.getSelectedIndex() == 0) return;
+    	iso2code = cmbLand.getSelectedItem().toString().substring(0,2);
+    	String ctry = cl.getCountryFromCode(iso2code);
+    	
+    	this.txtFields[1].setText(ctry);
+    }
+    
+    private void doCurrency() {
+    	if (cmbCurr.getSelectedIndex() == 0) return;
+    	currency3code = cmbCurr.getSelectedItem().toString().substring(0,3);
+    	
+    	this.txtFields[2].setText(currency3code);
     }
     
 	//###################################################################################################################################################
@@ -312,8 +354,7 @@ public class AusgabenPanel extends EditPanel {
 	}
     
     public void setTxtFields(int id) {
-    	if (id > 0) {
-		} else {
+    	if (id <= 0) {
 			this.datePicker.setDate(null);
     		for (int i = 0; i < this.txtFields.length; i++) {
 				this.txtFields[i].setText("");
@@ -322,22 +363,23 @@ public class AusgabenPanel extends EditPanel {
     		for (int i = 0; i < this.btnFields.length; i++) {
 				this.btnFields[i].setEnabled(true);
 			}
-    		ausgaben = new Ausgaben();
+    		a = new Ausgaben();
     		neuBeleg = true;
 			return;
 		}
     	
-    	ausgaben = ausgabenRepository.findById(id);
+    	a = ausgabenRepository.findById(id);
     	
-    	this.datePicker.setDate(ausgaben.getDatum());
+    	this.datePicker.setDate(a.getDatum());
     	
-    	this.txtFields[0].setText(ausgaben.getArt());
-    	this.txtFields[1].setText(ausgaben.getLand());
-    	this.txtFields[2].setText(ausgaben.getSteuersatz());
-    	this.txtFields[3].setText(ausgaben.getNetto().toString());
-    	this.txtFields[4].setText(ausgaben.getSteuer().toString());
-    	this.txtFields[5].setText(ausgaben.getBrutto().toString());
-    	this.txtFields[6].setText(ausgaben.getDateiname());
+    	this.txtFields[0].setText(a.getArt());
+    	this.txtFields[1].setText(cl.getCountryFromCode(a.getLand()));
+    	this.txtFields[2].setText(a.getWaehrung());
+    	this.txtFields[3].setText(a.getSteuersatz());
+    	this.txtFields[4].setText(a.getNetto().toString());
+    	this.txtFields[5].setText(a.getSteuer().toString());
+    	this.txtFields[6].setText(a.getBrutto().toString());
+    	this.txtFields[7].setText(a.getDateiname());
     	
     	txtFieldsFocusable(false);
     	neuBeleg = false;
@@ -352,7 +394,7 @@ public class AusgabenPanel extends EditPanel {
 	
 	public void setIcon() {
 		try {
-			DateianzeigeDialog.setFileIcon(lblFileTyp, txtFields[5].getText());
+			DateianzeigeDialog.setFileIcon(lblFileTyp, txtFields[6].getText());
 			lblFileTyp.setHorizontalAlignment(SwingConstants.CENTER);
 		} catch (IOException e) {
 			logger.error("setIcon() - " + e);
