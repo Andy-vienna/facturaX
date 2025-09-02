@@ -100,7 +100,7 @@ public class ArtikelPanel extends JPanel {
             add(txtFields[i]);
         }
         attachCommaToDot(txtFields[2]);
-        x = 10; y = y + ((txtFields.length - 1) * 25);
+        x = 110; y = y + ((txtFields.length - 1) * 25);
 
         try {
             btnFields[0] = createButton("<html>Artikel<br>anlegen</html>", "new.png");

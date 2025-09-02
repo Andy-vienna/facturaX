@@ -57,6 +57,7 @@ public class ExcelMahnung{
 
 		Rechnung rechnung = ExcelHelper.loadRechnung(sNr);
 		Kunde kunde = ExcelHelper.kundeData(rechnung.getIdKunde());
+		String adressat = ExcelHelper.kundeAnschrift(rechnung.getIdKunde());
 		Bank bank = ExcelHelper.bankData(rechnung.getIdBank());
 		ExcelHelper.textData();
 
@@ -144,8 +145,7 @@ public class ExcelMahnung{
 			//#######################################################################
 			// Zellwerte beschreiben aus dem Array arrAnContent
 			//#######################################################################
-			remAdress.setCellValue(kunde.getName() + "\n" + kunde.getStrasse() + "\n" + kunde.getPlz() + " " +
-					kunde.getOrt() + ", " + kunde.getLand().toUpperCase());
+			remAdress.setCellValue(adressat); // Kundenanschrift
 			remDate.setCellValue(StartUp.getDtNow());
 			remDuty.setCellValue(kunde.getPerson());
 			

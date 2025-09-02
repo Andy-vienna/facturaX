@@ -83,6 +83,7 @@ public class ExcelAngebot{
 
 		Angebot angebot = ExcelHelper.loadAngebot(sNr);
 		Kunde kunde = ExcelHelper.kundeData(angebot.getIdKunde());
+		String adressat = ExcelHelper.kundeAnschrift(angebot.getIdKunde());
 		Bank bank = ExcelHelper.bankData(angebot.getIdBank());
 		ExcelHelper.textData();
 
@@ -183,8 +184,7 @@ public class ExcelAngebot{
 			//#######################################################################
 			// Zellwerte beschreiben
 			//#######################################################################
-			anAdress.setCellValue(kunde.getName() + "\n" + kunde.getStrasse() + "\n" + kunde.getPlz() + " " +
-					kunde.getOrt() + ", " + kunde.getLand().toUpperCase());
+			anAdress.setCellValue(adressat); // Kundenanschrift
 			anDate.setCellValue(angebot.getDatum().toString());
 			anNr.setCellValue(angebot.getIdNummer());
 			anDuty.setCellValue(kunde.getPronomen() + " " + kunde.getPerson());

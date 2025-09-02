@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -20,6 +21,7 @@ import javax.swing.border.TitledBorder;
 
 import org.andy.code.dataStructure.entitiyMaster.Owner;
 import org.andy.code.dataStructure.repositoryMaster.OwnerRepository;
+import org.andy.code.misc.CodeListen;
 import org.andy.gui.main.HauptFenster;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,6 +30,11 @@ public class OwnerPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LogManager.getLogger(OwnerPanel.class);
+    
+    private CodeListen cl = new CodeListen();
+	private JComboBox<String> cmbLand = new JComboBox<>();
+	private JComboBox<String> cmbCurr = new JComboBox<>();
+	private String iso2code; private String currency3code;
     
     private OwnerRepository ownerRepository = new OwnerRepository();
     private List<Owner> ownerListe = new ArrayList<>();
@@ -74,11 +81,26 @@ public class OwnerPanel extends JPanel {
         x = lblFields[labels.length - 1].getX() + lblFields[labels.length - 1].getWidth();
 
         for (int i = 0; i < txtFields.length; i++) {
-            txtFields[i] = makeField(x, y + i * 25, 350, 25, false, null);
+        	if (i == 4 || i == 9) {
+        		txtFields[i] = makeField(x + 200, y + i * 25, 150, 25, false, null);
+        		txtFields[i].setFocusable(false);
+        	} else {
+        		txtFields[i] = makeField(x, y + i * 25, 350, 25, false, null);
+        	}
             add(txtFields[i]);
         }
-        x = 10; y = y + ((txtFields.length - 1) * 25);
+        
+        cmbLand = new JComboBox<>(cl.getCountries().toArray(new String[0]));
+		cmbLand.setBounds(x, 120, 200, 25);
+		cmbLand.addActionListener(_ -> doCountry());
+		add(cmbLand);
+		
+		cmbCurr = new JComboBox<>(cl.getCurrencies().toArray(new String[0]));
+		cmbCurr.setBounds(x, 245, 200, 25);
+		cmbCurr.addActionListener(_ -> doCurrency());
+		add(cmbCurr);
 
+		x = 110; y = y + ((txtFields.length - 1) * 25);
         try {
             btnFields[0] = createButton("<html>Owner<br>anlegen</html>", "new.png");
             btnFields[1] = createButton("<html>Owner<br>updaten</html>", "update.png");
@@ -125,7 +147,7 @@ public class OwnerPanel extends JPanel {
         ownerTexte[1] = ownerListe.get(0).getAdresse();
         ownerTexte[2] = ownerListe.get(0).getPlz();
         ownerTexte[3] = ownerListe.get(0).getOrt();
-        ownerTexte[4] = ownerListe.get(0).getLand();
+        ownerTexte[4] = cl.getCountryFromCode(ownerListe.get(0).getLand());
         ownerTexte[5] = ownerListe.get(0).getUstid();
         ownerTexte[6] = ownerListe.get(0).getKontaktName();
         ownerTexte[7] = ownerListe.get(0).getKontaktTel();
@@ -134,6 +156,18 @@ public class OwnerPanel extends JPanel {
         ownerTexte[10] = ownerListe.get(0).getTaxid();
         for (int i = 0; i < ownerTexte.length; i++) {
         	txtFields[i].setText(ownerTexte[i]);
+        }
+        for (int i = 0; i < cl.getCountries().size(); i++) {
+        	if (cl.getCountries().get(i).contains(ownerListe.get(0).getLand())) {
+        		cmbLand.setSelectedIndex(i);
+        		break;
+        	}
+        }
+        for (int i = 0; i < cl.getCurrencies().size(); i++) {
+        	if (cl.getCurrencies().get(i).contains(ownerListe.get(0).getCurrency())) {
+        		cmbCurr.setSelectedIndex(i);
+        		break;
+        	}
         }
         
         revalidate();
@@ -160,7 +194,7 @@ public class OwnerPanel extends JPanel {
         a.setAdresse(fields[1].getText().trim());
         a.setPlz(fields[2].getText().trim());
         a.setOrt(fields[3].getText().trim());
-        a.setLand(fields[4].getText().trim());
+        a.setLand(iso2code);
         a.setUstid(fields[5].getText().trim());
         a.setKontaktName(fields[6].getText().trim());
         a.setKontaktTel(fields[7].getText().trim());
@@ -186,6 +220,21 @@ public class OwnerPanel extends JPanel {
 
     private void clearFields(JTextField[] fields) {
         for (JTextField f : fields) f.setText("");
+    }
+    
+    private void doCountry() {
+    	if (cmbLand.getSelectedIndex() == 0) return;
+    	iso2code = cmbLand.getSelectedItem().toString().substring(0,2);
+    	String ctry = cl.getCountryFromCode(iso2code);
+    	
+    	this.txtFields[4].setText(ctry);
+    }
+    
+    private void doCurrency() {
+    	if (cmbCurr.getSelectedIndex() == 0) return;
+    	currency3code = cmbCurr.getSelectedItem().toString().substring(0,3);
+    	
+    	this.txtFields[9].setText(currency3code);
     }
     
 	//###################################################################################################################################################

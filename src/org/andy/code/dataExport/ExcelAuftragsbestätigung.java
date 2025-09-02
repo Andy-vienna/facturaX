@@ -82,6 +82,7 @@ public class ExcelAuftragsbestätigung{
 
 		Angebot angebot = ExcelHelper.loadAngebot(sNr);
 		Kunde kunde = ExcelHelper.kundeData(angebot.getIdKunde());
+		String adressat = ExcelHelper.kundeAnschrift(angebot.getIdKunde());
 		Bank bank = ExcelHelper.bankData(angebot.getIdBank());
 		ExcelHelper.textData();
 
@@ -174,8 +175,7 @@ public class ExcelAuftragsbestätigung{
 			//#######################################################################
 			// Zellwerte beschreiben aus dem Array arrAnContent
 			//#######################################################################
-			abAdress.setCellValue(kunde.getName() + "\n" + kunde.getStrasse() + "\n" + kunde.getPlz() + " " +
-					kunde.getOrt() + ", " + kunde.getLand().toUpperCase());
+			abAdress.setCellValue(adressat); // Kundenanschrift
 			abDate.setCellValue(angebot.getDatum().toString());
 			abNr.setCellValue(angebot.getIdNummer().replace("AN", "AB"));
 			abDuty.setCellValue(kunde.getPronomen() + " " + kunde.getPerson());

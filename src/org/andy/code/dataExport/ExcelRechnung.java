@@ -93,6 +93,7 @@ public class ExcelRechnung{
 
 		Rechnung rechnung = ExcelHelper.loadRechnung(sNr);
 		Kunde kunde = ExcelHelper.kundeData(rechnung.getIdKunde());
+		String adressat = ExcelHelper.kundeAnschrift(rechnung.getIdKunde());
 		Bank bank = ExcelHelper.bankData(rechnung.getIdBank());
 		ExcelHelper.textData();
 
@@ -192,8 +193,7 @@ public class ExcelRechnung{
 			//#######################################################################
 			// Zellwerte beschreiben
 			//#######################################################################
-			reAdress.setCellValue(kunde.getName() + "\n" + kunde.getStrasse() + "\n" + kunde.getPlz() + " " +
-					kunde.getOrt() + ", " + kunde.getLand().toUpperCase());
+			reAdress.setCellValue(adressat); // Kundenanschrift
 			reDate.setCellValue(rechnung.getDatum().toString());
 			reNr.setCellValue(rechnung.getIdNummer());
 			reLZ.setCellValue(rechnung.getlZeitr());

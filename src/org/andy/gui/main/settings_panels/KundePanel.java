@@ -23,6 +23,7 @@ import javax.swing.border.TitledBorder;
 
 import org.andy.code.dataStructure.entitiyMaster.Kunde;
 import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
+import org.andy.code.misc.CodeListen;
 import org.andy.gui.main.HauptFenster;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,6 +32,10 @@ public class KundePanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LogManager.getLogger(KundePanel.class);
+    
+    private CodeListen cl = new CodeListen();
+	private JComboBox<String> cmbLand = new JComboBox<>();
+	private String iso2code;
     
     private KundeRepository kundeRepository = new KundeRepository();
     private List<Kunde> kundeListe = new ArrayList<>();
@@ -83,42 +88,39 @@ public class KundePanel extends JPanel {
                 .map(Kunde::getName)   // oder .getId(), oder beliebiges Feld
                 .toArray(String[]::new);
         cmbSelect = new JComboBox<>(kundeTexte);
-        cmbSelect.setBounds(10, 20, 810, 25);
+        cmbSelect.setBounds(10, 20, 500, 25);
         cmbSelect.addActionListener(actionListener);
         add(cmbSelect);
 
-        for (int i = 0; i < labels.length/2; i++) {
+        for (int i = 0; i < labels.length; i++) {
             lblFields[i] = new JLabel(labels[i]);
             lblFields[i].setBounds(x, y + i * 25, 100, 25);
             add(lblFields[i]);
         }
-        x = lblFields[labels.length/2 - 1].getX() + lblFields[labels.length/2 - 1].getWidth();
-
-        for (int i = 0; i < txtFields.length/2; i++) {
-            txtFields[i] = makeField(x, y + i * 25, 300, 25, false, null);
-            add(txtFields[i]);
-        }
-        x = txtFields[txtFields.length/2 - 1].getX() + txtFields[txtFields.length/2 - 1].getWidth() + 10;
-        
-        for (int i = labels.length/2; i < labels.length; i++) {
-            lblFields[i] = new JLabel(labels[i]);
-            lblFields[i].setBounds(x, y + (i - labels.length/2) * 25, 100, 25);
-            add(lblFields[i]);
-        }
         x = lblFields[labels.length - 1].getX() + lblFields[labels.length - 1].getWidth();
 
-        for (int i = txtFields.length/2; i < txtFields.length; i++) {
-            txtFields[i] = makeField(x, y + (i - txtFields.length/2) * 25, 300, 25, false, null);
+        for (int i = 0; i < txtFields.length; i++) {
+        	if (i == 5) {
+        		txtFields[i] = makeField(x + 200, y + i * 25, 200, 25, false, null);
+        	} else {
+        		txtFields[i] = makeField(x, y + i * 25, 400, 25, false, null);
+        	}
             add(txtFields[i]);
         }
-        x = 10; y = y + ((txtFields.length/2 - 1) * 25);
+        
+        cmbLand = new JComboBox<>(cl.getCountries().toArray(new String[0]));
+		cmbLand.setBounds(x, 170, 200, 25);
+		cmbLand.addActionListener(_ -> doCountry());
+		add(cmbLand);
 
+		x = 110;
+        y = txtFields[txtFields.length - 1].getY() + 30;
         try {
             btnFields[0] = createButton("<html>Kunde<br>anlegen</html>", "new.png");
             btnFields[1] = createButton("<html>Kunde<br>updaten</html>", "update.png");
             btnFields[2] = createButton("<html>Kunde<br>loeschen</html>", "delete.png");
             for (int i = 0; i < btnFields.length; i++) {
-                btnFields[i].setBounds(x + i * (btnWidth + 10), y + 30, btnWidth, btnHeight);
+                btnFields[i].setBounds(x + i * (btnWidth + 10), y, btnWidth, btnHeight);
                 add(btnFields[i]);
             }
             for (int i = 0; i < btnFields.length; i++) {
@@ -133,7 +135,7 @@ public class KundePanel extends JPanel {
             logger.error("error creating button - " + e1);
         }
         
-        x = 10 + ((lblFields[labels.length - 1].getWidth() + txtFields[txtFields.length - 1].getWidth()) *2) + 20;
+        x = 10 + ((lblFields[labels.length - 1].getWidth() + txtFields[txtFields.length - 1].getWidth())) + 20;
         y = btnFields[btnFields.length - 1].getY() + btnFields[btnFields.length - 1].getHeight() + 20;
 
         setPreferredSize(new Dimension(x, y));
@@ -167,7 +169,7 @@ public class KundePanel extends JPanel {
                 txtFields[2].setText(kunde.getStrasse());
                 txtFields[3].setText(kunde.getPlz());
                 txtFields[4].setText(kunde.getOrt());
-                txtFields[5].setText(kunde.getLand());
+                txtFields[5].setText(cl.getCountryFromCode(kunde.getLand()));
                 txtFields[6].setText(kunde.getPronomen());
                 txtFields[7].setText(kunde.getPerson());
                 txtFields[8].setText(kunde.getUstid());
@@ -178,6 +180,13 @@ public class KundePanel extends JPanel {
                 txtFields[13].setText(kunde.geteBillTyp());
                 txtFields[14].setText(kunde.geteBillMail());
                 txtFields[15].setText(kunde.geteBillPhone());
+                
+                for (int i = 0; i < cl.getCountries().size(); i++) {
+                	if (cl.getCountries().get(i).contains(kunde.getLand())) {
+                		cmbLand.setSelectedIndex(i);
+                		break;
+                	}
+                }
             }
         }
     };
@@ -195,12 +204,13 @@ public class KundePanel extends JPanel {
                 .map(Kunde::getName)   // oder .getId(), oder beliebiges Feld
                 .toArray(String[]::new);
         cmbSelect = new JComboBox<>(kundeTexte);
-        cmbSelect.setBounds(10, 20, 750, 25);
+        cmbSelect.setBounds(10, 20, 500, 25);
         cmbSelect.addActionListener(actionListener);
         add(cmbSelect);
         btnFields[0].setEnabled(true);
         btnFields[1].setEnabled(false);
         btnFields[2].setEnabled(false);
+        
         revalidate();
         repaint();
     }
@@ -226,7 +236,7 @@ public class KundePanel extends JPanel {
         a.setStrasse(fields[2].getText().trim());
         a.setPlz(fields[3].getText().trim());
         a.setOrt(fields[4].getText().trim());
-        a.setLand(fields[5].getText().trim());
+        a.setLand(iso2code);
         a.setPronomen(fields[6].getText().trim());
         a.setPerson(fields[7].getText().trim());
         a.setUstid(fields[8].getText().trim());
@@ -257,6 +267,15 @@ public class KundePanel extends JPanel {
 
     private void clearFields(JTextField[] fields) {
         for (JTextField f : fields) f.setText("");
+        cmbLand.setSelectedIndex(0);
+    }
+    
+    private void doCountry() {
+    	if (cmbLand.getSelectedIndex() == 0) return;
+    	iso2code = cmbLand.getSelectedItem().toString().substring(0,2);
+    	String ctry = cl.getCountryFromCode(iso2code);
+    	
+    	this.txtFields[5].setText(ctry);
     }
     
 	//###################################################################################################################################################

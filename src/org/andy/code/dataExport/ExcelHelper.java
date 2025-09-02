@@ -16,6 +16,7 @@ import org.andy.code.dataStructure.repositoryMaster.TextRepository;
 import org.andy.code.dataStructure.repositoryProductive.AngebotRepository;
 import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
 import org.andy.code.main.Einstellungen;
+import org.andy.code.misc.CodeListen;
 
 public class ExcelHelper {
 	
@@ -48,6 +49,10 @@ public class ExcelHelper {
 	
 	public static Kunde kundeData(String KdNr) {
 		return readKunde(KdNr);
+	}
+	
+	public static String kundeAnschrift(String KdNr) {
+		return formatKunde(KdNr);
 	}
 	
 	public static Bank bankData(int id) {
@@ -96,6 +101,25 @@ public class ExcelHelper {
 		return null;
 	}
 	
+	private static String formatKunde(String tmp) {
+		KundeRepository kundeRepository = new KundeRepository();
+		List<Kunde> kundeListe = new ArrayList<>();
+		kundeListe.addAll(kundeRepository.findAll());
+		
+		for (int m = 0; m < kundeListe.size(); m++) {
+			
+			Kunde kunde = kundeListe.get(m);
+			
+			if (kunde.getId() != null && !kunde.getId().isEmpty() && kunde.getId().equals(tmp)) {
+				CodeListen cl = new CodeListen();
+			    String land = cl.getCountryFromCode(kunde.getLand()).toUpperCase();
+				return kunde.getName() + "\n" + kunde.getStrasse() + "\n" + kunde.getPlz() + " " +
+						kunde.getOrt() + ", " + land;
+			}
+		}
+		return null;
+	}
+	
 	//###################################################################################################################################################
 	
 	private static Bank readBank(int id) {
@@ -122,13 +146,16 @@ public class ExcelHelper {
 	    ownerListe.addAll(ownerRepository.findAll());
 	    owner = ownerListe.get(0);
 	    
+	    CodeListen cl = new CodeListen();
+	    String land = cl.getCountryFromCode(owner.getLand()).toUpperCase();
+	    
 	    ArrayList<String> owTmp = new ArrayList<>();
 
 	    owTmp.add(owner.getName() + "\n");
 	    owTmp.add(owner.getAdresse() + " | ");
 	    owTmp.add(owner.getPlz() + " ");
 	    owTmp.add(owner.getOrt() + " | ");
-	    owTmp.add(owner.getLand().toUpperCase() + "\n");
+	    owTmp.add(land + "\n");
 	    owTmp.add(owner.getUstid());
 	    
 	    senderOwner = owner.getName() + ", " + owner.getAdresse() + ", " + owner.getPlz() + " " + owner.getOrt();
