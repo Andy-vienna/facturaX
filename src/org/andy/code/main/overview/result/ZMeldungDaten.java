@@ -65,7 +65,7 @@ public class ZMeldungDaten {
 	            for (int i = 0; i < kundeListe.size(); i++) {
 	            	Kunde kunde = kundeListe.get(i);
 	                if (kunde.getId().trim().equals(sKunde)) {
-	                    if (!kunde.getLand().trim().equals("ÖSTERREICH")) {
+	                    if (!kunde.getLand().trim().equals("AT")) {
 	                        String ustId = kunde.getUstid().trim();
 	                        BigDecimal betrag = rechnung.getNetto();
 

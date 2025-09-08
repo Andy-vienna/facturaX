@@ -29,6 +29,12 @@ public class Text {
 
     @Column(name = "TextMahnung")
     private String textMahnung;
+    
+    @Column(name = "TextBestellung")
+    private String textBestellung;
+    
+    @Column(name = "TextLieferschein")
+    private String textLieferschein;
 	
 	//###################################################################################################################################################
 	// Getter und Setter für Felder
@@ -88,6 +94,22 @@ public class Text {
 
 	public void setTextMahnung(String textMahnung) {
 		this.textMahnung = textMahnung;
+	}
+
+	public String getTextBestellung() {
+		return textBestellung;
+	}
+
+	public void setTextBestellung(String textBestellung) {
+		this.textBestellung = textBestellung;
+	}
+
+	public String getTextLieferschein() {
+		return textLieferschein;
+	}
+
+	public void setTextLieferschein(String textLieferschein) {
+		this.textLieferschein = textLieferschein;
 	}
 
 }

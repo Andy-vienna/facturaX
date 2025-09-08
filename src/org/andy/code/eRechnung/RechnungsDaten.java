@@ -69,10 +69,10 @@ public class RechnungsDaten {
 		
 		String SEND_COUNTRY = null;
 		switch(SENDER[4].toUpperCase()) {
-		case "DEUTSCHLAND":
+		case "DE":
 			SEND_COUNTRY = "DE";
 			break;
-		case "ÖSTERREICH":
+		case "AT":
 			SEND_COUNTRY = "AT";
 			break;
 		}
@@ -88,10 +88,10 @@ public class RechnungsDaten {
 		String RECV_ZIP = kunde.getPlz();
 		String RECV_TOWN = kunde.getOrt();
 		switch(kunde.getLand().toUpperCase()) {
-		case "DEUTSCHLAND":
+		case "DE":
 			RECV_COUNTRY = "DE";
 			break;
-		case "ÖSTERREICH":
+		case "AT":
 			RECV_COUNTRY = "AT";
 			break;
 		}

@@ -21,8 +21,8 @@ public final class AnmeldeFenster {
     }
 
     private final JFrame frame = new JFrame("Anmeldung");
-    private final JTextField userField = new JTextField(18);
-    private final JPasswordField passField = new JPasswordField(18);
+    private final JTextField userField = new JTextField(12);
+    private final JPasswordField passField = new JPasswordField(12);
     private final JButton loginBtn = new JButton("OK");
     private final JButton cancelBtn = new JButton("Cancel");
 

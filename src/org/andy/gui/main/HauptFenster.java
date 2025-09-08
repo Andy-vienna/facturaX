@@ -192,6 +192,7 @@ public class HauptFenster extends JFrame {
         sLic = StartUp.getAPP_LICENSE();
         iLic = StartUp.getAPP_MODE();
         role = roleFromLogin(r);
+        Einstellungen.setStrAktUser(u); // angemeldeten User in globale Variable schreiben
 
         setTitle("FacturaX v2 (" + StartUp.APP_VERSION + ") - Wirtschaftsjahr " + Einstellungen.getStrAktGJ() + " - " + sLic);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -267,8 +268,8 @@ public class HauptFenster extends JFrame {
                 doAngebotPanel(false);
                 doRechnungPanel(false);
                 tabPanel.addTab("Angebote", pageAN);
-                tabPanel.setIconAt(0, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/offer.png")));
                 tabPanel.addTab("Rechnungen", pageRE);
+                tabPanel.setIconAt(0, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/offer.png")));
                 tabPanel.setIconAt(1, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/invoice.png")));
             }
             case SUPERUSER -> {
@@ -288,10 +289,16 @@ public class HauptFenster extends JFrame {
             case FINANCIALUSER -> {
                 doSvsTaxPanel();
                 doJahresergebnis();
+                doEinkaufPanel();
+                doAusgabenPanel();
+                tabPanel.addTab("Einkauf", pagePU);
+                tabPanel.addTab("Betriebsausgaben", pageEX);
                 tabPanel.addTab("SV und Steuer", pageST);
                 tabPanel.addTab("Jahresergebnis", pageOv);
-                tabPanel.setIconAt(0, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/tax.png")));
-                tabPanel.setIconAt(1, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/result.png")));
+                tabPanel.setIconAt(0, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/purchase.png")));
+                tabPanel.setIconAt(1, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/expenses.png")));
+                tabPanel.setIconAt(2, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/tax.png")));
+                tabPanel.setIconAt(3, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/result.png")));
             }
             case ADMIN -> {
                 doEinstellungen();
@@ -424,7 +431,7 @@ public class HauptFenster extends JFrame {
     //###################################################################################################################################################
 
     private void doEinkaufPanel() {
-        if (role != Role.SUPERUSER) return;
+        if (role != Role.SUPERUSER && role != Role.FINANCIALUSER) return;
 
         purchasePanel = EditPanelFactory.create("PU");
         if (purchasePanel instanceof EinkaufPanel pup) {
@@ -452,7 +459,7 @@ public class HauptFenster extends JFrame {
     //###################################################################################################################################################
 
     private void doAusgabenPanel() {
-        if (role != Role.SUPERUSER) return;
+        if (role != Role.SUPERUSER && role != Role.FINANCIALUSER) return;
 
         expensesPanel = EditPanelFactory.create("EX");
         if (expensesPanel instanceof AusgabenPanel ep) {
@@ -544,7 +551,8 @@ public class HauptFenster extends JFrame {
                 "Steuerdaten", "SEPA QR-Code", "Datenbank",
                 "Angebotstexte (Textbausteine)", "Auftragsbestätigungstexte (Textbausteine)",
                 "Umsatzsteuerhinweistexte (Textbausteine)", "Zahlungszieltexte (Textbausteine)",
-                "Zahlungserinnerungstexte (Textbausteine)", "Mahnungstexte (Textbausteine)" };
+                "Zahlungserinnerungstexte (Textbausteine)", "Mahnungstexte (Textbausteine)" ,
+                "Bestellungstexte (Textbausteine)", "Lieferscheintexte (Textbausteine)"};
 
         TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), null);
         border.setTitleJustification(TitledBorder.LEFT);
@@ -581,6 +589,8 @@ public class HauptFenster extends JFrame {
                 case 12 -> pageSetting.add(TextPanelFactory.create("ZzT"));
                 case 13 -> pageSetting.add(TextPanelFactory.create("ZeT"));
                 case 14 -> pageSetting.add(TextPanelFactory.create("MaT"));
+                case 15 -> pageSetting.add(TextPanelFactory.create("BeT"));
+                case 16 -> pageSetting.add(TextPanelFactory.create("LsT"));
                 default -> {}
             }
             pageSetting.revalidate(); pageSetting.repaint();
@@ -871,7 +881,11 @@ public class HauptFenster extends JFrame {
 				doAusgabenPanel();
             }
             case FINANCIALUSER -> {
+            	pagePU.removeAll();
+				pageEX.removeAll();
             	pageST.removeAll();
+            	doEinkaufPanel();
+				doAusgabenPanel();
 				doSvsTaxPanel();
 				doJahresergebnis();
             }
