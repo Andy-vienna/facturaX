@@ -30,6 +30,8 @@ public class Einstellungen {
 	private static String tplBill;
 	private static String tplReminder;
 	private static String tplMahnung;
+	private static String tplBestellung;
+	private static String tplLieferschein;
 	private static String tplP109a;
 	private static String workPath;
 	private static String sMasterData;
@@ -327,6 +329,22 @@ public class Einstellungen {
 
 	public static String getsProductiveData() {
 		return sProductiveData;
+	}
+
+	public static String getTplBestellung() {
+		return tplBestellung;
+	}
+
+	public static void setTplBestellung(String tplBestellung) {
+		Einstellungen.tplBestellung = tplBestellung;
+	}
+
+	public static String getTplLieferschein() {
+		return tplLieferschein;
+	}
+
+	public static void setTplLieferschein(String tplLieferschein) {
+		Einstellungen.tplLieferschein = tplLieferschein;
 	}
 
 }

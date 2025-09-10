@@ -32,7 +32,7 @@ public class PfadPanel extends JPanel {
 	Font font = new Font("Tahoma", Font.BOLD, 11);
 	Color titleColor = Color.BLUE; // oder z. B. new Color(30, 60, 150);
 	
-	private JTextField[] txtFields = new JTextField[8];
+	private JTextField[] txtFields = new JTextField[10];
 	
 	//###################################################################################################################################################
 	// public Teil
@@ -66,6 +66,8 @@ public class PfadPanel extends JPanel {
 				"templatebill",
 				"templatereminder",
 				"templatemahnung",
+				"templatebestellung",
+				"templatelieferschein",
 				"templatep109a",
 				"work",
 				};
@@ -77,6 +79,8 @@ public class PfadPanel extends JPanel {
 				"Rechnung Vorlage (Excel-Vorlage *.xlsx)",
 				"Zahlungserinnerung Vorlage (Excel-Vorlage *.xlsx)",
 				"Mahnung Vorlage (Excel-Vorlage *.xlsx",
+				"Bestellung Vorlage (Excel-Vorlage *.xlsx)",
+				"Lieferschein Vorlage (Excel-Vorlage *.xlsx)",
 				"§109a (E/A-Rechnung) Vorlage (Excel-Vorlage *.xlsx",
 				"Arbeitsverzeichnis",
 				};
@@ -94,7 +98,7 @@ public class PfadPanel extends JPanel {
 	    // Textfelder
 	    for (int r = 0; r < txtFields.length; r++) {
 	    	final int index = r;
-	    	txtFields[r] = makeField(310, 20 + r * 25, 585, 25, false, null);
+	    	txtFields[r] = makeField(310, 20 + r * 25, 800, 25, false, null);
 	    	txtFields[r].setText(getters[index].apply(null));
 	        txtFields[r].addMouseListener(new MouseAdapter() {
 	            @Override
@@ -103,7 +107,7 @@ public class PfadPanel extends JPanel {
 	                String currentPath = txtFields[index].getText();
 	                String defaultPath = currentPath.isEmpty() ? "C:\\" : getters[index].apply(null);
 
-	                if (index < txtFields.length -2) {
+	                if (index < txtFields.length -1) {
 	                	chosenPath = SelectFile.chooseFile(defaultPath);
 	                } else {
 	                	chosenPath = SelectFile.choosePath(defaultPath);
@@ -118,7 +122,7 @@ public class PfadPanel extends JPanel {
 	    	add(txtFields[r]);
 	    }
 		
-	    setPreferredSize(new Dimension(900, 20 + labels.length * 25 + 20));
+	    setPreferredSize(new Dimension(1120, 20 + labels.length * 25 + 20));
 		
 	}
 	
@@ -148,6 +152,8 @@ public class PfadPanel extends JPanel {
         _ -> Einstellungen.getTplBill(),
         _ -> Einstellungen.getTplReminder(),
         _ -> Einstellungen.getTplMahnung(),
+        _ -> Einstellungen.getTplBestellung(),
+        _ -> Einstellungen.getTplLieferschein(),
         _ -> Einstellungen.getTplP109a(),
         _ -> Einstellungen.getWorkPath()
     };
@@ -161,6 +167,8 @@ public class PfadPanel extends JPanel {
         (Consumer<String>) val -> Einstellungen.setTplBill(val),
         (Consumer<String>) val -> Einstellungen.setTplReminder(val),
         (Consumer<String>) val -> Einstellungen.setTplMahnung(val),
+        (Consumer<String>) val -> Einstellungen.setTplBestellung(val),
+        (Consumer<String>) val -> Einstellungen.setTplLieferschein(val),
         (Consumer<String>) val -> Einstellungen.setTplP109a(val),
         (Consumer<String>) val -> Einstellungen.setWorkPath(val)
     };
