@@ -1,9 +1,5 @@
 package org.andy.code.dataExport;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.*;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
@@ -12,6 +8,12 @@ import java.nio.file.Path;
 
 import org.andy.code.dataStructure.entitiyProductive.Angebot;
 import org.andy.code.main.Einstellungen;
+import org.openpdf.text.Document;
+import org.openpdf.text.Rectangle;
+import org.openpdf.text.pdf.PdfContentByte;
+import org.openpdf.text.pdf.PdfImportedPage;
+import org.openpdf.text.pdf.PdfReader;
+import org.openpdf.text.pdf.PdfWriter;
 
 public class ErzeugeLeistungsbeschreibung {
 	
