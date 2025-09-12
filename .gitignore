@@ -1,5 +1,4 @@
-*.jar
 *.lic
 *.log
 /target/
-!/lib/
+
