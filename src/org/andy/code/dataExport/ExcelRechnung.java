@@ -17,6 +17,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
@@ -96,6 +98,10 @@ public class ExcelRechnung{
 		String adressat = ExcelHelper.kundeAnschrift(rechnung.getIdKunde());
 		Bank bank = ExcelHelper.bankData(rechnung.getIdBank());
 		ExcelHelper.textData();
+		
+		LocalDate date = LocalDate.parse(rechnung.getDatum().toString(), DateTimeFormatter.ISO_LOCAL_DATE);
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        String datum = date.format(outputFormatter);
 
 		//#######################################################################
 		// Rechnungs-Excel erzeugen
@@ -194,7 +200,7 @@ public class ExcelRechnung{
 			// Zellwerte beschreiben
 			//#######################################################################
 			reAdress.setCellValue(adressat); // Kundenanschrift
-			reDate.setCellValue(rechnung.getDatum().toString());
+			reDate.setCellValue(datum);
 			reNr.setCellValue(rechnung.getIdNummer());
 			reLZ.setCellValue(rechnung.getlZeitr());
 			reUID.setCellValue(kunde.getUstid());

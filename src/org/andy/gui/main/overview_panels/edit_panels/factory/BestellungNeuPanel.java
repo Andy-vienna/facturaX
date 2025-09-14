@@ -3,8 +3,6 @@ package org.andy.gui.main.overview_panels.edit_panels.factory;
 import static org.andy.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
 import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
 import static org.andy.toolbox.misc.CreateObject.createButton;
-import static org.andy.toolbox.misc.Tools.FormatIBAN;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -16,7 +14,6 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -29,19 +26,16 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 
 import org.andy.code.dataStructure.entitiyMaster.Artikel;
-import org.andy.code.dataStructure.entitiyMaster.Bank;
-import org.andy.code.dataStructure.entitiyMaster.Kunde;
-import org.andy.code.dataStructure.entitiyProductive.Angebot;
+import org.andy.code.dataStructure.entitiyMaster.Lieferant;
+import org.andy.code.dataStructure.entitiyProductive.Bestellung;
 import org.andy.code.dataStructure.repositoryMaster.ArtikelRepository;
-import org.andy.code.dataStructure.repositoryMaster.BankRepository;
-import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
-import org.andy.code.dataStructure.repositoryProductive.AngebotRepository;
+import org.andy.code.dataStructure.repositoryMaster.LieferantRepository;
+import org.andy.code.dataStructure.repositoryProductive.BestellungRepository;
 import org.andy.code.main.Einstellungen;
 import org.andy.code.main.StartUp;
 import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
 import org.andy.code.misc.BD;
 import org.andy.gui.main.HauptFenster;
-import org.andy.gui.main.overview_panels.edit_panels.AngebotSeite2Editor;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.gui.misc.CommaHelper;
 import org.andy.gui.misc.RoundedBorder;
@@ -51,34 +45,27 @@ import org.apache.logging.log4j.Logger;
 import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
 
-public class AngebotNeuPanel extends EditPanel {
+public class BestellungNeuPanel extends EditPanel {
 	
     private static final long serialVersionUID = 1L;
-    private static final Logger logger = LogManager.getLogger(AngebotNeuPanel.class);
+    private static final Logger logger = LogManager.getLogger(BestellungNeuPanel.class);
 
     private static final int POS_COUNT = 12;
 
     // Datenquellen
-    private final KundeRepository kundeRepository = new KundeRepository();
-    private final BankRepository bankRepository = new BankRepository();
+    private final LieferantRepository lieferantRepository = new LieferantRepository();
     private final ArtikelRepository artikelRepository = new ArtikelRepository();
-    private final AngebotRepository angebotRepository = new AngebotRepository();
+    private final BestellungRepository bestellungRepository = new BestellungRepository();
 
     // Daten
-    private final List<Kunde> kunden = new ArrayList<>();
-    private final List<Bank> banken = new ArrayList<>();
+    private final List<Lieferant> lieferant = new ArrayList<>();
     private final List<Artikel> artikel = new ArrayList<>();
 
     // UI Felder
-    private JComboBox<String> cmbKunde;
-    private JTextField[] txtKd = new JTextField[12];
-    private JCheckBox chkRevCharge;
-
-    private JComboBox<String> cmbBank;
-    private JTextField txtBank, txtIBAN, txtBIC;
+    private JComboBox<String> cmbLieferant;
+    private JTextField[] txtLi = new JTextField[9];
 
     private JTextField txtNummer, txtReferenz;
-    private JCheckBox chkPage2;
     private DatePicker datePicker;
 
     private final JLabel[] lblPos = new JLabel[POS_COUNT];
@@ -92,20 +79,17 @@ public class AngebotNeuPanel extends EditPanel {
     private final BigDecimal[] bdEinzel = new BigDecimal[POS_COUNT];
     private final BigDecimal[] bdSumme  = new BigDecimal[POS_COUNT];
     private final String[] sPosText = new String[POS_COUNT];
-    
-    private AngebotSeite2Editor editor = new AngebotSeite2Editor();
 
     // Zustände
-    private boolean kundeGewählt = false;
-    private boolean bankGewählt = false;
+    private boolean lieferantGewählt = false;
     private boolean mind1ArtikelGewählt = false;
 
 	//###################################################################################################################################################
 	// public Teil
 	//###################################################################################################################################################
     
-    public AngebotNeuPanel() {
-        super("neues Angebot erstellen");
+    public BestellungNeuPanel() {
+        super("neue Bestellung erstellen");
         if (!(getBorder() instanceof TitledBorder)) {
             logger.warn("Kein TitledBorder gesetzt.");
         }
@@ -120,14 +104,8 @@ public class AngebotNeuPanel extends EditPanel {
 
     private void buildUI() {
         // Labels links
-        final String[] leftLabels = {
-            "Kundennummer","Kundenname","Strasse","PLZ","Ort","Land","Anrede","Ansprechpartner","UID","USt.-Satz","%","Rabattschlüssel","%","Zahlungsziel","Tage",
-            "Bank","IBAN","BIC"
-        };
-        final int[][] leftBounds = {
-                {10,55},{10,80},{10,105},{10,130},{10,155},{10,180},{10,205},{10,230},{10,255},{10,280},{155,280},{10,305},{155,305},{10,330},{155,330},
-                {1010,280},{1010,305},{1010,330}
-            };
+        final String[] leftLabels = { "Lieferanten-Nr.", "Kundennummer", "Name","Strasse","PLZ","Ort","Land","UID","USt.-Satz" };
+        final int[][] leftBounds = { {10,55},{10,80},{10,105},{10,130},{10,155},{10,180},{10,205},{10,230},{10,255} };
         List<JLabel> left = new ArrayList<>();
         for (int i=0;i<leftLabels.length;i++){
             JLabel l=new JLabel(leftLabels[i]);
@@ -148,28 +126,20 @@ public class AngebotNeuPanel extends EditPanel {
             add(x);
         }
 
-        JLabel lbl25=new JLabel("Angebotsnummer:"); lbl25.setBounds(1010,55,125,25); add(lbl25);
-        JLabel lbl26=new JLabel("Angebotsdatum:");  lbl26.setBounds(1010,80,125,25); add(lbl26);
+        JLabel lbl25=new JLabel("Bestellnummer:"); lbl25.setBounds(1010,55,125,25); add(lbl25);
+        JLabel lbl26=new JLabel("Bestelldatum:");  lbl26.setBounds(1010,80,125,25); add(lbl26);
         JLabel lbl29=new JLabel("Referenz");        lbl29.setBounds(1010,105,60,25);  add(lbl29);
 
         // Combos/Textfelder links
-        cmbKunde = new JComboBox<>(kunden.stream().map(k -> nullToEmpty(k.getName())).toArray(String[]::new));
-        cmbKunde.setBounds(10,30,300,25); add(cmbKunde);
+        cmbLieferant = new JComboBox<>(lieferant.stream().map(k -> nullToEmpty(k.getName())).toArray(String[]::new));
+        cmbLieferant.setBounds(10,30,300,25); add(cmbLieferant);
 
-        for (int ii=0;ii<txtKd.length;ii++) {
-        	txtKd[ii]=setRO(110, 55+(ii*25));
-        	add(txtKd[ii]);
+        for (int ii=0;ii<txtLi.length;ii++) {
+        	txtLi[ii]=setRO(110, 55+(ii*25));
+        	add(txtLi[ii]);
         }
 
-        chkRevCharge = new JCheckBox("ReverseCharge-Hinweis"); chkRevCharge.setBounds(110,355,110,25); chkRevCharge.setVisible(false); add(chkRevCharge);
-
-        cmbBank = new JComboBox<>(banken.stream().map(b -> nullToEmpty(b.getBankName())).toArray(String[]::new));
-        cmbBank.setBounds(1010,255,300,25); add(cmbBank);
-
-        txtBank=setRO(1110,280); txtIBAN=setRO(1110,305); txtBIC=setRO(1110,330);
-        add(txtBank); add(txtIBAN); add(txtBIC);
-
-        txtNummer = new JTextField(nextAnNummer());
+        txtNummer = new JTextField(nextBeNummer());
         txtNummer.setBounds(1130,55,140,25);
         txtNummer.setForeground(Color.BLUE);
         txtNummer.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -187,19 +157,11 @@ public class AngebotNeuPanel extends EditPanel {
         add(txtReferenz);
         txtReferenz.getDocument().addDocumentListener(bgFlipOnNonEmpty(txtReferenz));
         
-        chkPage2 = new JCheckBox("Angebot mit Anlage (Beschreibung aus Seite 2 hinzufügen)");
-        chkPage2.setBounds(1130,130,390,25); add(chkPage2);
-        
-        JButton btnPage2 = createButton("<html>Editor</html>", "edit.png", null);
-        btnPage2.setBounds(1130,165, HauptFenster.getButtonx(), HauptFenster.getButtony());
-        btnPage2.setEnabled(true); btnPage2.setVisible(false);
-        add(btnPage2);
-
-        JButton btnDoExport = createButton("<html>Angebot<br>erstellen</html>", "edit.png", null);
+        JButton btnDoExport = createButton("<html>Bestellung<br>erstellen</html>", "edit.png", null);
         btnDoExport.setBounds(1545,305, HauptFenster.getButtonx(), HauptFenster.getButtony());
         btnDoExport.setEnabled(true);
         add(btnDoExport);
-
+        
         // Positionszeilen
         final String[] artikelTexte = artikel.stream().map(a -> nullToEmpty(a.getText())).toArray(String[]::new);
         for (int ii=0;ii<POS_COUNT;ii++) {
@@ -227,11 +189,8 @@ public class AngebotNeuPanel extends EditPanel {
         JSeparator s2=new JSeparator(JSeparator.VERTICAL); s2.setBounds(1000,10,2,370); add(s2);
 
         // Aktionen
-        cmbKunde.addActionListener(_ -> onKundeChanged());
-        cmbBank.addActionListener(_ -> onBankChanged());
+        cmbLieferant.addActionListener(_ -> onLieferantChanged());
 
-        chkPage2.addActionListener(_ -> btnPage2.setVisible(chkPage2.isSelected()));
-        btnPage2.addActionListener(_ -> doText());
         btnDoExport.addActionListener(_ -> doSave());
 
         setPreferredSize(new Dimension(1000, 390));
@@ -241,42 +200,24 @@ public class AngebotNeuPanel extends EditPanel {
 	// ActionListener
 	//###################################################################################################################################################
 
-    private void onKundeChanged() {
-        int idx = cmbKunde.getSelectedIndex();
+    private void onLieferantChanged() {
+        int idx = cmbLieferant.getSelectedIndex();
         if (idx <= 0) {
-            clearKunde();
-            kundeGewählt = false;
+            clearLieferant();
+            lieferantGewählt = false;
             return;
         }
-        Kunde k = kunden.get(idx);
-        txtKd[0].setText(k.getId());
-        txtKd[1].setText(k.getName());
-        txtKd[2].setText(k.getStrasse());
-        txtKd[3].setText(k.getPlz());
-        txtKd[4].setText(k.getOrt());
-        txtKd[5].setText(k.getLand());
-        txtKd[6].setText(k.getPronomen());
-        txtKd[7].setText(k.getPerson());
-        txtKd[8].setText(k.getUstid());
-        txtKd[9].setText(k.getTaxvalue());
-        txtKd[10].setText(k.getDeposit());
-        txtKd[11].setText(k.getZahlungsziel());
-        chkRevCharge.setVisible("0".equals(txtKd[9].getText()));
-        kundeGewählt = true;
-    }
-
-    private void onBankChanged() {
-        int idx = cmbBank.getSelectedIndex();
-        if (idx <= 0) {
-            txtBank.setText(""); txtIBAN.setText(""); txtBIC.setText("");
-            bankGewählt = false;
-            return;
-        }
-        Bank b = banken.get(idx);
-        txtBank.setText(b.getBankName());
-        txtIBAN.setText(FormatIBAN(b.getIban()));
-        txtBIC.setText(b.getBic());
-        bankGewählt = true;
+        Lieferant l = lieferant.get(idx);
+        txtLi[0].setText(l.getId());
+        txtLi[1].setText(l.getKdnr());
+        txtLi[2].setText(l.getName());
+        txtLi[3].setText(l.getStrasse());
+        txtLi[4].setText(l.getPlz());
+        txtLi[5].setText(l.getOrt());
+        txtLi[6].setText(l.getLand());
+        txtLi[7].setText(l.getUstid());
+        txtLi[8].setText(l.getTaxvalue());
+        lieferantGewählt = true;
     }
 
     private void onArtikelChosen(int i) {
@@ -325,47 +266,38 @@ public class AngebotNeuPanel extends EditPanel {
             txtGP[i].setText("");
         }
     }
-    
-    private void doText() {
-    	editor.setHtml(editor.getStartText("Leistungsbeschreibung eingeben ..."));
-    	editor.setVisible(true);
-    }
 
     private void doSave() {
-        if (!kundeGewählt) { info("Kunde nicht ausgewählt …"); return; }
-        if (!bankGewählt)  { info("Bank nicht ausgewählt …");  return; }
+        if (!lieferantGewählt) { info("Lieferant nicht ausgewählt …"); return; }
         if (!mind1ArtikelGewählt) { info("keine Artikel ausgewählt …"); return; }
         if (isEmpty(txtReferenz)) { info("Kundenreferenz fehlt …"); return; }
 
-        Angebot a = new Angebot();
-        a.setIdNummer(nextAnNummer());
-        a.setJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
-        a.setDatum(dateOrToday(datePicker));
-        Kunde k = kunden.get(cmbKunde.getSelectedIndex());
-        Bank  b = banken.get(cmbBank.getSelectedIndex());
-        a.setIdKunde(Objects.toString(k.getId(),""));
-        a.setIdBank(b.getId());
-        a.setRef(txtReferenz.getText().trim());
-        a.setRevCharge(chkRevCharge.isSelected()?1:0);
-        a.setPage2(chkPage2.isSelected()?1:0);
-        if (chkPage2.isSelected()) { a.setBeschreibungHtml(editor.getHtml()); } // Liefer- und Leistungsbeschreibung
-
+        Bestellung b = new Bestellung();
+        b.setIdNummer(nextBeNummer());
+        b.setJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
+        b.setDatum(dateOrToday(datePicker));
+        Lieferant l = lieferant.get(cmbLieferant.getSelectedIndex());
+        b.setIdLieferant(Objects.toString(l.getId(),""));
+        b.setRef(txtReferenz.getText().trim());
+        
         int posCount = countFilledPositions();
-        a.setAnzPos(BigDecimal.valueOf(posCount));
+        b.setAnzPos(BigDecimal.valueOf(posCount));
 
-        BigDecimal netto = BD.ZERO;
+        BigDecimal ustFaktor = parseStringToBigDecimalSafe(l.getTaxvalue(), LocaleFormat.AUTO).divide(BD.HUNDRED);
+        BigDecimal netto = BD.ZERO; BigDecimal ust = BD.ZERO; BigDecimal brutto = BD.ZERO;
         for (int i=0;i<POS_COUNT;i++) {
             if (sPosText[i]==null || bdAnzahl[i]==null || bdEinzel[i]==null) continue;
-            setAngebotPosition(a, i, sPosText[i], bdAnzahl[i], bdEinzel[i]);
+            setBestellungPosition(b, i, sPosText[i], bdAnzahl[i], bdEinzel[i]);
             netto = netto.add(bdEinzel[i].multiply(bdAnzahl[i]));
         }
-        a.setNetto(netto.setScale(2, RoundingMode.HALF_UP));
-        a.setUst(BD.ZERO);
-        a.setBrutto(BD.ZERO);
-        a.setlZeitr(" ");
-        a.setState(1); // erstellt
+        b.setNetto(netto.setScale(2, RoundingMode.HALF_UP));
+        ust = netto.multiply(ustFaktor);
+        b.setUst(ust);
+        brutto = netto.add(ust);
+        b.setBrutto(brutto);
+        b.setState(1); // erstellt
 
-        angebotRepository.save(a);
+        bestellungRepository.save(b);
         HauptFenster.actScreen();
     }
 
@@ -374,35 +306,31 @@ public class AngebotNeuPanel extends EditPanel {
 	//###################################################################################################################################################
     
     private void loadData() {
-        kunden.clear();
-        banken.clear();
+        lieferant.clear();
         artikel.clear();
 
         // Dummy an Position 0
-        kunden.add(new Kunde());
-        kunden.addAll(kundeRepository.findAll());
-
-        banken.add(new Bank());
-        banken.addAll(bankRepository.findAll());
+        lieferant.add(new Lieferant());
+        lieferant.addAll(lieferantRepository.findAll());
 
         artikel.add(new Artikel());
         artikel.addAll(artikelRepository.findAll());
     }
 
-    private void setAngebotPosition(Angebot a, int idx0, String text, BigDecimal menge, BigDecimal ep) {
+    private void setBestellungPosition(Bestellung b, int idx0, String text, BigDecimal menge, BigDecimal ep) {
         switch (idx0) {
-            case 0 -> { a.setArt01(text); a.setMenge01(menge); a.setePreis01(ep); }
-            case 1 -> { a.setArt02(text); a.setMenge02(menge); a.setePreis02(ep); }
-            case 2 -> { a.setArt03(text); a.setMenge03(menge); a.setePreis03(ep); }
-            case 3 -> { a.setArt04(text); a.setMenge04(menge); a.setePreis04(ep); }
-            case 4 -> { a.setArt05(text); a.setMenge05(menge); a.setePreis05(ep); }
-            case 5 -> { a.setArt06(text); a.setMenge06(menge); a.setePreis06(ep); }
-            case 6 -> { a.setArt07(text); a.setMenge07(menge); a.setePreis07(ep); }
-            case 7 -> { a.setArt08(text); a.setMenge08(menge); a.setePreis08(ep); }
-            case 8 -> { a.setArt09(text); a.setMenge09(menge); a.setePreis09(ep); }
-            case 9 -> { a.setArt10(text); a.setMenge10(menge); a.setePreis10(ep); }
-            case 10 -> { a.setArt11(text); a.setMenge11(menge); a.setePreis11(ep); }
-            case 11 -> { a.setArt12(text); a.setMenge12(menge); a.setePreis12(ep); }
+            case 0 -> { b.setArt01(text); b.setMenge01(menge); b.setePreis01(ep); }
+            case 1 -> { b.setArt02(text); b.setMenge02(menge); b.setePreis02(ep); }
+            case 2 -> { b.setArt03(text); b.setMenge03(menge); b.setePreis03(ep); }
+            case 3 -> { b.setArt04(text); b.setMenge04(menge); b.setePreis04(ep); }
+            case 4 -> { b.setArt05(text); b.setMenge05(menge); b.setePreis05(ep); }
+            case 5 -> { b.setArt06(text); b.setMenge06(menge); b.setePreis06(ep); }
+            case 6 -> { b.setArt07(text); b.setMenge07(menge); b.setePreis07(ep); }
+            case 7 -> { b.setArt08(text); b.setMenge08(menge); b.setePreis08(ep); }
+            case 8 -> { b.setArt09(text); b.setMenge09(menge); b.setePreis09(ep); }
+            case 9 -> { b.setArt10(text); b.setMenge10(menge); b.setePreis10(ep); }
+            case 10 -> { b.setArt11(text); b.setMenge11(menge); b.setePreis11(ep); }
+            case 11 -> { b.setArt12(text); b.setMenge12(menge); b.setePreis12(ep); }
             default -> {}
         }
     }
@@ -470,16 +398,15 @@ public class AngebotNeuPanel extends EditPanel {
         return docChanged(() -> f.setBackground(f.getText().trim().isEmpty()? Color.PINK : Color.WHITE));
     }
 
-    private void clearKunde(){
-        for (JTextField t : txtKd) {
+    private void clearLieferant(){
+        for (JTextField t : txtLi) {
             t.setText("");
         }
-        chkRevCharge.setVisible(false);
     }
 
-    private String nextAnNummer() {
-        int max = angebotRepository.findMaxNummerByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
-        return "AN-" + Einstellungen.getStrAktGJ() + "-" + String.format("%04d", max + 1);
+    private String nextBeNummer() {
+        int max = bestellungRepository.findMaxNummerByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
+        return "BE-" + Einstellungen.getStrAktGJ() + "-" + String.format("%04d", max + 1);
     }
 
     private static void info(String msg){

@@ -260,7 +260,7 @@ public class EinkaufPanel extends EditPanel {
 	    add(cmbState);
 
 		try {
-			btnFields[1] = createButton("", "save.png");
+			btnFields[1] = createButton("", "save.png", null);
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}

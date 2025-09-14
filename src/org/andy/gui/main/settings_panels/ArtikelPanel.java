@@ -99,13 +99,15 @@ public class ArtikelPanel extends JPanel {
             txtFields[i] = makeField(x, y + i * 25, 650, 25, false, null);
             add(txtFields[i]);
         }
+        txtFields[0].setText(artikelRepository.findMaxNummer());
+        txtFields[0].setEditable(false);
         attachCommaToDot(txtFields[2]);
         x = 110; y = y + ((txtFields.length - 1) * 25);
 
         try {
-            btnFields[0] = createButton("<html>Artikel<br>anlegen</html>", "new.png");
-            btnFields[1] = createButton("<html>Artikel<br>updaten</html>", "update.png");
-            btnFields[2] = createButton("<html>Artikel<br>loeschen</html>", "delete.png");
+            btnFields[0] = createButton("<html>Artikel<br>anlegen</html>", "new.png", null);
+            btnFields[1] = createButton("<html>Artikel<br>updaten</html>", "update.png", null);
+            btnFields[2] = createButton("<html>Artikel<br>loeschen</html>", "delete.png", null);
             for (int i = 0; i < btnFields.length; i++) {
                 btnFields[i].setBounds(x + i * (btnWidth + 10), y + 30, btnWidth, btnHeight);
                 add(btnFields[i]);
@@ -143,8 +145,9 @@ public class ArtikelPanel extends JPanel {
                 btnFields[0].setEnabled(true);
                 btnFields[1].setEnabled(false);
                 btnFields[2].setEnabled(false);
-                txtFields[0].setEditable(true);
                 clearFields(txtFields);
+                txtFields[0].setText(artikelRepository.findMaxNummer());
+                txtFields[0].setEditable(false);
             } else {
                 btnFields[0].setEnabled(false);
                 btnFields[1].setEnabled(true);
@@ -177,6 +180,9 @@ public class ArtikelPanel extends JPanel {
         btnFields[0].setEnabled(true);
         btnFields[1].setEnabled(false);
         btnFields[2].setEnabled(false);
+        txtFields[0].setText(artikelRepository.findMaxNummer());
+        txtFields[0].setEditable(false);
+        
         revalidate();
         repaint();
     }

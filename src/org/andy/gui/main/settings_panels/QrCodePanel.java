@@ -112,8 +112,8 @@ public class QrCodePanel extends JPanel {
 		textQRanzeige.setBounds(110, 295, 140, 25);
 
 		try {
-			btnQREdit = createButton(null, "edit.png");
-			btnQROK = createButton(null, "ok.png");
+			btnQREdit = createButton(null, "edit.png", null);
+			btnQROK = createButton(null, "ok.png", null);
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}

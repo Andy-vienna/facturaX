@@ -48,8 +48,11 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import org.andy.code.dataExport.ExcelRechnung;
 import org.andy.code.dataExport.ExcelAngebot;
+import org.andy.code.dataExport.ExcelBestellung;
 import org.andy.code.dataStructure.entitiyMaster.Kunde;
+import org.andy.code.dataStructure.entitiyMaster.Lieferant;
 import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
+import org.andy.code.dataStructure.repositoryMaster.LieferantRepository;
 import org.andy.code.main.Einstellungen;
 import org.andy.code.main.StartUp;
 import org.andy.code.main.overview.result.SteuerDaten;
@@ -57,6 +60,7 @@ import org.andy.code.main.overview.result.UStDaten;
 import org.andy.code.main.overview.result.ZMeldungDaten;
 import org.andy.code.main.overview.table.LadeRechnung;
 import org.andy.code.main.overview.table.LadeAusgaben;
+import org.andy.code.main.overview.table.LadeBestellung;
 import org.andy.code.main.overview.table.LadeAngebot;
 import org.andy.code.main.overview.table.LadeEinkauf;
 import org.andy.code.main.overview.table.LadeSvTax;
@@ -71,6 +75,7 @@ import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanelFactory;
 import org.andy.gui.main.overview_panels.edit_panels.factory.RechnungPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.AusgabenPanel;
+import org.andy.gui.main.overview_panels.edit_panels.factory.BestellungPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.AngebotPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.EinkaufPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.SvTaxPanel;
@@ -82,6 +87,7 @@ import org.andy.gui.main.settings_panels.BankPanel;
 import org.andy.gui.main.settings_panels.DatenbankPanel;
 import org.andy.gui.main.settings_panels.GwbTabellePanel;
 import org.andy.gui.main.settings_panels.KundePanel;
+import org.andy.gui.main.settings_panels.LieferantPanel;
 import org.andy.gui.main.settings_panels.OwnerPanel;
 import org.andy.gui.main.settings_panels.PfadPanel;
 import org.andy.gui.main.settings_panels.QrCodePanel;
@@ -107,6 +113,7 @@ public class HauptFenster extends JFrame {
 
     private final String[] HEADER_AN = { "AN-Nummer", "Status", "Datum", "Referenz", "Kunde", "Netto" };
     private final String[] HEADER_RE = { "RE-Nummer", "Status", "Datum", "Leistungszeitraum", "Referenz", "Kunde", "Netto", "USt.", "Brutto" };
+    private final String[] HEADER_BE = { "BE-Nummer", "Status", "Datum", "Referenz", "Lieferant", "Netto", "USt.", "Brutto" };
     private final String[] HEADER_PU = { "RE-Datum","RE-Nummer", "Kreditor Name", "Land", "Steuersatz", "Netto", "USt.", "Brutto", "Zahlungsziel", "bezahlt", "Dateiname" };
     private final String[] HEADER_EX = { "Datum", "Bezeichnung", "Land", "Steuersatz", "Netto (EUR)", "Steuer (EUR)", "Brutto (EUR)", "Dateiname" };
     private final String[] HEADER_ST = { "Datum", "Zahlungsempfänger", "Bezeichnung", "Betrag", "Fälligkeit", "Art", "Dateiname" };
@@ -126,28 +133,29 @@ public class HauptFenster extends JFrame {
     // Seiten
     private final JPanel pageAN = new JPanel(new BorderLayout());
     private final JPanel pageRE = new JPanel(new BorderLayout());
+    private final JPanel pageBE = new JPanel(new BorderLayout());
     private final JPanel pagePU = new JPanel(new BorderLayout());
     private final JPanel pageEX = new JPanel(new BorderLayout());
     private final JPanel pageST = new JPanel(new BorderLayout());
     private JPanel pageOv, pageErg, pageAdmin, pageSetting;
 
     // Panels, Tabellen, Summen
-    private EditPanel offerPanel, billPanel, purchasePanel, svTaxPanel, expensesPanel;
-    private SummenPanelA infoAN, infoRE;
+    private EditPanel offerPanel, billPanel, bestellungPanel, purchasePanel, svTaxPanel, expensesPanel;
+    private SummenPanelA infoAN, infoRE, infoBE;
 	private SummenPanelB infoPU, infoEX, infoST;
 	
     private UStPanel panelUSt;
     private ZMeldungPanel panelZM;
     private SteuerPanel panelP109a;
     private JScrollPane sPaneErg;
-    private ErzeugeTabelle<Object> sPaneAN, sPaneRE, sPanePU, sPaneEX, sPaneST;
-    private ErzeugePanelA panelOfferInfo, panelBillInfo;
+    private ErzeugeTabelle<Object> sPaneAN, sPaneRE, sPaneBE, sPanePU, sPaneEX, sPaneST;
+    private ErzeugePanelA panelOfferInfo, panelBillInfo, panelBEInfo;
 
     // Daten
-    private String[][] sTempAN, sTempRE, sTempPU, sTempEX, sTempST;
+    private String[][] sTempAN, sTempRE, sTempBE, sTempPU, sTempEX, sTempST;
 
     // Auswahl
-    private String vZelleAN, vStateAN, vZelleRE, vStateRE;
+    private String vZelleAN, vStateAN, vZelleRE, vStateRE, vZelleBE, vStateBE;
 
     // Rollen
     enum Role { NONE, USER, SUPERUSER, FINANCIALUSER, ADMIN }
@@ -265,31 +273,34 @@ public class HauptFenster extends JFrame {
 
         switch (role) {
             case USER -> {
-                doAngebotPanel(false);
-                doRechnungPanel(false);
+                doAngebotPanel(0);
+                doRechnungPanel(0);
                 tabPanel.addTab("Angebote", pageAN);
                 tabPanel.addTab("Rechnungen", pageRE);
                 tabPanel.setIconAt(0, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/offer.png")));
                 tabPanel.setIconAt(1, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/invoice.png")));
             }
             case SUPERUSER -> {
-                doAngebotPanel(false);
-                doRechnungPanel(false);
-                doEinkaufPanel();
+                doAngebotPanel(0);
+                doRechnungPanel(0);
+                doBestellungPanel(0);
+                doEinkaufPanel(0);
                 doAusgabenPanel();
                 tabPanel.addTab("Angebote", pageAN);
                 tabPanel.addTab("Rechnungen", pageRE);
+                tabPanel.addTab("Bestellungen", pageBE);
                 tabPanel.addTab("Einkauf", pagePU);
                 tabPanel.addTab("Betriebsausgaben", pageEX);
                 tabPanel.setIconAt(0, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/offer.png")));
                 tabPanel.setIconAt(1, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/invoice.png")));
-                tabPanel.setIconAt(2, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/purchase.png")));
-                tabPanel.setIconAt(3, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/expenses.png")));
+                tabPanel.setIconAt(2, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/bestellen.png")));
+                tabPanel.setIconAt(3, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/purchase.png")));
+                tabPanel.setIconAt(4, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/expenses.png")));
             }
             case FINANCIALUSER -> {
                 doSvsTaxPanel();
                 doJahresergebnis();
-                doEinkaufPanel();
+                doEinkaufPanel(0);
                 doAusgabenPanel();
                 tabPanel.addTab("Einkauf", pagePU);
                 tabPanel.addTab("Betriebsausgaben", pageEX);
@@ -313,20 +324,36 @@ public class HauptFenster extends JFrame {
     //###################################################################################################################################################
     // Panels
 
-    private void doAngebotPanel(boolean use) {
+    private void doAngebotPanel(int use) {
         if (role != Role.USER && role != Role.SUPERUSER) return;
 
-        JButton[] btn;
-        if (use) {
-            btn = new JButton[1];
-            offerPanel = EditPanelFactory.create("NA");
-            btn[0] = createButton("zurück", "aktualisieren.png");
-        } else {
-            btn = new JButton[3];
-            offerPanel = EditPanelFactory.create("AN");
-            btn[0] = createButton("<html>neues<br>Angebot</html>", "new.png");
-            btn[1] = createButton("<html>Angebot<br>drucken</html>", "print.png");
-            btn[2] = createButton("<html>AB<br>drucken</html>", "print.png");
+        JButton[] btn = null;
+        switch(use) {
+        	case 0 -> {
+        		btn = new JButton[5];
+                offerPanel = EditPanelFactory.create("AN");
+                btn[0] = createButton("<html>Kunde<br>neu/bearb.</html>", "edit.png", new Color(168,168,168));
+                btn[1] = createButton("<html>Artikel<br>neu/bearb.</html>", "edit.png", new Color(159,182,205));
+                btn[2] = createButton("<html>neues<br>Angebot</html>", "new.png", new Color(191,239,255));
+                btn[3] = createButton("<html>Angebot<br>drucken</html>", "print.png", null);
+                btn[4] = createButton("<html>AB<br>drucken</html>", "print.png", null);
+                btn[1].setEnabled(true); btn[2].setEnabled(true);
+        	}
+        	case 1 -> {
+        		btn = new JButton[1];
+                offerPanel = EditPanelFactory.create("NA");
+                btn[0] = createButton("zurück", "aktualisieren.png", null);
+        	}
+        	case 2 -> {
+        		btn = new JButton[1];
+            	offerPanel = EditPanelFactory.create("NK");
+                btn[0] = createButton("zurück", "aktualisieren.png", null);
+        	}
+        	case 3 -> {
+        		btn = new JButton[1];
+            	offerPanel = EditPanelFactory.create("NArt");
+                btn[0] = createButton("zurück", "aktualisieren.png", null);
+        	}
         }
         btn[0].setEnabled(true);
 
@@ -339,14 +366,19 @@ public class HauptFenster extends JFrame {
 
         infoAN = new SummenPanelA(new String[] {"Summe offen:", "Summe best.:"}, true);
         setSumAN();
-        if (use) infoAN.setVisible(false);
+        if (use == 1 || use == 2 || use == 3) infoAN.setVisible(false);
 
         panelOfferInfo = new ErzeugePanelA(sPaneAN, offerPanel, btn, infoAN);
 
         // Actions
-        btn[0].addActionListener(_ -> { if (!use) doAngebotPanel(true); else updScreen(); });
-        if (!use) {
-        	btn[1].addActionListener(e -> {
+        if (use == 1 || use == 2 || use == 3) {
+        	btn[0].addActionListener(_ -> doAngebotPanel(0));
+        }
+        if (use == 0) {
+        	btn[0].addActionListener(_ -> { if (use == 0) doAngebotPanel(2); else updScreen(); });
+        	btn[1].addActionListener(_ -> { if (use == 0) doAngebotPanel(3); else updScreen(); });
+        	btn[2].addActionListener(_ -> { if (use == 0) doAngebotPanel(1); else updScreen(); });
+        	btn[3].addActionListener(e -> {
         	    if (vZelleAN == null) return;
         	    Window w = SwingUtilities.getWindowAncestor((Component) e.getSource());
         	    BusyDialog.run(w,
@@ -362,7 +394,7 @@ public class HauptFenster extends JFrame {
         	        this::updScreen   // oder: this::actScreen, falls so benannt
         	    );
         	});
-            btn[2].addActionListener(_ -> { if (vZelleAN != null) { try { ABDialog.showDialog(vZelleAN); updScreen(); } catch (Exception ex) { logger.error("AN AB", ex); } }});
+            btn[4].addActionListener(_ -> { if (vZelleAN != null) { try { ABDialog.showDialog(vZelleAN); updScreen(); } catch (Exception ex) { logger.error("AN AB", ex); } }});
         }
 
         pageAN.removeAll();
@@ -372,20 +404,36 @@ public class HauptFenster extends JFrame {
     
     //###################################################################################################################################################
 
-    private void doRechnungPanel(boolean use) {
+    private void doRechnungPanel(int use) {
         if (role != Role.USER && role != Role.SUPERUSER) return;
 
-        JButton[] btn;
-        if (use) {
-            btn = new JButton[1];
-            billPanel = EditPanelFactory.create("NR");
-            btn[0] = createButton("zurück", "aktualisieren.png");
-        } else {
-            btn = new JButton[3];
-            billPanel = EditPanelFactory.create("RE");
-            btn[0] = createButton("<html>neue<br>Rechnung</html>", "new.png");
-            btn[1] = createButton("<html>Rechnung<br>drucken</html>", "print.png");
-            btn[2] = createButton("<html>Mahn-<br>verfahren</html>", "print.png");
+        JButton[] btn = null;
+        switch(use) {
+        	case 0 -> {
+        		btn = new JButton[5];
+        		billPanel = EditPanelFactory.create("RE");
+                btn[0] = createButton("<html>Kunde<br>neu/bearb.</html>", "edit.png", new Color(168,168,168));
+                btn[1] = createButton("<html>Artikel<br>neu/bearb.</html>", "edit.png", new Color(159,182,205));
+                btn[2] = createButton("<html>neue<br>Rechnung</html>", "new.png", new Color(191,239,255));
+                btn[3] = createButton("<html>Rechnung<br>drucken</html>", "print.png", null);
+                btn[4] = createButton("<html>Mahn-<br>verfahren</html>", "print.png", null);
+                btn[1].setEnabled(true); btn[2].setEnabled(true);
+        	}
+        	case 1 -> {
+        		btn = new JButton[1];
+        		billPanel = EditPanelFactory.create("NR");
+                btn[0] = createButton("zurück", "aktualisieren.png", null);
+        	}
+        	case 2 -> {
+        		btn = new JButton[1];
+        		billPanel = EditPanelFactory.create("NK");
+                btn[0] = createButton("zurück", "aktualisieren.png", null);
+        	}
+        	case 3 -> {
+        		btn = new JButton[1];
+        		billPanel = EditPanelFactory.create("NArt");
+                btn[0] = createButton("zurück", "aktualisieren.png", null);
+        	}
         }
         btn[0].setEnabled(true);
 
@@ -398,14 +446,20 @@ public class HauptFenster extends JFrame {
 
         infoRE = new SummenPanelA(new String[] {"Summe offen:", "Summe bez.:"}, true);
         setSumRE();
-        if (use) infoRE.setVisible(false);
+        if (use == 1 || use == 2 || use == 3) infoRE.setVisible(false);
 
         panelBillInfo = new ErzeugePanelA(sPaneRE, billPanel, btn, infoRE);
-
-        btn[0].addActionListener(_ -> { if (!use) doRechnungPanel(true); else updScreen(); });
-        if (!use) {
-        	btn[1].addActionListener(e -> {
-        	    if (vZelleRE == null) return;
+        
+        // Actions
+        if (use == 1 || use == 2 || use == 3) {
+        	btn[0].addActionListener(_ -> doRechnungPanel(0));
+        }
+        if (use == 0) {
+        	btn[0].addActionListener(_ -> { if (use == 0) doRechnungPanel(2); else updScreen(); });
+        	btn[1].addActionListener(_ -> { if (use == 0) doRechnungPanel(3); else updScreen(); });
+        	btn[2].addActionListener(_ -> { if (use == 0) doRechnungPanel(1); else updScreen(); });
+        	btn[3].addActionListener(e -> {
+        		if (vZelleRE == null) return;
         	    Window w = SwingUtilities.getWindowAncestor((Component) e.getSource());
         	    BusyDialog.run(w,
         	        "Bitte warten",
@@ -420,7 +474,7 @@ public class HauptFenster extends JFrame {
         	        this::updScreen
         	    );
         	});
-            btn[2].addActionListener(_ -> { if (vZelleRE != null) { MahnstufeDialog.open(null, vZelleRE); updScreen(); }});
+            btn[4].addActionListener(_ -> { if (vZelleRE != null) { MahnstufeDialog.open(null, vZelleRE); updScreen(); }});
         }
 
         pageRE.removeAll();
@@ -429,11 +483,103 @@ public class HauptFenster extends JFrame {
     }
     
     //###################################################################################################################################################
+    
+    private void doBestellungPanel(int use) {
+    	if (role != Role.SUPERUSER && role != Role.FINANCIALUSER) return;
+        
+        JButton[] btn = null;
+        switch(use) {
+        	case 0 -> {
+        		btn = new JButton[4];
+        		bestellungPanel = EditPanelFactory.create("BE");
+        		btn[0] = createButton("<html>Lieferant<br>neu/bearb.</html>", "edit.png", new Color(168,168,168));
+                btn[1] = createButton("<html>Artikel<br>neu/bearb.</html>", "edit.png", new Color(159,182,205));
+                btn[2] = createButton("<html>neue<br>Bestellung</html>", "new.png", new Color(191,239,255));
+                btn[3] = createButton("<html>Bestellung<br>drucken</html>", "print.png", null);
+                btn[1].setEnabled(true); btn[2].setEnabled(true);
+        	}
+        	case 1 -> {
+        		btn = new JButton[1];
+        		bestellungPanel = EditPanelFactory.create("NB");
+                btn[0] = createButton("zurück", "aktualisieren.png", null);
+        	}
+        	case 2 -> {
+        		btn = new JButton[1];
+        		bestellungPanel = EditPanelFactory.create("NL");
+                btn[0] = createButton("zurück", "aktualisieren.png", null);
+        	}
+        	case 3 -> {
+        		btn = new JButton[1];
+        		bestellungPanel = EditPanelFactory.create("NArt");
+                btn[0] = createButton("zurück", "aktualisieren.png", null);
+        	}
+        }
+        btn[0].setEnabled(true);
+        
+        sPaneBE = new ErzeugeTabelle<>(sTempBE, HEADER_BE, new TableBEcr(this));
+        sPaneBE.getTable().addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) { actionClickBE(sPaneBE.getTable(), e); }
+        });
+        sPaneBE.setColumnWidths(new int[] {100,100,100,500,500,100,100,100});
+        sPaneBE.getTable().setAutoCreateRowSorter(true);
+        
+        infoBE = new SummenPanelA(new String[] {"Summe offen:", "Summe gel.:"}, false);
+        setSumBE();
+        if (use == 1) infoBE.setVisible(false);
 
-    private void doEinkaufPanel() {
+        panelBEInfo = new ErzeugePanelA(sPaneBE, bestellungPanel, btn, infoBE);
+        
+        if (use == 1 || use == 2 || use == 3) {
+        	btn[0].addActionListener(_ -> doBestellungPanel(0));
+        }
+        if (use == 0) {
+        	btn[0].addActionListener(_ -> { if (use == 0) doBestellungPanel(2); else updScreen(); });
+        	btn[1].addActionListener(_ -> { if (use == 0) doBestellungPanel(3); else updScreen(); });
+        	btn[2].addActionListener(_ -> { if (use == 0) doBestellungPanel(1); else updScreen(); });
+        	btn[3].addActionListener(e -> {
+        		if (vZelleBE == null) return;
+        	    Window w = SwingUtilities.getWindowAncestor((Component) e.getSource());
+        	    BusyDialog.run(w,
+        	        "Bitte warten",
+        	        "Bestellung wird erzeugt …",
+        	        () -> {
+						try {
+							ExcelBestellung.beExport(vZelleBE);
+						} catch (Exception ex) {
+							logger.error("error exporting order: ", ex);
+						}
+					},
+        	        this::updScreen
+        	    );
+        	});
+        }
+
+        pageBE.removeAll();
+        pageBE.add(panelBEInfo, BorderLayout.CENTER);
+        pageBE.revalidate(); pageBE.repaint();
+    	
+    }
+    
+    //###################################################################################################################################################
+
+    private void doEinkaufPanel(int use) {
         if (role != Role.SUPERUSER && role != Role.FINANCIALUSER) return;
-
-        purchasePanel = EditPanelFactory.create("PU");
+        
+        JButton[] btn = null;
+        switch(use) {
+        	case 0 -> {
+        		btn = new JButton[1];
+        		purchasePanel = EditPanelFactory.create("PU");
+        		btn[0] = createButton("<html>Lieferant<br>neu/bearb.</html>", "edit.png", new Color(168,168,168));
+        	}
+        	case 1 -> {
+        		btn = new JButton[1];
+        		purchasePanel = EditPanelFactory.create("NL");
+        		btn[0] = createButton("zurück", "aktualisieren.png", null);
+        	}
+        }
+        btn[0].setEnabled(true);
+        
         if (purchasePanel instanceof EinkaufPanel pup) {
             pup.setsTitel("");
             pup.setBtnText(0, "..."); pup.setBtnText(1, "save");
@@ -449,8 +595,19 @@ public class HauptFenster extends JFrame {
         infoPU = new SummenPanelB(7, new String[] {"Netto:", "Brutto:", "USt.AT 10%", "USt.AT 20%", "USt.EU (EURO)", "USt.EU sonst.", "USt. Welt"},
         							new boolean[] {true, true, true, true, true, false, false});
         setSumPU();
+        
+        if (use == 1) infoPU.setVisible(false);
+        
+        ErzeugePanelB cp = new ErzeugePanelB(sPanePU, purchasePanel, btn, infoPU);
+        
+        // Actions
+        if (use == 1) {
+        	btn[0].addActionListener(_ -> { if (use == 1) doEinkaufPanel(0); else updScreen(); });
+        }
+        if (use == 0) {
+        	btn[0].addActionListener(_ -> { if (use == 0) doEinkaufPanel(1); else updScreen(); });
+        }
 
-        ErzeugePanelB cp = new ErzeugePanelB(sPanePU, purchasePanel, null, infoPU);
         pagePU.removeAll();
         pagePU.add(cp, BorderLayout.CENTER);
         pagePU.revalidate(); pagePU.repaint();
@@ -577,7 +734,7 @@ public class HauptFenster extends JFrame {
             switch (cmbSelect.getSelectedIndex()) {
                 case 1 -> pageSetting.add(new OwnerPanel());
                 case 2 -> pageSetting.add(new BankPanel());
-                case 3 -> { pageSetting.add(new KundePanel()); pageSetting.add(new ArtikelPanel()); }
+                case 3 -> { pageSetting.add(new KundePanel()); pageSetting.add(new LieferantPanel()); pageSetting.add(new ArtikelPanel()); }
                 case 4 -> pageSetting.add(new PfadPanel());
                 case 5 -> pageSetting.add(new BenutzerPanel());
                 case 6 -> { pageSetting.add(new SteuertabellePanel()); pageSetting.add(new GwbTabellePanel()); }
@@ -649,6 +806,8 @@ public class HauptFenster extends JFrame {
         if (sTempAN == null) sTempAN = new String[0][HEADER_AN.length];
         sTempRE = LadeRechnung.loadRechnung(false);
         if (sTempRE == null) sTempRE = new String[0][HEADER_RE.length];
+        sTempBE = LadeBestellung.loadBestellung(false);
+        if (sTempBE == null) sTempBE = new String[0][HEADER_BE.length];
     	sTempPU = LadeEinkauf.loadEinkaufsRechnung(false);
         if (sTempPU == null) sTempPU = new String[0][HEADER_PU.length];
         sTempEX = LadeAusgaben.loadAusgaben(false);
@@ -671,6 +830,13 @@ public class HauptFenster extends JFrame {
         infoRE.setTxtSum(0, dOpen);
         infoRE.setTxtSum(1, dPayed);
         infoRE.setProgressBar(prozent(LadeRechnung.getSumOpen(), LadeRechnung.getSumPayed()));
+    }
+    
+    private void setSumBE() {
+    	double dOpen = LadeBestellung.getSumOpen().doubleValue();
+        double dDelivered = LadeBestellung.getSumDelivered().doubleValue();
+        infoBE.setTxtSum(0, dOpen);
+        infoBE.setTxtSum(1, dDelivered);
     }
 
     private void setSumPU() {
@@ -774,6 +940,41 @@ public class HauptFenster extends JFrame {
             }
         }
     }
+    
+    private void actionClickBE(JTable table, MouseEvent e) {
+        int row = table.rowAtPoint(e.getPoint());
+        int column = table.columnAtPoint(e.getPoint());
+        if (row == -1 || column == -1) return;
+
+        if (isLeftSingle(e)) {
+            e.consume();
+            if (table.getValueAt(row, column) == null) {
+                if (bestellungPanel instanceof BestellungPanel bep) {
+                    bep.setsTitel("Bestellungen");
+                    bep.setTxtFields(null, null);
+                }
+                return;
+            }
+            if (bestellungPanel instanceof BestellungPanel bep) {
+                bep.setsTitel("Bestellungen (Bestellung-Nr. = " + table.getValueAt(row, 0) + ")");
+                Lieferant lieferant = searchLieferantAll(table.getValueAt(row, 4).toString());
+                bep.setTxtFields(table.getValueAt(row, 0).toString(), lieferant != null ? lieferant.getTaxvalue() : null);
+                vZelleBE = table.getValueAt(row, 0).toString();
+                vStateBE = table.getValueAt(row, 1).toString();
+                if (panelBEInfo instanceof ErzeugePanelA cp) {
+                    JButton[] btn = cp.getButtons();
+                    setOrderButtonsByState(vStateBE, btn);
+                }
+            }
+        } else if (isLeftDouble(e)) {
+            e.consume();
+            if (table.getValueAt(row, column) != null) {
+                String nr = table.getValueAt(row, 0).toString();
+                Lieferant lieferant = searchLieferantAll(table.getValueAt(row, 4).toString());
+                actionFileBE(nr, lieferant);
+            }
+        }
+    }
 
     private void actionClickPU(JTable table, MouseEvent e) {
         if (!isLeftSingle(e)) return;
@@ -859,7 +1060,7 @@ public class HauptFenster extends JFrame {
     
     private void updScreen() {
         // Tabs je nach Rolle neu befüllen
-    	sTempAN = sTempRE = sTempPU = sTempEX = sTempST = null;
+    	sTempAN = sTempRE = sTempBE = sTempPU = sTempEX = sTempST = null;
         pageOv = null; pageErg = null;
 
         loadData();
@@ -867,24 +1068,26 @@ public class HauptFenster extends JFrame {
             case USER -> {
             	pageAN.removeAll();
 				pageRE.removeAll();
-				doAngebotPanel(false);
-				doRechnungPanel(false);
+				doAngebotPanel(0);
+				doRechnungPanel(0);
             }
             case SUPERUSER -> {
             	pageAN.removeAll();
 				pageRE.removeAll();
+				pageBE.removeAll();
 				pagePU.removeAll();
 				pageEX.removeAll();
-				doAngebotPanel(false);
-				doRechnungPanel(false);
-				doEinkaufPanel();
+				doAngebotPanel(0);
+				doRechnungPanel(0);
+				doBestellungPanel(0);
+				doEinkaufPanel(0);
 				doAusgabenPanel();
             }
             case FINANCIALUSER -> {
             	pagePU.removeAll();
 				pageEX.removeAll();
             	pageST.removeAll();
-            	doEinkaufPanel();
+            	doEinkaufPanel(0);
 				doAusgabenPanel();
 				doSvsTaxPanel();
 				doJahresergebnis();
@@ -915,6 +1118,11 @@ public class HauptFenster extends JFrame {
         if (value == null || kunde == null) return;
         DateianzeigeDialog.loadGUI(value, kunde);
     }
+    
+    private void actionFileBE(String value, Lieferant lieferant) {
+        if (value == null || lieferant == null) return;
+        DateianzeigeDialog.loadGUIBE(value, lieferant);
+    }
 
     private boolean isLeftSingle(MouseEvent e) {
         return e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 1 && !e.isConsumed();
@@ -927,8 +1135,8 @@ public class HauptFenster extends JFrame {
     private void setOfferButtonsByState(String state, JButton[] btn) {
         boolean print = "erstellt".equals(state);
         boolean confirm = "bestellt".equals(state);
-        btn[1].setEnabled(print);
-        btn[2].setEnabled(confirm);
+        btn[3].setEnabled(print);
+        btn[4].setEnabled(confirm);
     }
 
     private void setBillButtonsByState(String state, JButton[] btn) {
@@ -937,13 +1145,25 @@ public class HauptFenster extends JFrame {
             case "gedruckt", "Zahlungserinnerung", "Mahnstufe 1", "Mahnstufe 2" -> true;
             default -> false;
         };
-        btn[1].setEnabled(print);
-        btn[2].setEnabled(dunning);
+        btn[3].setEnabled(print);
+        btn[4].setEnabled(dunning);
+    }
+    
+    private void setOrderButtonsByState(String state, JButton[] btn) {
+        boolean print = "erstellt".equals(state);
+        btn[3].setEnabled(print);
     }
 
     private Kunde searchKundeAll(String name) {
         if (name == null || name.isBlank()) return null;
         return new KundeRepository().findAll().stream()
+                .filter(k -> name.equals(k.getName()))
+                .findFirst().orElse(null);
+    }
+    
+    private Lieferant searchLieferantAll(String name) {
+        if (name == null || name.isBlank()) return null;
+        return new LieferantRepository().findAll().stream()
                 .filter(k -> name.equals(k.getName()))
                 .findFirst().orElse(null);
     }
@@ -1008,6 +1228,29 @@ public class HauptFenster extends JFrame {
                     case "Mahnstufe 2" -> setBackground(Color.RED);
                     case "bezahlt" -> setBackground(new Color(152,251,152));
                     case "bez. Skonto 1", "bez. Skonto 2" -> setBackground(new Color(155,205,155));
+                }
+            }
+            return label;
+        }
+    }
+    
+    static class TableBEcr extends DefaultTableCellRenderer {
+        private static final long serialVersionUID = 1L;
+        private final HauptFenster ctx;
+        TableBEcr(HauptFenster ctx) { this.ctx = ctx; }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            label.setHorizontalAlignment((column <= 2) ? SwingConstants.CENTER
+                    : ((column >= 5 && column <= 7) ? SwingConstants.RIGHT : SwingConstants.LEFT));
+            setBackground(row % 2 < 1 ? new Color(10,10,10,10) : Color.WHITE);
+            String[][] s = ctx.sTempBE;
+            if (s != null && row < s.length && s[row][1] != null) {
+                switch (s[row][1]) {
+                    case "storniert" -> setBackground(Color.PINK);
+                    case "gedruckt" -> setBackground(new Color(175,238,238));
+                    case "geliefert" -> setBackground(Color.YELLOW);
                 }
             }
             return label;

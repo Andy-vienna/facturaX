@@ -79,6 +79,8 @@ public class Einstellungen {
 			tplBill = prpAppSettings.getProperty("templatebill");
 			tplReminder = prpAppSettings.getProperty("templatereminder");
 			tplMahnung = prpAppSettings.getProperty("templatemahnung");
+			tplBestellung = prpAppSettings.getProperty("templatebestellung");
+			tplLieferschein = prpAppSettings.getProperty("templatelieferschein");
 			tplP109a = prpAppSettings.getProperty("templatep109a");
 			workPath = prpAppSettings.getProperty("work");
 		} catch (FileNotFoundException e) {

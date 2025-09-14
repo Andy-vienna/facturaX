@@ -107,7 +107,7 @@ public class TextMahnung extends TextPanel  {
 			gbc.gridx = 2; // Wechsel zur nächsten Spalte
 			JButton btnUpdateText = null;
 			try {
-				btnUpdateText = createButton("Ändern", "menu/edit.png");
+				btnUpdateText = createButton("Ändern", "menu/edit.png", null);
 			} catch (RuntimeException e1) {
 				logger.error("error creating button - " + e1);
 			}

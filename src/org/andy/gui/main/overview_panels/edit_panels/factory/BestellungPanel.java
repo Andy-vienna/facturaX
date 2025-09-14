@@ -1,8 +1,7 @@
 package org.andy.gui.main.overview_panels.edit_panels.factory;
 
-import static org.andy.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
-import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
 import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -15,11 +14,8 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -32,13 +28,11 @@ import javax.swing.border.TitledBorder;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.NumberFormatter;
 
-import org.andy.code.dataStructure.entitiyMaster.Kunde;
-import org.andy.code.dataStructure.entitiyProductive.Rechnung;
-import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
-import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
+import org.andy.code.dataStructure.entitiyProductive.Bestellung;
+import org.andy.code.dataStructure.repositoryProductive.BestellungRepository;
 import org.andy.code.main.StartUp;
-import org.andy.code.misc.BD;
 import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
+import org.andy.code.misc.BD;
 import org.andy.gui.main.HauptFenster;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.gui.misc.CommaHelper;
@@ -52,12 +46,12 @@ import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
 import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
 import com.github.lgooddatepicker.zinternaltools.DemoPanel;
 
-public class RechnungPanel extends EditPanel {
+public class BestellungPanel extends EditPanel {
 
 	// Serialisierungs-ID für die Klasse
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = LogManager.getLogger(RechnungPanel.class);
+	private static final Logger logger = LogManager.getLogger(BestellungPanel.class);
 	
 	JPanel panel = new JPanel();
 	private Border b;
@@ -66,20 +60,16 @@ public class RechnungPanel extends EditPanel {
 	private DemoPanel[] panelDate = new DemoPanel[2];
 	private DatePickerSettings[] dateSettings = new DatePickerSettings[2];
 	private DatePicker[] datePicker = new DatePicker[2];
-	private JTextField[] txtFieldsHead = new JTextField[2];
+	private JTextField[] txtFieldsHead = new JTextField[1];
 	private JTextField[] txtFieldsPos = new JTextField[12];
 	private JTextField[] txtFieldsAnz = new JTextField[12];
 	private JTextField[] txtFieldsEP = new JTextField[12];
 	private JTextField[] txtFieldsGP = new JTextField[12];
 	private JFormattedTextField[] txtFieldsSum = new JFormattedTextField[3];
-
+	
 	private JLabel lblState = null;
 	private JComboBox<String> cmbState = null;
-	
-	private JLabel lblSkonto1, lblSkonto1a, lblSkonto2, lblSkonto2a;
-	private JCheckBox chkSkonto1; private JTextField txtSkontoTage1; private JTextField txtSkontoWert1;
-    private JCheckBox chkSkonto2; private JTextField txtSkontoTage2; private JTextField txtSkontoWert2;
-	
+
 	private JButton[] btnFields = new JButton[3];
 	
 	private String[] sDatum = new String[2];
@@ -91,7 +81,7 @@ public class RechnungPanel extends EditPanel {
 	// public Teil
 	//###################################################################################################################################################
 	
-    public RechnungPanel() {
+    public BestellungPanel() {
         super("");
         initContent();
     }
@@ -115,10 +105,10 @@ public class RechnungPanel extends EditPanel {
 	
 	private void buildPanel() {
 		
-		String[] selectState = {"", "storniert", "bezahlt"};
+		String[] selectState = {"", "storniert", "geliefert" };
 		
 		// Überschriften und Feldbeschriftungen
-	    String[] labelsTop = {"Datum:", "Leistungszeitraum", "Referenz:"};
+	    String[] labelsTop = {"Datum:", "Referenz:"};
 	    String[] labelsCol = {"Nr:", "Position:", "Anzahl:", "Einzel:", "Summe"};
 	    String[] labelsRow = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
 	    String[] labelsBtm = {"Netto:", "USt.:", "Brutto:"};
@@ -135,8 +125,7 @@ public class RechnungPanel extends EditPanel {
 	    	add(lblFieldsTop[r]);
 	    }
 	    lblFieldsTop[0].setBounds(10, 20, 50, 25);
-    	lblFieldsTop[1].setBounds(230, 20, 120, 25);
-    	lblFieldsTop[2].setBounds(570, 20, 70, 25);
+    	lblFieldsTop[1].setBounds(230, 20, 70, 25);
     	
 	    for (int r = 0; r < labelsCol.length; r++) {
 	    	lblFieldsCol[r] = new JLabel(labelsCol[r]);
@@ -191,9 +180,8 @@ public class RechnungPanel extends EditPanel {
 		datePicker[0].setBounds(60, 20, 150, 25);
 		
 		// Textfelder
-		txtFieldsHead[0] = makeField(640, 20, 1000, 25, true, null); // Referenz
-		txtFieldsHead[1] = makeField(350, 20, 200, 25, true, null); // Leistungszeitraum
 	    for (int r = 0; r < txtFieldsHead.length; r++) {
+	    	txtFieldsHead[r] = makeField(300, 20, 1000, 25, true, null);
 	    	txtFieldsHead[r].setHorizontalAlignment(SwingConstants.LEFT);
 	    	txtFieldsHead[r].setFocusable(false);
 	    	add(txtFieldsHead[r]);
@@ -231,22 +219,6 @@ public class RechnungPanel extends EditPanel {
 	    cmbState.setVisible(false);
 	    add(cmbState);
 	    
-	    chkSkonto1 = new JCheckBox("Skonto 1"); chkSkonto1.setBounds(1345, 120, 80, 25); add(chkSkonto1);
-        txtSkontoTage1 = new JTextField(); txtSkontoTage1.setBounds(1425, 120, 50, 25); add(txtSkontoTage1);
-        lblSkonto1 = new JLabel("Tage"); lblSkonto1.setBounds(1475, 120, 50, 25); add(lblSkonto1);
-        txtSkontoWert1 = new JTextField(); txtSkontoWert1.setBounds(1525, 120, 50, 25); add(txtSkontoWert1);
-        lblSkonto1a = new JLabel("%"); lblSkonto1a.setBounds(1575, 120, 50, 25); add(lblSkonto1a);
-        chkSkonto2 = new JCheckBox("Skonto 2"); chkSkonto2.setBounds(1345, 145, 80, 25); add(chkSkonto2);
-        txtSkontoTage2 = new JTextField(); txtSkontoTage2.setBounds(1425, 145, 50, 25); add(txtSkontoTage2);
-        lblSkonto2 = new JLabel("Tage"); lblSkonto2.setBounds(1475, 145, 50, 25); add(lblSkonto2);
-        txtSkontoWert2 = new JTextField(); txtSkontoWert2.setBounds(1525, 145, 50, 25); add(txtSkontoWert2);
-        lblSkonto2a = new JLabel("%"); lblSkonto2a.setBounds(1575, 145, 50, 25); add(lblSkonto2a);
-        lblSkonto1.setVisible(false); lblSkonto1a.setVisible(false); lblSkonto2.setVisible(false); lblSkonto2a.setVisible(false);
-        chkSkonto1.setVisible(false); txtSkontoTage1.setVisible(false); txtSkontoWert1.setVisible(false);
-        chkSkonto2.setVisible(false); txtSkontoTage2.setVisible(false); txtSkontoWert2.setVisible(false);
-        chkSkonto1.setEnabled(false); txtSkontoTage1.setEnabled(false); txtSkontoWert1.setEnabled(false);
-        chkSkonto2.setEnabled(false); txtSkontoTage2.setEnabled(false); txtSkontoWert2.setEnabled(false);
-	    
 	    // Buttons
 		try {
 			btnFields[0] = createButton("<html>neu<br>berechnen</html>", "calc.png", null);
@@ -259,9 +231,7 @@ public class RechnungPanel extends EditPanel {
 		btnFields[1].setBounds(1625, 320, HauptFenster.getButtonx(), HauptFenster.getButtony());
 		btnFields[2].setBounds(1625, 70, HauptFenster.getButtonx(), HauptFenster.getButtony());
 		btnFields[2].setVisible(false);
-		add(btnFields[0]);
-		add(btnFields[1]);
-		add(btnFields[2]);
+		add(btnFields[0]); add(btnFields[1]); add(btnFields[2]);
 		
 		setPreferredSize(new Dimension(1000, 70 + txtFieldsPos.length * 25 + 20));
 		
@@ -345,7 +315,7 @@ public class RechnungPanel extends EditPanel {
     private void attachCommaToDot(JTextField field) {
         ((AbstractDocument) field.getDocument()).setDocumentFilter(new CommaHelper.CommaToDotFilter());
     }
-    
+  
     private void txtFieldsFocusable(boolean b) {
     	this.datePicker[0].setEnabled(b);
     	for (int i = 0; i < this.txtFieldsHead.length; i++) {
@@ -365,11 +335,6 @@ public class RechnungPanel extends EditPanel {
 		btnFields[0].setEnabled(b);
 		btnFields[1].setEnabled(false);
 		btnFields[2].setVisible(false);
-		lblSkonto1.setVisible(b); lblSkonto1a.setVisible(b); lblSkonto2.setVisible(b); lblSkonto2a.setVisible(b);
-        chkSkonto1.setVisible(b); txtSkontoTage1.setVisible(b); txtSkontoWert1.setVisible(b);
-        chkSkonto2.setVisible(b); txtSkontoTage2.setVisible(b); txtSkontoWert2.setVisible(b);
-        chkSkonto1.setEnabled(b); txtSkontoTage1.setEnabled(b); txtSkontoWert1.setEnabled(b);
-        chkSkonto2.setEnabled(b); txtSkontoTage2.setEnabled(b); txtSkontoWert2.setEnabled(b);
     }
     
 	//###################################################################################################################################################
@@ -390,7 +355,7 @@ public class RechnungPanel extends EditPanel {
 	    		String ep = this.txtFieldsEP[i].getText();
 	    		
 	    		bdAnz = parseStringToBigDecimalSafe(anz, LocaleFormat.AUTO).setScale(2, RoundingMode.HALF_UP);
-	    		bdEP = parseStringToBigDecimalSafe(ep, LocaleFormat.AUTO).setScale(2, RoundingMode.HALF_UP);
+	    	    bdEP = parseStringToBigDecimalSafe(ep, LocaleFormat.AUTO).setScale(2, RoundingMode.HALF_UP);
 	        	bdGP = bdAnz.multiply(bdEP).setScale(2, RoundingMode.HALF_UP);
 	
 	        	bdNetto = bdNetto.add(bdGP).setScale(2, RoundingMode.HALF_UP);
@@ -411,113 +376,77 @@ public class RechnungPanel extends EditPanel {
     	BigDecimal[] bdAnzahl = new BigDecimal[this.txtFieldsPos.length];
     	BigDecimal[] bdEinzel = new BigDecimal[this.txtFieldsPos.length];
     	
-    	RechnungRepository rechnungRepository = new RechnungRepository();
-        Rechnung rechnung = rechnungRepository.findById(id);
+    	BestellungRepository bestellungRepository = new BestellungRepository();
+        Bestellung bestellung = bestellungRepository.findById(id);
     	
     	for (int i = 0; i < this.txtFieldsPos.length; i++) {
     		if (!this.txtFieldsPos[i].getText().isEmpty()) {
 				sPosText[i] = this.txtFieldsPos[i].getText();
 				bdAnzahl[i] = parseStringToBigDecimalSafe(this.txtFieldsAnz[i].getText(), LocaleFormat.AUTO).setScale(2, RoundingMode.HALF_UP);
 				bdEinzel[i] = parseStringToBigDecimalSafe(this.txtFieldsEP[i].getText(), LocaleFormat.AUTO).setScale(2, RoundingMode.HALF_UP);
-				anzPos = anzPos.add(BD.ONE); // Anzahl der Positionen
+				anzPos = anzPos.add(BigDecimal.ONE); // Anzahl der Positionen
     		}
 		}
     	
-    	rechnung.setDatum(datePicker[0].getDate());
-    	rechnung.setRef(txtFieldsHead[0].getText()); rechnung.setlZeitr(txtFieldsHead[1].getText());
+    	bestellung.setDatum(datePicker[0].getDate());
+    	bestellung.setRef(txtFieldsHead[0].getText());
     	
-    	rechnung.setAnzPos(anzPos);
-    	rechnung.setArt01(sPosText[0]); rechnung.setMenge01(bdAnzahl[0]); rechnung.setePreis01(bdEinzel[0]);
-    	rechnung.setArt02(sPosText[1]); rechnung.setMenge02(bdAnzahl[1]); rechnung.setePreis02(bdEinzel[1]);
-    	rechnung.setArt03(sPosText[2]); rechnung.setMenge03(bdAnzahl[2]); rechnung.setePreis03(bdEinzel[2]);
-    	rechnung.setArt04(sPosText[3]); rechnung.setMenge04(bdAnzahl[3]); rechnung.setePreis04(bdEinzel[3]);
-    	rechnung.setArt05(sPosText[4]); rechnung.setMenge05(bdAnzahl[4]); rechnung.setePreis05(bdEinzel[4]);
-    	rechnung.setArt06(sPosText[5]); rechnung.setMenge06(bdAnzahl[5]); rechnung.setePreis06(bdEinzel[5]);
-    	rechnung.setArt07(sPosText[6]); rechnung.setMenge07(bdAnzahl[6]); rechnung.setePreis07(bdEinzel[6]);
-    	rechnung.setArt08(sPosText[7]); rechnung.setMenge08(bdAnzahl[7]); rechnung.setePreis08(bdEinzel[7]);
-    	rechnung.setArt09(sPosText[8]); rechnung.setMenge09(bdAnzahl[8]); rechnung.setePreis09(bdEinzel[8]);
-    	rechnung.setArt10(sPosText[9]); rechnung.setMenge10(bdAnzahl[9]); rechnung.setePreis10(bdEinzel[9]);
-    	rechnung.setArt11(sPosText[10]); rechnung.setMenge11(bdAnzahl[10]); rechnung.setePreis11(bdEinzel[10]);
-    	rechnung.setArt12(sPosText[11]); rechnung.setMenge12(bdAnzahl[11]); rechnung.setePreis12(bdEinzel[11]);
+    	bestellung.setAnzPos(anzPos);
+    	bestellung.setArt01(sPosText[0]); bestellung.setMenge01(bdAnzahl[0]); bestellung.setePreis01(bdEinzel[0]);
+    	bestellung.setArt02(sPosText[1]); bestellung.setMenge02(bdAnzahl[1]); bestellung.setePreis02(bdEinzel[1]);
+    	bestellung.setArt03(sPosText[2]); bestellung.setMenge03(bdAnzahl[2]); bestellung.setePreis03(bdEinzel[2]);
+    	bestellung.setArt04(sPosText[3]); bestellung.setMenge04(bdAnzahl[3]); bestellung.setePreis04(bdEinzel[3]);
+    	bestellung.setArt05(sPosText[4]); bestellung.setMenge05(bdAnzahl[4]); bestellung.setePreis05(bdEinzel[4]);
+    	bestellung.setArt06(sPosText[5]); bestellung.setMenge06(bdAnzahl[5]); bestellung.setePreis06(bdEinzel[5]);
+    	bestellung.setArt07(sPosText[6]); bestellung.setMenge07(bdAnzahl[6]); bestellung.setePreis07(bdEinzel[6]);
+    	bestellung.setArt08(sPosText[7]); bestellung.setMenge08(bdAnzahl[7]); bestellung.setePreis08(bdEinzel[7]);
+    	bestellung.setArt09(sPosText[8]); bestellung.setMenge09(bdAnzahl[8]); bestellung.setePreis09(bdEinzel[8]);
+    	bestellung.setArt10(sPosText[9]); bestellung.setMenge10(bdAnzahl[9]); bestellung.setePreis10(bdEinzel[9]);
+    	bestellung.setArt11(sPosText[10]); bestellung.setMenge11(bdAnzahl[10]); bestellung.setePreis11(bdEinzel[10]);
+    	bestellung.setArt12(sPosText[11]); bestellung.setMenge12(bdAnzahl[11]); bestellung.setePreis12(bdEinzel[11]);
     	
     	Number numberN = (Number) this.txtFieldsSum[0].getValue();
     	double netto = numberN.doubleValue();
-    	rechnung.setNetto(BigDecimal.valueOf(netto));
+    	bestellung.setNetto(BigDecimal.valueOf(netto));
     	
     	Number numberT = (Number) this.txtFieldsSum[1].getValue();
     	double tax = numberT.doubleValue();
-    	rechnung.setUst(BigDecimal.valueOf(tax));
+    	bestellung.setUst(BigDecimal.valueOf(tax));
     	
     	Number numberB = (Number) this.txtFieldsSum[2].getValue();
     	double brutto = numberB.doubleValue();
-    	rechnung.setBrutto(BigDecimal.valueOf(brutto));
+    	bestellung.setBrutto(BigDecimal.valueOf(brutto));
     	
-    	rechnung.setSkonto1(chkSkonto1.isSelected()?1:0);
-    	rechnung.setSkonto1tage(txtSkontoTage1.getText().equals("")?0:parseStringToIntSafe(txtSkontoTage1.getText()));
-    	rechnung.setSkonto1wert(txtSkontoTage1.getText().equals("")?BD.ZERO:parseStringToBigDecimalSafe(txtSkontoWert1.getText(), LocaleFormat.AUTO).divide(BD.HUNDRED));
-    	rechnung.setSkonto2(chkSkonto2.isSelected()?1:0);
-    	rechnung.setSkonto2tage(txtSkontoTage2.getText().equals("")?0:parseStringToIntSafe(txtSkontoTage2.getText()));
-    	rechnung.setSkonto2wert(txtSkontoTage2.getText().equals("")?BD.ZERO:parseStringToBigDecimalSafe(txtSkontoWert2.getText(), LocaleFormat.AUTO).divide(BD.HUNDRED));
+    	bestellungRepository.update(bestellung);
     	
-    	rechnungRepository.update(rechnung); // Hibernate update
     	HauptFenster.actScreen();
     }
     
     private void updateState() {
-    	RechnungRepository rechnungRepository = new RechnungRepository();
-        Rechnung rechnung = rechnungRepository.findById(id);
+    	BestellungRepository bestellungRepository = new BestellungRepository();
+        Bestellung bestellung = bestellungRepository.findById(id);
+        
         switch (cmbState.getSelectedIndex()) {
 		case 1: // storniert
-			rechnung.setNetto(BD.ZERO);
-			rechnung.setUst(BD.ZERO);
-			rechnung.setBrutto(BD.ZERO);
-			rechnung.setState(0);
+			bestellung.setNetto(BD.ZERO);
+			bestellung.setUst(BD.ZERO);
+			bestellung.setBrutto(BD.ZERO);
+			bestellung.setState(0);
 			break;
-		case 2: // bezahlt
-			rechnung.setState(111);
-			break;
-		case 3: // bezahlt mit Skonto 1
-			updateSkonto(rechnung, 1);
-			break;
-		case 4: // bezahlt mit Skonto 2
-			updateSkonto(rechnung, 2);
+		case 2: // geliefert
+			bestellung.setState(51);
 			break;
 		default:
 			break;
 		}
-        rechnungRepository.update(rechnung); // Hibernate update
+        
+        bestellungRepository.update(bestellung);
+        
         HauptFenster.actScreen();
     }
     
-    private void updateSkonto(Rechnung r, int stufe) {
-    	KundeRepository kundeRepository = new KundeRepository();
-    	List<Kunde> kundeListe = kundeRepository.findAll();
-    	BigDecimal oldNetto = BD.ZERO, skonto = BD.ZERO, taxRate = BD.ZERO;
-    	BigDecimal newNetto = BD.ZERO, newUSt = BD.ZERO, newBrutto = BD.ZERO;
-    	for (int i = 0; i < kundeListe.size(); i++) {
-    		Kunde k = kundeListe.get(i);
-    		if (k.getId().equals(r.getIdKunde())){
-    			taxRate = parseStringToBigDecimalSafe(k.getTaxvalue(), LocaleFormat.AUTO).divide(BD.HUNDRED);
-    		}
-    	}
-    	switch(stufe) {
-    	case 1:
-    		oldNetto = r.getNetto();
-    		skonto = oldNetto.multiply(r.getSkonto1wert());
-    		r.setState(112);
-    		break;
-    	case 2:
-    		oldNetto = r.getNetto();
-    		skonto = oldNetto.multiply(r.getSkonto2wert());
-    		r.setState(113);
-    		break;
-    	}
-    	newNetto = oldNetto.subtract(skonto); newUSt = newNetto.multiply(taxRate); newBrutto = newNetto.add(newUSt);
-    	r.setNetto(newNetto); r.setUst(newUSt); r.setBrutto(newBrutto);
-    }
-    
 	//###################################################################################################################################################
-	// Getter und Setter
+	// Getter und Setter für Felder
 	//###################################################################################################################################################
     
     public void setsTitel(String sTitel) {
@@ -535,28 +464,28 @@ public class RechnungPanel extends EditPanel {
     	ArrayList<String> pos = new ArrayList<>();
     	ArrayList<BigDecimal> anz = new ArrayList<>();
     	ArrayList<BigDecimal> ep = new ArrayList<>();
-    	    	
-    	RechnungRepository rechnungRepository = new RechnungRepository();
-        Rechnung rechnung = rechnungRepository.findById(id);
+    	
+    	BestellungRepository bestellungRepository = new BestellungRepository();
+        Bestellung bestellung = bestellungRepository.findById(id);
         
-        if (id.isEmpty() || id == null) {
+    	if (id.isEmpty() || id == null) {
     		return;
     	}
-        
-        pos.add(rechnung.getArt01()); pos.add(rechnung.getArt02()); pos.add(rechnung.getArt03()); pos.add(rechnung.getArt04());
-    	pos.add(rechnung.getArt05()); pos.add(rechnung.getArt06()); pos.add(rechnung.getArt07()); pos.add(rechnung.getArt08());
-    	pos.add(rechnung.getArt09()); pos.add(rechnung.getArt10()); pos.add(rechnung.getArt11()); pos.add(rechnung.getArt12());
     	
-    	anz.add(rechnung.getMenge01()); anz.add(rechnung.getMenge02()); anz.add(rechnung.getMenge03()); anz.add(rechnung.getMenge04());
-    	anz.add(rechnung.getMenge05()); anz.add(rechnung.getMenge06()); anz.add(rechnung.getMenge07()); anz.add(rechnung.getMenge08());
-    	anz.add(rechnung.getMenge09()); anz.add(rechnung.getMenge10()); anz.add(rechnung.getMenge11()); anz.add(rechnung.getMenge12());
+    	pos.add(bestellung.getArt01()); pos.add(bestellung.getArt02()); pos.add(bestellung.getArt03()); pos.add(bestellung.getArt04());
+    	pos.add(bestellung.getArt05()); pos.add(bestellung.getArt06()); pos.add(bestellung.getArt07()); pos.add(bestellung.getArt08());
+    	pos.add(bestellung.getArt09()); pos.add(bestellung.getArt10()); pos.add(bestellung.getArt11()); pos.add(bestellung.getArt12());
     	
-    	ep.add(rechnung.getePreis01()); ep.add(rechnung.getePreis02()); ep.add(rechnung.getePreis03()); ep.add(rechnung.getePreis04());
-    	ep.add(rechnung.getePreis05()); ep.add(rechnung.getePreis06()); ep.add(rechnung.getePreis07()); ep.add(rechnung.getePreis08());
-    	ep.add(rechnung.getePreis09()); ep.add(rechnung.getePreis10()); ep.add(rechnung.getePreis11()); ep.add(rechnung.getePreis12());
+    	anz.add(bestellung.getMenge01()); anz.add(bestellung.getMenge02()); anz.add(bestellung.getMenge03()); anz.add(bestellung.getMenge04());
+    	anz.add(bestellung.getMenge05()); anz.add(bestellung.getMenge06()); anz.add(bestellung.getMenge07()); anz.add(bestellung.getMenge08());
+    	anz.add(bestellung.getMenge09()); anz.add(bestellung.getMenge10()); anz.add(bestellung.getMenge11()); anz.add(bestellung.getMenge12());
     	
+    	ep.add(bestellung.getePreis01()); ep.add(bestellung.getePreis02()); ep.add(bestellung.getePreis03()); ep.add(bestellung.getePreis04());
+    	ep.add(bestellung.getePreis05()); ep.add(bestellung.getePreis06()); ep.add(bestellung.getePreis07()); ep.add(bestellung.getePreis08());
+    	ep.add(bestellung.getePreis09()); ep.add(bestellung.getePreis10()); ep.add(bestellung.getePreis11()); ep.add(bestellung.getePreis12());
     	
     	this.id = null; this.bdTaxRate = BD.ZERO;
+    	cmbState.setSelectedIndex(0);
     	bdNetto = BD.ZERO;
     	bdTaxRate = parseStringToBigDecimalSafe(TaxVal, LocaleFormat.AUTO);
 
@@ -579,10 +508,11 @@ public class RechnungPanel extends EditPanel {
 		btnFields[0].setEnabled(false);
 		txtFieldsFocusable(false);
 		
-		this.datePicker[0].setDate(rechnung.getDatum());
-		this.txtFieldsHead[0].setText(rechnung.getRef());
-		this.txtFieldsHead[1].setText(rechnung.getlZeitr());
-		for (int i = 0; i < rechnung.getAnzPos().intValue(); i++) {
+    	this.datePicker[0].setDate(bestellung.getDatum());
+    	for (int i = 0; i < this.txtFieldsHead.length; i++) {
+    		this.txtFieldsHead[i].setText(bestellung.getRef());
+    	}
+    	for (int i = 0; i < bestellung.getAnzPos().intValue(); i++) {
     		BigDecimal bdAnz = anz.get(i);
     		BigDecimal bdEP = ep.get(i);
     		BigDecimal bdGP = bdAnz.multiply(bdEP).setScale(2, RoundingMode.HALF_UP);
@@ -594,39 +524,20 @@ public class RechnungPanel extends EditPanel {
 			this.txtFieldsGP[i].setText(bdGP.toString());
 			
 		}
-		txtFieldsSum[0].setValue(Double.parseDouble(bdNetto.toString()));
+    	txtFieldsSum[0].setValue(Double.parseDouble(bdNetto.toString()));
     	bdTax = bdNetto.multiply(bdTaxRate.divide(BD.HUNDRED)).setScale(2, RoundingMode.HALF_UP);
     	txtFieldsSum[1].setValue(Double.parseDouble(bdTax.toString()));
     	bdBrutto = bdNetto.add(bdTax).setScale(2, RoundingMode.HALF_UP);
     	txtFieldsSum[2].setValue(Double.parseDouble(bdBrutto.toString()));
     	
-    	if (rechnung.getSkonto1() == 1) {chkSkonto1.setSelected(true);} else {chkSkonto1.setSelected(false);}
-    	txtSkontoTage1.setText(String.valueOf(rechnung.getSkonto1tage()));
-    	txtSkontoWert1.setText(rechnung.getSkonto1wert().multiply(BD.HUNDRED).setScale(1, RoundingMode.HALF_UP).toString());
-    	if (rechnung.getSkonto2() == 1) {chkSkonto2.setSelected(true);} else {chkSkonto2.setSelected(false);}
-    	txtSkontoTage2.setText(String.valueOf(rechnung.getSkonto2tage()));
-    	txtSkontoWert2.setText(rechnung.getSkonto2wert().multiply(BD.HUNDRED).setScale(1, RoundingMode.HALF_UP).toString());
-
-    	switch(rechnung.getState()) {
+    	switch(bestellung.getState()) {
     	case 1:
     		txtFieldsFocusable(true);
     		break;
     	case 11:
-    		String[] selectState = null;
-    		if (rechnung.getSkonto1() == 1) {
-    			selectState = new String[] {"", "storniert", "bezahlt", "bezahlt Skonto 1"};
-    			if (rechnung.getSkonto2() == 1) {
-    				selectState = new String[] {"", "storniert", "bezahlt", "bezahlt Skonto 1", "bezahlt Skonto 2"};
-    			}
-    			cmbState.setModel(new DefaultComboBoxModel<>(selectState));
-    			cmbState.setSelectedIndex(0);
-    		}
     		lblState.setVisible(true);
     		cmbState.setVisible(true);
     		btnFields[2].setVisible(true);
-    		lblSkonto1.setVisible(true); lblSkonto1a.setVisible(true); lblSkonto2.setVisible(true); lblSkonto2a.setVisible(true);
-    		chkSkonto1.setVisible(true); txtSkontoTage1.setVisible(true); txtSkontoWert1.setVisible(true);
-            chkSkonto2.setVisible(true); txtSkontoTage2.setVisible(true); txtSkontoWert2.setVisible(true);
     	}
     }
 }

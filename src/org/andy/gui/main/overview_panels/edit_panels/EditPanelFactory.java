@@ -6,8 +6,13 @@ import org.andy.gui.main.overview_panels.edit_panels.factory.RechnungNeuPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.RechnungPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.AngebotNeuPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.AusgabenPanel;
+import org.andy.gui.main.overview_panels.edit_panels.factory.BestellungNeuPanel;
+import org.andy.gui.main.overview_panels.edit_panels.factory.BestellungPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.AngebotPanel;
+import org.andy.gui.main.overview_panels.edit_panels.factory.ArtikelNeuPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.EinkaufPanel;
+import org.andy.gui.main.overview_panels.edit_panels.factory.KundeNeuPanel;
+import org.andy.gui.main.overview_panels.edit_panels.factory.LieferantNeuPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.SvTaxPanel;
 
 public class EditPanelFactory {
@@ -16,9 +21,14 @@ public class EditPanelFactory {
         switch (sTyp) {
             case "AN":  return new AngebotPanel();
             case "NA":  return new AngebotNeuPanel();
+            case "NK":  return new KundeNeuPanel();
+            case "NArt":  return new ArtikelNeuPanel();
             case "RE":  return new RechnungPanel();
             case "NR":  return new RechnungNeuPanel();
+            case "BE":  return new BestellungPanel();
+            case "NB":  return new BestellungNeuPanel();
             case "PU":  return new EinkaufPanel();
+            case "NL":  return new LieferantNeuPanel();
             case "EX":  return new AusgabenPanel();
             case "SVT": return new SvTaxPanel();
             default:    return new EditPanel("Unbekannt") {

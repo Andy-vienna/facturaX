@@ -80,8 +80,8 @@ public class DatenbankPanel extends JPanel {
 		chkServerCert.setBounds(190, 145, 155, 25);
 
 		try {
-			btnDBEdit = createButton(null, "edit.png");
-			btnDBOK = createButton(null, "ok.png");
+			btnDBEdit = createButton(null, "edit.png", null);
+			btnDBOK = createButton(null, "ok.png", null);
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}

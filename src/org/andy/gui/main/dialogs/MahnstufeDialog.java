@@ -115,7 +115,7 @@ public final class MahnstufeDialog extends JDialog {
 
         JButton printBtn;
         try {
-            printBtn = createButton("<html>Mahnstufe drucken</html>", "print.png");
+            printBtn = createButton("<html>Mahnstufe drucken</html>", "print.png", null);
         } catch (RuntimeException ex) {
             log.warn("Button/Icon konnte nicht erstellt werden, fallback ohne Icon.", ex);
             printBtn = new JButton("Mahnstufe drucken");

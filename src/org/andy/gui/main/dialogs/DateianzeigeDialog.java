@@ -30,6 +30,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 
 import org.andy.code.dataStructure.entitiyMaster.Kunde;
+import org.andy.code.dataStructure.entitiyMaster.Lieferant;
 import org.andy.code.dataStructure.entitiyProductive.FileStore;
 import org.andy.code.dataStructure.repositoryProductive.FileStoreRepository;
 import org.andy.code.main.Einstellungen;
@@ -82,6 +83,8 @@ public class DateianzeigeDialog extends JFrame {
 
 	private static String sNummer = null;
 	private static Kunde lKunde = null;
+	@SuppressWarnings("unused")
+	private static Lieferant lLieferant = null;
 	private static int isFile = 0;
 	
 	private static FileStoreRepository fileStoreRepository = new FileStoreRepository();
@@ -99,6 +102,24 @@ public class DateianzeigeDialog extends JFrame {
 				try {
 					sNummer = sID;
 					lKunde = kunde;
+					fileStore = fileStoreRepository.findById(sID); // Tabelleneintrag mit Hibernate lesen
+					DateianzeigeDialog frame = new DateianzeigeDialog();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					logger.fatal("loadGUI(String sID) fehlgeschlagen - " + e);
+					Runtime.getRuntime().gc();
+				}
+			}
+		});
+	}
+	
+	public static void loadGUIBE(String sID, Lieferant lieferant) {
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					sNummer = sID;
+					lLieferant = lieferant;
 					fileStore = fileStoreRepository.findById(sID); // Tabelleneintrag mit Hibernate lesen
 					DateianzeigeDialog frame = new DateianzeigeDialog();
 					frame.setVisible(true);

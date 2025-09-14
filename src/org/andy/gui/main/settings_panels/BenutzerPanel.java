@@ -123,8 +123,8 @@ public class BenutzerPanel extends JPanel {
 		y = 170;
 
 		try {
-			btnShowPwd = createButton("...", null);
-			btnPwdOK = createButton(null, "ok.png");
+			btnShowPwd = createButton("...", null, null);
+			btnPwdOK = createButton(null, "ok.png", null);
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}

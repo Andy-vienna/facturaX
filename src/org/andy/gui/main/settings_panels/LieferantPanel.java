@@ -21,27 +21,27 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
-import org.andy.code.dataStructure.entitiyMaster.Kunde;
-import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
+import org.andy.code.dataStructure.entitiyMaster.Lieferant;
+import org.andy.code.dataStructure.repositoryMaster.LieferantRepository;
 import org.andy.code.misc.CodeListen;
 import org.andy.gui.main.HauptFenster;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class KundePanel extends JPanel {
+public class LieferantPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger logger = LogManager.getLogger(KundePanel.class);
+    private static final Logger logger = LogManager.getLogger(LieferantPanel.class);
     
     private CodeListen cl = new CodeListen();
 	private JComboBox<String> cmbLand = new JComboBox<>();
 	private String iso2code;
     
-    private KundeRepository kundeRepository = new KundeRepository();
-    private List<Kunde> kundeListe = new ArrayList<>();
-    private Kunde leer = new Kunde();
+    private LieferantRepository lieferantRepository = new LieferantRepository();
+    private List<Lieferant> lieferantListe = new ArrayList<>();
+    private Lieferant leer = new Lieferant();
 
-    private final JTextField[] txtFields = new JTextField[16];
+    private final JTextField[] txtFields = new JTextField[9];
     private final JButton[] btnFields = new JButton[3];
     private JComboBox<String> cmbSelect;
     private final Font font = new Font("Tahoma", Font.BOLD, 11);
@@ -52,18 +52,17 @@ public class KundePanel extends JPanel {
 	// public Teil
 	//###################################################################################################################################################
     
-    public KundePanel() {
+    public LieferantPanel() {
         setLayout(null);
-        TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Kundenverwaltung");
+        TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Lieferantenverwaltung");
         border.setTitleFont(font);
         border.setTitleColor(titleColor);
         border.setTitleJustification(TitledBorder.LEFT);
         border.setTitlePosition(TitledBorder.TOP);
         setBorder(border);
         
-        leer.setId(""); leer.setName(""); leer.setStrasse(""); leer.setPlz(""); leer.setOrt(""); leer.setLand(""); leer.setPronomen(""); leer.setPerson("");
-        leer.setUstid(""); leer.setTaxvalue(""); leer.setDeposit(""); leer.setZahlungsziel(""); leer.setLeitwegId(""); leer.seteBillTyp("");
-        leer.seteBillMail(""); leer.seteBillPhone(""); // Leeren Listeneintrag erzeugen
+        leer.setId(""); leer.setName(""); leer.setStrasse(""); leer.setPlz(""); leer.setOrt("");
+        leer.setLand(""); leer.setUstid(""); leer.setTaxvalue(""); // Leeren Listeneintrag erzeugen
         
         buildPanel();
     }
@@ -77,15 +76,14 @@ public class KundePanel extends JPanel {
     	int btnWidth = HauptFenster.getButtonx();
     	int btnHeight = HauptFenster.getButtony();
     	
-        String[] labels = { "Kunden-Nr.", "Name", "Strasse", "PLZ", "Ort", "Land", "Pronomen", "Ansprechpartner",
-        		"USt.-ID", "Steuersatz", "Rabattschlüssel", "Zahlungsziel", "Leitweg-ID", "eBill-Typ", "E-Mail", "Telefon" };
+        String[] labels = { "Lieferant-Nr.", "Kundennummer", "Name", "Strasse", "PLZ", "Ort", "Land", "USt.-ID", "Steuersatz" };
         JLabel[] lblFields = new JLabel[labels.length];
         
-        kundeListe.clear();
-        kundeListe.add(leer); // falls du immer einen Dummy-Eintrag vorne willst        
-        kundeListe.addAll(kundeRepository.findAll());
-        String[] kundeTexte = kundeListe.stream()
-                .map(Kunde::getName)   // oder .getId(), oder beliebiges Feld
+        lieferantListe.clear();
+        lieferantListe.add(leer); // falls du immer einen Dummy-Eintrag vorne willst        
+        lieferantListe.addAll(lieferantRepository.findAll());
+        String[] kundeTexte = lieferantListe.stream()
+                .map(Lieferant::getName)   // oder .getId(), oder beliebiges Feld
                 .toArray(String[]::new);
         cmbSelect = new JComboBox<>(kundeTexte);
         cmbSelect.setBounds(10, 20, 500, 25);
@@ -100,29 +98,29 @@ public class KundePanel extends JPanel {
         x = lblFields[labels.length - 1].getX() + lblFields[labels.length - 1].getWidth();
 
         for (int i = 0; i < txtFields.length; i++) {
-        	if (i == 5) {
+        	if (i == 6) {
         		txtFields[i] = makeField(x + 200, y + i * 25, 200, 25, false, null);
         	} else {
         		txtFields[i] = makeField(x, y + i * 25, 400, 25, false, null);
         	}
             add(txtFields[i]);
         }
-        txtFields[0].setText(kundeRepository.findMaxNummer());
+        txtFields[0].setText(lieferantRepository.findMaxNummer());
         txtFields[0].setEditable(false);
         
         cmbLand = new JComboBox<>(cl.getCountries().toArray(new String[0]));
-		cmbLand.setBounds(x, 170, 200, 25);
+		cmbLand.setBounds(x, 195, 200, 25);
 		cmbLand.addActionListener(_ -> doCountry());
 		add(cmbLand);
 
 		x = 510 + 10;
-        y = txtFields[txtFields.length - 6].getY() - 10;
+		y = txtFields[txtFields.length - 6].getY() - 10;
         try {
-            btnFields[0] = createButton("<html>Kunde<br>anlegen</html>", "new.png", null);
-            btnFields[1] = createButton("<html>Kunde<br>updaten</html>", "update.png", null);
-            btnFields[2] = createButton("<html>Kunde<br>loeschen</html>", "delete.png", null);
+            btnFields[0] = createButton("<html>Lieferant<br>anlegen</html>", "new.png", null);
+            btnFields[1] = createButton("<html>Lieferant<br>updaten</html>", "update.png", null);
+            btnFields[2] = createButton("<html>Lieferant<br>loeschen</html>", "delete.png", null);
             for (int i = 0; i < btnFields.length; i++) {
-                btnFields[i].setBounds(x, y + i * (btnHeight + 5), btnWidth, btnHeight);
+            	btnFields[i].setBounds(x, y + i * (btnHeight + 5), btnWidth, btnHeight);
                 add(btnFields[i]);
             }
             for (int i = 0; i < btnFields.length; i++) {
@@ -139,7 +137,7 @@ public class KundePanel extends JPanel {
         
         x = 10 + ((lblFields[labels.length - 1].getWidth() + txtFields[txtFields.length - 1].getWidth())) + btnWidth + 20;
         y = txtFields[txtFields.length - 1].getY() + 45;
-
+        
         setPreferredSize(new Dimension(x, y));
     }
 
@@ -151,7 +149,7 @@ public class KundePanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             int idx = cmbSelect.getSelectedIndex();
-            Kunde kunde = kundeListe.get(idx);
+            Lieferant lieferant = lieferantListe.get(idx);
 
             if (idx == 0) {
                 // Leereintrag: Felder leeren, Buttons sperren etc.
@@ -159,7 +157,7 @@ public class KundePanel extends JPanel {
                 btnFields[1].setEnabled(false);
                 btnFields[2].setEnabled(false);
                 clearFields(txtFields);
-                txtFields[0].setText(kundeRepository.findMaxNummer());
+                txtFields[0].setText(lieferantRepository.findMaxNummer());
                 txtFields[0].setEditable(false);
             } else {
                 btnFields[0].setEnabled(false);
@@ -167,25 +165,18 @@ public class KundePanel extends JPanel {
                 btnFields[2].setEnabled(true);
                 txtFields[0].setEditable(false);
 
-                txtFields[0].setText(kunde.getId());
-                txtFields[1].setText(kunde.getName());
-                txtFields[2].setText(kunde.getStrasse());
-                txtFields[3].setText(kunde.getPlz());
-                txtFields[4].setText(kunde.getOrt());
-                txtFields[5].setText(cl.getCountryFromCode(kunde.getLand()));
-                txtFields[6].setText(kunde.getPronomen());
-                txtFields[7].setText(kunde.getPerson());
-                txtFields[8].setText(kunde.getUstid());
-                txtFields[9].setText(kunde.getTaxvalue());
-                txtFields[10].setText(kunde.getDeposit());
-                txtFields[11].setText(kunde.getZahlungsziel());
-                txtFields[12].setText(kunde.getLeitwegId());
-                txtFields[13].setText(kunde.geteBillTyp());
-                txtFields[14].setText(kunde.geteBillMail());
-                txtFields[15].setText(kunde.geteBillPhone());
+                txtFields[0].setText(lieferant.getId());
+                txtFields[1].setText(lieferant.getKdnr());
+                txtFields[2].setText(lieferant.getName());
+                txtFields[3].setText(lieferant.getStrasse());
+                txtFields[4].setText(lieferant.getPlz());
+                txtFields[5].setText(lieferant.getOrt());
+                txtFields[6].setText(cl.getCountryFromCode(lieferant.getLand()));
+                txtFields[7].setText(lieferant.getUstid());
+                txtFields[8].setText(lieferant.getTaxvalue());
                 
                 for (int i = 0; i < cl.getCountries().size(); i++) {
-                	if (cl.getCountries().get(i).contains(kunde.getLand())) {
+                	if (cl.getCountries().get(i).contains(lieferant.getLand())) {
                 		cmbLand.setSelectedIndex(i);
                 		break;
                 	}
@@ -200,11 +191,11 @@ public class KundePanel extends JPanel {
 
     private void rebuild() {
         remove(cmbSelect);
-        kundeListe.clear();
-        kundeListe.add(leer); // falls du immer einen Dummy-Eintrag vorne willst        
-        kundeListe.addAll(kundeRepository.findAll());
-        String[] kundeTexte = kundeListe.stream()
-                .map(Kunde::getName)   // oder .getId(), oder beliebiges Feld
+        lieferantListe.clear();
+        lieferantListe.add(leer); // falls du immer einen Dummy-Eintrag vorne willst        
+        lieferantListe.addAll(lieferantRepository.findAll());
+        String[] kundeTexte = lieferantListe.stream()
+                .map(Lieferant::getName)   // oder .getId(), oder beliebiges Feld
                 .toArray(String[]::new);
         cmbSelect = new JComboBox<>(kundeTexte);
         cmbSelect.setBounds(10, 20, 500, 25);
@@ -213,7 +204,7 @@ public class KundePanel extends JPanel {
         btnFields[0].setEnabled(true);
         btnFields[1].setEnabled(false);
         btnFields[2].setEnabled(false);
-        txtFields[0].setText(kundeRepository.findMaxNummer());
+        txtFields[0].setText(lieferantRepository.findMaxNummer());
         txtFields[0].setEditable(false);
         
         revalidate();
@@ -234,34 +225,25 @@ public class KundePanel extends JPanel {
     
   //###################################################################################################################################################
 
-    private Kunde fromFields(JTextField[] fields) {
-        Kunde a = new Kunde();
-        a.setId(fields[0].getText().trim());
-        a.setName(fields[1].getText().trim());
-        a.setStrasse(fields[2].getText().trim());
-        a.setPlz(fields[3].getText().trim());
-        a.setOrt(fields[4].getText().trim());
-        a.setLand(iso2code);
-        a.setPronomen(fields[6].getText().trim());
-        a.setPerson(fields[7].getText().trim());
-        a.setUstid(fields[8].getText().trim());
-        a.setTaxvalue(fields[9].getText().trim());
-        a.setDeposit(fields[10].getText().trim());
-        a.setZahlungsziel(fields[11].getText().trim());
-        a.setLeitwegId(fields[12].getText().trim());
-        a.seteBillTyp(fields[13].getText().trim());
-        a.seteBillMail(fields[14].getText().trim());
-        a.seteBillPhone(fields[15].getText().trim());
-        return a;
+    private Lieferant fromFields(JTextField[] fields) {
+        Lieferant l = new Lieferant();
+        l.setId(fields[0].getText().trim());
+        l.setKdnr(fields[1].getText().trim());
+        l.setName(fields[2].getText().trim());
+        l.setStrasse(fields[3].getText().trim());
+        l.setPlz(fields[4].getText().trim());
+        l.setOrt(fields[5].getText().trim());
+        l.setLand(iso2code);
+        l.setUstid(fields[7].getText().trim());
+        l.setTaxvalue(fields[8].getText().trim());
+        return l;
     }
     
   //###################################################################################################################################################
 
-    private boolean isValid(Kunde a) {
-        if (a.getId().isEmpty() || a.getName().isEmpty() || a.getStrasse().toString().isEmpty() || a.getPlz().isEmpty() || a.getOrt().isEmpty() ||
-        	a.getLand().toString().isEmpty() || a.getPronomen().isEmpty() || a.getPerson().isEmpty() || a.getUstid().toString().isEmpty() ||
-        	a.getTaxvalue().toString().isEmpty() || a.getDeposit().isEmpty() || a.getZahlungsziel().isEmpty() || a.getLeitwegId().toString().isEmpty() ||
-        	a.geteBillTyp().toString().isEmpty() || a.geteBillMail().isEmpty() || a.geteBillPhone().isEmpty()) {
+    private boolean isValid(Lieferant l) {
+        if (l.getId().isEmpty() || l.getName().isEmpty() || l.getStrasse().toString().isEmpty() || l.getPlz().isEmpty() || l.getOrt().isEmpty() ||
+        	l.getLand().toString().isEmpty() || l.getUstid().toString().isEmpty() || l.getTaxvalue().toString().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Alle Felder müssen befüllt sein", "Validierung", JOptionPane.ERROR_MESSAGE);
             return false;
         }
@@ -280,7 +262,7 @@ public class KundePanel extends JPanel {
     	iso2code = cmbLand.getSelectedItem().toString().substring(0,2);
     	String ctry = cl.getCountryFromCode(iso2code);
     	
-    	this.txtFields[5].setText(ctry);
+    	this.txtFields[6].setText(ctry);
     }
     
 	//###################################################################################################################################################
@@ -290,16 +272,16 @@ public class KundePanel extends JPanel {
     @SuppressWarnings("unchecked")
     private Consumer<JTextField[]>[] createOperations() {
         Consumer<JTextField[]> insert = fields -> {
-            Kunde a = fromFields(fields);
-            if (!isValid(a)) return;
-            kundeRepository.insert(a);
+            Lieferant l = fromFields(fields);
+            if (!isValid(l)) return;
+            lieferantRepository.insert(l);
             clearFields(fields);
         };
 
         Consumer<JTextField[]> update = fields -> {
-            Kunde a = fromFields(fields);
-            if (!isValid(a)) return;
-            kundeRepository.update(a);
+            Lieferant l = fromFields(fields);
+            if (!isValid(l)) return;
+            lieferantRepository.update(l);
             clearFields(fields);
         };
 
@@ -309,7 +291,7 @@ public class KundePanel extends JPanel {
                 JOptionPane.showMessageDialog(null, "ID fehlt", "Löschen", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            kundeRepository.delete(id);
+            lieferantRepository.delete(id);
             clearFields(fields);
         };
 

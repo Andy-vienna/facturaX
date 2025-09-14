@@ -67,6 +67,7 @@ public class StartUp {
         // 4) Lizenz einlesen
         try {
             APP_MODE = getLicense(Einstellungen.getFileLicense());
+            APP_MODE = 2; // aktuell auch ohne Lizenzfile ...
         } catch (java.security.NoSuchAlgorithmException | java.io.IOException e) {
             logger.error("error reading license", e);
             APP_MODE = 0;

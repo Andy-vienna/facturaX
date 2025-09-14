@@ -19,7 +19,9 @@ public class ErzeugePDF {
 	private static final String OFFER = "Angebot";
 	private static final String CONFIRMATION = "Auftragsbestätigung";
 	private static final String BILL = "Rechnung";
+	private static final String ORDER = "Bestellung";
 	private static final String REMINDER = "Zahlungserinnerung";
+	private static final String UNKNOWN = "unknown";
 
 	/** Excel als pdf exportieren
 	 * @param sFileExcel
@@ -74,16 +76,12 @@ public class ErzeugePDF {
 
 	private static String decodeTyp(String sTyp) throws Exception {
 		switch(sTyp) {
-		case "AN":
-			return OFFER;
-		case "AB":
-			return CONFIRMATION;
-		case "RE":
-			return BILL;
-		case "ZE":
-			return REMINDER;
-		default:
-			return "unknown";
+			case "AN": return OFFER;
+			case "AB": return CONFIRMATION;
+			case "RE": return BILL;
+			case "BE": return ORDER;
+			case "ZE": return REMINDER;
+			default  : return UNKNOWN;
 		}
 	}
 

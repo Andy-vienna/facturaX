@@ -140,8 +140,8 @@ public class GwbTabellePanel extends JPanel {
         y = txtFields[5].getY();
         
         try {
-			btnFields[0] = createButton("<html>Jahr anlegen</html>", null);
-			btnFields[1] = createButton("<html>Tabelle<br>updaten</html>", "update.png");
+			btnFields[0] = createButton("<html>Jahr anlegen</html>", null, null);
+			btnFields[1] = createButton("<html>Tabelle<br>updaten</html>", "update.png", null);
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}

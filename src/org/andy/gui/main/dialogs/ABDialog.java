@@ -123,7 +123,7 @@ public final class ABDialog extends JDialog {
     private JButton createOkButton() {
         JButton ok;
         try {
-            ok = createButton("OK", "ok.png");
+            ok = createButton("OK", "ok.png", null);
         } catch (RuntimeException ex) {
             log.warn("OK-Button ohne Icon, cause: {}", ex.getMessage());
             ok = new JButton("OK");

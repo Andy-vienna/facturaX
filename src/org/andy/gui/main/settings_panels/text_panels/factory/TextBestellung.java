@@ -69,8 +69,8 @@ public class TextBestellung extends TextPanel  {
 		// Arrays für Labels und TextAreas
 		String[] labels = {
 				"Textbaustein Bestellung A12", "Textbaustein Bestellung A13", "Textbaustein Bestellung A33",
-				"Textbaustein Bestellung A36", "Textbaustein Bestellung A39", "Textbaustein Bestellung A40",
-				"Textbaustein Bestellung ...", "Textbaustein Bestellung ...", "Textbaustein Bestellung ...",
+				"Textbaustein Bestellung A36", "Textbaustein Bestellung A37", "Textbaustein Bestellung A39",
+				"Textbaustein Bestellung A40", "Textbaustein Bestellung ...", "Textbaustein Bestellung ...",
 				"Textbaustein Bestellung ...", "Textbaustein Bestellung ...", "Textbaustein Bestellung ...",
 				"Textbaustein Bestellung ...", "Textbaustein Bestellung ...", "Textbaustein Bestellung ..."};
 
@@ -107,7 +107,7 @@ public class TextBestellung extends TextPanel  {
 			gbc.gridx = 2; // Wechsel zur nächsten Spalte
 			JButton btnUpdateText = null;
 			try {
-				btnUpdateText = createButton("Ändern", "menu/edit.png");
+				btnUpdateText = createButton("Ändern", "menu/edit.png", null);
 			} catch (RuntimeException e1) {
 				logger.error("error creating button - " + e1);
 			}

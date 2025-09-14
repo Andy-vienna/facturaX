@@ -229,11 +229,11 @@ public class AngebotPanel extends EditPanel {
 	    
 	    // Buttons
 		try {
-			btnFields[0] = createButton("<html>neu<br>berechnen</html>", "calc.png");
-			btnFields[1] = createButton("<html>update</html>", "save.png");
-			btnFields[2] = createButton("<html>Status<br>setzen</html>", "save.png");
-			btnFields[3] = createButton("<html>Revision<br>anlegen</html>", "revision.png");
-			btnFields[4] = createButton("<html>Editor</html>", "edit.png");
+			btnFields[0] = createButton("<html>neu<br>berechnen</html>", "calc.png", null);
+			btnFields[1] = createButton("<html>update</html>", "save.png", null);
+			btnFields[2] = createButton("<html>Status<br>setzen</html>", "save.png", null);
+			btnFields[3] = createButton("<html>Revision<br>anlegen</html>", "revision.png", null);
+			btnFields[4] = createButton("<html>Editor</html>", "edit.png", null);
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}

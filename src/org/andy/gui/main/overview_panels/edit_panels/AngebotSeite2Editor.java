@@ -41,7 +41,7 @@ public class AngebotSeite2Editor extends JFrame {
         add(editorHost, BorderLayout.CENTER);
 
         JPanel south = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
-        JButton btnGetHtml = createButton("<html>OK</html>", "ok.png");
+        JButton btnGetHtml = createButton("<html>OK</html>", "ok.png", null);
         btnGetHtml.setFont(new Font("Tahoma", Font.BOLD, 14));
         btnGetHtml.setPreferredSize(new Dimension(130, 50));
         btnGetHtml.setEnabled(true);

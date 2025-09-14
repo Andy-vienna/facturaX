@@ -204,7 +204,7 @@ public class SvTaxPanel extends EditPanel {
 	    add(btnFields[0]);
 
 		try {
-			btnFields[1] = createButton("", "save.png");
+			btnFields[1] = createButton("", "save.png", null);
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}

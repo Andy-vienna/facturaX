@@ -4,18 +4,18 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.andy.code.dataStructure.HibernateUtil;
-import org.andy.code.dataStructure.entitiyMaster.Artikel;
+import org.andy.code.dataStructure.entitiyMaster.Lieferant;
 
-public class ArtikelRepository {
+public class LieferantRepository {
 
-    public List<Artikel> findAll() {
+    public List<Lieferant> findAll() {
         try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
-            return session.createQuery("FROM Artikel", Artikel.class).list();
+            return session.createQuery("FROM Lieferant", Lieferant.class).list();
         }
     }
     
     public String findMaxNummer() {
-        String sql ="SELECT ISNULL(MAX(TRY_CAST(SUBSTRING(s.id, 1, 10) AS int)), 0) + 1 FROM dbo.tblArtikel s";
+        String sql ="SELECT ISNULL(MAX(TRY_CAST(SUBSTRING(s.id, 1, 10) AS int)), 0) + 1 FROM dbo.tblLieferant s";
     	try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
     		Integer next = ((Number) session.createNativeQuery(sql, Integer.class)
     		    .getSingleResult()).intValue();
@@ -24,18 +24,18 @@ public class ArtikelRepository {
     	}
     }
 
-    public void insert(Artikel artikel) {
+    public void insert(Lieferant lieferant) {
         try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
             Transaction tx = session.beginTransaction();
-            session.persist(artikel);
+            session.persist(lieferant);
             tx.commit();
         }
     }
 
-    public void update(Artikel artikel) {
+    public void update(Lieferant lieferant) {
         try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
             Transaction tx = session.beginTransaction();
-            session.merge(artikel);
+            session.merge(lieferant);
             tx.commit();
         }
     }
@@ -43,8 +43,8 @@ public class ArtikelRepository {
     public void delete(String id) {
         try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
             Transaction tx = session.beginTransaction();
-            Artikel artikel = session.find(Artikel.class, id);
-            if (artikel != null) session.remove(artikel);
+            Lieferant lieferant = session.find(Lieferant.class, id);
+            if (lieferant != null) session.remove(lieferant);
             tx.commit();
         }
     }

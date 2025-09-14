@@ -14,6 +14,8 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -86,6 +88,10 @@ public class ExcelAngebot{
 		String adressat = ExcelHelper.kundeAnschrift(angebot.getIdKunde());
 		Bank bank = ExcelHelper.bankData(angebot.getIdBank());
 		ExcelHelper.textData();
+		
+		LocalDate date = LocalDate.parse(angebot.getDatum().toString(), DateTimeFormatter.ISO_LOCAL_DATE);
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        String datum = date.format(outputFormatter);
 
 		//#######################################################################
 		// Angebots-Excel erzeugen
@@ -185,7 +191,7 @@ public class ExcelAngebot{
 			// Zellwerte beschreiben
 			//#######################################################################
 			anAdress.setCellValue(adressat); // Kundenanschrift
-			anDate.setCellValue(angebot.getDatum().toString());
+			anDate.setCellValue(datum);
 			anNr.setCellValue(angebot.getIdNummer());
 			anDuty.setCellValue(kunde.getPronomen() + " " + kunde.getPerson());
 			anRef.setCellValue(angebot.getRef());

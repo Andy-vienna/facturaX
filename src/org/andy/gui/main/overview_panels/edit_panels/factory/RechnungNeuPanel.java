@@ -194,7 +194,7 @@ public class RechnungNeuPanel extends EditPanel {
         add(txtReferenz);
         txtReferenz.getDocument().addDocumentListener(bgFlipOnNonEmpty(txtReferenz));
 
-        JButton btnDoExport = createButton("<html>Rechnung<br>erstellen</html>", "edit.png");
+        JButton btnDoExport = createButton("<html>Rechnung<br>erstellen</html>", "edit.png", null);
         btnDoExport.setBounds(1545,305, HauptFenster.getButtonx(), HauptFenster.getButtony());
         btnDoExport.setEnabled(true);
         add(btnDoExport);

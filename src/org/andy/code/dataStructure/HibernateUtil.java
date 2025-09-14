@@ -4,12 +4,14 @@ import org.andy.code.dataStructure.entitiyMaster.Artikel;
 import org.andy.code.dataStructure.entitiyMaster.Bank;
 import org.andy.code.dataStructure.entitiyMaster.Gwb;
 import org.andy.code.dataStructure.entitiyMaster.Kunde;
+import org.andy.code.dataStructure.entitiyMaster.Lieferant;
 import org.andy.code.dataStructure.entitiyMaster.Owner;
 import org.andy.code.dataStructure.entitiyMaster.Tax;
 import org.andy.code.dataStructure.entitiyMaster.Text;
 import org.andy.code.dataStructure.entitiyMaster.User;
 import org.andy.code.dataStructure.entitiyProductive.Angebot;
 import org.andy.code.dataStructure.entitiyProductive.Ausgaben;
+import org.andy.code.dataStructure.entitiyProductive.Bestellung;
 import org.andy.code.dataStructure.entitiyProductive.Einkauf;
 import org.andy.code.dataStructure.entitiyProductive.FileStore;
 import org.andy.code.dataStructure.entitiyProductive.Rechnung;
@@ -77,15 +79,16 @@ public class HibernateUtil {
                 .build();
 
         MetadataSources sources = new MetadataSources(serviceRegistry);
-        sources.addAnnotatedClass(User.class);
-        sources.addAnnotatedClass(Owner.class);
-        sources.addAnnotatedClass(Kunde.class);
         sources.addAnnotatedClass(Artikel.class);
         sources.addAnnotatedClass(Bank.class);
-        sources.addAnnotatedClass(Text.class);
-        sources.addAnnotatedClass(Tax.class);
         sources.addAnnotatedClass(Gwb.class);
-
+        sources.addAnnotatedClass(Kunde.class);
+        sources.addAnnotatedClass(Lieferant.class);
+        sources.addAnnotatedClass(Owner.class);
+        sources.addAnnotatedClass(Tax.class);
+        sources.addAnnotatedClass(Text.class);
+        sources.addAnnotatedClass(User.class);
+        
         Metadata metadata = sources.getMetadataBuilder().build();
         return metadata.getSessionFactoryBuilder().build();
     }
@@ -124,6 +127,7 @@ public class HibernateUtil {
         MetadataSources sources = new MetadataSources(serviceRegistry);
         sources.addAnnotatedClass(Angebot.class);
         sources.addAnnotatedClass(Rechnung.class);
+        sources.addAnnotatedClass(Bestellung.class);
         sources.addAnnotatedClass(FileStore.class);
         sources.addAnnotatedClass(Einkauf.class);
         sources.addAnnotatedClass(Ausgaben.class);

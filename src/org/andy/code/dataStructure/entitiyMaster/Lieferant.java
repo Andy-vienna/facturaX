@@ -3,11 +3,14 @@ package org.andy.code.dataStructure.entitiyMaster;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "tblKunde")
-public class Kunde {
+@Table(name = "tblLieferant")
+public class Lieferant {
     @Id
     @Column(name = "Id", nullable = false)
     private String id;
+    
+    @Column(name = "kd-nr")
+    private String kdnr;
 
     @Column(name = "Name", nullable = false)
     private String name;
@@ -24,35 +27,11 @@ public class Kunde {
     @Column(name = "Land", nullable = false)
     private String land;
     
-    @Column(name = "Pronomen", nullable = false)
-    private String pronomen;
-
-    @Column(name = "Ansprechpartner", nullable = false)
-    private String person;
-
     @Column(name = "UID", nullable = false)
     private String ustid;
     
     @Column(name = "Steuersatz", nullable = false)
     private String taxvalue;
-
-    @Column(name = "Rabattschluessel", nullable = false)
-    private String deposit;
-
-    @Column(name = "Zahlungsziel", nullable = false)
-    private String zahlungsziel;
-    
-    @Column(name = "eBillLeitwegId")
-    private String leitwegId;
-
-    @Column(name = "eBillTyp")
-    private String eBillTyp;
-
-    @Column(name = "eBillMail")
-    private String eBillMail;
-    
-    @Column(name = "eBillPhone")
-    private String eBillPhone;
     
 	//###################################################################################################################################################
 	// Getter und Setter für Felder
@@ -106,22 +85,6 @@ public class Kunde {
 		this.land = land;
 	}
 
-	public String getPronomen() {
-		return pronomen;
-	}
-
-	public void setPronomen(String pronomen) {
-		this.pronomen = pronomen;
-	}
-
-	public String getPerson() {
-		return person;
-	}
-
-	public void setPerson(String person) {
-		this.person = person;
-	}
-
 	public String getUstid() {
 		return ustid;
 	}
@@ -138,52 +101,12 @@ public class Kunde {
 		this.taxvalue = taxvalue;
 	}
 
-	public String getDeposit() {
-		return deposit;
+	public String getKdnr() {
+		return kdnr;
 	}
 
-	public void setDeposit(String deposit) {
-		this.deposit = deposit;
-	}
-
-	public String getZahlungsziel() {
-		return zahlungsziel;
-	}
-
-	public void setZahlungsziel(String zahlungsziel) {
-		this.zahlungsziel = zahlungsziel;
-	}
-
-	public String getLeitwegId() {
-		return leitwegId;
-	}
-
-	public void setLeitwegId(String leitwegId) {
-		this.leitwegId = leitwegId;
-	}
-
-	public String geteBillTyp() {
-		return eBillTyp;
-	}
-
-	public void seteBillTyp(String eBillTyp) {
-		this.eBillTyp = eBillTyp;
-	}
-
-	public String geteBillMail() {
-		return eBillMail;
-	}
-
-	public void seteBillMail(String eBillMail) {
-		this.eBillMail = eBillMail;
-	}
-
-	public String geteBillPhone() {
-		return eBillPhone;
-	}
-
-	public void seteBillPhone(String eBillPhone) {
-		this.eBillPhone = eBillPhone;
+	public void setKdnr(String kdnr) {
+		this.kdnr = kdnr;
 	}
 
 }

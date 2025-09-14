@@ -102,8 +102,8 @@ public class OwnerPanel extends JPanel {
 
 		x = 110; y = y + ((txtFields.length - 1) * 25);
         try {
-            btnFields[0] = createButton("<html>Owner<br>anlegen</html>", "new.png");
-            btnFields[1] = createButton("<html>Owner<br>updaten</html>", "update.png");
+            btnFields[0] = createButton("<html>Owner<br>anlegen</html>", "new.png", null);
+            btnFields[1] = createButton("<html>Owner<br>updaten</html>", "update.png", null);
             for (int i = 0; i < btnFields.length; i++) {
                 btnFields[i].setBounds(x + i * (btnWidth + 10), y + 30, btnWidth, btnHeight);
                 add(btnFields[i]);
