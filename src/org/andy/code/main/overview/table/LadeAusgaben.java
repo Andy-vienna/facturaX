@@ -21,7 +21,7 @@ import org.andy.code.misc.CodeListen;
 public class LadeAusgaben {
 	
 	private static BigDecimal bdNetto = BD.ZERO; private static BigDecimal bdBrutto = BD.ZERO;
-	private static BigDecimal bd10Proz = BD.ZERO; private static BigDecimal bd20Proz = BD.ZERO;
+	private static BigDecimal[] bd10ProzQ = new BigDecimal[4]; private static BigDecimal[] bd20ProzQ = new BigDecimal[4];
 	private static BigDecimal bdUstEU = BD.ZERO; private static BigDecimal bdUstEUnoEURO = BD.ZERO;
 	private static BigDecimal bdUstNonEU = BD.ZERO;
 	
@@ -45,8 +45,11 @@ public class LadeAusgaben {
 		DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Locale.GERMANY);
 		DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
 		
-		bdNetto = BD.ZERO; bdBrutto = BD.ZERO; bd10Proz = BD.ZERO; bd20Proz = BD.ZERO;
+		bdNetto = BD.ZERO; bdBrutto = BD.ZERO;
 		bdUstEU = BD.ZERO; bdUstEUnoEURO = BD.ZERO; bdUstNonEU = BD.ZERO;
+		for (int n = 0; n < bd10ProzQ.length; n++) {
+			bd10ProzQ[n] = BD.ZERO; bd20ProzQ[n] = BD.ZERO;
+		}
 
 		AusgabenRepository ausgabenRepository = new AusgabenRepository();
 	    List<Ausgaben> ausgabenListe = new ArrayList<>();
@@ -85,8 +88,17 @@ public class LadeAusgaben {
 			
 			if (eu) {
 				if (ausgaben.getLand().equals("AT")) {
-					if (ausgaben.getSteuersatz().equals("10")) bd10Proz = bd10Proz.add(ausgaben.getSteuer());
-					if (ausgaben.getSteuersatz().equals("20")) bd20Proz = bd20Proz.add(ausgaben.getSteuer());
+					
+					int quartal = getQuartalFromString(ausgaben.getDatum().toString(), "yyyy-MM-dd") - 1;
+					String sTax = ausgaben.getSteuersatz();
+					BigDecimal bdVal = ausgaben.getSteuer();
+					if (quartal >= 0 && quartal < 4) {
+						switch (sTax) {
+						case "20" -> bd20ProzQ[quartal] = bd20ProzQ[quartal].add(bdVal);
+						case "10" -> bd10ProzQ[quartal] = bd10ProzQ[quartal].add(bdVal);
+						}
+					}
+					
 				} else if (euro) {
 					bdUstEU = bdUstEU.add(ausgaben.getSteuer());
 				} else {
@@ -101,6 +113,16 @@ public class LadeAusgaben {
 	}
 	
 	//###################################################################################################################################################
+	// Hilfsmethoden
+	//###################################################################################################################################################
+	
+	private static int getQuartalFromString(String datumString, String fPattern) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(fPattern);
+        LocalDate datum = LocalDate.parse(datumString, formatter);
+        return (datum.getMonthValue() - 1) / 3 + 1;
+    }
+	
+	//###################################################################################################################################################
 	// Getter und Setter
 	//###################################################################################################################################################
 
@@ -110,14 +132,6 @@ public class LadeAusgaben {
 
 	public static BigDecimal getBdBrutto() {
 		return bdBrutto;
-	}
-	
-	public static BigDecimal getBd10Proz() {
-		return bd10Proz;
-	}
-
-	public static BigDecimal getBd20Proz() {
-		return bd20Proz;
 	}
 	
 	public static BigDecimal getUstEU() {
@@ -134,6 +148,14 @@ public class LadeAusgaben {
 
 	public static int[] getBelegID() {
 		return belegID;
+	}
+
+	public static BigDecimal[] getBd10ProzQ() {
+		return bd10ProzQ;
+	}
+
+	public static BigDecimal[] getBd20ProzQ() {
+		return bd20ProzQ;
 	}
 	
 }

@@ -8,9 +8,18 @@ import org.andy.code.dataStructure.entitiyMaster.Lieferant;
 
 public class LieferantRepository {
 
-    public List<Lieferant> findAll() {
+	public List<Lieferant> findAll() {
         try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
             return session.createQuery("FROM Lieferant", Lieferant.class).list();
+        }
+    }
+	
+	public Lieferant findById(String id){
+    	try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
+            return session.createQuery(
+                    "FROM Lieferant r WHERE r.id = :id", Lieferant.class)
+                    .setParameter("id", id)
+                    .getSingleResult();
         }
     }
     

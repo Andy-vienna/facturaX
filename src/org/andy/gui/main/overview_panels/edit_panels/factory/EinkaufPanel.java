@@ -6,7 +6,6 @@ import static org.andy.toolbox.misc.CreateObject.createButton;
 import static org.andy.toolbox.misc.SelectFile.chooseFile;
 import static org.andy.toolbox.misc.SelectFile.choosePath;
 import static org.andy.toolbox.misc.SelectFile.getNotSelected;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -21,6 +20,8 @@ import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -36,7 +37,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 
+import org.andy.code.dataStructure.entitiyMaster.Lieferant;
 import org.andy.code.dataStructure.entitiyProductive.Einkauf;
+import org.andy.code.dataStructure.repositoryMaster.LieferantRepository;
 import org.andy.code.dataStructure.repositoryProductive.EinkaufRepository;
 import org.andy.code.main.Einstellungen;
 import org.andy.code.misc.ArithmeticHelper;
@@ -66,16 +69,16 @@ public class EinkaufPanel extends EditPanel {
 	private Border b;
 	
 	private CodeListen cl = new CodeListen();
-	private JComboBox<String> cmbLand = new JComboBox<>();
+	private JComboBox<String> cmbLieferant = new JComboBox<>();
 	private JComboBox<String> cmbCurr = new JComboBox<>();
-	private String iso2code; private String currency3code;
+	private String currency3code;
 	
 	private TitledBorder border;
 	private DemoPanel[] panelDate = new DemoPanel[2];
 	private DatePickerSettings[] dateSettings = new DatePickerSettings[2];
 	private DatePicker[] datePicker = new DatePicker[2];
-	private JTextField[] txtFieldsCol1 = new JTextField[8];
-	private JTextField[] txtFieldsCol2a = new JTextField[5];
+	private JTextField[] txtFieldsCol1 = new JTextField[2];
+	private JTextField[] txtFieldsCol2a = new JTextField[4];
 	private JTextField[] txtFieldsCol2b = new JTextField[2];
 	private JTextField[] txtFieldsSkonto = new JTextField[4];
 	private JLabel lblFileTyp = new JLabel();
@@ -85,9 +88,15 @@ public class EinkaufPanel extends EditPanel {
 	private String id = null;
 	private boolean file = false;
 	private boolean neuBeleg = false;
+	private boolean lieferantGewaehlt = false;
 	
 	private EinkaufRepository einkaufRepository = new EinkaufRepository();
+	private LieferantRepository lieferantRepository = new LieferantRepository();
+	
+	private final List<Lieferant> lieferantList = new ArrayList<>();
+	
 	private Einkauf einkauf = new Einkauf();
+	private Lieferant lieferant = new Lieferant();
 	
 	//###################################################################################################################################################
 	// public Teil
@@ -106,7 +115,9 @@ public class EinkaufPanel extends EditPanel {
 	    } else {
 	        logger.warn("Kein TitledBorder vorhanden – setsTitel() wird nicht funktionieren.");
 	    }
-	    
+	    // Dummy an Position 0
+        lieferantList.add(new Lieferant());
+        lieferantList.addAll(lieferantRepository.findAll());
 		buildPanel();
 	}
 
@@ -123,15 +134,9 @@ public class EinkaufPanel extends EditPanel {
 	    String[] labelsCol1 = {
 	        "Rechnungsdatum:",
 	        "Rechnungsnummer:",
-	        "Kreditor Name:",
-	        "Kreditor Straße:",
-	        "Kreditor PLZ:",
-	        "Kreditor Ort:",
-	        "Kreditor Land (2-Zeichen):",
-	        "Kreditor UID:",
-	        "Währung:"};
+	        "Währung:",
+	        "Lieferant:"};
 	    String[] labelsCol2 = {
-	        "USt.-Satz:",
 	        "Netto:",
 	        "USt.:",
 	        "Brutto:",
@@ -183,34 +188,35 @@ public class EinkaufPanel extends EditPanel {
 	    }
 		datePicker[0].setBounds(212, 20, 180, 25);
 		
-		cmbLand = new JComboBox<>(cl.getCountries().toArray(new String[0]));
-		cmbLand.setBounds(210, 170, 200, 25);
-		cmbLand.addActionListener(_ -> doCountry());
-		cmbLand.setEnabled(false);
-		add(cmbLand);
+		cmbLieferant = new JComboBox<>(lieferantList.stream().map(r -> nullToEmpty(r.getName())).toArray(String[]::new));
+		cmbLieferant.setBounds(210,95,400,25);
+		cmbLieferant.addActionListener(_ -> doLieferant());
+		cmbLieferant.setEnabled(false);
+		add(cmbLieferant);
 		
 		cmbCurr = new JComboBox<>(cl.getCurrencies().toArray(new String[0]));
-		cmbCurr.setBounds(210, 220, 200, 25);
+		cmbCurr.setBounds(210, 70, 200, 25);
 		cmbCurr.addActionListener(_ -> doCurrency());
 		cmbCurr.setEnabled(false);
 		add(cmbCurr);
 		
 		// Textfelder
 	    for (int r = 0; r < txtFieldsCol1.length; r++) {
-	    	if (r == 5 || r == 7) {
+	    	if (r == 1) {
 	    		txtFieldsCol1[r] = makeField(410, 45 + r * 25, 200, 25, false, null);
-	    		txtFieldsCol1[r].setFocusable(false);
 	    	} else {
 	    		txtFieldsCol1[r] = makeField(210, 45 + r * 25, 400, 25, false, null);
 	    	}
+	    	txtFieldsCol1[r].setFocusable(false);
 	    	add(txtFieldsCol1[r]);
 	    }
 	    for (int r = 0; r < txtFieldsCol2a.length; r++) {
 	    	txtFieldsCol2a[r] = makeField(830, 20 + r * 25, 400, 25, false, null);
+	    	txtFieldsCol2a[r].setFocusable(false);
 	    	add(txtFieldsCol2a[r]);
 	    	attachCommaToDot(txtFieldsCol2a[r]);
 	    }
-	    txtFieldsCol2a[1].getDocument().addDocumentListener(new DocumentListener() {
+	    txtFieldsCol2a[0].getDocument().addDocumentListener(new DocumentListener() {
 	    	@Override
 	        public void insertUpdate(DocumentEvent e) { calcFields(); }
 	        @Override
@@ -218,10 +224,11 @@ public class EinkaufPanel extends EditPanel {
 	        @Override
 	        public void changedUpdate(DocumentEvent e) { calcFields(); }
 	    });
-	    txtFieldsCol2a[4].setVisible(false); // Anzahlung wird aktuell nicht benötigt
-	    datePicker[1].setBounds(832, 145, 180, 25);
+	    txtFieldsCol2a[3].setVisible(false); // Anzahlung wird aktuell nicht benötigt
+	    datePicker[1].setBounds(832, 120, 180, 25);
 	    for (int r = 0; r < txtFieldsCol2b.length; r++) {
-	    	txtFieldsCol2b[r] = makeField(830, 170 + r * 25, 400, 25, false, null);
+	    	txtFieldsCol2b[r] = makeField(830, 145 + r * 25, 400, 25, false, null);
+	    	txtFieldsCol2b[r].setFocusable(false);
 	    	add(txtFieldsCol2b[r]);
 	    }
 	    txtFieldsCol2b[1].setFocusable(false);
@@ -230,6 +237,7 @@ public class EinkaufPanel extends EditPanel {
 	    txtFieldsSkonto[2] = makeField(1310, 45, 80, 25, false, null);
 	    txtFieldsSkonto[3] = makeField(1440, 45, 80, 25, false, null);
 	    for (int r = 0; r < txtFieldsSkonto.length; r++) {
+	    	txtFieldsSkonto[r].setFocusable(false);
 	    	add(txtFieldsSkonto[r]);
 	    	attachCommaToDot(txtFieldsSkonto[r]);
 	    }
@@ -240,22 +248,23 @@ public class EinkaufPanel extends EditPanel {
 	    
 	    // Anzeige Filetyp
 	    lblFileTyp.setHorizontalAlignment(SwingConstants.CENTER);
-		lblFileTyp.setBounds(1250, 175, 50, 40);
+		lblFileTyp.setBounds(1250, 155, 50, 40);
 		add(lblFileTyp);
 	    
 	    btnFields[0] = new JButton();
 	    btnFields[0].setToolTipText("");
-	    btnFields[0].setBounds(765, 195, 65, 25);
+	    btnFields[0].setBounds(765, 170, 65, 25);
+	    btnFields[0].setEnabled(false);
 	    add(btnFields[0]);
 	    
 	    // Zahlungsstatus
 	    JLabel lblState = new JLabel("Status:");
-	    lblState.setBounds(1340, 145, 100, 25);
+	    lblState.setBounds(1340, 120, 100, 25);
 	    lblState.setFont(new Font("Tahoma", Font.BOLD, 11));
 	    lblState.setVisible(false);
 	    add(lblState);
 	    cmbState = new JComboBox<String>(selectState);
-	    cmbState.setBounds(1440, 145, 130, 25);
+	    cmbState.setBounds(1440, 120, 130, 25);
 	    cmbState.setVisible(false);
 	    add(cmbState);
 
@@ -264,11 +273,12 @@ public class EinkaufPanel extends EditPanel {
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}
-		btnFields[1].setEnabled(true);
-		btnFields[1].setBounds(1440, 170, HauptFenster.getButtonx(), HauptFenster.getButtony());
+		btnFields[1].setEnabled(false);
+		btnFields[1].setBounds(1440, 145, HauptFenster.getButtonx(), HauptFenster.getButtony());
 		add(btnFields[1]);
+		txtFieldsFocusable(false);
 		
-		setPreferredSize(new Dimension(1000, 20 + labelsCol1.length * 25 + 20));
+		setPreferredSize(new Dimension(1000, 20 + labelsCol1.length * 25 + 20+75));
 	    
 	    // ------------------------------------------------------------------------------
  		// Action Listener für Buttons
@@ -314,32 +324,23 @@ public class EinkaufPanel extends EditPanel {
  			@Override
  			public void actionPerformed(ActionEvent e) {
  				if (neuBeleg) {
- 					String value = null;
  	 				einkauf.setJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
  	 				
  	 				boolean bResult = checkInput();
- 	 				if (!bResult) {
+ 	 				if (!bResult || !lieferantGewaehlt) {
  	 					JOptionPane.showMessageDialog(null, "Eingaben unvollständig, Beleg kann nicht gespeichert werden", "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
  	 					return;
  	 				}
  	 				
  	 				einkauf.setReDatum(datePicker[0].getDate());
  	 				einkauf.setId(txtFieldsCol1[0].getText().trim());
- 	 				einkauf.setKredName(txtFieldsCol1[1].getText().trim());
- 	 				value = (txtFieldsCol1[2].getText() != null) ? txtFieldsCol1[2].getText().trim() : "";
- 	 				einkauf.setKredStrasse(value);
- 	 				value = (txtFieldsCol1[3].getText() != null) ? txtFieldsCol1[3].getText().trim() : "";
- 	 				einkauf.setKredPlz(value);
- 	 				value = (txtFieldsCol1[4].getText() != null) ? txtFieldsCol1[4].getText().trim() : "";
- 	 				einkauf.setKredOrt(value);
- 	 				einkauf.setKredLand(iso2code);
- 	 				value = (txtFieldsCol1[6].getText() != null) ? txtFieldsCol1[6].getText().trim() : "";
- 	 				einkauf.setKredUid(value);
  	 				einkauf.setWaehrung(currency3code);
- 	 				einkauf.setSteuersatz(txtFieldsCol2a[0].getText().trim());
- 	 				einkauf.setNetto(parseStringToBigDecimalSafe(txtFieldsCol2a[1].getText(), LocaleFormat.AUTO));
- 	 				einkauf.setUst(parseStringToBigDecimalSafe(txtFieldsCol2a[2].getText(), LocaleFormat.AUTO));
- 	 				einkauf.setBrutto(parseStringToBigDecimalSafe(txtFieldsCol2a[3].getText(), LocaleFormat.AUTO));
+ 	 				
+ 	 				einkauf.setLieferantId(lieferant.getId()); // new: Lieferanten-ID als Verweis
+ 	 				
+ 	 				einkauf.setNetto(parseStringToBigDecimalSafe(txtFieldsCol2a[0].getText(), LocaleFormat.AUTO));
+ 	 				einkauf.setUst(parseStringToBigDecimalSafe(txtFieldsCol2a[1].getText(), LocaleFormat.AUTO));
+ 	 				einkauf.setBrutto(parseStringToBigDecimalSafe(txtFieldsCol2a[2].getText(), LocaleFormat.AUTO));
  	 				einkauf.setZahlungsziel(datePicker[1].getDate());
  	 				
  	 				int Tage1 = ArithmeticHelper.parseStringToIntSafe(txtFieldsSkonto[0].getText());
@@ -366,20 +367,20 @@ public class EinkaufPanel extends EditPanel {
                     case "bezahlt" -> einkauf.setStatus(2);
                     case "bezahlt Skonto 1" -> 	{ einkauf.setStatus(3);
                     							bdnetto = einkauf.getNetto().subtract(einkauf.getNetto().multiply(einkauf.getSkonto1wert()));
-                    							if(einkauf.getSteuersatz().equals("0")) {
+                    							if(lieferant.getTaxvalue().equals("0")) {
                     								bdust = BD.ZERO;
                     							} else {
-                    								bdust = bdnetto.multiply(parseStringToBigDecimalSafe(einkauf.getSteuersatz(), LocaleFormat.AUTO).divide(BD.HUNDRED));
+                    								bdust = bdnetto.multiply(parseStringToBigDecimalSafe(lieferant.getTaxvalue(), LocaleFormat.AUTO).divide(BD.HUNDRED));
                     							}
                     							bdbrutto = bdnetto.add(bdust);
                     							einkauf.setNetto(bdnetto); einkauf.setUst(bdust); einkauf.setBrutto(bdbrutto);
                     							}
                     case "bezahlt Skonto 2" ->  { einkauf.setStatus(3);
 												bdnetto = einkauf.getNetto().subtract(einkauf.getNetto().multiply(einkauf.getSkonto1wert()));
-												if(einkauf.getSteuersatz().equals("0")) {
+												if(lieferant.getTaxvalue().equals("0")) {
                     								bdust = BD.ZERO;
                     							} else {
-                    								bdust = bdnetto.multiply(parseStringToBigDecimalSafe(einkauf.getSteuersatz(), LocaleFormat.AUTO).divide(BD.HUNDRED));
+                    								bdust = bdnetto.multiply(parseStringToBigDecimalSafe(lieferant.getTaxvalue(), LocaleFormat.AUTO).divide(BD.HUNDRED));
                     							}
 												bdbrutto = bdnetto.add(bdust);
 												einkauf.setNetto(bdnetto); einkauf.setUst(bdust); einkauf.setBrutto(bdbrutto);
@@ -407,6 +408,8 @@ public class EinkaufPanel extends EditPanel {
         return t;
     }
     
+    private static String nullToEmpty(String s){ return s==null ? "" : s; }
+    
     private void attachCommaToDot(JTextField field) {
         ((AbstractDocument) field.getDocument()).setDocumentFilter(new CommaHelper.CommaToDotFilter());
     }
@@ -414,12 +417,11 @@ public class EinkaufPanel extends EditPanel {
     private void txtFieldsFocusable(boolean b) {
     	this.datePicker[0].setEnabled(b);
     	this.datePicker[1].setEnabled(b);
-    	this.cmbLand.setEnabled(b); this.cmbCurr.setEnabled(b);
-    	this.cmbLand.setSelectedIndex(0); this.cmbCurr.setSelectedIndex(0);
+    	this.cmbCurr.setEnabled(b); this.cmbCurr.setSelectedIndex(0);
+    	this.cmbLieferant.setEnabled(b); this.cmbLieferant.setSelectedIndex(0);
     	for (int i = 0; i < this.txtFieldsCol1.length; i++) {
 			this.txtFieldsCol1[i].setFocusable(b);
 		}
-    	this.txtFieldsCol1[5].setFocusable(false); this.txtFieldsCol1[7].setFocusable(false);
 		for (int i = 0; i < this.txtFieldsCol2a.length; i++) {
 			this.txtFieldsCol2a[i].setFocusable(b);
 		}
@@ -435,8 +437,7 @@ public class EinkaufPanel extends EditPanel {
     	if (datePicker[1].getDate() == null) return false;
     	if (txtFieldsCol1[0].getText() == null || txtFieldsCol1[0].getText().equals("")) return false;
     	if (txtFieldsCol1[1].getText() == null || txtFieldsCol1[1].getText().equals("")) return false;
-    	if (txtFieldsCol1[5].getText() == null || txtFieldsCol1[5].getText().equals("")) return false;
-    	if (txtFieldsCol1[7].getText() == null || txtFieldsCol1[7].getText().equals("")) return false;
+    	if (cmbLieferant.getSelectedIndex() < 1) return false;
     	for (int i = 0; i < txtFieldsCol2a.length - 1; i++) {
     		if (txtFieldsCol2a[i].getText() == null || txtFieldsCol2a[i].getText().equals("")) return false;
     	}
@@ -450,12 +451,13 @@ public class EinkaufPanel extends EditPanel {
     	BigDecimal tax = BD.ZERO; BigDecimal netto = BD.ZERO; BigDecimal ust = BD.ZERO;
     	if (!txtFieldsCol2a[0].isFocusable()) return; // keine Prüfung, wenn Feld nicht fokussierbar
     	try {
-    	    int value = Integer.parseInt(txtFieldsCol2a[0].getText().trim()); // Steuersatz als Ganzzahl eingegeben
+    		if (lieferant.getTaxvalue() == null || lieferant.getTaxvalue().isEmpty()) return;
+    	    int value = Integer.parseInt(lieferant.getTaxvalue().trim()); // Steuersatz als Ganzzahl eingegeben
     	    if (value >= 0 && value <= 99) {
     	        tax = new BigDecimal(value).divide(BD.HUNDRED); // Steuersatz
-    	        netto = new BigDecimal(txtFieldsCol2a[1].getText().trim()).setScale(2, RoundingMode.HALF_UP);
-    	        ust = netto.multiply(tax).setScale(2, RoundingMode.HALF_UP); txtFieldsCol2a[2].setText(ust.toString());
-    	        txtFieldsCol2a[3].setText(netto.add(ust).setScale(2, RoundingMode.HALF_UP).toString());
+    	        netto = new BigDecimal(txtFieldsCol2a[0].getText().trim()).setScale(2, RoundingMode.HALF_UP);
+    	        ust = netto.multiply(tax).setScale(2, RoundingMode.HALF_UP); txtFieldsCol2a[1].setText(ust.toString());
+    	        txtFieldsCol2a[2].setText(netto.add(ust).setScale(2, RoundingMode.HALF_UP).toString());
     	    } else {
     	    	JOptionPane.showMessageDialog(null, "Steuersatz ungültig", "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
     	    }
@@ -464,19 +466,17 @@ public class EinkaufPanel extends EditPanel {
     	}
     }
     
-    private void doCountry() {
-    	if (cmbLand.getSelectedIndex() == 0) return;
-    	iso2code = cmbLand.getSelectedItem().toString().substring(0,2);
-    	String ctry = cl.getCountryFromCode(iso2code);
-    	
-    	this.txtFieldsCol1[5].setText(ctry);
-    }
-    
     private void doCurrency() {
     	if (cmbCurr.getSelectedIndex() == 0) return;
     	currency3code = cmbCurr.getSelectedItem().toString().substring(0,3);
     	
-    	this.txtFieldsCol1[7].setText(currency3code);
+    	this.txtFieldsCol1[1].setText(currency3code);
+    }
+    
+    private void doLieferant() {
+    	int idx = cmbLieferant.getSelectedIndex();
+        lieferant = lieferantList.get(idx);
+        lieferantGewaehlt = true;
     }
     
 	//###################################################################################################################################################
@@ -530,18 +530,31 @@ public class EinkaufPanel extends EditPanel {
 		this.datePicker[1].setEnabled(false);
 		
 		this.txtFieldsCol1[0].setText(einkauf.getId());
-		this.txtFieldsCol1[1].setText(einkauf.getKredName());
-		this.txtFieldsCol1[2].setText(einkauf.getKredStrasse());
-		this.txtFieldsCol1[3].setText(einkauf.getKredPlz());
-		this.txtFieldsCol1[4].setText(einkauf.getKredOrt());
-		this.txtFieldsCol1[5].setText(cl.getCountryFromCode(einkauf.getKredLand()));
-		this.txtFieldsCol1[6].setText(einkauf.getKredUid());
-		this.txtFieldsCol1[7].setText(einkauf.getWaehrung());
+		this.txtFieldsCol1[1].setText(einkauf.getWaehrung());
 		
-		this.txtFieldsCol2a[0].setText(einkauf.getSteuersatz());
-		this.txtFieldsCol2a[1].setText(einkauf.getNetto().toString());
-		this.txtFieldsCol2a[2].setText(einkauf.getUst().toString());
-		this.txtFieldsCol2a[3].setText(einkauf.getBrutto().toString());
+		// Lieferant in der ComboBox anzeigen
+		int idx = java.util.stream.IntStream.range(0, lieferantList.size())
+		    .filter(i -> java.util.Objects.equals(einkauf.getLieferantId(), lieferantList.get(i).getId()))
+		    .findFirst()
+		    .orElse(-1);
+		javax.swing.SwingUtilities.invokeLater(() -> {
+		    String[] items = lieferantList.stream()
+		        .map(r -> {
+		            String n = r.getName();
+		            return (n == null || n.isBlank()) ? "" : n; // statt ""
+		        })
+		        .toArray(String[]::new);
+		    cmbLieferant.setModel(new javax.swing.DefaultComboBoxModel<>(items));
+		    if (idx >= 0 && idx < items.length) {
+		        cmbLieferant.setSelectedIndex(idx);
+		    } else {
+		        cmbLieferant.setSelectedIndex(-1); // bewusst keine Auswahl
+		    }
+		});
+		
+		this.txtFieldsCol2a[0].setText(einkauf.getNetto().toString());
+		this.txtFieldsCol2a[1].setText(einkauf.getUst().toString());
+		this.txtFieldsCol2a[2].setText(einkauf.getBrutto().toString());
 		
 		String Tage1 = ArithmeticHelper.parseIntToStringSafe(einkauf.getSkonto1tage());
 		String Tage2 = ArithmeticHelper.parseIntToStringSafe(einkauf.getSkonto2tage());

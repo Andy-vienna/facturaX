@@ -18,29 +18,11 @@ public class Einkauf {
     @Column(name = "Jahr", nullable = false)
     private int jahr;
 
-    @Column(name = "kred_name", nullable = false)
-    private String kredName;
-
-    @Column(name = "kred_strasse", nullable = false)
-    private String kredStrasse;
-
-    @Column(name = "kred_plz", nullable = false)
-    private String kredPlz;
-
-    @Column(name = "kred_ort", nullable = false)
-    private String kredOrt;
-
-    @Column(name = "kred_land", nullable = false)
-    private String kredLand;
-
-    @Column(name = "kred_uid", nullable = false)
-    private String kredUid;
+    @Column(name = "lieferant_id", nullable = false)
+    private String lieferantId;
 
     @Column(name = "waehrung", nullable = false)
     private String waehrung;
-
-    @Column(name = "steuersatz", nullable = false)
-    private String steuersatz;
 
     @Column(name = "netto", nullable = false, precision = 9, scale = 2)
     private BigDecimal netto;
@@ -107,46 +89,11 @@ public class Einkauf {
         this.jahr = jahr;
     }
 
-    public String getKredName() {
-        return kredName;
+    public String getLieferantId() {
+        return lieferantId;
     }
-    public void setKredName(String kredName) {
-        this.kredName = kredName;
-    }
-
-    public String getKredStrasse() {
-        return kredStrasse;
-    }
-    public void setKredStrasse(String kredStrasse) {
-        this.kredStrasse = kredStrasse;
-    }
-
-    public String getKredPlz() {
-        return kredPlz;
-    }
-    public void setKredPlz(String kredPlz) {
-        this.kredPlz = kredPlz;
-    }
-
-    public String getKredOrt() {
-        return kredOrt;
-    }
-    public void setKredOrt(String kredOrt) {
-        this.kredOrt = kredOrt;
-    }
-
-    public String getKredLand() {
-        return kredLand;
-    }
-    public void setKredLand(String kredLand) {
-        this.kredLand = kredLand;
-    }
-
-    public String getKredUid() {
-        return kredUid;
-    }
-    public void setKredUid(String kredUid) {
-        this.kredUid = kredUid;
+    public void setLieferantId(String lieferantId) {
+        this.lieferantId = lieferantId;
     }
 
     public String getWaehrung() {
@@ -154,13 +101,6 @@ public class Einkauf {
     }
     public void setWaehrung(String waehrung) {
         this.waehrung = waehrung;
-    }
-
-    public String getSteuersatz() {
-        return steuersatz;
-    }
-    public void setSteuersatz(String steuersatz) {
-        this.steuersatz = steuersatz;
     }
 
     public BigDecimal getNetto() {

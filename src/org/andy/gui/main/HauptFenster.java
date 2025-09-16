@@ -631,8 +631,9 @@ public class HauptFenster extends JFrame {
         sPaneEX.setColumnWidths(new int[] {100,650,50,100,150,150,150,500});
         sPaneEX.getTable().setAutoCreateRowSorter(true);
 
-        infoEX = new SummenPanelB(7, new String[] {"Netto:", "Brutto:", "USt.AT 10%", "USt.AT 20%", "USt.EU (EURO)", "USt.EU sonst.", "USt. Welt"},
-									new boolean[] {true, true, true, true, true, false, false});
+        infoEX = new SummenPanelB(13, new String[] {"Netto:", "Brutto:", "USt.AT 10% Q1", "USt.AT 20% Q1", "USt.AT 10% Q2", "USt.AT 20% Q2",
+        		"USt.AT 10% Q3", "USt.AT 20% Q3", "USt.AT 10% Q4", "USt.AT 20% Q4", "USt.EU (EURO)", "USt.EU sonst.", "USt. Welt", "", },
+				new boolean[] {true, true, true, true, true, true, true, true, true, true, true, false, false,});
         setSumEX();
 
         ErzeugePanelB cp = new ErzeugePanelB(sPaneEX, expensesPanel, null, infoEX);
@@ -851,14 +852,23 @@ public class HauptFenster extends JFrame {
     }
 
     private void setSumEX() {
+    	BigDecimal[] tmp10Q = new BigDecimal[4]; BigDecimal[] tmp20Q = new BigDecimal[4];
+    	double[] d10ProzQ = new double[4]; double[] d20ProzQ = new double[4];
     	double dNetto = LadeAusgaben.getBdNetto().doubleValue(); double dBrutto = LadeAusgaben.getBdBrutto().doubleValue();
-        double d10Proz = LadeAusgaben.getBd10Proz().doubleValue(); double d20Proz = LadeAusgaben.getBd20Proz().doubleValue();
+    	tmp10Q = LadeAusgaben.getBd10ProzQ(); tmp20Q = LadeAusgaben.getBd20ProzQ();
+        d10ProzQ[0] = tmp10Q[0].doubleValue(); d10ProzQ[1] = tmp10Q[1].doubleValue();
+        d10ProzQ[2] = tmp10Q[2].doubleValue(); d10ProzQ[2] = tmp10Q[2].doubleValue();
+        d20ProzQ[0] = tmp20Q[0].doubleValue(); d20ProzQ[1] = tmp20Q[1].doubleValue();
+        d20ProzQ[2] = tmp20Q[2].doubleValue(); d20ProzQ[2] = tmp20Q[2].doubleValue();
         double dUstSonst = LadeAusgaben.getUstEU().doubleValue(); double dSonstEUnoEURO = LadeAusgaben.getBdUstEUnoEURO().doubleValue();
         double dUstWelt = LadeAusgaben.getUstNonEU().doubleValue();
         infoEX.setTxtSum(0, dNetto); infoEX.setTxtSum(1, dBrutto);
-        infoEX.setTxtSum(2, d10Proz); infoEX.setTxtSum(3, d20Proz);
-        infoEX.setTxtSum(4, dUstSonst); ; infoEX.setTxtSum(5, dSonstEUnoEURO);
-        infoEX.setTxtSum(6, dUstWelt);
+        infoEX.setTxtSum(2, d10ProzQ[0]); infoEX.setTxtSum(3, d20ProzQ[0]);
+        infoEX.setTxtSum(4, d10ProzQ[1]); infoEX.setTxtSum(5, d20ProzQ[1]);
+        infoEX.setTxtSum(6, d10ProzQ[2]); infoEX.setTxtSum(7, d20ProzQ[2]);
+        infoEX.setTxtSum(8, d10ProzQ[3]); infoEX.setTxtSum(9, d20ProzQ[3]);
+        infoEX.setTxtSum(10, dUstSonst); ; infoEX.setTxtSum(11, dSonstEUnoEURO);
+        infoEX.setTxtSum(12, dUstWelt);
     }
 
     private void setSumST() {

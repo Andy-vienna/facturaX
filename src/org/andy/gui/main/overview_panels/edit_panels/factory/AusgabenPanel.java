@@ -157,10 +157,10 @@ public class AusgabenPanel extends EditPanel {
 	    for (int r = 0; r < txtFields.length; r++) {
 	    	if (r == 1 || r == 2) {
 	    		txtFields[r] = makeField(410, 45 + r * 25, 200, 25, false, null);
-	    		txtFields[r].setFocusable(false);
 	    	}else {
 	    		txtFields[r] = makeField(210, 45 + r * 25, 400, 25, false, null);
 	    	}
+	    	txtFields[r].setFocusable(false);
 	    	add(txtFields[r]);
 	    }
 	    attachCommaToDot(txtFields[4]);
@@ -190,7 +190,7 @@ public class AusgabenPanel extends EditPanel {
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}
-		btnFields[1].setBounds(660, 170, HauptFenster.getButtonx(), HauptFenster.getButtony());
+		btnFields[1].setBounds(660, 195, HauptFenster.getButtonx(), HauptFenster.getButtony());
 		add(btnFields[1]);
 		
 		txtFieldsFocusable(false);

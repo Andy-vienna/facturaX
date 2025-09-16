@@ -11,9 +11,11 @@ import java.util.List;
 
 import javax.swing.JFormattedTextField;
 
+import org.andy.code.dataStructure.entitiyMaster.Lieferant;
 import org.andy.code.dataStructure.entitiyProductive.Ausgaben;
 import org.andy.code.dataStructure.entitiyProductive.Einkauf;
 import org.andy.code.dataStructure.entitiyProductive.Rechnung;
+import org.andy.code.dataStructure.repositoryMaster.LieferantRepository;
 import org.andy.code.dataStructure.repositoryProductive.AusgabenRepository;
 import org.andy.code.dataStructure.repositoryProductive.EinkaufRepository;
 import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
@@ -49,6 +51,10 @@ public final class UStDaten {
 		BigDecimal[] zahlLast = new BigDecimal[4], tmp20 = new BigDecimal[4], tmp10 = new BigDecimal[4], tmp13 = new BigDecimal[4];
 		BigDecimal[] tmpKz021 = new BigDecimal[4], tmpKz022 = new BigDecimal[4];
 		BigDecimal[] tmpUst20 = new BigDecimal[5];
+		
+		LieferantRepository lieferantRepository = new LieferantRepository();
+	    List<Lieferant> lieferantListe = new ArrayList<>();
+	    lieferantListe.addAll(lieferantRepository.findAll());
 		
 		RechnungRepository rechnungRepository = new RechnungRepository();
 	    List<Rechnung> rechnungListe = new ArrayList<>();
@@ -101,9 +107,18 @@ public final class UStDaten {
 		// Berechnung der abziehbaren Vorsteuer (Eingangsrechnungen Inland mit Steuersatz 20%, 10% und 13%)
 		try {
 			for (int x = 1; x < einkaufListe.size(); x++) {
+				Lieferant lieferant = new Lieferant();
 				Einkauf einkauf = einkaufListe.get(x);
 				int quartal = getQuartalFromString(einkauf.getReDatum().toString(), "yyyy-MM-dd") - 1;
-				String sTax = einkauf.getSteuersatz();
+				
+				for (int l = 0; l < lieferantListe.size(); l++) {
+					lieferant = lieferantListe.get(l);
+					if (einkauf.getLieferantId().equals(lieferant.getId())) {
+						break;
+					}
+				}
+				
+				String sTax = lieferant.getTaxvalue();
 				BigDecimal bdVal = einkauf.getUst();
 				if (quartal >= 0 && quartal < 4) {
 					switch (sTax) {

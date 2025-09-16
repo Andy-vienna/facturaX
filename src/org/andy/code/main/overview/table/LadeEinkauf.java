@@ -12,7 +12,9 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
 
+import org.andy.code.dataStructure.entitiyMaster.Lieferant;
 import org.andy.code.dataStructure.entitiyProductive.Einkauf;
+import org.andy.code.dataStructure.repositoryMaster.LieferantRepository;
 import org.andy.code.dataStructure.repositoryProductive.EinkaufRepository;
 import org.andy.code.main.Einstellungen;
 import org.andy.code.misc.BD;
@@ -48,11 +50,26 @@ public class LadeEinkauf {
 		EinkaufRepository einkaufRepository = new EinkaufRepository();
 	    List<Einkauf> einkaufListe = new ArrayList<>();
 	    einkaufListe.addAll(einkaufRepository.findAllByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ())));
+	    
+	    LieferantRepository lieferantRepository = new LieferantRepository();
+	    List<Lieferant> lieferantListe = new ArrayList<>();
+	    lieferantListe.addAll(lieferantRepository.findAll());
 		
 		String[][] sTemp = new String [einkaufListe.size() + 1][11]; // 1 Zeile mehr für neuen Beleg
 		
 		for (int i = 0; i < einkaufListe.size(); i++){
+			Lieferant lieferant = new Lieferant();
 			Einkauf einkauf = einkaufListe.get(i);
+			
+			gefunden:
+			for (int l = 0; l < lieferantListe.size(); l++) {
+				lieferant = lieferantListe.get(l);
+				if (einkauf.getLieferantId().equals(lieferant.getId())) {
+					break gefunden;
+				}
+				lieferant = new Lieferant();
+				lieferant.setName("none"); lieferant.setLand("none"); lieferant.setTaxvalue("0");
+			}
 
 			DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 			LocalDate date = LocalDate.parse(einkauf.getReDatum().toString(), DateTimeFormatter.ISO_LOCAL_DATE);
@@ -64,6 +81,9 @@ public class LadeEinkauf {
 	        String netto = df.format(einkauf.getNetto()) + " " + currency.getCurrencyCode();
 	        String ust = df.format(einkauf.getUst()) + " " + currency.getCurrencyCode();
 	        String brutto = df.format(einkauf.getBrutto()) + " " + currency.getCurrencyCode();
+	        
+	        String land = lieferant.getLand();
+	        String steuer = lieferant.getTaxvalue();
 	        
 	        String status = null;
 	        switch(einkauf.getStatus()) {
@@ -77,9 +97,9 @@ public class LadeEinkauf {
 
 			sTemp[i][0] = datum;
 			sTemp[i][1] = einkauf.getId();
-			sTemp[i][2] = einkauf.getKredName();
-			sTemp[i][3] = einkauf.getKredLand();
-			sTemp[i][4] = einkauf.getSteuersatz();
+			sTemp[i][2] = lieferant.getName();
+			sTemp[i][3] = land;
+			sTemp[i][4] = steuer;
 			sTemp[i][5] = netto;
 			sTemp[i][6] = ust;
 			sTemp[i][7] = brutto;
@@ -91,12 +111,12 @@ public class LadeEinkauf {
 			bdBrutto = bdBrutto.add(einkauf.getBrutto());
 			
 			CodeListen cl = new CodeListen();
-			boolean eu = cl.isEU(einkauf.getKredLand()); boolean euro = cl.isEurozone(einkauf.getKredLand());
+			boolean eu = cl.isEU(land); boolean euro = cl.isEurozone(land);
 			
 			if (eu) {
-				if (einkauf.getKredLand().equals("AT")) {
-					if (einkauf.getSteuersatz().equals("10")) bd10Proz = bd10Proz.add(einkauf.getUst());
-					if (einkauf.getSteuersatz().equals("20")) bd20Proz = bd20Proz.add(einkauf.getUst());
+				if (land.equals("AT")) {
+					if (steuer.equals("10")) bd10Proz = bd10Proz.add(einkauf.getUst());
+					if (steuer.equals("20")) bd20Proz = bd20Proz.add(einkauf.getUst());
 				} else if (euro) {
 					bdUstEU = bdUstEU.add(einkauf.getUst());
 				} else {
