@@ -5,6 +5,8 @@ import static org.andy.toolbox.misc.Tools.saveSettingsApp;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Year;
 import java.util.Properties;
 
@@ -23,9 +25,13 @@ public class Einstellungen {
 
 	private static String strAktUser;
 	private static String strAktGJ;
+	private static String htmlBaseText;
+	private static String htmlBaseStyle;
 
 	private static String tplOffer;
 	private static String tplDescription;
+	private static String tplDescriptionBase;
+	private static String tplDescriptionStyle;
 	private static String tplConfirmation;
 	private static String tplBill;
 	private static String tplReminder;
@@ -75,6 +81,8 @@ public class Einstellungen {
 			strQRschema = prpAppSettings.getProperty("qrschema");
 			tplOffer = prpAppSettings.getProperty("templateoffer");
 			tplDescription = prpAppSettings.getProperty("templatedescription");
+			tplDescriptionBase = prpAppSettings.getProperty("templatedescriptionbase");
+			tplDescriptionStyle = prpAppSettings.getProperty("templatedescriptionstyle");
 			tplConfirmation = prpAppSettings.getProperty("templateconfirmation");
 			tplBill = prpAppSettings.getProperty("templatebill");
 			tplReminder = prpAppSettings.getProperty("templatereminder");
@@ -137,8 +145,37 @@ public class Einstellungen {
 				+ Einstellungen.strDBNameSource + ";encrypt=" + Einstellungen.strDBencrypted + ";trustServerCertificate=" + Einstellungen.strDBServerCert;
 		sProductiveData = "jdbc:sqlserver://" + Einstellungen.strDBComputer + ":" + Einstellungen.strDBPort + ";databaseName="
 				+ Einstellungen.strDBNameDest + ";encrypt=" + Einstellungen.strDBencrypted + ";trustServerCertificate=" + Einstellungen.strDBServerCert;
+		
+		htmlBaseText = htmlBaseText();
+		htmlBaseStyle = htmlBaseStyle();
 	}
 
+	// ###################################################################################################################################################
+	
+	private static String htmlBaseText() {
+		Path path = Path.of(tplDescriptionBase);
+        String content = null;
+		try {
+			content = Files.readString(path);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return content;
+	}
+	
+	private static String htmlBaseStyle() {
+		Path path = Path.of(tplDescriptionStyle);
+        String content = null;
+		try {
+			content = Files.readString(path);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return content;
+	}
+	
 	// ###################################################################################################################################################
 
 	private static String askFinacialYear() {
@@ -347,6 +384,22 @@ public class Einstellungen {
 
 	public static void setTplLieferschein(String tplLieferschein) {
 		Einstellungen.tplLieferschein = tplLieferschein;
+	}
+
+	public static String getHtmlBaseText() {
+		return htmlBaseText;
+	}
+
+	public static String getTplDescriptionStyle() {
+		return tplDescriptionStyle;
+	}
+
+	public static String getHtmlBaseStyle() {
+		return htmlBaseStyle;
+	}
+
+	public static String getTplDescriptionBase() {
+		return tplDescriptionBase;
 	}
 
 }

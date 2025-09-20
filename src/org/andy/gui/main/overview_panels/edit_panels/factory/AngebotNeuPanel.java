@@ -41,7 +41,6 @@ import org.andy.code.main.StartUp;
 import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
 import org.andy.code.misc.BD;
 import org.andy.gui.main.HauptFenster;
-import org.andy.gui.main.overview_panels.edit_panels.AngebotSeite2Editor;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.gui.misc.CommaHelper;
 import org.andy.gui.misc.RoundedBorder;
@@ -78,7 +77,7 @@ public class AngebotNeuPanel extends EditPanel {
     private JTextField txtBank, txtIBAN, txtBIC;
 
     private JTextField txtNummer, txtReferenz;
-    private JCheckBox chkPage2;
+    private JCheckBox chkPage2; private JLabel lblHinweis;
     private DatePicker datePicker;
 
     private final JLabel[] lblPos = new JLabel[POS_COUNT];
@@ -92,13 +91,13 @@ public class AngebotNeuPanel extends EditPanel {
     private final BigDecimal[] bdEinzel = new BigDecimal[POS_COUNT];
     private final BigDecimal[] bdSumme  = new BigDecimal[POS_COUNT];
     private final String[] sPosText = new String[POS_COUNT];
-    
-    private AngebotSeite2Editor editor = new AngebotSeite2Editor();
 
     // Zustände
     private boolean kundeGewählt = false;
     private boolean bankGewählt = false;
     private boolean mind1ArtikelGewählt = false;
+    
+    private String htmlText = null;
 
 	//###################################################################################################################################################
 	// public Teil
@@ -151,6 +150,12 @@ public class AngebotNeuPanel extends EditPanel {
         JLabel lbl25=new JLabel("Angebotsnummer:"); lbl25.setBounds(1010,55,125,25); add(lbl25);
         JLabel lbl26=new JLabel("Angebotsdatum:");  lbl26.setBounds(1010,80,125,25); add(lbl26);
         JLabel lbl29=new JLabel("Referenz");        lbl29.setBounds(1010,105,60,25);  add(lbl29);
+        
+        lblHinweis = new JLabel("<html>Bei Erstellung des Angebots wird ein Standardtext hinterlegt.<br>"
+        								   + "Quelle ist die Datei: basetext-leistungsbeschreibung_deu.html<br>"
+        								   + "im /template/ Verzeichnis</html>");
+        lblHinweis.setFont(new Font("Tahoma", Font.BOLD, 14)); lblHinweis.setForeground(Color.BLUE);
+        lblHinweis.setBounds(1130,155,500,75); lblHinweis.setVisible(false); add(lblHinweis);
 
         // Combos/Textfelder links
         cmbKunde = new JComboBox<>(kunden.stream().map(k -> nullToEmpty(k.getName())).toArray(String[]::new));
@@ -189,11 +194,6 @@ public class AngebotNeuPanel extends EditPanel {
         
         chkPage2 = new JCheckBox("Angebot mit Anlage (Beschreibung aus Seite 2 hinzufügen)");
         chkPage2.setBounds(1130,130,390,25); add(chkPage2);
-        
-        JButton btnPage2 = createButton("<html>Editor</html>", "edit.png", null);
-        btnPage2.setBounds(1130,165, HauptFenster.getButtonx(), HauptFenster.getButtony());
-        btnPage2.setEnabled(true); btnPage2.setVisible(false);
-        add(btnPage2);
 
         JButton btnDoExport = createButton("<html>Angebot<br>erstellen</html>", "edit.png", null);
         btnDoExport.setBounds(1545,305, HauptFenster.getButtonx(), HauptFenster.getButtony());
@@ -230,8 +230,7 @@ public class AngebotNeuPanel extends EditPanel {
         cmbKunde.addActionListener(_ -> onKundeChanged());
         cmbBank.addActionListener(_ -> onBankChanged());
 
-        chkPage2.addActionListener(_ -> btnPage2.setVisible(chkPage2.isSelected()));
-        btnPage2.addActionListener(_ -> doText());
+        chkPage2.addActionListener(_ -> onPage2Activated());
         btnDoExport.addActionListener(_ -> doSave());
 
         setPreferredSize(new Dimension(1000, 390));
@@ -326,16 +325,27 @@ public class AngebotNeuPanel extends EditPanel {
         }
     }
     
-    private void doText() {
-    	editor.setHtml(editor.getStartText("Leistungsbeschreibung eingeben ..."));
-    	editor.setVisible(true);
+    private void onPage2Activated() {
+    	if (chkPage2.isSelected()) {
+    		htmlText = Einstellungen.getHtmlBaseText();
+        	lblHinweis.setVisible(true);
+    	} else {
+    		htmlText = null;
+        	lblHinweis.setVisible(false);
+    	}
+    	
     }
-
+    
+	//###################################################################################################################################################
+	// Hilfsmethoden
+	//###################################################################################################################################################
+    
     private void doSave() {
         if (!kundeGewählt) { info("Kunde nicht ausgewählt …"); return; }
-        if (!bankGewählt)  { info("Bank nicht ausgewählt …");  return; }
         if (!mind1ArtikelGewählt) { info("keine Artikel ausgewählt …"); return; }
+        if (datePicker.getDate() == null) { info("Angebotsdatum fehlt …"); return; }
         if (isEmpty(txtReferenz)) { info("Kundenreferenz fehlt …"); return; }
+        if (!bankGewählt)  { info("Bank nicht ausgewählt …");  return; }
 
         Angebot a = new Angebot();
         a.setIdNummer(nextAnNummer());
@@ -348,8 +358,8 @@ public class AngebotNeuPanel extends EditPanel {
         a.setRef(txtReferenz.getText().trim());
         a.setRevCharge(chkRevCharge.isSelected()?1:0);
         a.setPage2(chkPage2.isSelected()?1:0);
-        if (chkPage2.isSelected()) { a.setBeschreibungHtml(editor.getHtml()); } // Liefer- und Leistungsbeschreibung
-
+        a.setBeschreibungHtml(htmlText); // Liefer- und Leistungsbeschreibung
+        
         int posCount = countFilledPositions();
         a.setAnzPos(BigDecimal.valueOf(posCount));
 
@@ -368,10 +378,6 @@ public class AngebotNeuPanel extends EditPanel {
         angebotRepository.save(a);
         HauptFenster.actScreen();
     }
-
-	//###################################################################################################################################################
-	// Hilfsmethoden
-	//###################################################################################################################################################
     
     private void loadData() {
         kunden.clear();

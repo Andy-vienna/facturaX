@@ -33,7 +33,7 @@ public class ErzeugeLeistungsbeschreibung {
 		Path runnerJar = Path.of("lib/html2pdfRunner.jar"); // relativ zum working dir
 
 		ProcessBuilder pb = new ProcessBuilder("java", "-jar", runnerJar.toString(), tmpHtml.toString(),
-				contentPdf.toString());
+				contentPdf.toString(), Einstellungen.getHtmlBaseStyle());
 		pb.inheritIO();
 		int code = pb.start().waitFor();
 		if (code != 0)

@@ -53,7 +53,7 @@ public class AngebotSeite2Editor extends JFrame {
         Platform.runLater(() -> {
             htmlEditor = new HTMLEditor();
             htmlEditor.setPrefHeight(400);
-            //htmlEditor.setHtmlText(formatText("Leistungsbeschreibung eingeben ..."));
+            //htmlEditor.setHtmlText(startHtml);
             jfxPanel.setScene(new Scene(new BorderPane(htmlEditor)));
             fxReady = true;
         });
@@ -79,28 +79,11 @@ public class AngebotSeite2Editor extends JFrame {
         return html;
     }
     
-    public String getStartText(String startText) {
-    	String fixedCssHtml = """
-        		<html><head><style>
-        		  /* Seite ohne Außenränder */
-        		  @page { margin: 0; }
-        		  html, body { margin:0; padding:0; }
-
-        		  /* Arial global, Größen aus Inline-Styles bleiben erhalten */
-        		  body { font-family: Arial, sans-serif; font-size: 10pt; }
-        		  * { font-family: inherit !important; }      /* verhindert Font-Wechsel */
-
-        		  /* Überschriften wie Absätze darstellen (Absatz fix) */
-        		  h1, h2, h3, h4, h5, h6 {
-        		    all: unset;
-        		    display: block;
-        		    margin: 0 0 8pt 0;
-        		    font-family: inherit !important;
-        		    font-size: inherit;                       /* übernimmt die gewählte Größe */
-        		    font-weight: bold;                        /* optional */
-        		  }
-        		  p { margin: 0 0 8pt 0; }
-        		</style></head><body>""" + startText + "</body></html>";
-    	return fixedCssHtml;
+    public String setStartText(String html) {
+    	pendingHtml = html;
+        if (fxReady && htmlEditor != null) {
+            Platform.runLater(() -> htmlEditor.setHtmlText(pendingHtml));
+        }
+        return htmlEditor.getHtmlText();
     }
 }
