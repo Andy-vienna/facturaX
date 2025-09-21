@@ -8,6 +8,8 @@ import java.nio.file.Path;
 
 import org.andy.code.dataStructure.entitiyProductive.Angebot;
 import org.andy.code.main.Einstellungen;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openpdf.text.Document;
 import org.openpdf.text.Rectangle;
 import org.openpdf.text.pdf.PdfContentByte;
@@ -16,6 +18,8 @@ import org.openpdf.text.pdf.PdfReader;
 import org.openpdf.text.pdf.PdfWriter;
 
 public class ErzeugeLeistungsbeschreibung {
+	
+	private static final Logger logger = LogManager.getLogger(ErzeugeLeistungsbeschreibung.class);
 	
 	//###################################################################################################################################################
 	// public Teil
@@ -32,18 +36,25 @@ public class ErzeugeLeistungsbeschreibung {
 
 		Path runnerJar = Path.of("lib/html2pdfRunner.jar"); // relativ zum working dir
 
-		ProcessBuilder pb = new ProcessBuilder("java", "-jar", runnerJar.toString(), tmpHtml.toString(),
-				contentPdf.toString(), Einstellungen.getHtmlBaseStyle());
+		// html2pdfRunner Syntax: 1.Parameter CSS, 2. Parameter Verweis auf HTML-Datei, 3.Parameter Verweis auf temp-PDF Datei
+		ProcessBuilder pb = new ProcessBuilder("java", "-jar",
+				runnerJar.toString(), Einstellungen.getHtmlBaseStyle(), tmpHtml.toString(), contentPdf.toString());
 		pb.inheritIO();
 		int code = pb.start().waitFor();
-		if (code != 0)
+		if (code != 0) {
+			switch(code) {
+			case 11 -> logger.error("error rendering HTML-file to pdf");
+			case 12 -> logger.error("error reading/importing HTML-file");
+			default -> logger.error("unknown rendering error");
+			}
 			throw new IllegalStateException("Runner exit=" + code);
-
+		}
 		// 3) Overlay: Content in Vorlage platzieren
 		File vorlage = new File(Einstellungen.getTplDescription());
 		File out = new File(pdfDescription);
 
 		overlay(vorlage, contentPdf.toFile(), out); // Overlay erzeugen
+
 	}
 	
 	//###################################################################################################################################################

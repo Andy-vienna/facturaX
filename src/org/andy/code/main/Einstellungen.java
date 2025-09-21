@@ -153,6 +153,7 @@ public class Einstellungen {
 	// ###################################################################################################################################################
 	
 	private static String htmlBaseText() {
+		if (tplDescriptionBase.equals("---") || tplDescriptionBase.isEmpty()) return null;
 		Path path = Path.of(tplDescriptionBase);
         String content = null;
 		try {
@@ -165,6 +166,7 @@ public class Einstellungen {
 	}
 	
 	private static String htmlBaseStyle() {
+		if (tplDescriptionStyle.equals("---") || tplDescriptionStyle.isEmpty()) return null;
 		Path path = Path.of(tplDescriptionStyle);
         String content = null;
 		try {
@@ -400,6 +402,14 @@ public class Einstellungen {
 
 	public static String getTplDescriptionBase() {
 		return tplDescriptionBase;
+	}
+
+	public static void setTplDescriptionBase(String tplDescriptionBase) {
+		Einstellungen.tplDescriptionBase = tplDescriptionBase;
+	}
+
+	public static void setTplDescriptionStyle(String tplDescriptionStyle) {
+		Einstellungen.tplDescriptionStyle = tplDescriptionStyle;
 	}
 
 }

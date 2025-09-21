@@ -118,15 +118,19 @@ public class AngebotNeuPanel extends EditPanel {
 	//###################################################################################################################################################
 
     private void buildUI() {
+    	
         // Labels links
-        final String[] leftLabels = {
-            "Kundennummer","Kundenname","Strasse","PLZ","Ort","Land","Anrede","Ansprechpartner","UID","USt.-Satz","%","Rabattschlüssel","%","Zahlungsziel","Tage",
-            "Bank","IBAN","BIC"
-        };
-        final int[][] leftBounds = {
-                {10,55},{10,80},{10,105},{10,130},{10,155},{10,180},{10,205},{10,230},{10,255},{10,280},{155,280},{10,305},{155,305},{10,330},{155,330},
-                {1010,280},{1010,305},{1010,330}
-            };
+        final String[] leftLabels = {"Kundennummer","Kundenname","Strasse","PLZ","Ort","Land","Anrede","Ansprechpartner","UID","USt.-Satz",
+        							 "%","Rabattschlüssel","%","Zahlungsziel","Tage","Bank","IBAN","BIC" };
+        
+        final int[][] leftBounds = {{10,55},{10,80},{10,105},{10,130},{10,155},{10,180},{10,205},{10,230},{10,255},{10,280},  {10,305},  {10,330},
+                																								  {155,280}, {155,305}, {155,330},
+                																								 {1010,280},{1010,305},{1010,330}};
+        
+        final String preFlightLabel = "<html>Bei Erstellung des Angebots wird ein Standardtext hinterlegt. Quelle ist die Datei:<br>"
+				   					+ "'" + Einstellungen.getTplDescriptionBase() + "'<br>"
+				   					+ "im /template/ Verzeichnis</html>";
+        
         List<JLabel> left = new ArrayList<>();
         for (int i=0;i<leftLabels.length;i++){
             JLabel l=new JLabel(leftLabels[i]);
@@ -151,11 +155,9 @@ public class AngebotNeuPanel extends EditPanel {
         JLabel lbl26=new JLabel("Angebotsdatum:");  lbl26.setBounds(1010,80,125,25); add(lbl26);
         JLabel lbl29=new JLabel("Referenz");        lbl29.setBounds(1010,105,60,25);  add(lbl29);
         
-        lblHinweis = new JLabel("<html>Bei Erstellung des Angebots wird ein Standardtext hinterlegt.<br>"
-        								   + "Quelle ist die Datei: basetext-leistungsbeschreibung_deu.html<br>"
-        								   + "im /template/ Verzeichnis</html>");
-        lblHinweis.setFont(new Font("Tahoma", Font.BOLD, 14)); lblHinweis.setForeground(Color.BLUE);
-        lblHinweis.setBounds(1130,155,500,75); lblHinweis.setVisible(false); add(lblHinweis);
+        lblHinweis = new JLabel(preFlightLabel);
+        lblHinweis.setFont(new Font("Tahoma", Font.BOLD, 11)); lblHinweis.setForeground(Color.BLUE);
+        lblHinweis.setBounds(1130,155,700,75); lblHinweis.setVisible(false); add(lblHinweis);
 
         // Combos/Textfelder links
         cmbKunde = new JComboBox<>(kunden.stream().map(k -> nullToEmpty(k.getName())).toArray(String[]::new));
@@ -333,7 +335,6 @@ public class AngebotNeuPanel extends EditPanel {
     		htmlText = null;
         	lblHinweis.setVisible(false);
     	}
-    	
     }
     
 	//###################################################################################################################################################

@@ -35,8 +35,8 @@ import org.andy.code.main.StartUp;
 import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
 import org.andy.code.misc.BD;
 import org.andy.gui.main.HauptFenster;
-import org.andy.gui.main.overview_panels.edit_panels.AngebotSeite2Editor;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
+import org.andy.gui.main.overview_panels.edit_panels.LeistungsbeschreibungEditor;
 import org.andy.gui.misc.CommaHelper;
 import org.andy.gui.misc.RoundedBorder;
 import org.apache.logging.log4j.LogManager;
@@ -80,7 +80,7 @@ public class AngebotPanel extends EditPanel {
 	private String id = null;
 	private BigDecimal bdTaxRate = BD.ZERO;
 	
-	private AngebotSeite2Editor editor = new AngebotSeite2Editor();
+	private LeistungsbeschreibungEditor runEditor = new LeistungsbeschreibungEditor();
 	
 	//###################################################################################################################################################
 	// public Teil
@@ -426,7 +426,7 @@ public class AngebotPanel extends EditPanel {
     	
     	if (angebot.getPage2() == 1 || chkPage2.isSelected()) {
     		angebot.setPage2(1);
-    		angebot.setBeschreibungHtml(editor.getHtml()); // Liefer- und Leistungsbeschreibung
+    		angebot.setBeschreibungHtml(runEditor.getText()); // Liefer- und Leistungsbeschreibung
     	}
     	
     	angebot.setAnzPos(anzPos);
@@ -506,8 +506,8 @@ public class AngebotPanel extends EditPanel {
     private void doText() {
     	AngebotRepository angebotRepository = new AngebotRepository();
     	Angebot angebot = angebotRepository.findById(id);
-    	editor.setHtml(angebot.getBeschreibungHtml());
-    	editor.setVisible(true);
+    	runEditor.setText(angebot.getBeschreibungHtml());
+    	runEditor.setVisible(true);
     }
     
 	//###################################################################################################################################################
@@ -597,7 +597,7 @@ public class AngebotPanel extends EditPanel {
     	txtFieldsSum[2].setValue(Double.parseDouble(bdBrutto.toString()));
     	
     	if (angebot.getPage2() == 1) {
-    		editor.setHtml(angebot.getBeschreibungHtml());
+    		runEditor.setText(angebot.getBeschreibungHtml());
     		chkPage2.setSelected(true);
     		btnFields[4].setVisible(true);
     	} else {

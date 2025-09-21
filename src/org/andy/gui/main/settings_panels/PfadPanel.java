@@ -32,7 +32,7 @@ public class PfadPanel extends JPanel {
 	Font font = new Font("Tahoma", Font.BOLD, 11);
 	Color titleColor = Color.BLUE; // oder z. B. new Color(30, 60, 150);
 	
-	private JTextField[] txtFields = new JTextField[10];
+	private JTextField[] txtFields = new JTextField[12];
 	
 	//###################################################################################################################################################
 	// public Teil
@@ -62,6 +62,8 @@ public class PfadPanel extends JPanel {
 		String[] propertyKeys = {
 				"templateoffer",
 				"templatedescription",
+				"templatedescriptionbase",
+				"templatedescriptionstyle",
 				"templateconfirmation",
 				"templatebill",
 				"templatereminder",
@@ -75,6 +77,8 @@ public class PfadPanel extends JPanel {
 		String labels[] = {
 				"Angebot Vorlage (Excel-Vorlage *.xlsx)",
 				"Leistungsbeschreibung Vorlage (pdf-Vorlage *.pdf)",
+				"Leistungsbeschreibung Basistext (html-Vorlage *.html)",
+				"Leistungsbeschreibung StyleSheet (css-Struktur *.css)",
 				"Angebotsbestätigung Vorlage (Excel-Vorlage *.xlsx)",
 				"Rechnung Vorlage (Excel-Vorlage *.xlsx)",
 				"Zahlungserinnerung Vorlage (Excel-Vorlage *.xlsx)",
@@ -148,6 +152,8 @@ public class PfadPanel extends JPanel {
     Function<Void, String>[] getters = new Function[] {
         _ -> Einstellungen.getTplOffer(),
         _ -> Einstellungen.getTplDescription(),
+        _ -> Einstellungen.getTplDescriptionBase(),
+        _ -> Einstellungen.getTplDescriptionStyle(),
         _ -> Einstellungen.getTplConfirmation(),
         _ -> Einstellungen.getTplBill(),
         _ -> Einstellungen.getTplReminder(),
@@ -163,6 +169,8 @@ public class PfadPanel extends JPanel {
     Consumer<String>[] setters = new Consumer[] {
         (Consumer<String>) val -> Einstellungen.setTplOffer(val),
         (Consumer<String>) val -> Einstellungen.setTplDescription(val),
+        (Consumer<String>) val -> Einstellungen.setTplDescriptionBase(val),
+        (Consumer<String>) val -> Einstellungen.setTplDescriptionStyle(val),
         (Consumer<String>) val -> Einstellungen.setTplConfirmation(val),
         (Consumer<String>) val -> Einstellungen.setTplBill(val),
         (Consumer<String>) val -> Einstellungen.setTplReminder(val),
