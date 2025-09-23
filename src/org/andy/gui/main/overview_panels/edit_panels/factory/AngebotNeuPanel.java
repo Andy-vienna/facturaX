@@ -128,8 +128,7 @@ public class AngebotNeuPanel extends EditPanel {
                 																								 {1010,280},{1010,305},{1010,330}};
         
         final String preFlightLabel = "<html>Bei Erstellung des Angebots wird ein Standardtext hinterlegt. Quelle ist die Datei:<br>"
-				   					+ "'" + Einstellungen.getTplDescriptionBase() + "'<br>"
-				   					+ "im /template/ Verzeichnis</html>";
+				   					+ "<font color='blue'><b>%s</b></font><br>";
         
         List<JLabel> left = new ArrayList<>();
         for (int i=0;i<leftLabels.length;i++){
@@ -155,8 +154,8 @@ public class AngebotNeuPanel extends EditPanel {
         JLabel lbl26=new JLabel("Angebotsdatum:");  lbl26.setBounds(1010,80,125,25); add(lbl26);
         JLabel lbl29=new JLabel("Referenz");        lbl29.setBounds(1010,105,60,25);  add(lbl29);
         
-        lblHinweis = new JLabel(preFlightLabel);
-        lblHinweis.setFont(new Font("Tahoma", Font.BOLD, 11)); lblHinweis.setForeground(Color.BLUE);
+        lblHinweis = new JLabel(String.format(preFlightLabel, Einstellungen.getTplDescriptionBase()));
+        //lblHinweis.setFont(new Font("Tahoma", Font.BOLD, 11));
         lblHinweis.setBounds(1130,155,700,75); lblHinweis.setVisible(false); add(lblHinweis);
 
         // Combos/Textfelder links

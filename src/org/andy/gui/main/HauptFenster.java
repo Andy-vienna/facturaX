@@ -773,8 +773,7 @@ public class HauptFenster extends JFrame {
                 "<html><b>%s</b> | %s | Angemeldeter Benutzer: <font color='blue'><b>%s</b> (%s)</font>"
                         + " | Master-DB: <font color='blue'><b>%s</b></font>"
                         + " | Produktiv-DB: <font color='blue'><b>%s</b></font></html>",
-                dtNow, sLic, u, role,
-                Einstellungen.getStrDBNameSource(), Einstellungen.getStrDBNameDest());
+                dtNow, sLic, u, role, Einstellungen.getStrDBNameSource(), Einstellungen.getStrDBNameDest());
 
         lblState = new JLabel(sStatus);
         lblState.setBorder(new RoundedBorder(10));

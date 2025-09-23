@@ -36,6 +36,7 @@ public class FxHtmlEditor extends JPanel {
         Platform.runLater(() -> {
             WebView webView = new WebView();
             engine = webView.getEngine();
+            noBrowser(engine); // Öffnen von Websites verhindern
             engine.loadContent(HTML_TEMPLATE);
 
             ToolBar tb = buildToolbar();
@@ -76,7 +77,37 @@ public class FxHtmlEditor extends JPanel {
 	// private Teil
 	//###################################################################################################################################################
 
-    // ---- JavaFX-UI (läuft auf FX-Thread) ----
+    // ---- Anzeige von Websites verhindern ----
+    private void noBrowser(WebEngine engine) {
+    	engine.setCreatePopupHandler(_ -> null);
+        engine.getLoadWorker().stateProperty().addListener((_,_,n) -> {
+            if (n == javafx.concurrent.Worker.State.SUCCEEDED) {
+                engine.executeScript("""
+                    (function(){
+                      // alle Link-Klicks unterbinden
+                      document.addEventListener('click', function(e){
+                        const a = e.target.closest('a');
+                        if (!a) return;
+                        e.preventDefault();
+                        // optional: window.java?.onLink && window.java.onLink(a.href);
+                      }, true);
+
+                      // Mittelklick blocken
+                      document.addEventListener('auxclick', function(e){
+                        if (e.button === 1 && e.target.closest('a')) e.preventDefault();
+                      }, true);
+
+                      // Kontextmenü auf Links verhindern (optional)
+                      document.addEventListener('contextmenu', function(e){
+                        if (e.target.closest('a')) e.preventDefault();
+                      });
+                    })();
+                """);
+            }
+        });
+    }
+    
+    // ---- ToolBar im Editor bauen ----
     private ToolBar buildToolbar() {
         Button undo = new Button("↶");     undo.setOnAction(_ -> exec("undo"));
         Button redo = new Button("↷");     redo.setOnAction(_ -> exec("redo"));
@@ -163,6 +194,8 @@ public class FxHtmlEditor extends JPanel {
     		    body { font-family: Arial, sans-serif; font-size:10pt; line-height:1.2; }
     		    #editable { box-sizing: border-box; min-height:100vh; padding:16px; outline:none; line-height:1.5; }
     		    #editable:empty:before { content: attr(data-placeholder); color:#888; }
+    		    #editable p { margin: 0; }
+    			#editable p + p { margin-top: 0.01em; }
     		    blockquote { border-left:4px solid #ccc; margin:8px 0; padding:8px 12px; color:#ba55d3; font-weight:700; }
     		    pre { background:#f6f8fa; padding:12px; border-radius:6px; overflow:auto; }
     		    h1,h2 { margin:1.2em 0 0.5em; }
@@ -221,7 +254,7 @@ public class FxHtmlEditor extends JPanel {
     		        s.removeAllRanges();
     		        s.addRange(r);
     		      }
-
+    		      
     		      // Nur-Text-Einfügen
     		      ed.addEventListener('paste', function (e) {
     		        e.preventDefault();

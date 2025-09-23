@@ -1,4 +1,4 @@
-@page { size: 210mm 297mm; margin: 130pt 55pt 60pt 55pt; }
+@page { size: 210mm 297mm; margin: 130pt 55pt 50pt 55pt; }
 @page:first { margin-top: 130pt; }
 body { font-family: 'Arial', sans-serif; font-size:10pt; line-height:1.35; color:#000; }
 /* Überschrift H1 */

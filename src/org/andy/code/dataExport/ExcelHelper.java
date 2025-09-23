@@ -304,7 +304,6 @@ public class ExcelHelper {
 	            String text = (cell != null) ? fmt.formatCellValue(cell, eval) : null;
 	            if (text != null && text.equals(placeholder)) {
 				    cell.setCellValue(target);
-				    System.out.println(text + " - Text: " + target);
 	            	return true;
 	            }
 	        }

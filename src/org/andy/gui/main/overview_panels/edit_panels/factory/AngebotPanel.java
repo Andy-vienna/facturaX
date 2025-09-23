@@ -55,6 +55,10 @@ public class AngebotPanel extends EditPanel {
 
 	private static final Logger logger = LogManager.getLogger(AngebotPanel.class);
 	
+	private static final String emptyHtml = """
+			<p style="margin:0;height:1em"><span style="font-size: 10pt;">... kein Text in Datenbank vorhanden ...</span><br></p>
+			""";
+	
 	JPanel panel = new JPanel();
 	private Border b;
 	
@@ -506,7 +510,11 @@ public class AngebotPanel extends EditPanel {
     private void doText() {
     	AngebotRepository angebotRepository = new AngebotRepository();
     	Angebot angebot = angebotRepository.findById(id);
-    	runEditor.setText(angebot.getBeschreibungHtml());
+    	if (angebot.getBeschreibungHtml() != null) {
+    		runEditor.setText(angebot.getBeschreibungHtml());
+    	} else {
+    		runEditor.setText(emptyHtml);
+    	}
     	runEditor.setVisible(true);
     }
     
@@ -597,7 +605,9 @@ public class AngebotPanel extends EditPanel {
     	txtFieldsSum[2].setValue(Double.parseDouble(bdBrutto.toString()));
     	
     	if (angebot.getPage2() == 1) {
-    		runEditor.setText(angebot.getBeschreibungHtml());
+    		if (angebot.getBeschreibungHtml() != null) {
+        		runEditor.setText(angebot.getBeschreibungHtml());
+        	}
     		chkPage2.setSelected(true);
     		btnFields[4].setVisible(true);
     	} else {
