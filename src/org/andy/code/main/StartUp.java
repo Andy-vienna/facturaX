@@ -81,6 +81,9 @@ public class StartUp {
         // 5) Version lesen
         APP_VERSION = getVersion();
         APP_BUILD = getBuildTime();
+        
+        // 5a) aktuelles Datum setzen
+        dtNow = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
 
         // 6) Einstellungen laden
         Einstellungen.LoadProgSettings();

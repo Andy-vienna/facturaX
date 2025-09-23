@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import org.andy.code.dataStructure.entitiyMaster.Bank;
@@ -32,13 +33,12 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class ExcelMahnung{
+public class ExcelMahnstufe1{
 
-	private static final Logger logger = LogManager.getLogger(ExcelMahnung.class);
+	private static final Logger logger = LogManager.getLogger(ExcelMahnstufe1.class);
 
 	private static final int COLUMN_A = 0;
 	private static final int COLUMN_B = 1;
-	private static final int COLUMN_E = 4;
 	private static final int COLUMN_F = 5;
 
 	//###################################################################################################################################################
@@ -59,7 +59,8 @@ public class ExcelMahnung{
 		Kunde kunde = ExcelHelper.kundeData(rechnung.getIdKunde());
 		String adressat = ExcelHelper.kundeAnschrift(rechnung.getIdKunde());
 		Bank bank = ExcelHelper.bankData(rechnung.getIdBank());
-		ExcelHelper.textData();
+		
+		String[][] txtBaustein = ExcelHelper.findText("Mahnstufe1");
 
 		//#######################################################################
 		// Zahlungserinnerung-Excel erzeugen
@@ -130,17 +131,6 @@ public class ExcelMahnung{
 			Cell remAdress = ws.getRow(4).getCell(COLUMN_B); //Name und Anschrift
 			Cell remDate = ws.getRow(4).getCell(COLUMN_F); //Datum der Zahlungserinnerung
 			Cell remDuty = ws.getRow(8).getCell(COLUMN_F); //Ansprechpartner
-			Cell remHeader = ws.getRow(15).getCell(COLUMN_B); //Überschrift
-			Cell remAnrede = ws.getRow(17).getCell(COLUMN_B); //Anrede
-			Cell remText1 = ws.getRow(19).getCell(COLUMN_B); //Textzeile 1
-			Cell remText2 = ws.getRow(20).getCell(COLUMN_B); //Textzeile 2
-			Cell remText3 = ws.getRow(21).getCell(COLUMN_B); //Textzeile 3
-			Cell remText4 = ws.getRow(22).getCell(COLUMN_B); //Textzeile 4
-			Cell remGruss = ws.getRow(25).getCell(COLUMN_B); //Grußformel
-			Cell remName = ws.getRow(26).getCell(COLUMN_B); //Name
-			Cell remBank = ws.getRow(46).getCell(COLUMN_E); //Bankverbindung E47 - E49: Bankname
-			Cell remIBAN = ws.getRow(47).getCell(COLUMN_E); //IBAN
-			Cell remBIC = ws.getRow(48).getCell(COLUMN_E); //BIC
 			
 			//#######################################################################
 			// Zellwerte beschreiben aus dem Array arrAnContent
@@ -149,46 +139,27 @@ public class ExcelMahnung{
 			remDate.setCellValue(StartUp.getDtNow());
 			remDuty.setCellValue(kunde.getPerson());
 			
-			remHeader.setCellValue(ExcelHelper.getTextMahnung().get(0)
-					.replace("{NrMahn}", String.valueOf(iStufe))
-					.replace("{RE}", rechnung.getIdNummer())
-					.replace("{Datum}", rechnung.getDatum().toString()));
+			ExcelHelper.replaceCellValue(wb, ws, "{Bank}", bank.getBankName());
+			ExcelHelper.replaceCellValue(wb, ws, "{IBAN}", FormatIBAN(bank.getIban()));
+			ExcelHelper.replaceCellValue(wb, ws, "{BIC}", bank.getBic());
+			
+			for (int x = 0; x < txtBaustein.length; x++) {
+			    String key = txtBaustein[x][0]; String val = txtBaustein[x][1];
 
-			if(kunde.getPronomen().equals("Herr")) {
-				remAnrede.setCellValue(ExcelHelper.getTextMahnung().get(1).replace("{Name}", kunde.getPerson()));
-			}else if(kunde.getPronomen().equals("Frau")) {
-				remAnrede.setCellValue(ExcelHelper.getTextMahnung().get(2).replace("{Name}", kunde.getPerson()));
-			}else {
-				remAnrede.setCellValue(ExcelHelper.getTextMahnung().get(3));
+			    if (val != null) {
+			        val = val.replace("{NrMahn}", String.valueOf(iStufe));
+			        val = val.replace("{RE}", rechnung.getIdNummer());
+			        val = val.replace("{Datum}", rechnung.getDatum().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+			        val = val.replace("{Wert}", rechnung.getBrutto().toString());
+			        val = val.replace("{Spesen}", "40,00");
+			        val = val.replace("{OwnerName}", ExcelHelper.getKontaktName());
+			    }
+			    txtBaustein[x][1] = val;
+			    
+			    ExcelHelper.replaceCellValue(wb, ws, key, val); // Texte in Zellen schreiben
+
 			}
 			
-			switch(iStufe) {
-			case 1:
-				remText1.setCellValue(ExcelHelper.getTextMahnung().get(4)
-						.replace("{Datum}", rechnung.getDatum().toString())
-						.replace("{Wert}", rechnung.getBrutto().toString()));
-				remText2.setCellValue(ExcelHelper.getTextMahnung().get(6));
-				remText3.setCellValue(ExcelHelper.getTextMahnung().get(8));
-				remText4.setCellValue(ExcelHelper.getTextMahnung().get(10));
-				break;
-			case 2:
-				remText1.setCellValue(ExcelHelper.getTextMahnung().get(5)
-						.replace("{Datum}", rechnung.getDatum().toString())
-						.replace("{Wert}", rechnung.getBrutto().toString()));
-				remText2.setCellValue(ExcelHelper.getTextMahnung().get(7));
-				remText3.setCellValue(ExcelHelper.getTextMahnung().get(9)
-						.replace("{Spesen}", "40,00"));
-				remText4.setCellValue(ExcelHelper.getTextMahnung().get(11));
-				break;
-			}
-
-			remGruss.setCellValue(ExcelHelper.getTextZahlErin().get(8));
-			remName.setCellValue(ExcelHelper.getTextZahlErin().get(9).replace("{OwnerName}", ExcelHelper.getKontaktName()));
-
-			remBank.setCellValue(bank.getBankName());
-			remIBAN.setCellValue(FormatIBAN(bank.getIban()));
-			remBIC.setCellValue(bank.getBic());
-
 			//#######################################################################
 			// WORKBOOK mit Daten befüllen und schließen
 			//#######################################################################

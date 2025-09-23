@@ -4,6 +4,7 @@ import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
 import static org.andy.toolbox.misc.CreateObject.applyHighlighting;
 import static org.andy.toolbox.misc.CreateObject.createButton;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -15,6 +16,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
@@ -28,14 +30,15 @@ import org.andy.gui.misc.RoundedBorder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class TextMahnung extends TextPanel  {
+public class TextRechnung extends TextPanel  {
 	
 	// Serialisierungs-ID für die Klasse
 	private static final long serialVersionUID = 1L;
 	
-	private static final Logger logger = LogManager.getLogger(TextMahnung.class);
+	private static final Logger logger = LogManager.getLogger(TextRechnung.class);
 		
 	private final List<JLabel> labelList = new ArrayList<>();
+	private final List<JTextField> placeholderList = new ArrayList<>();
 	private final List<JTextPane> textAreas = new ArrayList<>();
 	private final List<JButton> updateButtons = new ArrayList<>();
 	
@@ -43,8 +46,8 @@ public class TextMahnung extends TextPanel  {
 	// public Teil
 	//###################################################################################################################################################
 
-	public TextMahnung() {
-        super("Textbausteine für Mahnung bearbeiten");
+	public TextRechnung() {
+        super("Textbausteine für Umsatzsteuerhinweis bearbeiten");
         if (!(getBorder() instanceof TitledBorder)) {
             logger.warn("Kein TitledBorder gesetzt.");
         }
@@ -68,11 +71,11 @@ public class TextMahnung extends TextPanel  {
 
 		// Arrays für Labels und TextAreas
 		String[] labels = {
-				"Textbaustein Mahnung B16", "Textbaustein Mahnung B18/a", "Textbaustein Mahnung B18/b",
-				"Textbaustein Mahnung B18/c", "Textbaustein Mahnung B20/a", "Textbaustein Mahnung B20/b",
-				"Textbaustein Mahnung B21/a", "Textbaustein Mahnung B21/b",	"Textbaustein Mahnung B22/a",
-				"Textbaustein Mahnung B22/b", "Textbaustein Mahnung B23/a", "Textbaustein Mahnung B23/b",
-				"Textbaustein Mahnung B26", "Textbaustein Mahnung B27", "Textbaustein Mahnung ..."};
+				"Platzhalter | Zeilentext", "Platzhalter | Zeilentext",	"Platzhalter | Zeilentext",
+				"Platzhalter | Zeilentext",	"Platzhalter | Zeilentext", "Platzhalter | Zeilentext",
+				"Platzhalter | Zeilentext", "Platzhalter | Zeilentext", "Platzhalter | Zeilentext",
+				"Platzhalter | Zeilentext", "Platzhalter | Zeilentext", "Platzhalter | Zeilentext",
+				"Platzhalter | Zeilentext", "Platzhalter | Zeilentext", "Platzhalter | Zeilentext"};
 
 		for (int i = 0; i < labels.length; i++) {
 
@@ -81,16 +84,31 @@ public class TextMahnung extends TextPanel  {
 			//------------------------------------------------------------------------------
 			gbc.gridx = 0; // erste Spalte
 			JLabel lbl = new JLabel(label);
+			lbl.setFont(new Font("Tahoma", Font.PLAIN, 12));
+			lbl.setForeground(Color.BLACK);
 			JLabel lblInf = new JLabel();
 			lblInf.setVisible(false);
 			labelList.add(lblInf); // Label zur Liste hinzufügen)
-			gbc.weightx = 0.06;  // Label nimmt 6 % des Platzes
+			gbc.weightx = 0.03;  // Label nimmt 6 % des Platzes
 			gbc.weighty = 0;
 			add(lbl, gbc);
 			add(lblInf, gbc);
 			
 			//------------------------------------------------------------------------------
 			gbc.gridx = 1; // Wechsel zur nächsten Spalte
+			JTextField txtPlaceholder = new JTextField();
+			txtPlaceholder.setFont(new Font("Tahoma", Font.BOLD, 12));
+			txtPlaceholder.setColumns(12);
+			txtPlaceholder.setForeground(Color.RED);
+			
+			placeholderList.add(txtPlaceholder); // TextField zur Liste hinzufügen
+			gbc.fill = GridBagConstraints.BOTH;
+			gbc.weightx = 0.07; // Textfeld nimmt 89 % des Platzes
+			gbc.weighty = 0;
+			add(txtPlaceholder, gbc);
+			
+			//------------------------------------------------------------------------------
+			gbc.gridx = 2; // Wechsel zur nächsten Spalte
 			JTextPane txtPane = new JTextPane(); // Verwende JTextPane statt JTextArea
 			txtPane.setFont(new Font("Tahoma", Font.BOLD, 12));
 			txtPane.setEditable(true);
@@ -104,7 +122,7 @@ public class TextMahnung extends TextPanel  {
 			add(txtScroll, gbc);
 
 			//------------------------------------------------------------------------------
-			gbc.gridx = 2; // Wechsel zur nächsten Spalte
+			gbc.gridx = 3; // Wechsel zur nächsten Spalte
 			JButton btnUpdateText = null;
 			try {
 				btnUpdateText = createButton("Ändern", "menu/edit.png", null);
@@ -114,8 +132,16 @@ public class TextMahnung extends TextPanel  {
 			if (btnUpdateText != null) {
 				JButton finalBtn = btnUpdateText; // Lokale Kopie des Buttons
 				int idx = i;
-				btnUpdateText.addActionListener(_ -> handleButtonClick(idx, txtPane));
+				btnUpdateText.addActionListener(_ -> handleButtonClick(idx, txtPlaceholder, txtPane));
 				txtPane.getDocument().addDocumentListener(new DocumentListener() {
+					@Override
+					public void insertUpdate(DocumentEvent e) { finalBtn.setEnabled(true); }
+					@Override
+					public void removeUpdate(DocumentEvent e) { finalBtn.setEnabled(true); }
+					@Override
+					public void changedUpdate(DocumentEvent e) { finalBtn.setEnabled(true); }
+				});
+				txtPlaceholder.getDocument().addDocumentListener(new DocumentListener() {
 					@Override
 					public void insertUpdate(DocumentEvent e) { finalBtn.setEnabled(true); }
 					@Override
@@ -143,7 +169,8 @@ public class TextMahnung extends TextPanel  {
     	int n = Math.min(textAreas.size(), textListe.size());
     	for (int i = 0; i < n; i++) {
     	    Text tx = textListe.get(i);
-    	    textAreas.get(i).setText(tx.getTextMahnung());
+    	    placeholderList.get(i).setText(tx.getVarTextRechnung());
+    	    textAreas.get(i).setText(tx.getTextRechnung());
     	    labelList.get(i).setText(String.valueOf(tx.getId()));
     	}
 		
@@ -169,11 +196,12 @@ public class TextMahnung extends TextPanel  {
     
 	//###################################################################################################################################################
     
-    private void handleButtonClick(int index, JTextPane txtPane) {
+    private void handleButtonClick(int index, JTextField txtVar, JTextPane txtPane) {
         int dataId = parseStringToIntSafe(labelList.get(index).getText());
         TextRepository repo = new TextRepository();
         Text text = repo.findById(dataId);
-        text.setTextMahnung(txtPane.getText());
+        text.setVarTextRechnung(txtVar.getText());
+        text.setTextRechnung(txtPane.getText());
         repo.update(text);
         texte();
     }

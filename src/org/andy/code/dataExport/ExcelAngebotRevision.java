@@ -45,9 +45,9 @@ import org.andy.code.dataStructure.repositoryProductive.FileStoreRepository;
 import org.andy.code.main.Einstellungen;
 import org.andy.code.qr.ZxingQR;
 
-public class ExcelAngebot{
+public class ExcelAngebotRevision{
 
-	private static final Logger logger = LogManager.getLogger(ExcelAngebot.class);
+	private static final Logger logger = LogManager.getLogger(ExcelAngebotRevision.class);
 
 	private static final int START_ROW_OFFSET = 16;
 	private static final int COLUMN_A = 0;
@@ -66,7 +66,7 @@ public class ExcelAngebot{
 
 	public static void anExport(String sNr) throws Exception {
 		String revNr = null;
-		String sExcelIn = Einstellungen.getTplOffer();
+		String sExcelIn = Einstellungen.getTplOfferRev();
 		if(sNr.contains("/")) {
 			revNr = sNr.replace("/", "rev");
 		} else {
@@ -87,7 +87,7 @@ public class ExcelAngebot{
 		String adressat = ExcelHelper.kundeAnschrift(angebot.getIdKunde());
 		Bank bank = ExcelHelper.bankData(angebot.getIdBank());
 		
-		String[][] txtBaustein = ExcelHelper.findText("Angebot");
+		String[][] txtBaustein = ExcelHelper.findText("AngebotRev");
 		
 		LocalDate date = LocalDate.parse(angebot.getDatum().toString(), DateTimeFormatter.ISO_LOCAL_DATE);
         DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
@@ -161,7 +161,7 @@ public class ExcelAngebot{
 			Cell anNr = ws.getRow(5).getCell(COLUMN_F); //Angebotsnummer
 			Cell anRef = ws.getRow(6).getCell(COLUMN_F); //Angebotsreferenz
 			Cell anDuty = ws.getRow(8).getCell(COLUMN_F); //Ansprechpartner
-
+			
 			ws.getRow(13).getCell(COLUMN_A);
 			
 			for(int i = 0; i < angebot.getAnzPos().intValue(); i++ ) { //Angebotspositionen B, C, D, F Zeile 17-28
@@ -204,12 +204,18 @@ public class ExcelAngebot{
 			ExcelHelper.replaceCellValue(wb, ws, "{IBAN}", FormatIBAN(bank.getIban()));
 			ExcelHelper.replaceCellValue(wb, ws, "{BIC}", bank.getBic());
 			
+			int idx = angebot.getIdNummer().indexOf('/');
+			String basis = idx < 0 ? angebot.getIdNummer() : angebot.getIdNummer().substring(0, idx); // bei Revision: urspr. Angebotsnummer
+			Integer rev = idx < 0 ? 0 : Integer.parseInt(angebot.getIdNummer().substring(idx + 1)); // bei Revision: Revisionsnummer
+			
 			for (int x = 0; x < txtBaustein.length; x++) {
 			    String key = txtBaustein[x][0]; String val = txtBaustein[x][1];
 
 			    if (angebot.getPage2() == 0 && key != null && key.contains("{LBvorh}")) {
 			        val = "";
 			    } else if (val != null) {
+			    	val = val.replace("{Revision}", "Revision " + rev);
+			    	val = val.replace("{Angebot-Nr}", basis);
 			        val = val.replace("{OwnerName}", ExcelHelper.getKontaktName());
 			        val = val.replace("{Tage}",     kunde.getZahlungsziel()); // ggf. String.valueOf(...)
 			    }

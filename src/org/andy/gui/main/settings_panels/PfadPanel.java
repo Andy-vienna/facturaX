@@ -32,7 +32,7 @@ public class PfadPanel extends JPanel {
 	Font font = new Font("Tahoma", Font.BOLD, 11);
 	Color titleColor = Color.BLUE; // oder z. B. new Color(30, 60, 150);
 	
-	private JTextField[] txtFields = new JTextField[12];
+	private JTextField[] txtFields = new JTextField[13];
 	
 	//###################################################################################################################################################
 	// public Teil
@@ -61,6 +61,7 @@ public class PfadPanel extends JPanel {
 		
 		String[] propertyKeys = {
 				"templateoffer",
+				"templateofferrev",
 				"templatedescription",
 				"templatedescriptionbase",
 				"templatedescriptionstyle",
@@ -76,6 +77,7 @@ public class PfadPanel extends JPanel {
 		
 		String labels[] = {
 				"Angebot Vorlage (Excel-Vorlage *.xlsx)",
+				"Angebotsrevision Vorlage (Excel-Vorlage *.xlsx)",
 				"Leistungsbeschreibung Vorlage (pdf-Vorlage *.pdf)",
 				"Leistungsbeschreibung Basistext (html-Vorlage *.html)",
 				"Leistungsbeschreibung StyleSheet (css-Struktur *.css)",
@@ -151,6 +153,7 @@ public class PfadPanel extends JPanel {
     @SuppressWarnings("unchecked")
     Function<Void, String>[] getters = new Function[] {
         _ -> Einstellungen.getTplOffer(),
+        _ -> Einstellungen.getTplOfferRev(),
         _ -> Einstellungen.getTplDescription(),
         _ -> Einstellungen.getTplDescriptionBase(),
         _ -> Einstellungen.getTplDescriptionStyle(),
@@ -168,6 +171,7 @@ public class PfadPanel extends JPanel {
     @SuppressWarnings("unchecked")
     Consumer<String>[] setters = new Consumer[] {
         (Consumer<String>) val -> Einstellungen.setTplOffer(val),
+        (Consumer<String>) val -> Einstellungen.setTplOfferRev(val),
         (Consumer<String>) val -> Einstellungen.setTplDescription(val),
         (Consumer<String>) val -> Einstellungen.setTplDescriptionBase(val),
         (Consumer<String>) val -> Einstellungen.setTplDescriptionStyle(val),

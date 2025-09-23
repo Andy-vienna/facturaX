@@ -48,6 +48,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import org.andy.code.dataExport.ExcelRechnung;
 import org.andy.code.dataExport.ExcelAngebot;
+import org.andy.code.dataExport.ExcelAngebotRevision;
 import org.andy.code.dataExport.ExcelBestellung;
 import org.andy.code.dataStructure.entitiyMaster.Kunde;
 import org.andy.code.dataStructure.entitiyMaster.Lieferant;
@@ -361,7 +362,7 @@ public class HauptFenster extends JFrame {
         sPaneAN.getTable().addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) { actionClickAN(sPaneAN.getTable(), e); }
         });
-        sPaneAN.setColumnWidths(new int[] {200,200,200,750,300,200});
+        sPaneAN.setColumnWidths(new int[] {120,120,120,750,300,200});
         sPaneAN.getTable().setAutoCreateRowSorter(true);
 
         infoAN = new SummenPanelA(new String[] {"Summe offen:", "Summe best.:"}, true);
@@ -386,7 +387,11 @@ public class HauptFenster extends JFrame {
         	        "Angebot wird erzeugt …",
         	        () -> {
 						try {
-							ExcelAngebot.anExport(vZelleAN);
+							if(vZelleAN.contains("/")) {
+								ExcelAngebotRevision.anExport(vZelleAN); // Angebotsrevision
+							} else {
+								ExcelAngebot.anExport(vZelleAN); //Angebot
+							}
 						} catch (Exception ex) {
 							logger.error("error exporting offer: ", ex);
 						}
@@ -520,7 +525,7 @@ public class HauptFenster extends JFrame {
         sPaneBE.getTable().addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) { actionClickBE(sPaneBE.getTable(), e); }
         });
-        sPaneBE.setColumnWidths(new int[] {100,100,100,500,500,100,100,100});
+        sPaneBE.setColumnWidths(new int[] {120,120,120,500,500,100,100,100});
         sPaneBE.getTable().setAutoCreateRowSorter(true);
         
         infoBE = new SummenPanelA(new String[] {"Summe offen:", "Summe gel.:"}, false);
@@ -707,10 +712,11 @@ public class HauptFenster extends JFrame {
 
         String[] select = { "", "Eigentümerdaten", "Bankdaten", "Stammdatenverwaltung", "Pfadverwaltung", "Benutzerverwaltung",
                 "Steuerdaten", "SEPA QR-Code", "Datenbank",
-                "Angebotstexte (Textbausteine)", "Auftragsbestätigungstexte (Textbausteine)",
-                "Umsatzsteuerhinweistexte (Textbausteine)", "Zahlungszieltexte (Textbausteine)",
-                "Zahlungserinnerungstexte (Textbausteine)", "Mahnungstexte (Textbausteine)" ,
-                "Bestellungstexte (Textbausteine)", "Lieferscheintexte (Textbausteine)"};
+                "Angebotstexte (Textbausteine)", "Angebotsrevisionstexte (Textbausteine)",
+                "Auftragsbestätigungstexte (Textbausteine)", "Rechnungstexte (Textbausteine)",
+                "Zahlungserinnerungstexte (Textbausteine)", "Mahnungstexte Mahnstufe 1 (Textbausteine)",
+                "Mahnungstexte Mahnstufe 2 (Textbausteine)", "Bestellungstexte (Textbausteine)",
+                "Lieferscheintexte (Textbausteine)"};
 
         TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), null);
         border.setTitleJustification(TitledBorder.LEFT);
@@ -742,13 +748,14 @@ public class HauptFenster extends JFrame {
                 case 7 -> pageSetting.add(new QrCodePanel());
                 case 8 -> pageSetting.add(new DatenbankPanel());
                 case 9 -> pageSetting.add(TextPanelFactory.create("AnT"));
-                case 10 -> pageSetting.add(TextPanelFactory.create("AbT"));
-                case 11 -> pageSetting.add(TextPanelFactory.create("ReT"));
-                case 12 -> pageSetting.add(TextPanelFactory.create("ZzT"));
+                case 10 -> pageSetting.add(TextPanelFactory.create("AnTR"));
+                case 11 -> pageSetting.add(TextPanelFactory.create("AbT"));
+                case 12 -> pageSetting.add(TextPanelFactory.create("ReT"));
                 case 13 -> pageSetting.add(TextPanelFactory.create("ZeT"));
-                case 14 -> pageSetting.add(TextPanelFactory.create("MaT"));
-                case 15 -> pageSetting.add(TextPanelFactory.create("BeT"));
-                case 16 -> pageSetting.add(TextPanelFactory.create("LsT"));
+                case 14 -> pageSetting.add(TextPanelFactory.create("Ma1T"));
+                case 15 -> pageSetting.add(TextPanelFactory.create("Ma2T"));
+                case 16 -> pageSetting.add(TextPanelFactory.create("BeT"));
+                case 17 -> pageSetting.add(TextPanelFactory.create("LsT"));
                 default -> {}
             }
             pageSetting.revalidate(); pageSetting.repaint();

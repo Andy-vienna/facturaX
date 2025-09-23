@@ -16,7 +16,8 @@ import javax.swing.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.andy.code.dataExport.ExcelMahnung;
+import org.andy.code.dataExport.ExcelMahnstufe1;
+import org.andy.code.dataExport.ExcelMahnstufe2;
 import org.andy.code.dataExport.ExcelZahlungserinnerung;
 import org.andy.gui.main.HauptFenster;
 import org.andy.toolbox.misc.SetFrameIcon;
@@ -140,8 +141,8 @@ public final class MahnstufeDialog extends JDialog {
         try {
             switch (selected) {
                 case S0 -> ExcelZahlungserinnerung.reminderExport(sachId);
-                case S1 -> ExcelMahnung.mahnungExport(sachId, 1);
-                case S2 -> ExcelMahnung.mahnungExport(sachId, 2);
+                case S1 -> ExcelMahnstufe1.mahnungExport(sachId, 1);
+                case S2 -> ExcelMahnstufe2.mahnungExport(sachId, 2);
             }
         } catch (IOException io) {
             log.error("I/O-Fehler beim Erstellen der Mahnung: {}", io.getMessage(), io);

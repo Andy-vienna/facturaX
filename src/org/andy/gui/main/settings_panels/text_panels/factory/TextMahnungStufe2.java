@@ -30,12 +30,12 @@ import org.andy.gui.misc.RoundedBorder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class TextLieferschein extends TextPanel  {
+public class TextMahnungStufe2 extends TextPanel  {
 	
 	// Serialisierungs-ID für die Klasse
 	private static final long serialVersionUID = 1L;
 	
-	private static final Logger logger = LogManager.getLogger(TextLieferschein.class);
+	private static final Logger logger = LogManager.getLogger(TextMahnungStufe2.class);
 		
 	private final List<JLabel> labelList = new ArrayList<>();
 	private final List<JTextField> placeholderList = new ArrayList<>();
@@ -46,8 +46,8 @@ public class TextLieferschein extends TextPanel  {
 	// public Teil
 	//###################################################################################################################################################
 
-	public TextLieferschein() {
-        super("Textbausteine für Lieferschein bearbeiten");
+	public TextMahnungStufe2() {
+        super("Textbausteine für Mahnstufe 2 bearbeiten");
         if (!(getBorder() instanceof TitledBorder)) {
             logger.warn("Kein TitledBorder gesetzt.");
         }
@@ -169,8 +169,8 @@ private void buildUI() {
     	int n = Math.min(textAreas.size(), textListe.size());
     	for (int i = 0; i < n; i++) {
     	    Text tx = textListe.get(i);
-    	    placeholderList.get(i).setText(tx.getVarTextLieferschein());
-    	    textAreas.get(i).setText(tx.getTextLieferschein());
+    	    placeholderList.get(i).setText(tx.getVarTextMahnungStufe2());
+    	    textAreas.get(i).setText(tx.getTextMahnungStufe2());
     	    labelList.get(i).setText(String.valueOf(tx.getId()));
     	}
 		
@@ -200,8 +200,8 @@ private void buildUI() {
         int dataId = parseStringToIntSafe(labelList.get(index).getText());
         TextRepository repo = new TextRepository();
         Text text = repo.findById(dataId);
-        text.setVarTextLieferschein(txtVar.getText());
-        text.setTextLieferschein(txtPane.getText());
+        text.setVarTextMahnungStufe2(txtVar.getText());
+        text.setTextMahnungStufe2(txtPane.getText());
         repo.update(text);
         texte();
     }

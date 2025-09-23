@@ -33,31 +33,34 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class ExcelZahlungserinnerung{
+public class ExcelMahnstufe2{
 
-	private static final Logger logger = LogManager.getLogger(ExcelZahlungserinnerung.class);
+	private static final Logger logger = LogManager.getLogger(ExcelMahnstufe2.class);
 
 	private static final int COLUMN_A = 0;
 	private static final int COLUMN_B = 1;
 	private static final int COLUMN_F = 5;
 
 	//###################################################################################################################################################
-	// Zahlungserinnerung erzeugen und als pdf exportieren
+	// Mahnung erzeugen und als pdf exportieren
 	//###################################################################################################################################################
 
-	public static void reminderExport(String sNr) throws Exception {
+	public static void mahnungExport(String sNr, int iStufe) throws Exception {
 
-		new ArrayList<>();
-		String sExcelIn = Einstellungen.getTplReminder();
-		String sExcelOut = Einstellungen.getWorkPath() + "Zahlungserinnerung_" + sNr + ".xlsx";
-		String sPdfOut = Einstellungen.getWorkPath() + "Zahlungserinnerung_" + sNr + ".pdf";
+		if(iStufe < 1 || iStufe > 2) {
+			return;
+		}
+
+		String sExcelIn = Einstellungen.getTplMahnung();
+		String sExcelOut = Einstellungen.getWorkPath() + "Mahnung_" + String.valueOf(iStufe) + "_" + sNr + ".xlsx";
+		String sPdfOut = Einstellungen.getWorkPath() + "Mahnung_" + String.valueOf(iStufe) + "_" + sNr + ".pdf";
 
 		Rechnung rechnung = ExcelHelper.loadRechnung(sNr);
 		Kunde kunde = ExcelHelper.kundeData(rechnung.getIdKunde());
 		String adressat = ExcelHelper.kundeAnschrift(rechnung.getIdKunde());
 		Bank bank = ExcelHelper.bankData(rechnung.getIdBank());
 		
-		String[][] txtBaustein = ExcelHelper.findText("Zahlungserinnerung");
+		String[][] txtBaustein = ExcelHelper.findText("Mahnstufe2");
 
 		//#######################################################################
 		// Zahlungserinnerung-Excel erzeugen
@@ -69,7 +72,7 @@ public class ExcelZahlungserinnerung{
 			fileOut = new FileOutputStream(sExcelOut);
 
 			XSSFWorkbook wb = new XSSFWorkbook(inputStream);
-			Sheet ws = wb.getSheet("Zahlungserinnerung");
+			Sheet ws = wb.getSheet("Mahnung");
 
 			//#######################################################################
 			// Owner-Informationen in die Excel-Datei schreiben
@@ -144,9 +147,11 @@ public class ExcelZahlungserinnerung{
 			    String key = txtBaustein[x][0]; String val = txtBaustein[x][1];
 
 			    if (val != null) {
-			    	val = val.replace("{RE}", rechnung.getIdNummer());
-			    	val = val.replace("{Datum}", rechnung.getDatum().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-			    	val = val.replace("{Wert}", rechnung.getBrutto().toString());
+			        val = val.replace("{NrMahn}", String.valueOf(iStufe));
+			        val = val.replace("{RE}", rechnung.getIdNummer());
+			        val = val.replace("{Datum}", rechnung.getDatum().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+			        val = val.replace("{Wert}", rechnung.getBrutto().toString());
+			        val = val.replace("{Spesen}", "40,00");
 			        val = val.replace("{OwnerName}", ExcelHelper.getKontaktName());
 			    }
 			    txtBaustein[x][1] = val;
@@ -187,10 +192,18 @@ public class ExcelZahlungserinnerung{
 		FileStoreRepository fileStoreRepository = new FileStoreRepository();
 		FileStore fileStore = fileStoreRepository.findById(rechnung.getIdNummer()); // Tabelleneintrag mit Hibernate lesen
 		
-		fileStore.setZeFileName(FileName);
-		
 		Path path = Paths.get(FileNamePath);
-		fileStore.setZePdfFile(Files.readAllBytes(path)); // ByteArray für Dateiinhalt
+		
+		switch(iStufe) {
+		case 1:
+			fileStore.setM1FileName(FileName);
+			fileStore.setM1PdfFile(Files.readAllBytes(path)); // ByteArray für Dateiinhalt
+			break;
+		case 2:
+			fileStore.setM2FileName(FileName);
+			fileStore.setM2PdfFile(Files.readAllBytes(path)); // ByteArray für Dateiinhalt
+			break;
+		}
 		
 		fileStoreRepository.update(fileStore); // Datei in DB speichern
 		
@@ -198,10 +211,10 @@ public class ExcelZahlungserinnerung{
 		// Status der Rechnung ändern
 		//#######################################################################
 		
-		rechnung.setState(rechnung.getState() + 200); // Zustand Zahlungserinnerung setzen
+		rechnung.setState(rechnung.getState() + 100); // Zustand Mahnstufe x setzen
 		RechnungRepository rechnungRepository = new RechnungRepository();
 		rechnungRepository.update(rechnung);
-		
+				
 		//#######################################################################
 		// Ursprungs-Excel und -pdf löschen
 		//#######################################################################

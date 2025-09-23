@@ -67,7 +67,8 @@ public class ExcelBestellung{
 
 		Bestellung bestellung = ExcelHelper.loadBestellung(sNr);
 		String adressat = ExcelHelper.lieferantAnschrift(bestellung.getIdLieferant());
-		ExcelHelper.textData();
+		
+		String[][] txtBaustein = ExcelHelper.findText("Bestellung");
 		
 		LocalDate date = LocalDate.parse(bestellung.getDatum().toString(), DateTimeFormatter.ISO_LOCAL_DATE);
         DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
@@ -141,9 +142,6 @@ public class ExcelBestellung{
 			Cell beNr = ws.getRow(5).getCell(COLUMN_F); //Bestellnummer
 			Cell beRef = ws.getRow(6).getCell(COLUMN_F); //Referenz
 			
-			Cell beA12 = ws.getRow(11).getCell(COLUMN_A); //Text A12
-			Cell beA13 = ws.getRow(12).getCell(COLUMN_A); //Text A13
-			
 			for(int i = 0; i < bestellung.getAnzPos().intValue(); i++ ) { //Bestellpositionen B, C, D, F Zeile 17-28
 				int j = i + START_ROW_OFFSET;
 				bePos[i] = ws.getRow(j).getCell(COLUMN_A); //Position
@@ -152,15 +150,8 @@ public class ExcelBestellung{
 				beEPreis[i] = ws.getRow(j).getCell(COLUMN_D); //E-Preis
 				beGPreis[i] = ws.getRow(j).getCell(COLUMN_F); //G-Preis
 			}
-			
 			Cell beNetto = ws.getRow(28).getCell(COLUMN_F); //Nettosumme, Steuersatz, USt., Gesamtsumme
 
-			Cell beA33 = ws.getRow(32).getCell(COLUMN_A); //Angebotstexte
-			Cell beA36 = ws.getRow(35).getCell(COLUMN_A);
-			Cell beA37 = ws.getRow(36).getCell(COLUMN_A);
-			Cell beA39 = ws.getRow(38).getCell(COLUMN_A);
-			Cell beA40 = ws.getRow(39).getCell(COLUMN_A);
-			
 			//#######################################################################
 			// Zellwerte beschreiben
 			//#######################################################################
@@ -168,9 +159,6 @@ public class ExcelBestellung{
 			beDate.setCellValue(datum);
 			beNr.setCellValue(bestellung.getIdNummer());
 			beRef.setCellValue(bestellung.getRef());
-			
-			beA12.setCellValue(ExcelHelper.getTextBestellung().get(0));
-			beA13.setCellValue(ExcelHelper.getTextBestellung().get(1));
 			
 			for(int i = 0; i < bestellung.getAnzPos().intValue(); i++ ) {
 				bePos[i].setCellValue(String.valueOf(i + 1));
@@ -187,14 +175,19 @@ public class ExcelBestellung{
 					System.out.println(e.getMessage());
 				}
 			}
-
 			beNetto.setCellValue(bestellung.getNetto().doubleValue());
 			
-			beA33.setCellValue(ExcelHelper.getTextBestellung().get(2));
-			beA36.setCellValue(ExcelHelper.getTextBestellung().get(3));
-			beA37.setCellValue(ExcelHelper.getTextBestellung().get(4));
-			beA39.setCellValue(ExcelHelper.getTextBestellung().get(5));
-			beA40.setCellValue(ExcelHelper.getTextBestellung().get(6).replace("{OwnerName}", ExcelHelper.getKontaktName()));
+			for (int x = 0; x < txtBaustein.length; x++) {
+			    String key = txtBaustein[x][0]; String val = txtBaustein[x][1];
+
+			    if (val != null) {
+			        val = val.replace("{OwnerName}", ExcelHelper.getKontaktName());
+			    }
+			    txtBaustein[x][1] = val;
+			    
+			    ExcelHelper.replaceCellValue(wb, ws, key, val); // Texte in Zellen schreiben
+			    
+			}
 			
 			//#######################################################################
 			// WORKBOOK mit Daten befüllen und schließen

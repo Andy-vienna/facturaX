@@ -12,35 +12,65 @@ public class Text {
     @Column(name = "Id")
     private int id;
 	
-	@Column(name = "TextUSt")
-    private String textUst;
-    
-    @Column(name = "TextZahlZiel")
-    private String textZahlZiel;
-    
-    @Column(name = "TextAngebot")
+	@Column(name = "VarTextAngebot")
+    private String varTextAngebot;
+	
+	@Column(name = "TextAngebot")
     private String textAngebot;
-
-    @Column(name = "TextZahlErin")
-    private String textZahlErin;
-    
-    @Column(name = "TextOrderConfirm")
-    private String textOrderConfirm;
-
-    @Column(name = "TextMahnung")
-    private String textMahnung;
-    
-    @Column(name = "TextBestellung")
+	
+	@Column(name = "VarTextAngebotRev")
+    private String varTextAngebotRev;
+	
+	@Column(name = "TextAngebotRev")
+    private String textAngebotRev;
+	
+	@Column(name = "VarTextBestellung")
+    private String varTextBestellung;
+	
+	@Column(name = "TextBestellung")
     private String textBestellung;
-    
-    @Column(name = "TextLieferschein")
+	
+	@Column(name = "VarTextLieferschein")
+    private String varTextLieferschein;
+	
+	@Column(name = "TextLieferschein")
     private String textLieferschein;
+	
+	@Column(name = "VarTextMahnungStufe1")
+    private String varTextMahnungStufe1;
+	
+	@Column(name = "TextMahnungStufe1")
+    private String textMahnungStufe1;
+	
+	@Column(name = "VarTextMahnungStufe2")
+    private String varTextMahnungStufe2;
+	
+	@Column(name = "TextMahnungStufe2")
+    private String textMahnungStufe2;
+	
+	@Column(name = "VarTextOrderConfirm")
+    private String varTextOrderConfirm;
+	
+	@Column(name = "TextOrderConfirm")
+    private String textOrderConfirm;
+	
+	@Column(name = "VarTextRechnung")
+    private String varTextRechnung;
+    
+    @Column(name = "TextRechnung")
+    private String textRechnung;
+	
+	@Column(name = "VarTextZahlErin")
+    private String varTextZahlErin;
+	
+	@Column(name = "TextZahlErin")
+    private String textZahlErin;
 	
 	//###################################################################################################################################################
 	// Getter und Setter für Felder
 	//###################################################################################################################################################
-	
-    public int getId() {
+
+	public int getId() {
 		return id;
 	}
 
@@ -48,20 +78,12 @@ public class Text {
 		this.id = id;
 	}
 
-	public String getTextUst() {
-		return textUst;
+	public String getVarTextAngebot() {
+		return varTextAngebot;
 	}
 
-	public void setTextUst(String textUst) {
-		this.textUst = textUst;
-	}
-
-	public String getTextZahlZiel() {
-		return textZahlZiel;
-	}
-
-	public void setTextZahlZiel(String textZahlZiel) {
-		this.textZahlZiel = textZahlZiel;
+	public void setVarTextAngebot(String varTextAngebot) {
+		this.varTextAngebot = varTextAngebot;
 	}
 
 	public String getTextAngebot() {
@@ -72,28 +94,28 @@ public class Text {
 		this.textAngebot = textAngebot;
 	}
 
-	public String getTextZahlErin() {
-		return textZahlErin;
+	public String getVarTextAngebotRev() {
+		return varTextAngebotRev;
 	}
 
-	public void setTextZahlErin(String textZahlErin) {
-		this.textZahlErin = textZahlErin;
+	public void setVarTextAngebotRev(String varTextAngebotRev) {
+		this.varTextAngebotRev = varTextAngebotRev;
 	}
 
-	public String getTextOrderConfirm() {
-		return textOrderConfirm;
+	public String getTextAngebotRev() {
+		return textAngebotRev;
 	}
 
-	public void setTextOrderConfirm(String textOrderConfirm) {
-		this.textOrderConfirm = textOrderConfirm;
+	public void setTextAngebotRev(String textAngebotRev) {
+		this.textAngebotRev = textAngebotRev;
 	}
 
-	public String getTextMahnung() {
-		return textMahnung;
+	public String getVarTextBestellung() {
+		return varTextBestellung;
 	}
 
-	public void setTextMahnung(String textMahnung) {
-		this.textMahnung = textMahnung;
+	public void setVarTextBestellung(String varTextBestellung) {
+		this.varTextBestellung = varTextBestellung;
 	}
 
 	public String getTextBestellung() {
@@ -104,6 +126,14 @@ public class Text {
 		this.textBestellung = textBestellung;
 	}
 
+	public String getVarTextLieferschein() {
+		return varTextLieferschein;
+	}
+
+	public void setVarTextLieferschein(String varTextLieferschein) {
+		this.varTextLieferschein = varTextLieferschein;
+	}
+
 	public String getTextLieferschein() {
 		return textLieferschein;
 	}
@@ -112,4 +142,84 @@ public class Text {
 		this.textLieferschein = textLieferschein;
 	}
 
+	public String getVarTextMahnungStufe1() {
+		return varTextMahnungStufe1;
+	}
+
+	public void setVarTextMahnungStufe1(String varTextMahnungStufe1) {
+		this.varTextMahnungStufe1 = varTextMahnungStufe1;
+	}
+
+	public String getTextMahnungStufe1() {
+		return textMahnungStufe1;
+	}
+
+	public void setTextMahnungStufe1(String textMahnungStufe1) {
+		this.textMahnungStufe1 = textMahnungStufe1;
+	}
+	
+	public String getVarTextMahnungStufe2() {
+		return varTextMahnungStufe2;
+	}
+
+	public void setVarTextMahnungStufe2(String varTextMahnungStufe2) {
+		this.varTextMahnungStufe2 = varTextMahnungStufe2;
+	}
+
+	public String getTextMahnungStufe2() {
+		return textMahnungStufe2;
+	}
+
+	public void setTextMahnungStufe2(String textMahnungStufe2) {
+		this.textMahnungStufe2 = textMahnungStufe2;
+	}
+
+	public String getVarTextOrderConfirm() {
+		return varTextOrderConfirm;
+	}
+
+	public void setVarTextOrderConfirm(String varTextOrderConfirm) {
+		this.varTextOrderConfirm = varTextOrderConfirm;
+	}
+
+	public String getTextOrderConfirm() {
+		return textOrderConfirm;
+	}
+
+	public void setTextOrderConfirm(String textOrderConfirm) {
+		this.textOrderConfirm = textOrderConfirm;
+	}
+
+	public String getVarTextRechnung() {
+		return varTextRechnung;
+	}
+
+	public void setVarTextRechnung(String varTextRechnung) {
+		this.varTextRechnung = varTextRechnung;
+	}
+
+	public String getTextRechnung() {
+		return textRechnung;
+	}
+
+	public void setTextRechnung(String textRechnung) {
+		this.textRechnung = textRechnung;
+	}
+
+	public String getVarTextZahlErin() {
+		return varTextZahlErin;
+	}
+
+	public void setVarTextZahlErin(String varTextZahlErin) {
+		this.varTextZahlErin = varTextZahlErin;
+	}
+
+	public String getTextZahlErin() {
+		return textZahlErin;
+	}
+
+	public void setTextZahlErin(String textZahlErin) {
+		this.textZahlErin = textZahlErin;
+	}
+	
 }

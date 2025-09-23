@@ -21,6 +21,13 @@ import org.andy.code.dataStructure.repositoryProductive.BestellungRepository;
 import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
 import org.andy.code.main.Einstellungen;
 import org.andy.code.misc.CodeListen;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.util.CellReference;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ExcelHelper {
 	
@@ -29,15 +36,6 @@ public class ExcelHelper {
 	private static String footerCenter;
 	private static String kontaktName;
 	private static String steuerNummer;
-	
-	private static ArrayList<String> TextUSt = new ArrayList<>();
-	private static ArrayList<String> TextZahlZiel = new ArrayList<>();
-	private static ArrayList<String> TextAngebot = new ArrayList<>();
-	private static ArrayList<String> TextZahlErin = new ArrayList<>();
-	private static ArrayList<String> TextOrderConfirm = new ArrayList<>();
-	private static ArrayList<String> TextMahnung = new ArrayList<>();
-	private static ArrayList<String> TextBestellung = new ArrayList<>();
-	private static ArrayList<String> TextLieferschein = new ArrayList<>();
 	
 	private static Owner owner = new Owner();
 	
@@ -79,10 +77,6 @@ public class ExcelHelper {
 	
 	public static ArrayList<String> ownerData(){
 		return readOwner();
-	}
-	
-	public static void textData(){
-		readText();
 	}
 	
 	//###################################################################################################################################################
@@ -231,21 +225,91 @@ public class ExcelHelper {
 	
 	//###################################################################################################################################################
 	
-	private static void readText(){
+	public static String[][] findText(String forDocument) {
+		
 		TextRepository textRepository = new TextRepository();
 		List<Text> textListe = new ArrayList<>();
 	    textListe.addAll(textRepository.findAll());
 	    
-		for(int i = 0; i < textListe.size(); i++) {
-			TextUSt.add(textListe.get(i).getTextUst());
-			TextZahlZiel.add(textListe.get(i).getTextZahlZiel());
-			TextAngebot.add(textListe.get(i).getTextAngebot());
-			TextZahlErin.add(textListe.get(i).getTextZahlErin());
-			TextOrderConfirm.add(textListe.get(i).getTextOrderConfirm());
-			TextMahnung.add(textListe.get(i).getTextMahnung());
-			TextBestellung.add(textListe.get(i).getTextBestellung());
-			TextLieferschein.add(textListe.get(i).getTextLieferschein());
-		}
+	    String[][] tmp = new String[textListe.size()][2];
+	    
+	    switch(forDocument) {
+	    case "Angebot":
+	    	for(int i = 0; i < textListe.size(); i++) {
+	    		tmp[i][0] = textListe.get(i).getVarTextAngebot();
+	    		tmp[i][1] = textListe.get(i).getTextAngebot();
+	    	}
+	    	break;
+	    case "AngebotRev":
+	    	for(int i = 0; i < textListe.size(); i++) {
+	    		tmp[i][0] = textListe.get(i).getVarTextAngebotRev();
+	    		tmp[i][1] = textListe.get(i).getTextAngebotRev();
+	    	}
+	    	break;
+	    case "AuftragsBest":
+	    	for(int i = 0; i < textListe.size(); i++) {
+	    		tmp[i][0] = textListe.get(i).getVarTextOrderConfirm();
+	    		tmp[i][1] = textListe.get(i).getTextOrderConfirm();
+	    	}
+	    	break;
+	    case "Bestellung":
+	    	for(int i = 0; i < textListe.size(); i++) {
+	    		tmp[i][0] = textListe.get(i).getVarTextBestellung();
+	    		tmp[i][1] = textListe.get(i).getTextBestellung();
+	    	}
+	    	break;
+	    case "Mahnstufe1":
+	    	for(int i = 0; i < textListe.size(); i++) {
+	    		tmp[i][0] = textListe.get(i).getVarTextMahnungStufe1();
+	    		tmp[i][1] = textListe.get(i).getTextMahnungStufe1();
+	    	}
+	    	break;
+	    case "Mahnstufe2":
+	    	for(int i = 0; i < textListe.size(); i++) {
+	    		tmp[i][0] = textListe.get(i).getVarTextMahnungStufe2();
+	    		tmp[i][1] = textListe.get(i).getTextMahnungStufe2();
+	    	}
+	    	break;
+	    case "Rechnung":
+	    	for(int i = 0; i < textListe.size(); i++) {
+	    		tmp[i][0] = textListe.get(i).getVarTextRechnung();
+	    		tmp[i][1] = textListe.get(i).getTextRechnung();
+	    	}
+	    	break;
+	    case "Zahlungserinnerung":
+	    	for(int i = 0; i < textListe.size(); i++) {
+	    		tmp[i][0] = textListe.get(i).getVarTextZahlErin();
+	    		tmp[i][1] = textListe.get(i).getTextZahlErin();
+	    	}
+	    	break;
+	    }
+	    return tmp;
+	}
+	
+	//###################################################################################################################################################
+	
+	public static boolean replaceCellValue(XSSFWorkbook wb, Sheet ws, String placeholder, String target) {
+		
+		DataFormatter fmt = new DataFormatter();
+	    FormulaEvaluator eval = wb.getCreationHelper().createFormulaEvaluator();
+	    
+	    CellReference start = new CellReference("A1");
+	    CellReference end   = new CellReference("G60");
+		
+		for (int r = start.getRow(); r <= end.getRow(); r++) {
+	        Row row = ws.getRow(r); // kann null sein
+	        for (int c = start.getCol(); c <= end.getCol(); c++) {
+	            Cell cell = (row != null) ? row.getCell(c) : null;
+
+	            String text = (cell != null) ? fmt.formatCellValue(cell, eval) : null;
+	            if (text != null && text.equals(placeholder)) {
+				    cell.setCellValue(target);
+				    System.out.println(text + " - Text: " + target);
+	            	return true;
+	            }
+	        }
+	    }
+		return false;
 	}
 	
 	//###################################################################################################################################################
@@ -276,36 +340,4 @@ public class ExcelHelper {
 		return steuerNummer;
 	}
 
-	public static ArrayList<String> getTextUSt() {
-		return TextUSt;
-	}
-
-	public static ArrayList<String> getTextZahlZiel() {
-		return TextZahlZiel;
-	}
-
-	public static ArrayList<String> getTextAngebot() {
-		return TextAngebot;
-	}
-
-	public static ArrayList<String> getTextZahlErin() {
-		return TextZahlErin;
-	}
-
-	public static ArrayList<String> getTextOrderConfirm() {
-		return TextOrderConfirm;
-	}
-
-	public static ArrayList<String> getTextMahnung() {
-		return TextMahnung;
-	}
-
-	public static ArrayList<String> getTextBestellung() {
-		return TextBestellung;
-	}
-
-	public static ArrayList<String> getTextLieferschein() {
-		return TextLieferschein;
-	}
-	
 }

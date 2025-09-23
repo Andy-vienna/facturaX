@@ -52,7 +52,6 @@ public class ExcelAuftragsbestätigung{
 	private static final int COLUMN_B = 1;
 	private static final int COLUMN_C = 2;
 	private static final int COLUMN_D = 3;
-	private static final int COLUMN_E = 4;
 	private static final int COLUMN_F = 5;
 
 	private static String[] sAnTxt = new String[12];
@@ -84,7 +83,8 @@ public class ExcelAuftragsbestätigung{
 		Kunde kunde = ExcelHelper.kundeData(angebot.getIdKunde());
 		String adressat = ExcelHelper.kundeAnschrift(angebot.getIdKunde());
 		Bank bank = ExcelHelper.bankData(angebot.getIdBank());
-		ExcelHelper.textData();
+
+		String[][] txtBaustein = ExcelHelper.findText("AuftragsBest");
 
 		//#######################################################################
 		// Angebots-Excel erzeugen
@@ -164,13 +164,6 @@ public class ExcelAuftragsbestätigung{
 				abGPreis[i] = ws.getRow(j).getCell(COLUMN_F); //G-Preis
 			}
 			Cell abSumme = ws.getRow(28).getCell(COLUMN_F); //Gesamtsumme
-			Cell abText1 = ws.getRow(34).getCell(COLUMN_A); //Angebotstexte
-			Cell abText2 = ws.getRow(37).getCell(COLUMN_A);
-			Cell abText4 = ws.getRow(43).getCell(COLUMN_A);
-			Cell abText3 = ws.getRow(46).getCell(COLUMN_A);
-			Cell abBank = ws.getRow(46).getCell(COLUMN_E); //Bankverbindung E47 - E49: Bankname
-			Cell abIBAN = ws.getRow(47).getCell(COLUMN_E); //IBAN
-			Cell abBIC = ws.getRow(48).getCell(COLUMN_E); //BIC
 			
 			//#######################################################################
 			// Zellwerte beschreiben aus dem Array arrAnContent
@@ -196,25 +189,38 @@ public class ExcelAuftragsbestätigung{
 					System.out.println(e.getMessage());
 				}
 			}
-			
 			abSumme.setCellValue(angebot.getNetto().doubleValue());
-			abText1.setCellValue(ExcelHelper.getTextOrderConfirm().get(0).replace("{AN}", angebot.getIdNummer())
-					.replace("{Best-Nr}", confNr).replace("{Datum}", confDate));
-			abText2.setCellValue(ExcelHelper.getTextOrderConfirm().get(1).replace("{Datum}", startDate));
-			abText3.setCellValue(ExcelHelper.getTextOrderConfirm().get(2).replace("{Tage}", kunde.getZahlungsziel()));
-			abText4.setCellValue(ExcelHelper.getTextOrderConfirm().get(3));
 			
-			abBank.setCellValue(bank.getBankName());
-			abIBAN.setCellValue(FormatIBAN(bank.getIban()));
-			abBIC.setCellValue(bank.getBic());
-			//#######################################################################
-			// QR Code erzeugen und im Anwendungsverzeichnis ablegen
-			//#######################################################################
-			try {
-				ZxingQR.makeLinkQR(ExcelHelper.getTextOrderConfirm().get(4));
-			} catch (WriterException e) {
-				logger.error("makeLinkQR(arrAbContent[3][5]) - " + e);
+			ExcelHelper.replaceCellValue(wb, ws, "{Bank}", bank.getBankName());
+			ExcelHelper.replaceCellValue(wb, ws, "{IBAN}", FormatIBAN(bank.getIban()));
+			ExcelHelper.replaceCellValue(wb, ws, "{BIC}", bank.getBic());
+			
+			for (int x = 0; x < txtBaustein.length; x++) {
+			    String key = txtBaustein[x][0]; String val = txtBaustein[x][1];
+
+			    if (angebot.getPage2() == 0 && key != null && key.contains("{LBvorh}")) {
+			        val = "";
+			    } else if (val != null) {
+			        val = val.replace("{AN}", angebot.getIdNummer());
+			        val = val.replace("{Best-Nr}", confNr);
+			        val = val.replace("{Datum}", confDate);
+			        val = val.replace("{StartDatum}", startDate);
+			        val = val.replace("{Tage}",     kunde.getZahlungsziel()); // ggf. String.valueOf(...)
+			    }
+			    txtBaustein[x][1] = val;
+			    
+			    ExcelHelper.replaceCellValue(wb, ws, key, val); // Texte in Zellen schreiben
+
+			    // QR Code erzeugen und im Anwendungsverzeichnis ablegen
+			    if (key != null && key.contains("{QR}") && val != null && !val.isEmpty()) {
+			        try {
+			            ZxingQR.makeLinkQR(val);
+			        } catch (WriterException e) {
+			            logger.error("makeLinkQR error", e);
+			        }
+			    }
 			}
+			
 			//#######################################################################
 			// erzeugten QR Code als png-Datei einlesen
 			//#######################################################################

@@ -4,6 +4,7 @@ import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
 import static org.andy.toolbox.misc.CreateObject.applyHighlighting;
 import static org.andy.toolbox.misc.CreateObject.createButton;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -15,6 +16,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
@@ -28,14 +30,15 @@ import org.andy.gui.misc.RoundedBorder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class TextUSt extends TextPanel  {
+public class TextMahnungStufe1 extends TextPanel  {
 	
 	// Serialisierungs-ID für die Klasse
 	private static final long serialVersionUID = 1L;
 	
-	private static final Logger logger = LogManager.getLogger(TextUSt.class);
+	private static final Logger logger = LogManager.getLogger(TextMahnungStufe1.class);
 		
 	private final List<JLabel> labelList = new ArrayList<>();
+	private final List<JTextField> placeholderList = new ArrayList<>();
 	private final List<JTextPane> textAreas = new ArrayList<>();
 	private final List<JButton> updateButtons = new ArrayList<>();
 	
@@ -43,8 +46,8 @@ public class TextUSt extends TextPanel  {
 	// public Teil
 	//###################################################################################################################################################
 
-	public TextUSt() {
-        super("Textbausteine für Umsatzsteuerhinweis bearbeiten");
+	public TextMahnungStufe1() {
+        super("Textbausteine für Mahnstufe 1 bearbeiten");
         if (!(getBorder() instanceof TitledBorder)) {
             logger.warn("Kein TitledBorder gesetzt.");
         }
@@ -56,7 +59,7 @@ public class TextUSt extends TextPanel  {
 	// private Teil
 	//###################################################################################################################################################
 
-    private void buildUI() {
+private void buildUI() {
     	
     	setLayout(new GridBagLayout()); // Verwende GridBagLayout für flexible Anordnung
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -68,11 +71,11 @@ public class TextUSt extends TextPanel  {
 
 		// Arrays für Labels und TextAreas
 		String[] labels = {
-				"Textbaustein USt.-Hinweis A36/a", "Textbaustein USt.-Hinweis A36/b", "Textbaustein USt.-Hinweis A41",
-				"Textbaustein USt.-Hinweis A42", "Textbaustein USt.-Hinweis ...", "Textbaustein USt.-Hinweis ...",
-				"Textbaustein USt.-Hinweis ...", "Textbaustein USt.-Hinweis ...", "Textbaustein USt.-Hinweis ...",
-				"Textbaustein USt.-Hinweis ...", "Textbaustein USt.-Hinweis ...", "Textbaustein USt.-Hinweis ...",
-				"Textbaustein USt.-Hinweis ...", "Textbaustein USt.-Hinweis ...", "Textbaustein USt.-Hinweis ..."};
+				"Platzhalter | Zeilentext", "Platzhalter | Zeilentext", "Platzhalter | Zeilentext",
+				"Platzhalter | Zeilentext", "Platzhalter | Zeilentext", "Platzhalter | Zeilentext",
+				"Platzhalter | Zeilentext", "Platzhalter | Zeilentext", "Platzhalter | Zeilentext",
+				"Platzhalter | Zeilentext", "Platzhalter | Zeilentext", "Platzhalter | Zeilentext",
+				"Platzhalter | Zeilentext", "Platzhalter | Zeilentext", "Platzhalter | Zeilentext"};
 
 		for (int i = 0; i < labels.length; i++) {
 
@@ -81,16 +84,31 @@ public class TextUSt extends TextPanel  {
 			//------------------------------------------------------------------------------
 			gbc.gridx = 0; // erste Spalte
 			JLabel lbl = new JLabel(label);
+			lbl.setFont(new Font("Tahoma", Font.PLAIN, 12));
+			lbl.setForeground(Color.BLACK);
 			JLabel lblInf = new JLabel();
 			lblInf.setVisible(false);
 			labelList.add(lblInf); // Label zur Liste hinzufügen)
-			gbc.weightx = 0.06;  // Label nimmt 6 % des Platzes
+			gbc.weightx = 0.03;  // Label nimmt 6 % des Platzes
 			gbc.weighty = 0;
 			add(lbl, gbc);
 			add(lblInf, gbc);
 			
 			//------------------------------------------------------------------------------
 			gbc.gridx = 1; // Wechsel zur nächsten Spalte
+			JTextField txtPlaceholder = new JTextField();
+			txtPlaceholder.setFont(new Font("Tahoma", Font.BOLD, 12));
+			txtPlaceholder.setColumns(12);
+			txtPlaceholder.setForeground(Color.RED);
+			
+			placeholderList.add(txtPlaceholder); // TextField zur Liste hinzufügen
+			gbc.fill = GridBagConstraints.BOTH;
+			gbc.weightx = 0.07; // Textfeld nimmt 89 % des Platzes
+			gbc.weighty = 0;
+			add(txtPlaceholder, gbc);
+			
+			//------------------------------------------------------------------------------
+			gbc.gridx = 2; // Wechsel zur nächsten Spalte
 			JTextPane txtPane = new JTextPane(); // Verwende JTextPane statt JTextArea
 			txtPane.setFont(new Font("Tahoma", Font.BOLD, 12));
 			txtPane.setEditable(true);
@@ -104,7 +122,7 @@ public class TextUSt extends TextPanel  {
 			add(txtScroll, gbc);
 
 			//------------------------------------------------------------------------------
-			gbc.gridx = 2; // Wechsel zur nächsten Spalte
+			gbc.gridx = 3; // Wechsel zur nächsten Spalte
 			JButton btnUpdateText = null;
 			try {
 				btnUpdateText = createButton("Ändern", "menu/edit.png", null);
@@ -114,8 +132,16 @@ public class TextUSt extends TextPanel  {
 			if (btnUpdateText != null) {
 				JButton finalBtn = btnUpdateText; // Lokale Kopie des Buttons
 				int idx = i;
-				btnUpdateText.addActionListener(_ -> handleButtonClick(idx, txtPane));
+				btnUpdateText.addActionListener(_ -> handleButtonClick(idx, txtPlaceholder, txtPane));
 				txtPane.getDocument().addDocumentListener(new DocumentListener() {
+					@Override
+					public void insertUpdate(DocumentEvent e) { finalBtn.setEnabled(true); }
+					@Override
+					public void removeUpdate(DocumentEvent e) { finalBtn.setEnabled(true); }
+					@Override
+					public void changedUpdate(DocumentEvent e) { finalBtn.setEnabled(true); }
+				});
+				txtPlaceholder.getDocument().addDocumentListener(new DocumentListener() {
 					@Override
 					public void insertUpdate(DocumentEvent e) { finalBtn.setEnabled(true); }
 					@Override
@@ -143,7 +169,8 @@ public class TextUSt extends TextPanel  {
     	int n = Math.min(textAreas.size(), textListe.size());
     	for (int i = 0; i < n; i++) {
     	    Text tx = textListe.get(i);
-    	    textAreas.get(i).setText(tx.getTextUst());
+    	    placeholderList.get(i).setText(tx.getVarTextMahnungStufe1());
+    	    textAreas.get(i).setText(tx.getTextMahnungStufe1());
     	    labelList.get(i).setText(String.valueOf(tx.getId()));
     	}
 		
@@ -169,11 +196,12 @@ public class TextUSt extends TextPanel  {
     
 	//###################################################################################################################################################
     
-    private void handleButtonClick(int index, JTextPane txtPane) {
+    private void handleButtonClick(int index, JTextField txtVar, JTextPane txtPane) {
         int dataId = parseStringToIntSafe(labelList.get(index).getText());
         TextRepository repo = new TextRepository();
         Text text = repo.findById(dataId);
-        text.setTextUst(txtPane.getText());
+        text.setVarTextMahnungStufe1(txtVar.getText());
+        text.setTextMahnungStufe1(txtPane.getText());
         repo.update(text);
         texte();
     }

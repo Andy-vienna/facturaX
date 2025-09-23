@@ -29,6 +29,7 @@ public class Einstellungen {
 	private static String htmlBaseStyle;
 
 	private static String tplOffer;
+	private static String tplOfferRev;
 	private static String tplDescription;
 	private static String tplDescriptionBase;
 	private static String tplDescriptionStyle;
@@ -80,6 +81,7 @@ public class Einstellungen {
 			strAktGJ = prpAppSettings.getProperty("year");
 			strQRschema = prpAppSettings.getProperty("qrschema");
 			tplOffer = prpAppSettings.getProperty("templateoffer");
+			tplOfferRev = prpAppSettings.getProperty("templateofferrev");
 			tplDescription = prpAppSettings.getProperty("templatedescription");
 			tplDescriptionBase = prpAppSettings.getProperty("templatedescriptionbase");
 			tplDescriptionStyle = prpAppSettings.getProperty("templatedescriptionstyle");
@@ -410,6 +412,14 @@ public class Einstellungen {
 
 	public static void setTplDescriptionStyle(String tplDescriptionStyle) {
 		Einstellungen.tplDescriptionStyle = tplDescriptionStyle;
+	}
+
+	public static String getTplOfferRev() {
+		return tplOfferRev;
+	}
+
+	public static void setTplOfferRev(String tplOfferRev) {
+		Einstellungen.tplOfferRev = tplOfferRev;
 	}
 
 }

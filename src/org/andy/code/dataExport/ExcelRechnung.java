@@ -63,7 +63,6 @@ public class ExcelRechnung{
 	private static final int COLUMN_B = 1;
 	private static final int COLUMN_C = 2;
 	private static final int COLUMN_D = 3;
-	private static final int COLUMN_E = 4;
 	private static final int COLUMN_F = 5;
 
 	private static final String ZUGFeRD = "ZUGFeRD";
@@ -97,7 +96,8 @@ public class ExcelRechnung{
 		Kunde kunde = ExcelHelper.kundeData(rechnung.getIdKunde());
 		String adressat = ExcelHelper.kundeAnschrift(rechnung.getIdKunde());
 		Bank bank = ExcelHelper.bankData(rechnung.getIdBank());
-		ExcelHelper.textData();
+		
+		String[][] txtBaustein = ExcelHelper.findText("Rechnung");
 		
 		LocalDate date = LocalDate.parse(rechnung.getDatum().toString(), DateTimeFormatter.ISO_LOCAL_DATE);
         DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
@@ -187,14 +187,6 @@ public class ExcelRechnung{
 			Cell reUstSatz = ws.getRow(29).getCell(COLUMN_F);
 			Cell reUSt = ws.getRow(30).getCell(COLUMN_F);
 			Cell reBrutto = ws.getRow(31).getCell(COLUMN_F);
-			Cell reText1 = ws.getRow(35).getCell(COLUMN_A); //Rechnungstexte (Steuerhinweis, Zahlungsziel)
-			Cell reText2 = ws.getRow(37).getCell(COLUMN_A);
-			Cell reSkontoText = ws.getRow(39).getCell(COLUMN_A); //Skontovereinbarung
-			Cell reSkonto1 = ws.getRow(40).getCell(COLUMN_A); //Skonto Zeile 1
-			Cell reSkonto2 = ws.getRow(41).getCell(COLUMN_A); //Skonto Zeile 1
-			Cell reBank = ws.getRow(46).getCell(COLUMN_E); //Bankverbindung E47 - E49: Bankname
-			Cell reIBAN = ws.getRow(47).getCell(COLUMN_E); //IBAN
-			Cell reBIC = ws.getRow(48).getCell(COLUMN_E); //BIC
 			
 			//#######################################################################
 			// Zellwerte beschreiben
@@ -222,49 +214,54 @@ public class ExcelRechnung{
 					System.out.println(e.getMessage());
 				}
 			}
-
 			reNetto.setCellValue(rechnung.getNetto().doubleValue());
 			reUstSatz.setCellValue(kunde.getTaxvalue() + "%");
 			reUSt.setCellValue(rechnung.getUst().doubleValue());
 			reBrutto.setCellValue(rechnung.getBrutto().doubleValue());
 			
-			if(kunde.getTaxvalue().equals("0")) {
-				if(rechnung.getRevCharge() == 0) {
-					taxNote = ExcelHelper.getTextUSt().get(0); // Steuerhinweis
+			ExcelHelper.replaceCellValue(wb, ws, "{Bank}", bank.getBankName());
+			ExcelHelper.replaceCellValue(wb, ws, "{IBAN}", FormatIBAN(bank.getIban()));
+			ExcelHelper.replaceCellValue(wb, ws, "{BIC}", bank.getBic());
+			
+			for (int x = 0; x < txtBaustein.length; x++) {
+			    String key = txtBaustein[x][0]; String val = txtBaustein[x][1];
+
+			    if (val != null) {
+			    	val = val.replace("{Tage}", kunde.getZahlungsziel());
+			    	val = val.replace("{Skontowert-1}", rechnung.getSkonto1wert().multiply(BD.HUNDRED).setScale(1, RoundingMode.HALF_UP).toString());
+					val = val.replace("{Skontotage-1}", String.valueOf(rechnung.getSkonto1tage()));
+					val = val.replace("{Skontowert-2}", rechnung.getSkonto2wert().multiply(BD.HUNDRED).setScale(1, RoundingMode.HALF_UP).toString());
+					val = val.replace("{Skontotage-2}", String.valueOf(rechnung.getSkonto2tage()));
+			    }
+			    
+			    if (kunde.getTaxvalue().equals("0")) {
+			    	if (key.contains("{steuerfrei}") && rechnung.getRevCharge() == 1) val = " "; // Steuerfrei-Hinweis ausblenden
+				    if (key.contains("{RevCharge}") && rechnung.getRevCharge() == 0) val = " "; // Steuerfrei-Hinweis ausblenden
+			    } else {
+			    	if (key.contains("{steuerfrei}")) val = " ";
+				    if (key.contains("{RevCharge}")) val = " ";
+			    }
+			    
+			    if(kunde.getZahlungsziel().equals("0")) {
+			    	if (key.contains("{ZahlZiel}")) val = " "; // Zahlungsziel x Tage ausblenden
 				} else {
-					taxNote = ExcelHelper.getTextUSt().get(1); // Steuerhinweis Reverse Charge
+					if (key.contains("{sofort}")) val = " "; // Zahlungsziel
 				}
+			    
+			    if(rechnung.getSkonto1() == 1) { // Skontovereinbarung, nur Skonto 1
+			    	if (rechnung.getSkonto2() == 0 && key.contains("{Skonto2}")) val = " ";
+			    } else {
+			    	if (key.contains("{SkKopf}")) val = " ";
+			    	if (key.contains("{Skonto1}")) val = " ";
+			    	if (key.contains("{Skonto2}")) val = " ";
+			    }
+			    
+			    txtBaustein[x][1] = val;
+			    
+			    ExcelHelper.replaceCellValue(wb, ws, key, val); // Texte in Zellen schreiben
+
 			}
-			
-			reText1.setCellValue(taxNote); // Steuerhinweis
-			
-			if(kunde.getZahlungsziel().equals("0")) {
-				reText2.setCellValue(ExcelHelper.getTextZahlZiel().get(0)); // Zahlungsziel
-			} else {
-				reText2.setCellValue(ExcelHelper.getTextZahlZiel().get(1).replace("{Tage}", kunde.getZahlungsziel())); // Zahlungsziel
-			}
-			
-			if(rechnung.getSkonto1() == 1) { // Skontovereinbarung
-				reSkontoText.setCellValue(ExcelHelper.getTextZahlZiel().get(2));
-				reSkonto1.setCellValue(ExcelHelper.getTextZahlZiel().get(3)
-						.replace("{Skontowert-1}", rechnung.getSkonto1wert().multiply(BD.HUNDRED).setScale(1, RoundingMode.HALF_UP).toString())
-						.replace("{Skontotage-1}", String.valueOf(rechnung.getSkonto1tage())));
-				if(rechnung.getSkonto2() == 1) {
-					reSkonto2.setCellValue(ExcelHelper.getTextZahlZiel().get(4)
-							.replace("{Skontowert-2}", rechnung.getSkonto2wert().multiply(BD.HUNDRED).setScale(1, RoundingMode.HALF_UP).toString())
-							.replace("{Skontotage-2}", String.valueOf(rechnung.getSkonto2tage())));
-				} else {
-					reSkonto2.setCellValue(" ");
-				}
-			} else {
-				reSkontoText.setCellValue(" ");
-				reSkonto1.setCellValue(" ");
-				reSkonto2.setCellValue(" ");
-			}
-			
-			reBank.setCellValue(bank.getBankName());
-			reIBAN.setCellValue(FormatIBAN(bank.getIban()));
-			reBIC.setCellValue(bank.getBic());
+
 			//#######################################################################
 			// QR Code erzeugen und im Anwendungsverzeichnis ablegen
 			//#######################################################################

@@ -353,6 +353,9 @@ public class RechnungNeuPanel extends EditPanel {
         if (!kundeGewählt) { info("Kunde nicht ausgewählt …"); return; }
         if (!bankGewählt)  { info("Bank nicht ausgewählt …");  return; }
         if (!mind1ArtikelGewählt) { info("keine Artikel ausgewählt …"); return; }
+        if (datePicker.getDate() == null) { info("Rechnungsdatum fehlt …"); return; }
+        if (dateLZvon.getDate() == null) { info("Leistungszeitraum Start fehlt …"); return; }
+        if (dateLZbis.getDate() == null) { info("Leistungszeitraum bis fehlt …"); return; }
         if (isEmpty(txtReferenz)) { info("Kundenreferenz fehlt …"); return; }
 
         Rechnung r = new Rechnung();
