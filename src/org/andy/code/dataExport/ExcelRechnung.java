@@ -17,10 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-
 import javax.swing.JOptionPane;
 
 import org.andy.code.dataStructure.entitiyMaster.Bank;
@@ -33,29 +30,20 @@ import org.andy.code.eRechnung.XRechnungXML;
 import org.andy.code.eRechnung.ZUGFeRDpdf;
 import org.andy.code.main.Einstellungen;
 import org.andy.code.misc.BD;
+import org.andy.code.misc.ExportHelper;
+import org.andy.code.misc.Identified;
 import org.andy.code.qr.ZxingQR;
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Drawing;
-import org.apache.poi.ss.usermodel.Footer;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Picture;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
-import org.apache.poi.xssf.usermodel.XSSFCreationHelper;
-import org.apache.poi.xssf.usermodel.XSSFFont;
-import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.google.zxing.WriterException;
 
-public class ExcelRechnung{
+public class ExcelRechnung implements Identified {
 
+	public static final String CLASS_ID = ExcelRechnung.class.getSimpleName();
 	private static final Logger logger = LogManager.getLogger(ExcelRechnung.class);
 
 	private static final int START_ROW_OFFSET = 16;
@@ -68,11 +56,12 @@ public class ExcelRechnung{
 	private static final String ZUGFeRD = "ZUGFeRD";
 	private static final String XRECHNUNG = "XRechnung";
 	
+	private static String taxNote = "";
 	private static String[] sReTxt = new String[12];
 	private static double[] dAnz = new double[12];
 	private static double[] dEp = new double[12];
 	
-	private static String taxNote;
+	private ExcelRechnung() {} // Instanzierung verhindern
 
 	//###################################################################################################################################################
 	// Rechnung erzeugen und als pdf exportieren
@@ -92,16 +81,12 @@ public class ExcelRechnung{
 		final Cell reEPreis[] = new Cell[12];
 		final Cell reGPreis[] = new Cell[12];
 
-		Rechnung rechnung = ExcelHelper.loadRechnung(sNr);
-		Kunde kunde = ExcelHelper.kundeData(rechnung.getIdKunde());
-		String adressat = ExcelHelper.kundeAnschrift(rechnung.getIdKunde());
-		Bank bank = ExcelHelper.bankData(rechnung.getIdBank());
+		Rechnung rechnung = ExportHelper.loadRechnung(sNr);
+		Kunde kunde = ExportHelper.kundeData(rechnung.getIdKunde());
+		String adressat = ExportHelper.kundeAnschrift(rechnung.getIdKunde());
+		Bank bank = ExportHelper.bankData(rechnung.getIdBank());
 		
-		String[][] txtBaustein = ExcelHelper.findText("Rechnung");
-		
-		LocalDate date = LocalDate.parse(rechnung.getDatum().toString(), DateTimeFormatter.ISO_LOCAL_DATE);
-        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        String datum = date.format(outputFormatter);
+		String[][] txtBaustein = ExportHelper.findText(CLASS_ID);
 
 		//#######################################################################
 		// Rechnungs-Excel erzeugen
@@ -115,65 +100,11 @@ public class ExcelRechnung{
 			//#######################################################################
 			// Owner-Informationen in die Excel-Datei schreiben
 			//#######################################################################
-
-		    ArrayList<String> editOwner = new ArrayList<>();
-		    Footer footer = ws.getFooter();
-
-			editOwner = ExcelHelper.ownerData();
-			String senderOwner = ExcelHelper.getSenderOwner();
-
-			// Schrift: Arial 9, Farbe: Grau 50% (#7F7F7F)
-			String style = "&\"Arial,Regular\"&9&K7F7F7F";
-
-			footer.setLeft(style + ExcelHelper.getFooterLeft());
-			footer.setCenter(style + ExcelHelper.getFooterCenter());
-
-			Cell anOwner = ws.getRow(0).getCell(COLUMN_A); //Angebotsinhaber
-			Cell anOwnerSender = ws.getRow(3).getCell(COLUMN_B); //Absender über Adressfeld
-
-			XSSFRichTextString OwnerText = new XSSFRichTextString();
-			XSSFRichTextString OwnerSender = new XSSFRichTextString();
-
-			for (int i = 0; i < 6; i++) {
-				String part = editOwner.get(i);
-				XSSFFont font = wb.createFont();
-
-				if (i == 0) {
-					font.setFontName("Arial");
-					font.setFontHeightInPoints((short) 24);
-					font.setColor(IndexedColors.GREY_50_PERCENT.getIndex());
-				} else {
-					font.setFontName("Arial");
-					font.setFontHeightInPoints((short) 12);
-					font.setColor(IndexedColors.GREY_50_PERCENT.getIndex());
-				}
-
-				OwnerText.append(part, font);
-			}
-
-			XSSFFont font = wb.createFont();
-			font.setFontName("Arial");
-			font.setFontHeightInPoints((short) 7);
-			font.setColor(IndexedColors.GREY_50_PERCENT.getIndex());
-			CellStyle rightAlignStyle = wb.createCellStyle();
-			rightAlignStyle.setAlignment(HorizontalAlignment.RIGHT);
-			anOwnerSender.setCellStyle(rightAlignStyle);
-			OwnerSender.append(senderOwner, font);
-
-			anOwner.setCellValue(OwnerText);
-			anOwnerSender.setCellValue(OwnerSender);
-
+			ExportHelper.applyOwnerAndFooter(wb, ws);
+			
 			//#######################################################################
 			// Zellen in Tabelle Enummerieren
 			//#######################################################################
-			Cell reAdress = ws.getRow(4).getCell(COLUMN_B); //Name und Anschrift
-			Cell reDate = ws.getRow(4).getCell(COLUMN_F); //Rechnungsdatum
-			Cell reNr = ws.getRow(5).getCell(COLUMN_F); //Rechnungsnummer
-			Cell reLZ = ws.getRow(6).getCell(COLUMN_F); //Leistungszeitraum
-			Cell reUID = ws.getRow(7).getCell(COLUMN_F); //UID
-			Cell reDuty = ws.getRow(8).getCell(COLUMN_F); //Ansprechpartner
-			Cell reRef = ws.getRow(9).getCell(COLUMN_F); //Kundenreferenz
-			
 			for(int i = 0; i < rechnung.getAnzPos().intValue(); i++ ) { //Rechnungspositionen B, C, D, F Zeile 17-28
 				int j = i + START_ROW_OFFSET;
 				rePos[i] = ws.getRow(j).getCell(COLUMN_A); //Position
@@ -182,22 +113,17 @@ public class ExcelRechnung{
 				reEPreis[i] = ws.getRow(j).getCell(COLUMN_D); //E-Preis
 				reGPreis[i] = ws.getRow(j).getCell(COLUMN_F); //G-Preis
 			}
-			
-			Cell reNetto = ws.getRow(28).getCell(COLUMN_F); //Nettosumme, Steuersatz, USt., Gesamtsumme
-			Cell reUstSatz = ws.getRow(29).getCell(COLUMN_F);
-			Cell reUSt = ws.getRow(30).getCell(COLUMN_F);
-			Cell reBrutto = ws.getRow(31).getCell(COLUMN_F);
-			
+
 			//#######################################################################
 			// Zellwerte beschreiben
 			//#######################################################################
-			reAdress.setCellValue(adressat); // Kundenanschrift
-			reDate.setCellValue(datum);
-			reNr.setCellValue(rechnung.getIdNummer());
-			reLZ.setCellValue(rechnung.getlZeitr());
-			reUID.setCellValue(kunde.getUstid());
-			reDuty.setCellValue(kunde.getPronomen() + " " + kunde.getPerson());
-			reRef.setCellValue(rechnung.getRef());
+			ExportHelper.replaceCellValue(wb, ws, "{reAdresse}", adressat);
+			ExportHelper.replaceCellValue(wb, ws, "{reDatum}", rechnung.getDatum().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+			ExportHelper.replaceCellValue(wb, ws, "{reNummer}", rechnung.getIdNummer());
+			ExportHelper.replaceCellValue(wb, ws, "{reLZ}", rechnung.getlZeitr());
+			ExportHelper.replaceCellValue(wb, ws, "{reKdUID}", kunde.getUstid());
+			ExportHelper.replaceCellValue(wb, ws, "{reDuty}", kunde.getPronomen() + " " + kunde.getPerson());
+			ExportHelper.replaceCellValue(wb, ws, "{reRef}", rechnung.getRef());
 			
 			for(int i = 0; i < rechnung.getAnzPos().intValue(); i++ ) {
 				rePos[i].setCellValue(String.valueOf(i + 1));
@@ -214,14 +140,14 @@ public class ExcelRechnung{
 					System.out.println(e.getMessage());
 				}
 			}
-			reNetto.setCellValue(rechnung.getNetto().doubleValue());
-			reUstSatz.setCellValue(kunde.getTaxvalue() + "%");
-			reUSt.setCellValue(rechnung.getUst().doubleValue());
-			reBrutto.setCellValue(rechnung.getBrutto().doubleValue());
+			ExportHelper.replaceCellValue(wb, ws, "{reNetto}", rechnung.getNetto().doubleValue());
+			ExportHelper.replaceCellValue(wb, ws, "{reSteuersatz}", kunde.getTaxvalue() + "%");
+			ExportHelper.replaceCellValue(wb, ws, "{reUSt}", rechnung.getUst().doubleValue());
+			ExportHelper.replaceCellValue(wb, ws, "{reSumme}", rechnung.getBrutto().doubleValue());
 			
-			ExcelHelper.replaceCellValue(wb, ws, "{Bank}", bank.getBankName());
-			ExcelHelper.replaceCellValue(wb, ws, "{IBAN}", FormatIBAN(bank.getIban()));
-			ExcelHelper.replaceCellValue(wb, ws, "{BIC}", bank.getBic());
+			ExportHelper.replaceCellValue(wb, ws, "{Bank}", bank.getBankName());
+			ExportHelper.replaceCellValue(wb, ws, "{IBAN}", FormatIBAN(bank.getIban()));
+			ExportHelper.replaceCellValue(wb, ws, "{BIC}", bank.getBic());
 			
 			for (int x = 0; x < txtBaustein.length; x++) {
 			    String key = txtBaustein[x][0]; String val = txtBaustein[x][1];
@@ -235,11 +161,16 @@ public class ExcelRechnung{
 			    }
 			    
 			    if (kunde.getTaxvalue().equals("0")) {
-			    	if (key.contains("{steuerfrei}") && rechnung.getRevCharge() == 1) val = " "; // Steuerfrei-Hinweis ausblenden
-				    if (key.contains("{RevCharge}") && rechnung.getRevCharge() == 0) val = " "; // Steuerfrei-Hinweis ausblenden
+			    	if (key.contains("{steuerfrei}") && rechnung.getRevCharge() == 1) val = ""; // Steuerfrei-Hinweis ausblenden
+				    if (key.contains("{RevCharge}") && rechnung.getRevCharge() == 0) val = ""; // Steuerfrei-Hinweis ausblenden
 			    } else {
-			    	if (key.contains("{steuerfrei}")) val = " ";
-				    if (key.contains("{RevCharge}")) val = " ";
+			    	if (key.contains("{steuerfrei}")) val = "";
+				    if (key.contains("{RevCharge}")) val = "";
+			    }
+			    if (key.contains("{steuerfrei}") && !val.isEmpty()) { // Steuerhinweis für eRechnung
+			    	taxNote = val;
+			    } else if (key.contains("{RevCharge}") && !val.isEmpty()) {
+			    	taxNote = val;
 			    }
 			    
 			    if(kunde.getZahlungsziel().equals("0")) {
@@ -258,7 +189,7 @@ public class ExcelRechnung{
 			    
 			    txtBaustein[x][1] = val;
 			    
-			    ExcelHelper.replaceCellValue(wb, ws, key, val); // Texte in Zellen schreiben
+			    ExportHelper.replaceCellValue(wb, ws, key, val); // Texte in Zellen schreiben
 
 			}
 
@@ -276,20 +207,8 @@ public class ExcelRechnung{
 			//#######################################################################
 			// erzeugten QR Code als png-Datei einlesen
 			//#######################################################################
-			try (FileInputStream is = new FileInputStream(System.getProperty("user.dir") + "\\qr.png")) {
-				byte[] bytes = IOUtils.toByteArray(is);
-				int pictureIdx = wb.addPicture(bytes, Workbook.PICTURE_TYPE_PNG);
-				is.close();
-				XSSFCreationHelper helper = wb.getCreationHelper();
-				Drawing<?> drawing = ws.createDrawingPatriarch(); //POI Patriarch erstellen als Container, Bildelement hinzufügen
-				XSSFClientAnchor anchor = helper.createClientAnchor();
-				anchor.setCol1(4); //obere linke Ecke festlegen
-				anchor.setRow1(36);
-				Picture pict = drawing.createPicture(anchor, pictureIdx);
-				pict.resize(0.9, 0.9); //Bild im Faktor 0,9x0,9 zoomen
-			} catch (IOException e) {
-				logger.error("reExport(...) - " + e);
-			}
+			ExportHelper.placeQRinExcel(wb, ws, "qr.png");
+			
 			//#######################################################################
 			// WORKBOOK mit Daten befüllen und schließen
 			//#######################################################################
@@ -325,7 +244,7 @@ public class ExcelRechnung{
 			sFile = Einstellungen.getWorkPath() + "Rechnung_" + sNr + "_ZUGFeRD.pdf";
 
 			try {
-				ZUGFeRDpdf.generateZUGFeRDpdf(rechnung, bank, kunde, ExcelHelper.getOwner(), sPdfOut, sFile);
+				ZUGFeRDpdf.generateZUGFeRDpdf(rechnung, bank, kunde, ExportHelper.getOwner(), sPdfOut, sFile);
 			} catch (ParseException | IOException e) {
 				logger.error("error generating zugferd - " + e);
 			}
@@ -336,7 +255,7 @@ public class ExcelRechnung{
 			sFile = Einstellungen.getWorkPath() + "Rechnung_" + sNr + "_XRechnung.xml";
 
 			try {
-				XRechnungXML.generateXRechnungXML(rechnung, bank, kunde, ExcelHelper.getOwner(), sFile);
+				XRechnungXML.generateXRechnungXML(rechnung, bank, kunde, ExportHelper.getOwner(), sFile);
 			} catch (ParseException | IOException e) {
 				logger.error("error generating xrechnung - " + e);
 			}

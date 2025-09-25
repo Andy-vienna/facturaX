@@ -11,6 +11,7 @@ import com.spire.pdf.PdfDocumentInformation;
 import com.spire.pdf.conversion.PdfStandardsConverter;
 
 import org.andy.code.main.StartUp;
+import org.andy.code.misc.ExportHelper;
 
 public class ErzeugePDF {
 
@@ -62,10 +63,10 @@ public class ErzeugePDF {
 		PdfDocumentInformation info = document.getDocumentInformation(); // Zugriff auf die Dokumentinformationen
 
 		// Metadaten festlegen
-		info.setAuthor(ExcelHelper.getKontaktName());
+		info.setAuthor(ExportHelper.getKontaktName());
 		info.setTitle(sTitel + " " + sNr);
 		info.setSubject(sTitel);
-		info.setKeywords(sTitel + "," + sNr + "," + ExcelHelper.getKontaktName());
+		info.setKeywords(sTitel + "," + sNr + "," + ExportHelper.getKontaktName());
 		info.setCreator(StartUp.APP_NAME);
 
 		// PDF speichern

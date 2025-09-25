@@ -25,9 +25,9 @@ import javax.swing.text.AbstractDocument;
 
 import org.andy.code.dataStructure.entitiyMaster.Artikel;
 import org.andy.code.dataStructure.repositoryMaster.ArtikelRepository;
+import org.andy.code.misc.CommaHelper;
 import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
 import org.andy.gui.main.HauptFenster;
-import org.andy.gui.misc.CommaHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

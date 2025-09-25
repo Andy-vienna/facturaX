@@ -25,7 +25,7 @@ import org.apache.logging.log4j.Logger;
 import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
 
-import org.andy.code.dataExport.ExcelAuftragsbestätigung;
+import org.andy.code.dataExport.ExcelAuftragsbestaetigung;
 import org.andy.code.main.StartUp;
 import org.andy.gui.main.HauptFenster;
 
@@ -163,7 +163,7 @@ public final class ABDialog extends JDialog {
         }
 
         try {
-            ExcelAuftragsbestätigung.abExport(vZelleA, confNr, confDate, startDate);
+            ExcelAuftragsbestaetigung.abExport(vZelleA, confNr, confDate, startDate);
         } catch (IOException ex) {
             log.error("I/O bei abExport: {}", ex.getMessage(), ex);
             JOptionPane.showMessageDialog(this, "Dateifehler beim Export. Details siehe Log.", "Fehler", JOptionPane.ERROR_MESSAGE);

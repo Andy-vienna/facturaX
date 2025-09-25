@@ -23,7 +23,5 @@ public abstract class TextPanel extends JPanel {
             ));
     }
 
-    // Optional: Methode für spätere Inhalte
-    public abstract void initContent();
 }
 

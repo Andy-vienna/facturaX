@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import org.andy.code.main.Einstellungen;
+import org.andy.code.misc.ExportHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
@@ -89,13 +90,13 @@ public class ExcelP109a {
 			ArrayList<String> editOwner = new ArrayList<>();
 		    Footer footer = ws.getFooter();
 
-			editOwner = ExcelHelper.ownerData();
+			editOwner = ExportHelper.ownerData();
 
 			// Schrift: Arial 9, Farbe: Grau 50% (#7F7F7F)
 			String style = "&\"Arial,Regular\"&9&K7F7F7F";
 
-			footer.setLeft(style + ExcelHelper.getFooterLeft());
-			footer.setCenter(style + ExcelHelper.getFooterCenter());
+			footer.setLeft(style + ExportHelper.getFooterLeft());
+			footer.setCenter(style + ExportHelper.getFooterCenter());
 
 			XSSFRichTextString OwnerText = new XSSFRichTextString();
 
@@ -119,7 +120,7 @@ public class ExcelP109a {
 			// Zellwerte beschreiben
 			//#######################################################################
 			owner.setCellValue(OwnerText); //Name
-			taxID.setCellValue("Steuernummer: " + ExcelHelper.getSteuerNummer()); //Steuernummer
+			taxID.setCellValue("Steuernummer: " + ExportHelper.getSteuerNummer()); //Steuernummer
 			year.setCellValue(Einstellungen.getStrAktGJ()); //Wirtschaftsjahr
 			
 			P109In.setCellValue(listContent.get(0).doubleValue()); //Einkünfte aus selbstständiger Arbeit

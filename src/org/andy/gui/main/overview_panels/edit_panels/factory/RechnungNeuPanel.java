@@ -46,10 +46,10 @@ import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
 import org.andy.code.main.Einstellungen;
 import org.andy.code.main.StartUp;
 import org.andy.code.misc.BD;
+import org.andy.code.misc.CommaHelper;
 import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
 import org.andy.gui.main.HauptFenster;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
-import org.andy.gui.misc.CommaHelper;
 import org.andy.gui.misc.RoundedBorder;
 
 public class RechnungNeuPanel extends EditPanel {

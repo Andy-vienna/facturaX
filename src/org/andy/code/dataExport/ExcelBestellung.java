@@ -13,29 +13,23 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-
 import org.andy.code.dataStructure.entitiyProductive.Bestellung;
 import org.andy.code.dataStructure.entitiyProductive.FileStore;
 import org.andy.code.dataStructure.repositoryProductive.BestellungRepository;
 import org.andy.code.dataStructure.repositoryProductive.FileStoreRepository;
 import org.andy.code.main.Einstellungen;
+import org.andy.code.misc.ExportHelper;
+import org.andy.code.misc.Identified;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Footer;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFFont;
-import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class ExcelBestellung{
+public class ExcelBestellung implements Identified {
 
+	public static final String CLASS_ID = ExcelBestellung.class.getSimpleName();
 	private static final Logger logger = LogManager.getLogger(ExcelBestellung.class);
 
 	private static final int START_ROW_OFFSET = 16;
@@ -54,7 +48,6 @@ public class ExcelBestellung{
 	//###################################################################################################################################################
 
 	public static void beExport(String sNr) throws Exception {
-		
 		String sExcelIn = Einstellungen.getTplBestellung();
 		String sExcelOut = Einstellungen.getWorkPath() + "Bestellung_" + sNr + ".xlsx";
 		String sPdfOut = Einstellungen.getWorkPath() + "Bestellung_" + sNr + ".pdf";
@@ -65,14 +58,10 @@ public class ExcelBestellung{
 		final Cell beEPreis[] = new Cell[12];
 		final Cell beGPreis[] = new Cell[12];
 
-		Bestellung bestellung = ExcelHelper.loadBestellung(sNr);
-		String adressat = ExcelHelper.lieferantAnschrift(bestellung.getIdLieferant());
+		Bestellung bestellung = ExportHelper.loadBestellung(sNr);
+		String adressat = ExportHelper.lieferantAnschrift(bestellung.getIdLieferant());
 		
-		String[][] txtBaustein = ExcelHelper.findText("Bestellung");
-		
-		LocalDate date = LocalDate.parse(bestellung.getDatum().toString(), DateTimeFormatter.ISO_LOCAL_DATE);
-        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        String datum = date.format(outputFormatter);
+		String[][] txtBaustein = ExportHelper.findText(CLASS_ID);
 
 		//#######################################################################
 		// Rechnungs-Excel erzeugen
@@ -86,62 +75,11 @@ public class ExcelBestellung{
 			//#######################################################################
 			// Owner-Informationen in die Excel-Datei schreiben
 			//#######################################################################
-
-		    ArrayList<String> editOwner = new ArrayList<>();
-		    Footer footer = ws.getFooter();
-
-			editOwner = ExcelHelper.ownerData();
-			String senderOwner = ExcelHelper.getSenderOwner();
-
-			// Schrift: Arial 9, Farbe: Grau 50% (#7F7F7F)
-			String style = "&\"Arial,Regular\"&9&K7F7F7F";
-
-			footer.setLeft(style + ExcelHelper.getFooterLeft());
-			footer.setCenter(style + ExcelHelper.getFooterCenter());
-
-			Cell anOwner = ws.getRow(0).getCell(COLUMN_A); //Angebotsinhaber
-			Cell anOwnerSender = ws.getRow(3).getCell(COLUMN_B); //Absender über Adressfeld
-
-			XSSFRichTextString OwnerText = new XSSFRichTextString();
-			XSSFRichTextString OwnerSender = new XSSFRichTextString();
-
-			for (int i = 0; i < 6; i++) {
-				String part = editOwner.get(i);
-				XSSFFont font = wb.createFont();
-
-				if (i == 0) {
-					font.setFontName("Arial");
-					font.setFontHeightInPoints((short) 24);
-					font.setColor(IndexedColors.GREY_50_PERCENT.getIndex());
-				} else {
-					font.setFontName("Arial");
-					font.setFontHeightInPoints((short) 12);
-					font.setColor(IndexedColors.GREY_50_PERCENT.getIndex());
-				}
-
-				OwnerText.append(part, font);
-			}
-
-			XSSFFont font = wb.createFont();
-			font.setFontName("Arial");
-			font.setFontHeightInPoints((short) 7);
-			font.setColor(IndexedColors.GREY_50_PERCENT.getIndex());
-			CellStyle rightAlignStyle = wb.createCellStyle();
-			rightAlignStyle.setAlignment(HorizontalAlignment.RIGHT);
-			anOwnerSender.setCellStyle(rightAlignStyle);
-			OwnerSender.append(senderOwner, font);
-
-			anOwner.setCellValue(OwnerText);
-			anOwnerSender.setCellValue(OwnerSender);
+			ExportHelper.applyOwnerAndFooter(wb, ws);
 
 			//#######################################################################
 			// Zellen in Tabelle Enummerieren
 			//#######################################################################
-			Cell beAdress = ws.getRow(4).getCell(COLUMN_B); //Name und Anschrift
-			Cell beDate = ws.getRow(4).getCell(COLUMN_F); //Datum
-			Cell beNr = ws.getRow(5).getCell(COLUMN_F); //Bestellnummer
-			Cell beRef = ws.getRow(6).getCell(COLUMN_F); //Referenz
-			
 			for(int i = 0; i < bestellung.getAnzPos().intValue(); i++ ) { //Bestellpositionen B, C, D, F Zeile 17-28
 				int j = i + START_ROW_OFFSET;
 				bePos[i] = ws.getRow(j).getCell(COLUMN_A); //Position
@@ -150,16 +88,15 @@ public class ExcelBestellung{
 				beEPreis[i] = ws.getRow(j).getCell(COLUMN_D); //E-Preis
 				beGPreis[i] = ws.getRow(j).getCell(COLUMN_F); //G-Preis
 			}
-			Cell beNetto = ws.getRow(28).getCell(COLUMN_F); //Nettosumme, Steuersatz, USt., Gesamtsumme
 
 			//#######################################################################
 			// Zellwerte beschreiben
 			//#######################################################################
-			beAdress.setCellValue(adressat); // Kundenanschrift
-			beDate.setCellValue(datum);
-			beNr.setCellValue(bestellung.getIdNummer());
-			beRef.setCellValue(bestellung.getRef());
-			
+			ExportHelper.replaceCellValue(wb, ws, "{beAdresse}", adressat);
+			ExportHelper.replaceCellValue(wb, ws, "{beDatum}", bestellung.getDatum().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+			ExportHelper.replaceCellValue(wb, ws, "{beNummer}", bestellung.getIdNummer());
+			ExportHelper.replaceCellValue(wb, ws, "{beRef}", bestellung.getRef());
+
 			for(int i = 0; i < bestellung.getAnzPos().intValue(); i++ ) {
 				bePos[i].setCellValue(String.valueOf(i + 1));
 				try {
@@ -175,17 +112,17 @@ public class ExcelBestellung{
 					System.out.println(e.getMessage());
 				}
 			}
-			beNetto.setCellValue(bestellung.getNetto().doubleValue());
+			ExportHelper.replaceCellValue(wb, ws, "{beSumme}", bestellung.getNetto().doubleValue());
 			
 			for (int x = 0; x < txtBaustein.length; x++) {
 			    String key = txtBaustein[x][0]; String val = txtBaustein[x][1];
 
 			    if (val != null) {
-			        val = val.replace("{OwnerName}", ExcelHelper.getKontaktName());
+			        val = val.replace("{OwnerName}", ExportHelper.getKontaktName());
 			    }
 			    txtBaustein[x][1] = val;
 			    
-			    ExcelHelper.replaceCellValue(wb, ws, key, val); // Texte in Zellen schreiben
+			    ExportHelper.replaceCellValue(wb, ws, key, val); // Texte in Zellen schreiben
 			    
 			}
 			

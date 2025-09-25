@@ -81,7 +81,7 @@ public class PfadPanel extends JPanel {
 				"Leistungsbeschreibung Vorlage (pdf-Vorlage *.pdf)",
 				"Leistungsbeschreibung Basistext (html-Vorlage *.html)",
 				"Leistungsbeschreibung StyleSheet (css-Struktur *.css)",
-				"Angebotsbestätigung Vorlage (Excel-Vorlage *.xlsx)",
+				"Auftragsbestätigung Vorlage (Excel-Vorlage *.xlsx)",
 				"Rechnung Vorlage (Excel-Vorlage *.xlsx)",
 				"Zahlungserinnerung Vorlage (Excel-Vorlage *.xlsx)",
 				"Mahnung Vorlage (Excel-Vorlage *.xlsx",

@@ -739,23 +739,23 @@ public class HauptFenster extends JFrame {
         cmbSelect.addActionListener(_ -> {
             pageSetting.removeAll();
             switch (cmbSelect.getSelectedIndex()) {
-                case 1 -> pageSetting.add(new OwnerPanel());
-                case 2 -> pageSetting.add(new BankPanel());
-                case 3 -> { pageSetting.add(new KundePanel()); pageSetting.add(new LieferantPanel()); pageSetting.add(new ArtikelPanel()); }
-                case 4 -> pageSetting.add(new PfadPanel());
-                case 5 -> pageSetting.add(new BenutzerPanel());
-                case 6 -> { pageSetting.add(new SteuertabellePanel()); pageSetting.add(new GwbTabellePanel()); }
-                case 7 -> pageSetting.add(new QrCodePanel());
-                case 8 -> pageSetting.add(new DatenbankPanel());
-                case 9 -> pageSetting.add(TextPanelFactory.create("AnT"));
-                case 10 -> pageSetting.add(TextPanelFactory.create("AnTR"));
-                case 11 -> pageSetting.add(TextPanelFactory.create("AbT"));
-                case 12 -> pageSetting.add(TextPanelFactory.create("ReT"));
-                case 13 -> pageSetting.add(TextPanelFactory.create("ZeT"));
-                case 14 -> pageSetting.add(TextPanelFactory.create("Ma1T"));
-                case 15 -> pageSetting.add(TextPanelFactory.create("Ma2T"));
-                case 16 -> pageSetting.add(TextPanelFactory.create("BeT"));
-                case 17 -> pageSetting.add(TextPanelFactory.create("LsT"));
+                case 1 ->  pageSetting.add(new OwnerPanel());
+                case 2 ->  pageSetting.add(new BankPanel());
+                case 3 ->  { pageSetting.add(new KundePanel()); pageSetting.add(new LieferantPanel()); pageSetting.add(new ArtikelPanel()); }
+                case 4 ->  pageSetting.add(new PfadPanel());
+                case 5 ->  pageSetting.add(new BenutzerPanel());
+                case 6 ->  { pageSetting.add(new SteuertabellePanel()); pageSetting.add(new GwbTabellePanel()); }
+                case 7 ->  pageSetting.add(new QrCodePanel());
+                case 8 ->  pageSetting.add(new DatenbankPanel());
+                case 9 ->  pageSetting.add(TextPanelFactory.create("T1"));
+                case 10 -> pageSetting.add(TextPanelFactory.create("T2"));
+                case 11 -> pageSetting.add(TextPanelFactory.create("T3"));
+                case 12 -> pageSetting.add(TextPanelFactory.create("T4"));
+                case 13 -> pageSetting.add(TextPanelFactory.create("T5"));
+                case 14 -> pageSetting.add(TextPanelFactory.create("T6"));
+                case 15 -> pageSetting.add(TextPanelFactory.create("T7"));
+                case 16 -> pageSetting.add(TextPanelFactory.create("T8"));
+                case 17 -> pageSetting.add(TextPanelFactory.create("T9"));
                 default -> {}
             }
             pageSetting.revalidate(); pageSetting.repaint();
