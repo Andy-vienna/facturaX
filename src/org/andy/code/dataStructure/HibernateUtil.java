@@ -14,6 +14,7 @@ import org.andy.code.dataStructure.entitiyProductive.Ausgaben;
 import org.andy.code.dataStructure.entitiyProductive.Bestellung;
 import org.andy.code.dataStructure.entitiyProductive.Einkauf;
 import org.andy.code.dataStructure.entitiyProductive.FileStore;
+import org.andy.code.dataStructure.entitiyProductive.Lieferschein;
 import org.andy.code.dataStructure.entitiyProductive.Rechnung;
 import org.andy.code.dataStructure.entitiyProductive.SVSteuer;
 import org.andy.code.main.Einstellungen;
@@ -37,8 +38,9 @@ public class HibernateUtil {
         // Logging drosseln
         Configurator.setRootLevel(Level.WARN);
         Configurator.setLevel("org.hibernate", Level.WARN);
-        Configurator.setLevel("org.hibernate.SQL", Level.ERROR);           // SQL stumm
+        Configurator.setLevel("org.hibernate.SQL", Level.ERROR); // SQL stumm | Level.DEBUG setzen für gute Diagnose
         Configurator.setLevel("org.hibernate.orm.jdbc.bind", Level.ERROR); // Bind-Parameter stumm
+        //Configurator.setLevel("org.hibernate.type.descriptor.sql.BasicBinder", Level.TRACE);
         Configurator.setLevel("com.zaxxer.hikari", Level.WARN);
 
         // Hibernate initialisieren
@@ -128,6 +130,7 @@ public class HibernateUtil {
         sources.addAnnotatedClass(Angebot.class);
         sources.addAnnotatedClass(Rechnung.class);
         sources.addAnnotatedClass(Bestellung.class);
+        sources.addAnnotatedClass(Lieferschein.class);
         sources.addAnnotatedClass(FileStore.class);
         sources.addAnnotatedClass(Einkauf.class);
         sources.addAnnotatedClass(Ausgaben.class);

@@ -361,7 +361,7 @@ public class AngebotNeuPanel extends EditPanel {
         a.setBeschreibungHtml(htmlText); // Liefer- und Leistungsbeschreibung
         
         int posCount = countFilledPositions();
-        a.setAnzPos(BigDecimal.valueOf(posCount));
+        a.setAnzPos(posCount);
 
         BigDecimal netto = BD.ZERO;
         for (int i=0;i<POS_COUNT;i++) {

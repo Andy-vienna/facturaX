@@ -377,7 +377,7 @@ public class RechnungNeuPanel extends EditPanel {
         r.setSkonto2wert(txtSkontoTage2.getText().equals("")?BD.ZERO:parseStringToBigDecimalSafe(txtSkontoWert2.getText(), LocaleFormat.AUTO).divide(BD.HUNDRED));
 
         int posCount = countFilledPositions();
-        r.setAnzPos(BigDecimal.valueOf(posCount));
+        r.setAnzPos(posCount);
 
         BigDecimal ustFaktor = parseStringToBigDecimalSafe(k.getTaxvalue(), LocaleFormat.AUTO).divide(BD.HUNDRED);
         BigDecimal netto = BD.ZERO; BigDecimal ust = BD.ZERO; BigDecimal brutto = BD.ZERO;

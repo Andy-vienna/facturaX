@@ -7,7 +7,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,15 +25,14 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 
 import org.andy.code.dataStructure.entitiyMaster.Artikel;
-import org.andy.code.dataStructure.entitiyMaster.Lieferant;
-import org.andy.code.dataStructure.entitiyProductive.Bestellung;
+import org.andy.code.dataStructure.entitiyMaster.Kunde;
+import org.andy.code.dataStructure.entitiyProductive.Lieferschein;
 import org.andy.code.dataStructure.repositoryMaster.ArtikelRepository;
-import org.andy.code.dataStructure.repositoryMaster.LieferantRepository;
-import org.andy.code.dataStructure.repositoryProductive.BestellungRepository;
+import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
+import org.andy.code.dataStructure.repositoryProductive.LieferscheinRepository;
 import org.andy.code.main.Einstellungen;
 import org.andy.code.main.StartUp;
 import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
-import org.andy.code.misc.BD;
 import org.andy.code.misc.CommaHelper;
 import org.andy.gui.main.HauptFenster;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
@@ -45,25 +43,25 @@ import org.apache.logging.log4j.Logger;
 import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
 
-public class BestellungNeuPanel extends EditPanel {
+public class LieferscheinNeuPanel extends EditPanel {
 	
     private static final long serialVersionUID = 1L;
-    private static final Logger logger = LogManager.getLogger(BestellungNeuPanel.class);
+    private static final Logger logger = LogManager.getLogger(LieferscheinNeuPanel.class);
 
     private static final int POS_COUNT = 12;
 
     // Datenquellen
-    private final LieferantRepository lieferantRepository = new LieferantRepository();
+    private final KundeRepository kundeRepository = new KundeRepository();
     private final ArtikelRepository artikelRepository = new ArtikelRepository();
-    private final BestellungRepository bestellungRepository = new BestellungRepository();
+    private final LieferscheinRepository lieferscheinRepository = new LieferscheinRepository();
 
     // Daten
-    private final List<Lieferant> lieferant = new ArrayList<>();
+    private final List<Kunde> kunde = new ArrayList<>();
     private final List<Artikel> artikel = new ArrayList<>();
 
     // UI Felder
-    private JComboBox<String> cmbLieferant;
-    private JTextField[] txtLi = new JTextField[9];
+    private JComboBox<String> cmbKunde;
+    private JTextField[] txtKd = new JTextField[12];
 
     private JTextField txtNummer, txtReferenz;
     private DatePicker datePicker;
@@ -72,24 +70,20 @@ public class BestellungNeuPanel extends EditPanel {
     @SuppressWarnings("unchecked")
 	private final JComboBox<String>[] cbPos = new JComboBox[POS_COUNT];
     private final JTextField[] txtAnz = new JTextField[POS_COUNT];
-    private final JTextField[] txtEP  = new JTextField[POS_COUNT];
-    private final JTextField[] txtGP  = new JTextField[POS_COUNT];
 
     private final BigDecimal[] bdAnzahl = new BigDecimal[POS_COUNT];
-    private final BigDecimal[] bdEinzel = new BigDecimal[POS_COUNT];
-    private final BigDecimal[] bdSumme  = new BigDecimal[POS_COUNT];
     private final String[] sPosText = new String[POS_COUNT];
 
     // Zustände
-    private boolean lieferantGewählt = false;
+    private boolean kundeGewählt = false;
     private boolean mind1ArtikelGewählt = false;
 
 	//###################################################################################################################################################
 	// public Teil
 	//###################################################################################################################################################
     
-    public BestellungNeuPanel() {
-        super("neue Bestellung erstellen");
+    public LieferscheinNeuPanel() {
+        super("neuen Lieferschein erstellen");
         if (!(getBorder() instanceof TitledBorder)) {
             logger.warn("Kein TitledBorder gesetzt.");
         }
@@ -103,9 +97,14 @@ public class BestellungNeuPanel extends EditPanel {
 	//###################################################################################################################################################
 
     private void buildUI() {
+    	
         // Labels links
-        final String[] leftLabels = { "Lieferanten-Nr.", "Kundennummer", "Name","Strasse","PLZ","Ort","Land","UID","USt.-Satz" };
-        final int[][] leftBounds = { {10,55},{10,80},{10,105},{10,130},{10,155},{10,180},{10,205},{10,230},{10,255} };
+    	final String[] leftLabels = {"Kundennummer","Kundenname","Strasse","PLZ","Ort","Land","Anrede","Ansprechpartner","UID","USt.-Satz",
+				 "%","Rabattschlüssel","%","Zahlungsziel","Tage" };
+
+    	final int[][] leftBounds = {{10,55},{10,80},{10,105},{10,130},{10,155},{10,180},{10,205},{10,230},{10,255},{10,280},  {10,305},  {10,330},
+																							  {155,280}, {155,305}, {155,330}};
+    	
         List<JLabel> left = new ArrayList<>();
         for (int i=0;i<leftLabels.length;i++){
             JLabel l=new JLabel(leftLabels[i]);
@@ -119,27 +118,25 @@ public class BestellungNeuPanel extends EditPanel {
         JLabel lbl20=new JLabel("Nr.");  lbl20.setBounds(320,30,25,25);
         JLabel lbl21=new JLabel("Position"); lbl21.setBounds(345,30,440,25);
         JLabel lbl22=new JLabel("Anz."); lbl22.setBounds(785,30,70,25);
-        JLabel lbl23=new JLabel("Einzel"); lbl23.setBounds(855,30,70,25);
-        JLabel lbl24=new JLabel("Summe"); lbl24.setBounds(925,30,70,25);
-        for (JLabel x : new JLabel[]{lbl20,lbl21,lbl22,lbl23,lbl24}) {
+        for (JLabel x : new JLabel[]{lbl20,lbl21,lbl22}) {
             x.setHorizontalAlignment(SwingConstants.CENTER);
             add(x);
         }
 
-        JLabel lbl25=new JLabel("Bestellnummer:"); lbl25.setBounds(1010,55,125,25); add(lbl25);
-        JLabel lbl26=new JLabel("Bestelldatum:");  lbl26.setBounds(1010,80,125,25); add(lbl26);
+        JLabel lbl25=new JLabel("Lieferscheinnummer:"); lbl25.setBounds(1010,55,125,25); add(lbl25);
+        JLabel lbl26=new JLabel("Datum:");  lbl26.setBounds(1010,80,125,25); add(lbl26);
         JLabel lbl29=new JLabel("Referenz");        lbl29.setBounds(1010,105,60,25);  add(lbl29);
 
         // Combos/Textfelder links
-        cmbLieferant = new JComboBox<>(lieferant.stream().map(k -> nullToEmpty(k.getName())).toArray(String[]::new));
-        cmbLieferant.setBounds(10,30,300,25); add(cmbLieferant);
+        cmbKunde = new JComboBox<>(kunde.stream().map(k -> nullToEmpty(k.getName())).toArray(String[]::new));
+        cmbKunde.setBounds(10,30,300,25); add(cmbKunde);
 
-        for (int ii=0;ii<txtLi.length;ii++) {
-        	txtLi[ii]=setRO(110, 55+(ii*25));
-        	add(txtLi[ii]);
+        for (int ii=0;ii<txtKd.length;ii++) {
+        	txtKd[ii]=setRO(110, 55+(ii*25));
+        	add(txtKd[ii]);
         }
 
-        txtNummer = new JTextField(nextBeNummer());
+        txtNummer = new JTextField(nextLsNummer());
         txtNummer.setBounds(1130,55,140,25);
         txtNummer.setForeground(Color.BLUE);
         txtNummer.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -157,7 +154,7 @@ public class BestellungNeuPanel extends EditPanel {
         add(txtReferenz);
         txtReferenz.getDocument().addDocumentListener(bgFlipOnNonEmpty(txtReferenz));
         
-        JButton btnDoExport = createButton("<html>Bestellung<br>erstellen</html>", "edit.png", null);
+        JButton btnDoExport = createButton("<html>Lieferschein<br>erstellen</html>", "edit.png", null);
         btnDoExport.setBounds(1545,305, HauptFenster.getButtonx(), HauptFenster.getButtony());
         btnDoExport.setEnabled(true);
         add(btnDoExport);
@@ -175,12 +172,9 @@ public class BestellungNeuPanel extends EditPanel {
             cbPos[i].setBounds(345,y,440,25); add(cbPos[i]);
 
             txtAnz[i]=centeredField(785,y,70); txtAnz[i].setEnabled(false); add(txtAnz[i]); attachCommaToDot(txtAnz[i]);
-            txtEP[i] =centeredField(855,y,70); txtEP[i].setEditable(false); add(txtEP[i]); attachCommaToDot(txtEP[i]);
-            txtGP[i] =centeredField(925,y,70); txtGP[i].setEditable(false); add(txtGP[i]);
-
+            
             // Listener je Zeile
             cbPos[i].addActionListener(_ -> onArtikelChosen(i));
-            txtEP[i].getDocument().addDocumentListener(docChanged(() -> onEPChanged(i)));
             txtAnz[i].getDocument().addDocumentListener(docChanged(() -> onQtyOrEPChanged(i)));
         }
         
@@ -189,7 +183,7 @@ public class BestellungNeuPanel extends EditPanel {
         JSeparator s2=new JSeparator(JSeparator.VERTICAL); s2.setBounds(1000,10,2,370); add(s2);
 
         // Aktionen
-        cmbLieferant.addActionListener(_ -> onLieferantChanged());
+        cmbKunde.addActionListener(_ -> onKundeChanged());
 
         btnDoExport.addActionListener(_ -> doSave());
 
@@ -200,104 +194,81 @@ public class BestellungNeuPanel extends EditPanel {
 	// ActionListener
 	//###################################################################################################################################################
 
-    private void onLieferantChanged() {
-        int idx = cmbLieferant.getSelectedIndex();
+    private void onKundeChanged() {
+        int idx = cmbKunde.getSelectedIndex();
         if (idx <= 0) {
-            clearLieferant();
-            lieferantGewählt = false;
+            clearKunde();
+            kundeGewählt = false;
             return;
         }
-        Lieferant l = lieferant.get(idx);
-        txtLi[0].setText(l.getId());
-        txtLi[1].setText(l.getKdnr());
-        txtLi[2].setText(l.getName());
-        txtLi[3].setText(l.getStrasse());
-        txtLi[4].setText(l.getPlz());
-        txtLi[5].setText(l.getOrt());
-        txtLi[6].setText(l.getLand());
-        txtLi[7].setText(l.getUstid());
-        txtLi[8].setText(l.getTaxvalue());
-        lieferantGewählt = true;
+        Kunde k = kunde.get(idx);
+        txtKd[0].setText(k.getId());
+        txtKd[1].setText(k.getName());
+        txtKd[2].setText(k.getStrasse());
+        txtKd[3].setText(k.getPlz());
+        txtKd[4].setText(k.getOrt());
+        txtKd[5].setText(k.getLand());
+        txtKd[6].setText(k.getPronomen());
+        txtKd[7].setText(k.getPerson());
+        txtKd[8].setText(k.getUstid());
+        txtKd[9].setText(k.getTaxvalue());
+        txtKd[10].setText(k.getDeposit());
+        txtKd[11].setText(k.getZahlungsziel());
+        kundeGewählt = true;
     }
 
     private void onArtikelChosen(int i) {
         int idx = cbPos[i].getSelectedIndex();
         if (idx <= 0) {
-            txtAnz[i].setText(""); txtEP[i].setText(""); txtGP[i].setText("");
-            txtAnz[i].setEnabled(false); txtEP[i].setEditable(false);
-            txtAnz[i].setBackground(Color.WHITE); txtEP[i].setBackground(Color.WHITE);
-            bdAnzahl[i]=bdEinzel[i]=bdSumme[i]=null; sPosText[i]=null;
+            txtAnz[i].setText("");
+            txtAnz[i].setEnabled(false);
+            txtAnz[i].setBackground(Color.WHITE);
+            bdAnzahl[i]=null; sPosText[i]=null;
             recomputeMind1Artikel();
             return;
         }
         Artikel a = artikel.get(idx);
         sPosText[i] = a.getText();
-        bdEinzel[i] = a.getWert();
-        txtEP[i].setText(bdEinzel[i].toString());
         txtAnz[i].setEnabled(true);
         txtAnz[i].setBackground(Color.PINK);
         recomputeMind1Artikel();
         onQtyOrEPChanged(i); // initial Summe
     }
 
-    private void onEPChanged(int i) {
-        String s = txtEP[i].getText().trim();
-        if (s.isEmpty()) { bdEinzel[i]=null; txtGP[i].setText(""); return; }
-        try {
-            bdEinzel[i] = parseStringToBigDecimalSafe(s, LocaleFormat.AUTO);
-            onQtyOrEPChanged(i);
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Eingabe inkorrekt …", "Angebot", JOptionPane.ERROR_MESSAGE);
-            txtEP[i].setText("");
-        }
-    }
-
     private void onQtyOrEPChanged(int i) {
-        if (isEmpty(txtEP[i]) || isEmpty(txtAnz[i])) { txtAnz[i].setBackground(Color.PINK); txtGP[i].setText(""); return; }
+        if (isEmpty(txtAnz[i])) { txtAnz[i].setBackground(Color.PINK); return; }
         try {
             bdAnzahl[i] = parseStringToBigDecimalSafe(txtAnz[i].getText(), LocaleFormat.AUTO);
-            if (bdEinzel[i] == null) bdEinzel[i] = parseStringToBigDecimalSafe(txtEP[i].getText(), LocaleFormat.AUTO);
-            bdSumme[i]  = bdEinzel[i].multiply(bdAnzahl[i]).setScale(2, RoundingMode.HALF_UP);
-            txtGP[i].setText(bdSumme[i].toString());
             txtAnz[i].setBackground(Color.WHITE);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Eingabe inkorrekt …", "Angebot", JOptionPane.ERROR_MESSAGE);
             txtAnz[i].setText("");
-            txtGP[i].setText("");
         }
     }
 
     private void doSave() {
-        if (!lieferantGewählt) { info("Lieferant nicht ausgewählt …"); return; }
+        if (!kundeGewählt) { info("Kunde nicht ausgewählt …"); return; }
         if (!mind1ArtikelGewählt) { info("keine Artikel ausgewählt …"); return; }
         if (isEmpty(txtReferenz)) { info("Kundenreferenz fehlt …"); return; }
 
-        Bestellung b = new Bestellung();
-        b.setIdNummer(nextBeNummer());
-        b.setJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
-        b.setDatum(dateOrToday(datePicker));
-        Lieferant l = lieferant.get(cmbLieferant.getSelectedIndex());
-        b.setIdLieferant(Objects.toString(l.getId(),""));
-        b.setRef(txtReferenz.getText().trim());
+        Lieferschein l = new Lieferschein();
+        l.setIdNummer(nextLsNummer());
+        l.setJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
+        l.setDatum(dateOrToday(datePicker));
+        Kunde k = kunde.get(cmbKunde.getSelectedIndex());
+        l.setIdKunde(Objects.toString(k.getId(),""));
+        l.setRef(txtReferenz.getText().trim());
         
         int posCount = countFilledPositions();
-        b.setAnzPos(posCount);
+        l.setAnzPos(posCount);
 
-        BigDecimal ustFaktor = parseStringToBigDecimalSafe(l.getTaxvalue(), LocaleFormat.AUTO).divide(BD.HUNDRED);
-        BigDecimal netto = BD.ZERO; BigDecimal ust = BD.ZERO; BigDecimal brutto = BD.ZERO;
         for (int i=0;i<POS_COUNT;i++) {
-            if (sPosText[i]==null || bdAnzahl[i]==null || bdEinzel[i]==null) continue;
-            setBestellungPosition(b, i, sPosText[i], bdAnzahl[i], bdEinzel[i]);
-            netto = netto.add(bdEinzel[i].multiply(bdAnzahl[i]));
+            if (sPosText[i]==null || bdAnzahl[i]==null) continue;
+            setLieferscheinPosition(l, i, sPosText[i], bdAnzahl[i]);
         }
-        b.setNetto(netto.setScale(2, RoundingMode.HALF_UP));
-        ust = netto.multiply(ustFaktor);
-        b.setUst(ust);
-        brutto = netto.add(ust);
-        b.setBrutto(brutto);
-        b.setState(1); // erstellt
+        l.setState(1); // erstellt
 
-        bestellungRepository.save(b);
+        lieferscheinRepository.save(l);
         HauptFenster.actScreen();
     }
 
@@ -306,31 +277,31 @@ public class BestellungNeuPanel extends EditPanel {
 	//###################################################################################################################################################
     
     private void loadData() {
-        lieferant.clear();
+        kunde.clear();
         artikel.clear();
 
         // Dummy an Position 0
-        lieferant.add(new Lieferant());
-        lieferant.addAll(lieferantRepository.findAll());
+        kunde.add(new Kunde());
+        kunde.addAll(kundeRepository.findAll());
 
         artikel.add(new Artikel());
         artikel.addAll(artikelRepository.findAll());
     }
 
-    private void setBestellungPosition(Bestellung b, int idx0, String text, BigDecimal menge, BigDecimal ep) {
+    private void setLieferscheinPosition(Lieferschein l, int idx0, String text, BigDecimal menge) {
         switch (idx0) {
-            case 0 -> { b.setArt01(text); b.setMenge01(menge); b.setePreis01(ep); }
-            case 1 -> { b.setArt02(text); b.setMenge02(menge); b.setePreis02(ep); }
-            case 2 -> { b.setArt03(text); b.setMenge03(menge); b.setePreis03(ep); }
-            case 3 -> { b.setArt04(text); b.setMenge04(menge); b.setePreis04(ep); }
-            case 4 -> { b.setArt05(text); b.setMenge05(menge); b.setePreis05(ep); }
-            case 5 -> { b.setArt06(text); b.setMenge06(menge); b.setePreis06(ep); }
-            case 6 -> { b.setArt07(text); b.setMenge07(menge); b.setePreis07(ep); }
-            case 7 -> { b.setArt08(text); b.setMenge08(menge); b.setePreis08(ep); }
-            case 8 -> { b.setArt09(text); b.setMenge09(menge); b.setePreis09(ep); }
-            case 9 -> { b.setArt10(text); b.setMenge10(menge); b.setePreis10(ep); }
-            case 10 -> { b.setArt11(text); b.setMenge11(menge); b.setePreis11(ep); }
-            case 11 -> { b.setArt12(text); b.setMenge12(menge); b.setePreis12(ep); }
+            case 0 -> { l.setArt01(text); l.setMenge01(menge); }
+            case 1 -> { l.setArt02(text); l.setMenge02(menge); }
+            case 2 -> { l.setArt03(text); l.setMenge03(menge); }
+            case 3 -> { l.setArt04(text); l.setMenge04(menge); }
+            case 4 -> { l.setArt05(text); l.setMenge05(menge); }
+            case 5 -> { l.setArt06(text); l.setMenge06(menge); }
+            case 6 -> { l.setArt07(text); l.setMenge07(menge); }
+            case 7 -> { l.setArt08(text); l.setMenge08(menge); }
+            case 8 -> { l.setArt09(text); l.setMenge09(menge); }
+            case 9 -> { l.setArt10(text); l.setMenge10(menge); }
+            case 10 -> { l.setArt11(text); l.setMenge11(menge); }
+            case 11 -> { l.setArt12(text); l.setMenge12(menge); }
             default -> {}
         }
     }
@@ -338,7 +309,7 @@ public class BestellungNeuPanel extends EditPanel {
     private int countFilledPositions() {
         int n=0;
         for (int i=0;i<POS_COUNT;i++) {
-            if (sPosText[i]!=null && bdAnzahl[i]!=null && bdEinzel[i]!=null) n++;
+            if (sPosText[i]!=null && bdAnzahl[i]!=null) n++;
         }
         return n;
     }
@@ -398,19 +369,19 @@ public class BestellungNeuPanel extends EditPanel {
         return docChanged(() -> f.setBackground(f.getText().trim().isEmpty()? Color.PINK : Color.WHITE));
     }
 
-    private void clearLieferant(){
-        for (JTextField t : txtLi) {
+    private void clearKunde(){
+        for (JTextField t : txtKd) {
             t.setText("");
         }
     }
 
-    private String nextBeNummer() {
-        int max = bestellungRepository.findMaxNummerByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
-        return "BE-" + Einstellungen.getStrAktGJ() + "-" + String.format("%04d", max + 1);
+    private String nextLsNummer() {
+        int max = lieferscheinRepository.findMaxNummerByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
+        return "LS-" + Einstellungen.getStrAktGJ() + "-" + String.format("%04d", max + 1);
     }
 
     private static void info(String msg){
-        JOptionPane.showMessageDialog(null, msg, "Angebot erstellen", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(null, msg, "Lieferschein erstellen", JOptionPane.INFORMATION_MESSAGE);
     }
     
     private void attachCommaToDot(JTextField field) {

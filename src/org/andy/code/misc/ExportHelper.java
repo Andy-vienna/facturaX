@@ -14,6 +14,7 @@ import org.andy.code.dataStructure.entitiyMaster.Owner;
 import org.andy.code.dataStructure.entitiyMaster.Text;
 import org.andy.code.dataStructure.entitiyProductive.Angebot;
 import org.andy.code.dataStructure.entitiyProductive.Bestellung;
+import org.andy.code.dataStructure.entitiyProductive.Lieferschein;
 import org.andy.code.dataStructure.entitiyProductive.Rechnung;
 import org.andy.code.dataStructure.repositoryMaster.BankRepository;
 import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
@@ -22,6 +23,7 @@ import org.andy.code.dataStructure.repositoryMaster.OwnerRepository;
 import org.andy.code.dataStructure.repositoryMaster.TextRepository;
 import org.andy.code.dataStructure.repositoryProductive.AngebotRepository;
 import org.andy.code.dataStructure.repositoryProductive.BestellungRepository;
+import org.andy.code.dataStructure.repositoryProductive.LieferscheinRepository;
 import org.andy.code.dataStructure.repositoryProductive.RechnungRepository;
 import org.andy.code.main.Einstellungen;
 import org.andy.code.main.StartUp;
@@ -74,6 +76,10 @@ public class ExportHelper {
 		return readBestellung(BeNr);
 	}
 	
+	public static Lieferschein loadLieferschein(String LsNr) {
+		return readLieferschein(LsNr);
+	}
+	
 	public static Kunde kundeData(String KdNr) {
 		return readKunde(KdNr);
 	}
@@ -123,6 +129,13 @@ public class ExportHelper {
 	private static Bestellung readBestellung(String BeNr) {
 		BestellungRepository bestellungRepository = new BestellungRepository();
 		return bestellungRepository.findById(BeNr);
+	}
+	
+	//###################################################################################################################################################
+	
+	private static Lieferschein readLieferschein(String LsNr) {
+		LieferscheinRepository lieferscheinRepository = new LieferscheinRepository();
+		return lieferscheinRepository.findById(LsNr);
 	}
 	
 	//###################################################################################################################################################
@@ -262,6 +275,7 @@ public class ExportHelper {
 	    	case "ExcelAngebotRevision"      -> typ = "AngebotRev";
 	    	case "ExcelAuftragsbestaetigung" -> typ = "OrderConfirm";
 	    	case "ExcelBestellung"           -> typ = "Bestellung";
+	    	case "ExcelLieferschein"         -> typ = "Lieferschein";
 	    	case "ExcelMahnstufe1"           -> typ = "MahnungStufe1";
 	    	case "ExcelMahnstufe2"           -> typ = "MahnungStufe2";
 	    	case "ExcelRechnung"             -> typ = "Rechnung";

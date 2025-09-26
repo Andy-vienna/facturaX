@@ -13,6 +13,8 @@ import org.andy.gui.main.overview_panels.edit_panels.factory.ArtikelNeuPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.EinkaufPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.KundeNeuPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.LieferantNeuPanel;
+import org.andy.gui.main.overview_panels.edit_panels.factory.LieferscheinNeuPanel;
+import org.andy.gui.main.overview_panels.edit_panels.factory.LieferscheinPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.SvTaxPanel;
 
 public class EditPanelFactory {
@@ -27,6 +29,8 @@ public class EditPanelFactory {
             case "NR":  return new RechnungNeuPanel();
             case "BE":  return new BestellungPanel();
             case "NB":  return new BestellungNeuPanel();
+            case "LS":  return new LieferscheinPanel();
+            case "nLS": return new LieferscheinNeuPanel();
             case "PU":  return new EinkaufPanel();
             case "NL":  return new LieferantNeuPanel();
             case "EX":  return new AusgabenPanel();

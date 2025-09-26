@@ -50,6 +50,7 @@ import org.andy.code.dataExport.ExcelRechnung;
 import org.andy.code.dataExport.ExcelAngebot;
 import org.andy.code.dataExport.ExcelAngebotRevision;
 import org.andy.code.dataExport.ExcelBestellung;
+import org.andy.code.dataExport.ExcelLieferschein;
 import org.andy.code.dataStructure.entitiyMaster.Kunde;
 import org.andy.code.dataStructure.entitiyMaster.Lieferant;
 import org.andy.code.dataStructure.repositoryMaster.KundeRepository;
@@ -64,6 +65,7 @@ import org.andy.code.main.overview.table.LadeAusgaben;
 import org.andy.code.main.overview.table.LadeBestellung;
 import org.andy.code.main.overview.table.LadeAngebot;
 import org.andy.code.main.overview.table.LadeEinkauf;
+import org.andy.code.main.overview.table.LadeLieferschein;
 import org.andy.code.main.overview.table.LadeSvTax;
 import org.andy.code.misc.BD;
 import org.andy.gui.main.dialogs.ABDialog;
@@ -79,6 +81,7 @@ import org.andy.gui.main.overview_panels.edit_panels.factory.AusgabenPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.BestellungPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.AngebotPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.EinkaufPanel;
+import org.andy.gui.main.overview_panels.edit_panels.factory.LieferscheinPanel;
 import org.andy.gui.main.overview_panels.edit_panels.factory.SvTaxPanel;
 import org.andy.gui.main.result_panels.SteuerPanel;
 import org.andy.gui.main.result_panels.UStPanel;
@@ -115,6 +118,7 @@ public class HauptFenster extends JFrame {
     private final String[] HEADER_AN = { "AN-Nummer", "Status", "Datum", "Referenz", "Kunde", "Netto" };
     private final String[] HEADER_RE = { "RE-Nummer", "Status", "Datum", "Leistungszeitraum", "Referenz", "Kunde", "Netto", "USt.", "Brutto" };
     private final String[] HEADER_BE = { "BE-Nummer", "Status", "Datum", "Referenz", "Lieferant", "Netto", "USt.", "Brutto" };
+    private final String[] HEADER_LS = { "LS-Nummer", "Status", "Datum", "Referenz", "Empfänger" };
     private final String[] HEADER_PU = { "RE-Datum","RE-Nummer", "Kreditor Name", "Land", "Steuersatz", "Netto", "USt.", "Brutto", "Zahlungsziel", "bezahlt", "Dateiname" };
     private final String[] HEADER_EX = { "Datum", "Bezeichnung", "Land", "Steuersatz", "Netto (EUR)", "Steuer (EUR)", "Brutto (EUR)", "Dateiname" };
     private final String[] HEADER_ST = { "Datum", "Zahlungsempfänger", "Bezeichnung", "Betrag", "Fälligkeit", "Art", "Dateiname" };
@@ -135,28 +139,29 @@ public class HauptFenster extends JFrame {
     private final JPanel pageAN = new JPanel(new BorderLayout());
     private final JPanel pageRE = new JPanel(new BorderLayout());
     private final JPanel pageBE = new JPanel(new BorderLayout());
+    private final JPanel pageLS = new JPanel(new BorderLayout());
     private final JPanel pagePU = new JPanel(new BorderLayout());
     private final JPanel pageEX = new JPanel(new BorderLayout());
     private final JPanel pageST = new JPanel(new BorderLayout());
     private JPanel pageOv, pageErg, pageAdmin, pageSetting;
 
     // Panels, Tabellen, Summen
-    private EditPanel offerPanel, billPanel, bestellungPanel, purchasePanel, svTaxPanel, expensesPanel;
-    private SummenPanelA infoAN, infoRE, infoBE;
+    private EditPanel offerPanel, billPanel, bestellungPanel, lieferscheinPanel, purchasePanel, svTaxPanel, expensesPanel;
+    private SummenPanelA infoAN, infoRE, infoBE, infoLS;
 	private SummenPanelB infoPU, infoEX, infoST;
 	
     private UStPanel panelUSt;
     private ZMeldungPanel panelZM;
     private SteuerPanel panelP109a;
     private JScrollPane sPaneErg;
-    private ErzeugeTabelle<Object> sPaneAN, sPaneRE, sPaneBE, sPanePU, sPaneEX, sPaneST;
-    private ErzeugePanelA panelOfferInfo, panelBillInfo, panelBEInfo;
+    private ErzeugeTabelle<Object> sPaneAN, sPaneRE, sPaneBE, sPaneLS, sPanePU, sPaneEX, sPaneST;
+    private ErzeugePanelA panelOfferInfo, panelBillInfo, panelBEInfo, panelLSInfo;
 
     // Daten
-    private String[][] sTempAN, sTempRE, sTempBE, sTempPU, sTempEX, sTempST;
+    private String[][] sTempAN, sTempRE, sTempBE, sTempLS, sTempPU, sTempEX, sTempST;
 
     // Auswahl
-    private String vZelleAN, vStateAN, vZelleRE, vStateRE, vZelleBE, vStateBE;
+    private String vZelleAN, vStateAN, vZelleRE, vStateRE, vZelleBE, vStateBE, vZelleLS, vStateLS;
 
     // Rollen
     enum Role { NONE, USER, SUPERUSER, FINANCIALUSER, ADMIN }
@@ -260,7 +265,6 @@ public class HauptFenster extends JFrame {
 				Component c = (Component) e.getSource();
 	        	Window owner = SwingUtilities.getWindowAncestor(c);
 	        	InfoDialog.show(owner, StartUp.APP_NAME, StartUp.APP_VERSION, StartUp.APP_BUILD);
-	        	//InfoDialog.show(SwingUtilities.getWindowAncestor(null), StartUp.APP_NAME, StartUp.APP_VERSION)
 			}
 		});
     }
@@ -285,18 +289,27 @@ public class HauptFenster extends JFrame {
                 doAngebotPanel(0);
                 doRechnungPanel(0);
                 doBestellungPanel(0);
+                doLieferscheinPanel(0);
                 doEinkaufPanel(0);
                 doAusgabenPanel();
+                doSvsTaxPanel();
+                doJahresergebnis();
                 tabPanel.addTab("Angebote", pageAN);
                 tabPanel.addTab("Rechnungen", pageRE);
                 tabPanel.addTab("Bestellungen", pageBE);
+                tabPanel.addTab("Lieferscheine", pageLS);
                 tabPanel.addTab("Einkauf", pagePU);
                 tabPanel.addTab("Betriebsausgaben", pageEX);
+                tabPanel.addTab("SV und Steuer", pageST);
+                tabPanel.addTab("Jahresergebnis", pageOv);
                 tabPanel.setIconAt(0, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/offer.png")));
                 tabPanel.setIconAt(1, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/invoice.png")));
                 tabPanel.setIconAt(2, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/bestellen.png")));
-                tabPanel.setIconAt(3, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/purchase.png")));
-                tabPanel.setIconAt(4, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/expenses.png")));
+                tabPanel.setIconAt(3, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/lieferschein.png")));
+                tabPanel.setIconAt(4, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/purchase.png")));
+                tabPanel.setIconAt(5, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/expenses.png")));
+                tabPanel.setIconAt(6, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/tax.png")));
+                tabPanel.setIconAt(7, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/result.png")));
             }
             case FINANCIALUSER -> {
                 doSvsTaxPanel();
@@ -566,6 +579,73 @@ public class HauptFenster extends JFrame {
     }
     
     //###################################################################################################################################################
+    
+    private void doLieferscheinPanel(int use) {
+    	if (role != Role.SUPERUSER && role != Role.FINANCIALUSER) return;
+    	
+    	JButton[] btn = null;
+        switch(use) {
+        	case 0 -> {
+        		btn = new JButton[2];
+        		lieferscheinPanel = EditPanelFactory.create("LS");
+                btn[0] = createButton("<html>neuer<br>Lieferschein</html>", "new.png", new Color(191,239,255));
+                btn[1] = createButton("<html>Lieferschein<br>drucken</html>", "print.png", null);
+        	}
+        	case 1 -> {
+        		btn = new JButton[1];
+        		lieferscheinPanel = EditPanelFactory.create("nLS");
+                btn[0] = createButton("zurück", "aktualisieren.png", null);
+        	}
+        	case 2 -> {
+        		
+        	}
+        	case 3 -> {
+        		
+        	}
+        }
+        btn[0].setEnabled(true);
+        
+        sPaneLS = new ErzeugeTabelle<>(sTempLS, HEADER_LS, new TableLScr(this));
+        sPaneLS.getTable().addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) { actionClickLS(sPaneLS.getTable(), e); }
+        });
+        sPaneLS.setColumnWidths(new int[] {120,120,120,500,500});
+        sPaneLS.getTable().setAutoCreateRowSorter(true);
+        
+        infoLS = new SummenPanelA(new String[] {null}, false);
+        if (use == 1) infoLS.setVisible(false);
+
+        panelLSInfo = new ErzeugePanelA(sPaneLS, lieferscheinPanel, btn, infoLS);
+        
+        if (use == 1 || use == 2 || use == 3) {
+        	btn[0].addActionListener(_ -> doLieferscheinPanel(0));
+        }
+        if (use == 0) {
+        	btn[0].addActionListener(_ -> { if (use == 0) doLieferscheinPanel(1); else updScreen(); });
+        	btn[1].addActionListener(e -> {
+        		if (vZelleLS == null) return;
+        	    Window w = SwingUtilities.getWindowAncestor((Component) e.getSource());
+        	    BusyDialog.run(w,
+        	        "Bitte warten",
+        	        "Lieferschein wird erzeugt …",
+        	        () -> {
+						try {
+							ExcelLieferschein.lsExport(vZelleLS);
+						} catch (Exception ex) {
+							logger.error("error exporting delivery note: ", ex);
+						}
+					},
+        	        this::updScreen
+        	    );
+        	});
+        }
+
+        pageLS.removeAll();
+        pageLS.add(panelLSInfo, BorderLayout.CENTER);
+        pageLS.revalidate(); pageLS.repaint();
+    }
+    
+    //###################################################################################################################################################
 
     private void doEinkaufPanel(int use) {
         if (role != Role.SUPERUSER && role != Role.FINANCIALUSER) return;
@@ -650,7 +730,7 @@ public class HauptFenster extends JFrame {
     //###################################################################################################################################################
 
     private void doSvsTaxPanel() {
-        if (role != Role.FINANCIALUSER) return;
+    	if (role != Role.SUPERUSER && role != Role.FINANCIALUSER) return;
 
         svTaxPanel = EditPanelFactory.create("SVT");
         if (svTaxPanel instanceof SvTaxPanel svt) {
@@ -678,7 +758,7 @@ public class HauptFenster extends JFrame {
     //###################################################################################################################################################
 
     private void doJahresergebnis() {
-        if (role != Role.FINANCIALUSER) return;
+    	if (role != Role.SUPERUSER && role != Role.FINANCIALUSER) return;
 
         panelUSt = new UStPanel(); panelUSt.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         panelZM = new ZMeldungPanel(); panelZM.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
@@ -815,6 +895,8 @@ public class HauptFenster extends JFrame {
         if (sTempRE == null) sTempRE = new String[0][HEADER_RE.length];
         sTempBE = LadeBestellung.loadBestellung(false);
         if (sTempBE == null) sTempBE = new String[0][HEADER_BE.length];
+        sTempLS = LadeLieferschein.loadLieferschein(false);
+        if (sTempLS == null) sTempLS = new String[0][HEADER_LS.length];
     	sTempPU = LadeEinkauf.loadEinkaufsRechnung(false);
         if (sTempPU == null) sTempPU = new String[0][HEADER_PU.length];
         sTempEX = LadeAusgaben.loadAusgaben(false);
@@ -845,7 +927,7 @@ public class HauptFenster extends JFrame {
         infoBE.setTxtSum(0, dOpen);
         infoBE.setTxtSum(1, dDelivered);
     }
-
+    
     private void setSumPU() {
         double dNetto = LadeEinkauf.getBdNetto().doubleValue(); double dBrutto = LadeEinkauf.getBdBrutto().doubleValue();
         double d10Proz = LadeEinkauf.getBd10Proz().doubleValue(); double d20Proz = LadeEinkauf.getBd20Proz().doubleValue();
@@ -991,6 +1073,40 @@ public class HauptFenster extends JFrame {
             }
         }
     }
+    
+    private void actionClickLS(JTable table, MouseEvent e) {
+        int row = table.rowAtPoint(e.getPoint());
+        int column = table.columnAtPoint(e.getPoint());
+        if (row == -1 || column == -1) return;
+
+        if (isLeftSingle(e)) {
+            e.consume();
+            if (table.getValueAt(row, column) == null) {
+                if (lieferscheinPanel instanceof LieferscheinPanel lsp) {
+                    lsp.setsTitel("Lieferscheine");
+                    lsp.setTxtFields(null);
+                }
+                return;
+            }
+            if (lieferscheinPanel instanceof LieferscheinPanel lsp) {
+            	lsp.setsTitel("Lieferschein (Lieferschein-Nr. = " + table.getValueAt(row, 0) + ")");
+            	lsp.setTxtFields(table.getValueAt(row, 0).toString());
+                vZelleLS = table.getValueAt(row, 0).toString();
+                vStateLS = table.getValueAt(row, 1).toString();
+                if (panelLSInfo instanceof ErzeugePanelA cp) {
+                    JButton[] btn = cp.getButtons();
+                    setDeliveryNoteButtonsByState(vStateLS, btn);
+                }
+            }
+        } else if (isLeftDouble(e)) {
+            e.consume();
+            if (table.getValueAt(row, column) != null) {
+                String nr = table.getValueAt(row, 0).toString();
+                Kunde kunde = searchKundeAll(table.getValueAt(row, 4).toString());
+                actionFile(nr, kunde);
+            }
+        }
+    }
 
     private void actionClickPU(JTable table, MouseEvent e) {
         if (!isLeftSingle(e)) return;
@@ -1076,7 +1192,7 @@ public class HauptFenster extends JFrame {
     
     private void updScreen() {
         // Tabs je nach Rolle neu befüllen
-    	sTempAN = sTempRE = sTempBE = sTempPU = sTempEX = sTempST = null;
+    	sTempAN = sTempRE = sTempBE = sTempLS = sTempPU = sTempEX = sTempST = null;
         pageOv = null; pageErg = null;
 
         loadData();
@@ -1091,13 +1207,18 @@ public class HauptFenster extends JFrame {
             	pageAN.removeAll();
 				pageRE.removeAll();
 				pageBE.removeAll();
+				pageLS.removeAll();
 				pagePU.removeAll();
 				pageEX.removeAll();
+				pageST.removeAll();
 				doAngebotPanel(0);
 				doRechnungPanel(0);
 				doBestellungPanel(0);
+				doLieferscheinPanel(0);
 				doEinkaufPanel(0);
 				doAusgabenPanel();
+				doSvsTaxPanel();
+				doJahresergebnis();
             }
             case FINANCIALUSER -> {
             	pagePU.removeAll();
@@ -1168,6 +1289,11 @@ public class HauptFenster extends JFrame {
     private void setOrderButtonsByState(String state, JButton[] btn) {
         boolean print = "erstellt".equals(state);
         btn[3].setEnabled(print);
+    }
+    
+    private void setDeliveryNoteButtonsByState(String state, JButton[] btn) {
+        boolean print = "erstellt".equals(state);
+        btn[1].setEnabled(print);
     }
 
     private Kunde searchKundeAll(String name) {
@@ -1262,6 +1388,29 @@ public class HauptFenster extends JFrame {
                     : ((column >= 5 && column <= 7) ? SwingConstants.RIGHT : SwingConstants.LEFT));
             setBackground(row % 2 < 1 ? new Color(10,10,10,10) : Color.WHITE);
             String[][] s = ctx.sTempBE;
+            if (s != null && row < s.length && s[row][1] != null) {
+                switch (s[row][1]) {
+                    case "storniert" -> setBackground(Color.PINK);
+                    case "gedruckt" -> setBackground(new Color(175,238,238));
+                    case "geliefert" -> setBackground(Color.YELLOW);
+                }
+            }
+            return label;
+        }
+    }
+    
+    static class TableLScr extends DefaultTableCellRenderer {
+        private static final long serialVersionUID = 1L;
+        private final HauptFenster ctx;
+        TableLScr(HauptFenster ctx) { this.ctx = ctx; }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            label.setHorizontalAlignment((column <= 2) ? SwingConstants.CENTER
+                    : ((column >= 5 && column <= 7) ? SwingConstants.RIGHT : SwingConstants.LEFT));
+            setBackground(row % 2 < 1 ? new Color(10,10,10,10) : Color.WHITE);
+            String[][] s = ctx.sTempLS;
             if (s != null && row < s.length && s[row][1] != null) {
                 switch (s[row][1]) {
                     case "storniert" -> setBackground(Color.PINK);

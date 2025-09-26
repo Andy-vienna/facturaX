@@ -406,7 +406,7 @@ public class RechnungPanel extends EditPanel {
     
     private void updateTable() {
     	
-    	BigDecimal anzPos = BD.ZERO;
+    	int anzPos = 0;
     	String[] sPosText = new String[13];
     	BigDecimal[] bdAnzahl = new BigDecimal[this.txtFieldsPos.length];
     	BigDecimal[] bdEinzel = new BigDecimal[this.txtFieldsPos.length];
@@ -419,7 +419,7 @@ public class RechnungPanel extends EditPanel {
 				sPosText[i] = this.txtFieldsPos[i].getText();
 				bdAnzahl[i] = parseStringToBigDecimalSafe(this.txtFieldsAnz[i].getText(), LocaleFormat.AUTO).setScale(2, RoundingMode.HALF_UP);
 				bdEinzel[i] = parseStringToBigDecimalSafe(this.txtFieldsEP[i].getText(), LocaleFormat.AUTO).setScale(2, RoundingMode.HALF_UP);
-				anzPos = anzPos.add(BD.ONE); // Anzahl der Positionen
+				anzPos = anzPos + 1; // Anzahl der Positionen
     		}
 		}
     	
@@ -582,7 +582,7 @@ public class RechnungPanel extends EditPanel {
 		this.datePicker[0].setDate(rechnung.getDatum());
 		this.txtFieldsHead[0].setText(rechnung.getRef());
 		this.txtFieldsHead[1].setText(rechnung.getlZeitr());
-		for (int i = 0; i < rechnung.getAnzPos().intValue(); i++) {
+		for (int i = 0; i < rechnung.getAnzPos(); i++) {
     		BigDecimal bdAnz = anz.get(i);
     		BigDecimal bdEP = ep.get(i);
     		BigDecimal bdGP = bdAnz.multiply(bdEP).setScale(2, RoundingMode.HALF_UP);

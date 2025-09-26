@@ -408,7 +408,7 @@ public class AngebotPanel extends EditPanel {
     
     private void updateTable() {
     	
-    	BigDecimal anzPos = BD.ZERO;
+    	int anzPos = 0;
     	String[] sPosText = new String[13];
     	BigDecimal[] bdAnzahl = new BigDecimal[this.txtFieldsPos.length];
     	BigDecimal[] bdEinzel = new BigDecimal[this.txtFieldsPos.length];
@@ -421,7 +421,7 @@ public class AngebotPanel extends EditPanel {
 				sPosText[i] = this.txtFieldsPos[i].getText();
 				bdAnzahl[i] = parseStringToBigDecimalSafe(this.txtFieldsAnz[i].getText(), LocaleFormat.AUTO).setScale(2, RoundingMode.HALF_UP);
 				bdEinzel[i] = parseStringToBigDecimalSafe(this.txtFieldsEP[i].getText(), LocaleFormat.AUTO).setScale(2, RoundingMode.HALF_UP);
-				anzPos = anzPos.add(BigDecimal.ONE); // Anzahl der Positionen
+				anzPos = anzPos + 1; // Anzahl der Positionen
     		}
 		}
     	
@@ -586,7 +586,7 @@ public class AngebotPanel extends EditPanel {
     	for (int i = 0; i < this.txtFieldsHead.length; i++) {
     		this.txtFieldsHead[i].setText(angebot.getRef());
     	}
-    	for (int i = 0; i < angebot.getAnzPos().intValue(); i++) {
+    	for (int i = 0; i < angebot.getAnzPos(); i++) {
     		BigDecimal bdAnz = anz.get(i);
     		BigDecimal bdEP = ep.get(i);
     		BigDecimal bdGP = bdAnz.multiply(bdEP).setScale(2, RoundingMode.HALF_UP);

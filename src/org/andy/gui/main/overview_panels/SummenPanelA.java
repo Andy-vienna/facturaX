@@ -41,9 +41,10 @@ public class SummenPanelA extends JPanel {
 	//###################################################################################################################################################
     
     private void buildSumPanel(String[] labels, boolean showBar) {
-				
+    	if (labels[0] == null) return; // nichts anzeigen
+    	
 		// Labels und Textfelder erstellen
-		for (int i = 0; i < lblSum.length; i++) {
+    	for (int i = 0; i < lblSum.length; i++) {
 			lblSum[i] = new JLabel(labels[i]);
 			lblSum[i].setBounds(5, 0 + (i * 25), 80, 25);
 			add(lblSum[i]);

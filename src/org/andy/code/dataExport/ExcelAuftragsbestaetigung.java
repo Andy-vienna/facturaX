@@ -93,7 +93,7 @@ public class ExcelAuftragsbestaetigung implements Identified {
 			//#######################################################################
 			// Zellen in Tabelle Enummerieren
 			//#######################################################################
-			for(int i = 0; i < angebot.getAnzPos().intValue(); i++ ) { //Positionen B, C, D, F Zeile 17-28
+			for(int i = 0; i < angebot.getAnzPos(); i++ ) { //Positionen B, C, D, F Zeile 17-28
 				int j = i + START_ROW_OFFSET;
 				abPos[i] = ws.getRow(j).getCell(COLUMN_A); //Position
 				abText[i] = ws.getRow(j).getCell(COLUMN_B); //Text
@@ -111,7 +111,7 @@ public class ExcelAuftragsbestaetigung implements Identified {
 			ExportHelper.replaceCellValue(wb, ws, "{abRef}", angebot.getIdNummer());
 			ExportHelper.replaceCellValue(wb, ws, "{abDuty}", kunde.getPronomen() + " " + kunde.getPerson());
 
-			for(int i = 0; i < angebot.getAnzPos().intValue(); i++ ) {
+			for(int i = 0; i < angebot.getAnzPos(); i++ ) {
 				abPos[i].setCellValue(String.valueOf(i + 1));
 				try {
 					String art = (String) Angebot.class.getMethod("getArt" + String.format("%02d", i + 1)).invoke(angebot);

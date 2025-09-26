@@ -105,7 +105,7 @@ public class ExcelRechnung implements Identified {
 			//#######################################################################
 			// Zellen in Tabelle Enummerieren
 			//#######################################################################
-			for(int i = 0; i < rechnung.getAnzPos().intValue(); i++ ) { //Rechnungspositionen B, C, D, F Zeile 17-28
+			for(int i = 0; i < rechnung.getAnzPos(); i++ ) { //Rechnungspositionen B, C, D, F Zeile 17-28
 				int j = i + START_ROW_OFFSET;
 				rePos[i] = ws.getRow(j).getCell(COLUMN_A); //Position
 				reText[i] = ws.getRow(j).getCell(COLUMN_B); //Text
@@ -125,7 +125,7 @@ public class ExcelRechnung implements Identified {
 			ExportHelper.replaceCellValue(wb, ws, "{reDuty}", kunde.getPronomen() + " " + kunde.getPerson());
 			ExportHelper.replaceCellValue(wb, ws, "{reRef}", rechnung.getRef());
 			
-			for(int i = 0; i < rechnung.getAnzPos().intValue(); i++ ) {
+			for(int i = 0; i < rechnung.getAnzPos(); i++ ) {
 				rePos[i].setCellValue(String.valueOf(i + 1));
 				try {
 					String art = (String) Rechnung.class.getMethod("getArt" + String.format("%02d", i + 1)).invoke(rechnung);

@@ -60,26 +60,26 @@ public class DateianzeigeDialog extends JFrame {
 	
 	private static final Font FONT_PLAIN = new Font("Tahoma", Font.PLAIN, 11);
 	private static final Font FONT_BOLD  = new Font("Tahoma", Font.BOLD, 11);
-	private static final String[] TYPES  = {"AN", "AB", "BE", "RE", "ZE", "M1", "M2", "01", "02", "03"};
+	private static final String[] TYPES  = {"AN", "AB", "BE", "RE", "ZE", "M1", "M2", "01", "02", "03", "LS"};
 
 	// Titeltexte (linke Spalte)
 	private static final String[] TITLE_TEXTS = {
 	    "Angebot:", "Auftragsbestätigung:", "Bestellung:", "Rechnung:",
 	    "Zahlungserinnerung:", "Mahnstufe 1:", "Mahnstufe 2",
-	    "zus. Datei 1:", "zus. Datei 2:", "zus. Datei 3:"
+	    "zus. Datei 1:", "zus. Datei 2:", "zus. Datei 3:", "Lieferschein"
 	};
 
 	// Labels (linke Titel, Dateiname, Dateityp-Icon)
-	private final JLabel[] lblTitle = new JLabel[10];
-	private static final JLabel[] lblFileName = new JLabel[10];
-	private static final JLabel[] lblFileTyp = new JLabel[10];
+	private final JLabel[] lblTitle = new JLabel[11];
+	private static final JLabel[] lblFileName = new JLabel[11];
+	private static final JLabel[] lblFileTyp = new JLabel[11];
 
 	// Buttons
-	private static final JButton[] btnDownload = new JButton[10];
-	private static final JButton[] btnUpload   = new JButton[10];
-	private static final JButton[] btnUpdate   = new JButton[10];
-	private static final JButton[] btnDelete   = new JButton[10];
-	private static final JButton[] btnSendMail = new JButton[10];
+	private static final JButton[] btnDownload = new JButton[11];
+	private static final JButton[] btnUpload   = new JButton[11];
+	private static final JButton[] btnUpdate   = new JButton[11];
+	private static final JButton[] btnDelete   = new JButton[11];
+	private static final JButton[] btnSendMail = new JButton[11];
 
 	private static String sNummer = null;
 	private static Kunde lKunde = null;
@@ -153,7 +153,7 @@ public class DateianzeigeDialog extends JFrame {
 		setResizable(false);
 		setTitle("Dateihandling - " + StartUp.APP_NAME + StartUp.APP_VERSION);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 785, 600);
+		setBounds(100, 100, 785, 650);
 		setLocationRelativeTo(null);
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add(contentPane, BorderLayout.CENTER);
@@ -677,6 +677,7 @@ public class DateianzeigeDialog extends JFrame {
 	        case "AN" -> { fs.setAnFileName(name); fs.setAnPdfFile(data); }
 	        case "AB" -> { fs.setAbFileName(name); fs.setAbPdfFile(data); }
 	        case "BE" -> { fs.setBeFileName(name); fs.setBePdfFile(data); }
+	        case "LS" -> { fs.setLsFileName(name); fs.setLsPdfFile(data); }
 	        case "RE" -> { fs.setReFileName(name); fs.setRePdfFile(data); }
 	        case "ZE" -> { fs.setZeFileName(name); fs.setZePdfFile(data); }
 	        case "M1" -> { fs.setM1FileName(name); fs.setM1PdfFile(data); }
@@ -693,6 +694,7 @@ public class DateianzeigeDialog extends JFrame {
 	        case "AN" -> fs.getAnFileName();
 	        case "AB" -> fs.getAbFileName();
 	        case "BE" -> fs.getBeFileName();
+	        case "LS" -> fs.getLsFileName();
 	        case "RE" -> fs.getReFileName();
 	        case "ZE" -> fs.getZeFileName();
 	        case "M1" -> fs.getM1FileName();
@@ -709,6 +711,7 @@ public class DateianzeigeDialog extends JFrame {
 	        case "AN" -> fs.getAnPdfFile();
 	        case "AB" -> fs.getAbPdfFile();
 	        case "BE" -> fs.getBePdfFile();
+	        case "LS" -> fs.getLsPdfFile();
 	        case "RE" -> fs.getRePdfFile();
 	        case "ZE" -> fs.getZePdfFile();
 	        case "M1" -> fs.getM1PdfFile();

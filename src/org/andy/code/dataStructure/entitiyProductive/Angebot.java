@@ -56,8 +56,8 @@ public class Angebot {
 	@Column(name = "Brutto", precision = 9, scale = 2, nullable = false)
 	private BigDecimal brutto;
 
-	@Column(name = "AnzPos", precision = 3, scale = 2, nullable = false)
-	private BigDecimal anzPos;
+	@Column(name = "AnzPos", nullable = false)
+	private int anzPos;
 
 	@Column(name = "Art01", nullable = false)
 	private String art01;
@@ -251,11 +251,11 @@ public class Angebot {
 		this.brutto = brutto;
 	}
 
-	public BigDecimal getAnzPos() {
+	public int getAnzPos() {
 		return anzPos;
 	}
 
-	public void setAnzPos(BigDecimal anzPos) {
+	public void setAnzPos(int anzPos) {
 		this.anzPos = anzPos;
 	}
 

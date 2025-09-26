@@ -130,7 +130,7 @@ public class RechnungsDaten {
 		start = dateInMilis(vonDate); // Lieferdatum (aus Leistungszeitraum von)
 		end = dateInMilis(bisDate); // Lieferdatum (aus Leistungszeitraum von)
 
-		int iAnz = rechnung.getAnzPos().intValue();
+		int iAnz = rechnung.getAnzPos();
 		String[] posText = ExcelRechnung.getsReTxt(); double[] posAnz = ExcelRechnung.getdAnz(); double[] posEp = ExcelRechnung.getdEp();
 		for(int x = 0; x < iAnz; x++) {
 			//new Item(new Product("Artikeltext", "Artikelbeschreibung", "C62", new BigDecimal(Steuersatz), new BigDecimal(E-Preis),  new BigDecimal(Menge))

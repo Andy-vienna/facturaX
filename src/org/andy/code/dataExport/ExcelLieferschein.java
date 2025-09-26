@@ -14,10 +14,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
-import org.andy.code.dataStructure.entitiyProductive.Bestellung;
 import org.andy.code.dataStructure.entitiyProductive.FileStore;
-import org.andy.code.dataStructure.repositoryProductive.BestellungRepository;
+import org.andy.code.dataStructure.entitiyProductive.Lieferschein;
 import org.andy.code.dataStructure.repositoryProductive.FileStoreRepository;
+import org.andy.code.dataStructure.repositoryProductive.LieferscheinRepository;
 import org.andy.code.main.Einstellungen;
 import org.andy.code.misc.ExportHelper;
 import org.andy.code.misc.Identified;
@@ -27,39 +27,34 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class ExcelBestellung implements Identified {
+public class ExcelLieferschein implements Identified {
 
-	public static final String CLASS_ID = ExcelBestellung.class.getSimpleName();
-	private static final Logger logger = LogManager.getLogger(ExcelBestellung.class);
+	public static final String CLASS_ID = ExcelLieferschein.class.getSimpleName();
+	private static final Logger logger = LogManager.getLogger(ExcelLieferschein.class);
 
 	private static final int START_ROW_OFFSET = 16;
 	private static final int COLUMN_A = 0;
 	private static final int COLUMN_B = 1;
-	private static final int COLUMN_C = 2;
-	private static final int COLUMN_D = 3;
 	private static final int COLUMN_F = 5;
 	
-	private static String[] sBeTxt = new String[12];
+	private static String[] sLsTxt = new String[12];
 	private static double[] dAnz = new double[12];
-	private static double[] dEp = new double[12];
 
 	//###################################################################################################################################################
 	// Rechnung erzeugen und als pdf exportieren
 	//###################################################################################################################################################
 
-	public static void beExport(String sNr) throws Exception {
-		String sExcelIn = Einstellungen.getTplBestellung();
-		String sExcelOut = Einstellungen.getWorkPath() + "Bestellung_" + sNr + ".xlsx";
-		String sPdfOut = Einstellungen.getWorkPath() + "Bestellung_" + sNr + ".pdf";
+	public static void lsExport(String sNr) throws Exception {
+		String sExcelIn = Einstellungen.getTplLieferschein();
+		String sExcelOut = Einstellungen.getWorkPath() + "Lieferschein_" + sNr + ".xlsx";
+		String sPdfOut = Einstellungen.getWorkPath() + "Lieferschein_" + sNr + ".pdf";
 
-		final Cell bePos[] = new Cell[12];
-		final Cell beText[] = new Cell[12];
-		final Cell beAnz[] = new Cell[12];
-		final Cell beEPreis[] = new Cell[12];
-		final Cell beGPreis[] = new Cell[12];
+		final Cell lsPos[] = new Cell[12];
+		final Cell lsText[] = new Cell[12];
+		final Cell lsAnz[] = new Cell[12];
 
-		Bestellung bestellung = ExportHelper.loadBestellung(sNr);
-		String adressat = ExportHelper.lieferantAnschrift(bestellung.getIdLieferant());
+		Lieferschein lieferschein = ExportHelper.loadLieferschein(sNr);
+		String adressat = ExportHelper.kundeAnschrift(lieferschein.getIdKunde());
 		
 		String[][] txtBaustein = ExportHelper.findText(CLASS_ID);
 
@@ -70,7 +65,7 @@ public class ExcelBestellung implements Identified {
 				OutputStream fileOut = new FileOutputStream(sExcelOut)) {
 
 			XSSFWorkbook wb = new XSSFWorkbook(inputStream);
-			Sheet ws = wb.getSheet("Bestellung");
+			Sheet ws = wb.getSheet("Lieferschein");
 
 			//#######################################################################
 			// Owner-Informationen in die Excel-Datei schreiben
@@ -80,46 +75,36 @@ public class ExcelBestellung implements Identified {
 			//#######################################################################
 			// Zellen in Tabelle Enummerieren
 			//#######################################################################
-			for(int i = 0; i < bestellung.getAnzPos(); i++ ) { //Bestellpositionen B, C, D, F Zeile 17-28
+			for(int i = 0; i < lieferschein.getAnzPos(); i++ ) { //Positionen B, C, D, F Zeile 17-28
 				int j = i + START_ROW_OFFSET;
-				bePos[i] = ws.getRow(j).getCell(COLUMN_A); //Position
-				beText[i] = ws.getRow(j).getCell(COLUMN_B); //Text
-				beAnz[i] = ws.getRow(j).getCell(COLUMN_C); //Menge
-				beEPreis[i] = ws.getRow(j).getCell(COLUMN_D); //E-Preis
-				beGPreis[i] = ws.getRow(j).getCell(COLUMN_F); //G-Preis
+				lsPos[i] = ws.getRow(j).getCell(COLUMN_A); //Position
+				lsText[i] = ws.getRow(j).getCell(COLUMN_B); //Text
+				lsAnz[i] = ws.getRow(j).getCell(COLUMN_F); //Menge
 			}
 
 			//#######################################################################
 			// Zellwerte beschreiben
 			//#######################################################################
-			ExportHelper.replaceCellValue(wb, ws, "{beAdresse}", adressat);
-			ExportHelper.replaceCellValue(wb, ws, "{beDatum}", bestellung.getDatum().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-			ExportHelper.replaceCellValue(wb, ws, "{beNummer}", bestellung.getIdNummer());
-			ExportHelper.replaceCellValue(wb, ws, "{beRef}", bestellung.getRef());
+			ExportHelper.replaceCellValue(wb, ws, "{lsAdresse}", adressat);
+			ExportHelper.replaceCellValue(wb, ws, "{lsDatum}", lieferschein.getDatum().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+			ExportHelper.replaceCellValue(wb, ws, "{lsNummer}", lieferschein.getIdNummer());
 
-			for(int i = 0; i < bestellung.getAnzPos(); i++ ) {
-				bePos[i].setCellValue(String.valueOf(i + 1));
+			for(int i = 0; i < lieferschein.getAnzPos(); i++ ) {
+				lsPos[i].setCellValue(String.valueOf(i + 1));
 				try {
-					String art = (String) Bestellung.class.getMethod("getArt" + String.format("%02d", i + 1)).invoke(bestellung);
-		            BigDecimal menge = (BigDecimal) Bestellung.class.getMethod("getMenge" + String.format("%02d", i + 1)).invoke(bestellung);
-		            BigDecimal ep = (BigDecimal) Bestellung.class.getMethod("getePreis" + String.format("%02d", i + 1)).invoke(bestellung);
-		            sBeTxt[i] = art; dAnz[i] = menge.doubleValue(); dEp[i] = ep.doubleValue();
-		            beText[i].setCellValue(art);
-					beAnz[i].setCellValue(menge.doubleValue());
-					beEPreis[i].setCellValue(ep.doubleValue());
-					beGPreis[i].setCellValue(menge.multiply(ep).doubleValue());
+					String art = (String) Lieferschein.class.getMethod("getArt" + String.format("%02d", i + 1)).invoke(lieferschein);
+		            BigDecimal menge = (BigDecimal) Lieferschein.class.getMethod("getMenge" + String.format("%02d", i + 1)).invoke(lieferschein);
+		            sLsTxt[i] = art; dAnz[i] = menge.doubleValue();
+		            lsText[i].setCellValue(art);
+					lsAnz[i].setCellValue(menge.doubleValue());
 				} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 					System.out.println(e.getMessage());
 				}
 			}
-			ExportHelper.replaceCellValue(wb, ws, "{beSumme}", bestellung.getNetto().doubleValue());
 			
 			for (int x = 0; x < txtBaustein.length; x++) {
 			    String key = txtBaustein[x][0]; String val = txtBaustein[x][1];
 
-			    if (val != null) {
-			        val = val.replace("{OwnerName}", ExportHelper.getKontaktName());
-			    }
 			    txtBaustein[x][1] = val;
 			    
 			    ExportHelper.replaceCellValue(wb, ws, key, val); // Texte in Zellen schreiben
@@ -155,8 +140,8 @@ public class ExcelBestellung implements Identified {
 		FileStoreRepository fileStoreRepository = new FileStoreRepository();
 		FileStore fileStore = new FileStore();
 		
-		fileStore.setIdNummer(bestellung.getIdNummer()); // Bestellnummer als Index für fileStore schreiben
-		fileStore.setJahr(bestellung.getJahr()); // Jahr in fileStore schreiben
+		fileStore.setIdNummer(lieferschein.getIdNummer()); // Bestellnummer als Index für fileStore schreiben
+		fileStore.setJahr(lieferschein.getJahr()); // Jahr in fileStore schreiben
 		
 		//#######################################################################
 		// Datei in DB speichern
@@ -165,10 +150,10 @@ public class ExcelBestellung implements Identified {
 		File PdfFn = new File(PdfNamePath);
 		
 		String PdfName = PdfFn.getName();
-		fileStore.setBeFileName(PdfName);
+		fileStore.setLsFileName(PdfName);
 		
 		Path PdfPath = Paths.get(PdfNamePath);
-		fileStore.setBePdfFile(Files.readAllBytes(PdfPath)); // ByteArray für Dateiinhalt
+		fileStore.setLsPdfFile(Files.readAllBytes(PdfPath)); // ByteArray für Dateiinhalt
 		
 		fileStoreRepository.save(fileStore); // Datei(en) in DB speichern
 		
@@ -176,9 +161,9 @@ public class ExcelBestellung implements Identified {
 		// Status der Bestellung ändern
 		//#######################################################################
 		
-		bestellung.setState(bestellung.getState() + 10); // Zustand gedruckt setzen
-		BestellungRepository bestellungRepository = new BestellungRepository();
-		bestellungRepository.update(bestellung);
+		lieferschein.setState(lieferschein.getState() + 10); // Zustand gedruckt setzen
+		LieferscheinRepository lieferscheinRepository = new LieferscheinRepository();
+		lieferscheinRepository.update(lieferschein);
 
 		//#######################################################################
 		// Ursprungs-Excel und -pdf löschen
@@ -193,7 +178,7 @@ public class ExcelBestellung implements Identified {
 		if(xlFile.delete() && pdFile.delete()) {
 
 		}else {
-			logger.error("anExport(String sNr) - xlsx- und pdf-Datei konnte nicht gelöscht werden");
+			logger.error("lsExport(String sNr) - xlsx- und pdf-Datei konnte nicht gelöscht werden");
 		}
 	}
 	
@@ -202,15 +187,11 @@ public class ExcelBestellung implements Identified {
 	//###################################################################################################################################################
 
 	public static String[] getsReTxt() {
-		return sBeTxt;
+		return sLsTxt;
 	}
 
 	public static double[] getdAnz() {
 		return dAnz;
-	}
-
-	public static double[] getdEp() {
-		return dEp;
 	}
 
 }
