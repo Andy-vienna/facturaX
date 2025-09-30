@@ -16,7 +16,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import org.andy.code.main.Einstellungen;
-import org.andy.toolbox.misc.SelectFile;
+import org.andy.code.misc.FileSelect;
 
 public class PfadPanel extends JPanel {
 	
@@ -114,9 +114,9 @@ public class PfadPanel extends JPanel {
 	                String defaultPath = currentPath.isEmpty() ? "C:\\" : getters[index].apply(null);
 
 	                if (index < txtFields.length -1) {
-	                	chosenPath = SelectFile.chooseFile(defaultPath);
+	                	chosenPath = FileSelect.chooseFile(defaultPath);
 	                } else {
-	                	chosenPath = SelectFile.choosePath(defaultPath);
+	                	chosenPath = FileSelect.choosePath(defaultPath);
 	                }
 	                if (chosenPath != null) {
 	                    setters[index].accept(chosenPath);

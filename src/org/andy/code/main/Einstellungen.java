@@ -1,7 +1,8 @@
 package org.andy.code.main;
 
-import static org.andy.toolbox.misc.Tools.loadSettingsEx;
-import static org.andy.toolbox.misc.Tools.saveSettingsApp;
+import static org.andy.code.misc.FileTools.loadSettingsEx;
+import static org.andy.code.misc.FileTools.saveSettingsApp;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;

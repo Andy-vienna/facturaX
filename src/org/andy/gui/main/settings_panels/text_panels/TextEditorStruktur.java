@@ -1,6 +1,6 @@
 package org.andy.gui.main.settings_panels.text_panels;
 
-import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.gui.misc.CreateButton.createButton;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -17,6 +17,8 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+
+import org.andy.gui.iconHandler.ButtonIcon;
 import org.andy.gui.misc.RoundedBorder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -103,7 +105,7 @@ public class TextEditorStruktur extends TextPanel {
 			gbc.gridx = 3; // Wechsel zur nächsten Spalte
 			JButton btnUpdateText = null;
 			try {
-				btnUpdateText = createButton("speichern", "menu/save.png", null);
+				btnUpdateText = createButton("speichern", ButtonIcon.SAVE.icon(), null);
 			} catch (RuntimeException e1) {
 				logger.error("error creating button - " + e1);
 			}

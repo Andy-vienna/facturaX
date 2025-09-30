@@ -1,9 +1,9 @@
 package org.andy.gui.main.settings_panels;
 
-import static org.andy.toolbox.crypto.Password.checkComplexity;
-import static org.andy.toolbox.crypto.Password.hashPwd;
-import static org.andy.toolbox.crypto.Password.verifyPwd;
-import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.code.misc.Password.checkComplexity;
+import static org.andy.code.misc.Password.hashPwd;
+import static org.andy.code.misc.Password.verifyPwd;
+import static org.andy.gui.misc.CreateButton.createButton;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -18,6 +18,7 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -28,7 +29,9 @@ import javax.swing.border.TitledBorder;
 
 import org.andy.code.dataStructure.entitiyMaster.User;
 import org.andy.code.dataStructure.repositoryMaster.UserRepository;
+import org.andy.gui.iconHandler.ButtonIcon;
 import org.andy.gui.main.HauptFenster;
+import org.andy.gui.main.table_panels.TabMask;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -46,6 +49,7 @@ public class BenutzerPanel extends JPanel {
     private JTextField userExist = new JTextField();
     private JPasswordField[] passFields = new JPasswordField[3];
     private JComboBox<String> cmbRoles;
+    private JCheckBox[] chkConfig = new JCheckBox[9];
     
     private UserRepository userRepository = new UserRepository();
 	private List<User> userListe = new ArrayList<>();
@@ -81,6 +85,8 @@ public class BenutzerPanel extends JPanel {
     	
     	String[] roles = {"", "user", "superuser", "financialuser", "admin"};
     	String[] label = {"vorh. User", "Username", "Kennwort alt", "Kennwort neu", "Kennw. wiederh.", "Benutzerrolle"};
+    	String[] config = { "Angebot", "Rechnung", "Bestellung", "Lieferschein", "Einkauf", "Betriebsausgaben", "SV und Steuer",
+    			"Jahresergenis", "Einstellungen" };
     	
     	JLabel[] lblFields = new JLabel[label.length];
     	for (int i= 0; i < label.length; i++) {
@@ -119,12 +125,20 @@ public class BenutzerPanel extends JPanel {
 
 		cmbRoles = new JComboBox<>(roles);
 		cmbRoles.setBounds(x, y, 220, 25);
+		cmbRoles.addActionListener(cmbRolesListener);
 		add(cmbRoles);
+		x = 370; y = 20;
+		
+		for (int i = 0; i < chkConfig.length; i++) {
+			chkConfig[i] = new JCheckBox(config[i]);
+			chkConfig[i].setBounds(x, y + (i * 25), 120, 25);
+			add(chkConfig[i]);
+		}
 		y = 170;
 
 		try {
 			btnShowPwd = createButton("...", null, null);
-			btnPwdOK = createButton(null, "ok.png", null);
+			btnPwdOK = createButton(null, ButtonIcon.OK.icon(), null);
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}
@@ -133,11 +147,11 @@ public class BenutzerPanel extends JPanel {
 		btnShowPwd.setEnabled(true);
 		btnPwdOK.setEnabled(true);
 		btnShowPwd.setBounds(320, 70, 25, 75);
-		btnPwdOK.setBounds(360, 120, btnWidth, btnHeight);
+		btnPwdOK.setBounds(580, 195, btnWidth, btnHeight);
 		add(btnShowPwd);
 		add(btnPwdOK);
 		
-		setPreferredSize(new Dimension(500, y + 20));
+		setPreferredSize(new Dimension(720, y + 90));
 	}
     
 	//###################################################################################################################################################
@@ -158,6 +172,39 @@ public class BenutzerPanel extends JPanel {
 		passFields[1].setText("");
 		passFields[2].setText("");
 		cmbRoles.setSelectedIndex(0);
+		for (int i = 0; i < chkConfig.length; i++) {
+			chkConfig[i].setSelected(false);
+		}
+    }
+    
+    private int calcValueConfig() {
+    	int val = 0;
+    	for (int x = 0; x < chkConfig.length; x++) {
+    		if (chkConfig[x].isSelected()) {
+    			val = val + (1 << x);
+    		}
+    	}
+    	return val;
+    }
+    
+    private void isSelectable(String role) {
+    	boolean[] cbRole = null;
+    	boolean[] selUser = {true,true,true,true,false,false,false,false,false};
+    	boolean[] selSuser = {true,true,true,true,true,true,true,true,false};
+    	boolean[] selFuser = {false,false,false,false,true,true,true,true,false};
+    	boolean[] selAdmin = {false,false,false,false,false,false,false,false,true};
+    	boolean[] selDefault = {false,false,false,false,false,false,false,false,false};
+    	switch(role) {
+    	case "user" -> cbRole = selUser;
+    	case "superuser" -> cbRole = selSuser;
+    	case "financialuser" -> cbRole = selFuser;
+    	case "admin" -> cbRole = selAdmin;
+    	default -> cbRole = selDefault;
+    	}
+    	for (int x = 0; x < chkConfig.length; x++) {
+    		chkConfig[x].setEnabled(cbRole[x]);
+    		if (!chkConfig[x].isEnabled()) chkConfig[x].setSelected(false);
+    	}
     }
     
 	//###################################################################################################################################################
@@ -188,8 +235,33 @@ public class BenutzerPanel extends JPanel {
                 }
                 userExist.setEnabled(false);
                 passFields[0].setEnabled(true);
+                
+                for (int x = 0; x < chkConfig.length; x++) {
+        			chkConfig[x].setSelected(false);
+        			chkConfig[x].setEnabled(true);
+        		}
+                if (TabMask.visible(user.getTabConfig(), TabMask.Tab.OFFER)) chkConfig[0].setSelected(true);
+                if (TabMask.visible(user.getTabConfig(), TabMask.Tab.INVOICE)) chkConfig[1].setSelected(true);
+                if (TabMask.visible(user.getTabConfig(), TabMask.Tab.ORDER)) chkConfig[2].setSelected(true);
+                if (TabMask.visible(user.getTabConfig(), TabMask.Tab.DELIVERY)) chkConfig[3].setSelected(true);
+                if (TabMask.visible(user.getTabConfig(), TabMask.Tab.PURCHASE)) chkConfig[4].setSelected(true);
+                if (TabMask.visible(user.getTabConfig(), TabMask.Tab.EXPENSES)) chkConfig[5].setSelected(true);
+                if (TabMask.visible(user.getTabConfig(), TabMask.Tab.TAX)) chkConfig[6].setSelected(true);
+                if (TabMask.visible(user.getTabConfig(), TabMask.Tab.RESULT)) chkConfig[7].setSelected(true);
+                if (TabMask.visible(user.getTabConfig(), TabMask.Tab.SETTINGS)) chkConfig[8].setSelected(true);
             }
+            String tmp = cmbRoles.getSelectedItem().toString();
+            isSelectable(tmp);
         }
+    };
+    
+    private final ActionListener cmbRolesListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String tmp = cmbRoles.getSelectedItem().toString();
+            isSelectable(tmp);
+		}
+    	
     };
     
     private final KeyListener passListener = new KeyListener() {
@@ -240,6 +312,7 @@ public class BenutzerPanel extends JPanel {
 
 			boolean bCheckComplexity = false, bCheckUser = false;
 
+			int value = calcValueConfig();
 			bCheckComplexity = checkComplexity(passFields[1].getPassword());
 			
 			for(int x = 0; x < userListe.size(); x++) {
@@ -271,6 +344,7 @@ public class BenutzerPanel extends JPanel {
 					newUser.setId(userExist.getText().trim());
 					newUser.setHash(newPass);
 					newUser.setRoles(userRole);
+					newUser.setTabConfig(value);
 					userRepository.insert(newUser);
 					
 					Arrays.fill(passwordChars, '\0');
@@ -284,6 +358,7 @@ public class BenutzerPanel extends JPanel {
 			if(bCheckUser) { //bekannter User
 				if (passFields[0].getPassword().length == 0 && passFields[1].getPassword().length == 0 && passFields[2].getPassword().length == 0) {
 					storedUser.setRoles(cmbRoles.getSelectedItem().toString());
+					storedUser.setTabConfig(value);
 					userRepository.update(storedUser);
 					rebuild(100, 20);
 					return;

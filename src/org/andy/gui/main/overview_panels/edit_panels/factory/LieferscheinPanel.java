@@ -1,6 +1,6 @@
 package org.andy.gui.main.overview_panels.edit_panels.factory;
 
-import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.gui.misc.CreateButton.createButton;
 import static org.andy.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
 
 import java.awt.Color;
@@ -27,6 +27,7 @@ import org.andy.code.dataStructure.repositoryProductive.LieferscheinRepository;
 import org.andy.code.main.StartUp;
 import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
 import org.andy.code.misc.CommaHelper;
+import org.andy.gui.iconHandler.ButtonIcon;
 import org.andy.gui.main.HauptFenster;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.gui.misc.RoundedBorder;
@@ -185,8 +186,8 @@ public class LieferscheinPanel extends EditPanel {
 	    
 	    // Buttons
 		try {
-			btnFields[0] = createButton("<html>update</html>", "save.png", null);
-			btnFields[1] = createButton("<html>Status<br>setzen</html>", "save.png", null);
+			btnFields[0] = createButton("<html>update</html>", ButtonIcon.SAVE.icon(), null);
+			btnFields[1] = createButton("<html>Status<br>setzen</html>", ButtonIcon.SAVE.icon(), null);
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}
@@ -263,8 +264,6 @@ public class LieferscheinPanel extends EditPanel {
 		}
 		lblState.setVisible(false);
 		cmbState.setVisible(false);
-		btnFields[0].setEnabled(true);
-		btnFields[1].setVisible(false);
     }
     
 	//###################################################################################################################################################
@@ -392,11 +391,27 @@ public class LieferscheinPanel extends EditPanel {
     	switch(lieferschein.getState()) {
     	case 1:
     		txtFieldsFocusable(true);
+    		btnFields[0].setEnabled(true);
+    		btnFields[1].setVisible(false);
     		break;
     	case 11:
     		lblState.setVisible(true);
     		cmbState.setVisible(true);
+    		btnFields[0].setEnabled(false);
     		btnFields[1].setVisible(true);
+    		break;
+    	case 51:
+    		lblState.setVisible(false);
+    		cmbState.setVisible(false);
+    		btnFields[0].setEnabled(false);
+    		btnFields[1].setVisible(false);
+    		break;
+    	default:
+    		lblState.setVisible(false);
+    		cmbState.setVisible(false);
+    		btnFields[0].setEnabled(false);
+    		btnFields[1].setVisible(false);
+    		break;
     	}
     }
 }

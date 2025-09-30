@@ -1,6 +1,6 @@
 package org.andy.code.dataExport;
 
-import static org.andy.toolbox.misc.Tools.isLocked;
+import static org.andy.code.misc.FileTools.isLocked;
 
 import java.io.File;
 import java.io.FileInputStream;

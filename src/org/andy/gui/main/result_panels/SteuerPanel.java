@@ -1,12 +1,13 @@
 package org.andy.gui.main.result_panels;
 
-import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.gui.misc.CreateButton.createButton;
 
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 
 import org.andy.code.dataExport.ExcelP109a;
 import org.andy.code.main.Einstellungen;
+import org.andy.gui.iconHandler.ButtonIcon;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -130,7 +131,7 @@ public class SteuerPanel extends JPanel {
             lblGwbStufen[i].setBounds(left3, iTop + (i + 1) * iHeight, iWidth, iHeight);
             add(lblGwbStufen[i]);
         }
-        lblGwbTotal = new JLabel("Summe GWB", new ImageIcon(SteuerPanel.class.getResource("/icons/linkspfeil.png")), JLabel.LEFT);
+        lblGwbTotal = new JLabel("Summe GWB", new ImageIcon(SteuerPanel.class.getResource("/icons/panels/linkspfeil.png")), JLabel.LEFT);
         lblGwbTotal.setBounds(left3, iTop + 8 * iHeight, iWidth, iHeight);
         lblGwbTotal.setFont(new Font("Tahoma", Font.BOLD, 11));
         lblGwbTotal.setForeground(Color.BLUE);
@@ -148,7 +149,7 @@ public class SteuerPanel extends JPanel {
         lblE1Hinweis.setFont(new Font("Tahoma", Font.BOLD, 11));
         add(lblE1Hinweis);
 
-        lblE1VorSt = new JLabel("Gewinn vor Steuer", new ImageIcon(SteuerPanel.class.getResource("/icons/rechtspfeil.png")), JLabel.LEFT);
+        lblE1VorSt = new JLabel("Gewinn vor Steuer", new ImageIcon(SteuerPanel.class.getResource("/icons/panels/rechtspfeil.png")), JLabel.LEFT);
         lblE1VorSt.setBounds(left5, iTop + 0 * iHeight, iWidth, iHeight);
         lblE1VorSt.setFont(new Font("Tahoma", Font.BOLD, 11));
         add(lblE1VorSt);
@@ -175,7 +176,8 @@ public class SteuerPanel extends JPanel {
             add(lblE1Stufen[i]);
         }
 
-        lblE1Summe = new JLabel("vorauss. Einkommensteuer für das Jahr " + Einstellungen.getStrAktGJ(), new ImageIcon(SteuerPanel.class.getResource("/icons/stern.png")), JLabel.LEFT);
+        lblE1Summe = new JLabel("vorauss. Einkommensteuer für das Jahr " + Einstellungen.getStrAktGJ(),
+        		new ImageIcon(SteuerPanel.class.getResource("/icons/panels/stern.png")), JLabel.LEFT);
         lblE1Summe.setBounds(left5, 290, iWidth, iHeight);
         lblE1Summe.setFont(new Font("Tahoma", Font.BOLD, 11));
         lblE1Summe.setForeground(Color.BLUE);
@@ -208,7 +210,7 @@ public class SteuerPanel extends JPanel {
 
         // Export-Button
         try {
-            btnExportP109a = createButton("<html>Export<br>§109a</html>", "export.png", null);
+            btnExportP109a = createButton("<html>Export<br>§109a</html>", ButtonIcon.EXPORT.icon(), null);
         } catch (RuntimeException e1) {
             // logger.error("error creating button - " + e1);
             btnExportP109a = new JButton("Export §109a");

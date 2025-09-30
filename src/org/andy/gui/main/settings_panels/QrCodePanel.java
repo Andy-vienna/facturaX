@@ -1,6 +1,6 @@
 package org.andy.gui.main.settings_panels;
 
-import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.gui.misc.CreateButton.createButton;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -17,8 +17,9 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import org.andy.code.main.Einstellungen;
+import org.andy.code.misc.FileTools;
+import org.andy.gui.iconHandler.ButtonIcon;
 import org.andy.gui.main.HauptFenster;
-import org.andy.toolbox.misc.Tools;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -112,8 +113,8 @@ public class QrCodePanel extends JPanel {
 		textQRanzeige.setBounds(110, 295, 140, 25);
 
 		try {
-			btnQREdit = createButton(null, "edit.png", null);
-			btnQROK = createButton(null, "ok.png", null);
+			btnQREdit = createButton(null, ButtonIcon.EDIT.icon(), null);
+			btnQROK = createButton(null, ButtonIcon.OK.icon(), null);
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}
@@ -198,7 +199,7 @@ public class QrCodePanel extends JPanel {
 				Einstellungen.setPrpAppSettings("qrschema", Einstellungen.getStrQRschema());
 
 				try {
-					Tools.saveSettingsApp(Einstellungen.getPrpAppSettings());
+					FileTools.saveSettingsApp(Einstellungen.getPrpAppSettings());
 				} catch (IOException e1) {
 					logger.error("JFsettings() - " + e1);
 				}

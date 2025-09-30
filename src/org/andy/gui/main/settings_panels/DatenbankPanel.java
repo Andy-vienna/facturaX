@@ -1,7 +1,7 @@
 package org.andy.gui.main.settings_panels;
 
-import static org.andy.toolbox.misc.CreateObject.createButton;
-import static org.andy.toolbox.misc.Tools.saveSettingsDB;
+import static org.andy.code.misc.FileTools.saveSettingsDB;
+import static org.andy.gui.misc.CreateButton.createButton;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -20,6 +20,7 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import org.andy.code.main.Einstellungen;
+import org.andy.gui.iconHandler.ButtonIcon;
 import org.andy.gui.main.HauptFenster;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -80,8 +81,8 @@ public class DatenbankPanel extends JPanel {
 		chkServerCert.setBounds(190, 145, 155, 25);
 
 		try {
-			btnDBEdit = createButton(null, "edit.png", null);
-			btnDBOK = createButton(null, "ok.png", null);
+			btnDBEdit = createButton(null, ButtonIcon.EDIT.icon(), null);
+			btnDBOK = createButton(null, ButtonIcon.OK.icon(), null);
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}

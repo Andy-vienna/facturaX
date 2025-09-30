@@ -1,6 +1,6 @@
 package org.andy.code.eRechnung;
 
-import static org.andy.toolbox.misc.SelectFile.chooseFile;
+import static org.andy.code.misc.FileSelect.chooseFile;
 
 import java.io.IOException;
 import java.nio.file.Files;

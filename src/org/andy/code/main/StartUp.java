@@ -1,6 +1,6 @@
 package org.andy.code.main;
 
-import static org.andy.toolbox.crypto.License.getLicense;
+import static org.andy.code.misc.License.getLicense;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -119,7 +119,7 @@ public class StartUp {
             // hier erst Fenster erzeugen
             new AnmeldeFenster(new UserRepository(), new AnmeldeFenster.AuthCallback() {
             	@Override
-                public void onSuccess(User u) { HauptFenster.loadGUI(u.getId(), u.getRoles()); }
+                public void onSuccess(User u) { HauptFenster.loadGUI(u.getId(), u.getRoles(), u.getTabConfig()); }
                 public void onCancel() { System.exit(0); }
             }).show();
         });

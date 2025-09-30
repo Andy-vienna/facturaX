@@ -1,6 +1,6 @@
 package org.andy.gui.main.overview_panels.edit_panels.factory;
 
-import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.gui.misc.CreateButton.createButton;
 import static org.andy.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
 
 import java.awt.Color;
@@ -35,6 +35,7 @@ import org.andy.code.main.StartUp;
 import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
 import org.andy.code.misc.BD;
 import org.andy.code.misc.CommaHelper;
+import org.andy.gui.iconHandler.ButtonIcon;
 import org.andy.gui.main.HauptFenster;
 import org.andy.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.gui.main.overview_panels.edit_panels.LeistungsbeschreibungEditor;
@@ -233,11 +234,11 @@ public class AngebotPanel extends EditPanel {
 	    
 	    // Buttons
 		try {
-			btnFields[0] = createButton("<html>neu<br>berechnen</html>", "calc.png", null);
-			btnFields[1] = createButton("<html>update</html>", "save.png", null);
-			btnFields[2] = createButton("<html>Status<br>setzen</html>", "save.png", null);
-			btnFields[3] = createButton("<html>Revision<br>anlegen</html>", "revision.png", null);
-			btnFields[4] = createButton("<html>Editor</html>", "edit.png", null);
+			btnFields[0] = createButton("<html>neu<br>berechnen</html>", ButtonIcon.CALC.icon(), null);
+			btnFields[1] = createButton("<html>update</html>", ButtonIcon.SAVE.icon(), null);
+			btnFields[2] = createButton("<html>Status<br>setzen</html>", ButtonIcon.SAVE.icon(), null);
+			btnFields[3] = createButton("<html>Revision<br>anlegen</html>", ButtonIcon.REV.icon(), null);
+			btnFields[4] = createButton("<html>Editor</html>", ButtonIcon.EDIT.icon(), null);
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}

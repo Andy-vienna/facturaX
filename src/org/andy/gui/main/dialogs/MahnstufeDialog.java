@@ -1,6 +1,6 @@
 package org.andy.gui.main.dialogs;
 
-import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.gui.misc.CreateButton.createButton;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -19,8 +19,9 @@ import org.apache.logging.log4j.Logger;
 import org.andy.code.dataExport.ExcelMahnstufe1;
 import org.andy.code.dataExport.ExcelMahnstufe2;
 import org.andy.code.dataExport.ExcelZahlungserinnerung;
+import org.andy.gui.iconHandler.ButtonIcon;
+import org.andy.gui.iconHandler.FrameIcon;
 import org.andy.gui.main.HauptFenster;
-import org.andy.toolbox.misc.SetFrameIcon;
 
 public final class MahnstufeDialog extends JDialog {
 
@@ -52,7 +53,7 @@ public final class MahnstufeDialog extends JDialog {
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setResizable(false);
-        setIconSafe("rufzeichen.png");
+        setIconImage(FrameIcon.RUFZEICHEN.image());
 
         getContentPane().setLayout(new BorderLayout(12, 12));
         JPanel center = buildCenter();
@@ -116,7 +117,7 @@ public final class MahnstufeDialog extends JDialog {
 
         JButton printBtn;
         try {
-            printBtn = createButton("<html>Mahnstufe drucken</html>", "print.png", null);
+            printBtn = createButton("<html>Mahnstufe drucken</html>", ButtonIcon.PRINT.icon(), null);
         } catch (RuntimeException ex) {
             log.warn("Button/Icon konnte nicht erstellt werden, fallback ohne Icon.", ex);
             printBtn = new JButton("Mahnstufe drucken");
@@ -170,14 +171,6 @@ public final class MahnstufeDialog extends JDialog {
         root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
             .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "esc");
         root.getActionMap().put("esc", close);
-    }
-
-    private void setIconSafe(String resource) {
-        try {
-            setIconImage(SetFrameIcon.getFrameIcon(resource));
-        } catch (IOException e) {
-            log.debug("Frame-Icon nicht ladbar: {}", resource, e);
-        }
     }
 
     private void showError(String msg) {

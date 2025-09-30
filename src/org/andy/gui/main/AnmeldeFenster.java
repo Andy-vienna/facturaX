@@ -1,6 +1,6 @@
 package org.andy.gui.main;
 
-import static org.andy.toolbox.crypto.Password.verifyPwd;
+import static org.andy.code.misc.Password.verifyPwd;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -157,7 +157,7 @@ public final class AnmeldeFenster {
                     }
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(frame,
-                            "Fehler bei der Anmeldung.",
+                            "Fehler beim Start der Anwendung.",
                             "Anmeldung",
                             JOptionPane.ERROR_MESSAGE);
                     System.out.println(ex);

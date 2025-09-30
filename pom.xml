@@ -60,6 +60,7 @@
 						<configuration>
 							<finalName>fX-${project.version}</finalName>
 							<createDependencyReducedPom>false</createDependencyReducedPom>
+							<minimizeJar>false</minimizeJar>
 							<filters>
 								<filter>
 									<artifact>*:*</artifact>
@@ -68,6 +69,10 @@
 										<exclude>META-INF/*.SF</exclude>
 										<exclude>META-INF/*.DSA</exclude>
 										<exclude>META-INF/*.RSA</exclude>
+										<exclude>META-INF/INDEX.LIST</exclude>
+										<exclude>META-INF/LICENSE*</exclude>
+										<exclude>META-INF/NOTICE*</exclude>
+										<exclude>**/*.kotlin_metadata</exclude>
 									</excludes>
 								</filter>
 							</filters>
@@ -154,6 +159,17 @@
 			<version>13.2.0.jre11</version>
 			<scope>compile</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>com.kosprov.jargon2</groupId>
+			<artifactId>jargon2-api</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.kosprov.jargon2</groupId>
+			<artifactId>jargon2-native-ri-backend</artifactId>
+			<version>1.1.1</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.openjfx</groupId>
@@ -234,12 +250,6 @@
 			<artifactId>openpdf</artifactId>
 			<version>3.0.0</version>
 		</dependency>
-
-		<dependency>
-			<groupId>org.andy</groupId>
-			<artifactId>toolbox</artifactId>
-			<version>1.2.7</version>
-		</dependency>
+		
 	</dependencies>
-
 </project>

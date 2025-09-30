@@ -1,8 +1,7 @@
 package org.andy.code.eRechnung;
 
 import static org.andy.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
-import static org.andy.toolbox.misc.Tools.cutBack;
-import static org.andy.toolbox.misc.Tools.cutFront;
+import static org.andy.code.misc.TextFormatter.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;

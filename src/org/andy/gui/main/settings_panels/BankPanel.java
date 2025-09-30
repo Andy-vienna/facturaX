@@ -1,6 +1,6 @@
 package org.andy.gui.main.settings_panels;
 
-import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.gui.misc.CreateButton.createButton;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -23,6 +23,7 @@ import javax.swing.border.TitledBorder;
 
 import org.andy.code.dataStructure.entitiyMaster.Bank;
 import org.andy.code.dataStructure.repositoryMaster.BankRepository;
+import org.andy.gui.iconHandler.ButtonIcon;
 import org.andy.gui.main.HauptFenster;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -99,9 +100,9 @@ public class BankPanel extends JPanel {
         x = 10; y = y + ((txtFields.length - 1) * 25);
 
         try {
-            btnFields[0] = createButton("<html>Bank<br>anlegen</html>", "new.png", null);
-            btnFields[1] = createButton("<html>Bank<br>updaten</html>", "update.png", null);
-            btnFields[2] = createButton("<html>Bank<br>loeschen</html>", "delete.png", null);
+            btnFields[0] = createButton("<html>Bank<br>anlegen</html>", ButtonIcon.NEW.icon(), null);
+            btnFields[1] = createButton("<html>Bank<br>updaten</html>", ButtonIcon.UPDATE.icon(), null);
+            btnFields[2] = createButton("<html>Bank<br>loeschen</html>", ButtonIcon.DEL.icon(), null);
             for (int i = 0; i < btnFields.length; i++) {
                 final int index = i;
                 btnFields[i].setBounds(x + i * (btnWidth + 10), y + 30, btnWidth, btnHeight);

@@ -2,7 +2,7 @@ package org.andy.gui.main.settings_panels;
 
 import static org.andy.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
 import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
-import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.gui.misc.CreateButton.createButton;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -26,6 +26,7 @@ import org.andy.code.dataStructure.entitiyMaster.Tax;
 import org.andy.code.dataStructure.repositoryMaster.TaxRepository;
 import org.andy.code.misc.CommaHelper;
 import org.andy.code.misc.ArithmeticHelper.LocaleFormat;
+import org.andy.gui.iconHandler.ButtonIcon;
 import org.andy.gui.main.HauptFenster;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -180,7 +181,7 @@ public class SteuertabellePanel extends JPanel {
         
         try {
 			btnFields[0] = createButton("<html>Jahr anlegen</html>", null, null);
-			btnFields[1] = createButton("<html>Tabelle<br>updaten</html>", "update.png", null);
+			btnFields[1] = createButton("<html>Tabelle<br>updaten</html>", ButtonIcon.UPDATE.icon(), null);
 		} catch (RuntimeException e1) {
 			logger.error("error creating button - " + e1);
 		}

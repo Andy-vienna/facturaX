@@ -14,6 +14,9 @@ public class User {
     
     @Column(name = "Roles")
     private String roles;
+    
+    @Column(name = "tabConfig")
+    private int tabConfig;
 
 	//###################################################################################################################################################
 	// Getter und Setter für Felder
@@ -41,6 +44,14 @@ public class User {
 
 	public void setRoles(String roles) {
 		this.roles = roles;
+	}
+
+	public int getTabConfig() {
+		return tabConfig;
+	}
+
+	public void setTabConfig(int tabConfig) {
+		this.tabConfig = tabConfig;
 	}
    
 }

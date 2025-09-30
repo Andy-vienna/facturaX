@@ -1,6 +1,6 @@
 package org.andy.gui.main.overview_panels.edit_panels;
 
-import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.gui.misc.CreateButton.createButton;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -9,7 +9,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import org.andy.gui.misc.FxHtmlEditor;
+import org.andy.gui.iconHandler.ButtonIcon;
+import org.andy.gui.misc.FxHtmlEditorAI;
 
 import javafx.application.Platform;
 
@@ -18,7 +19,7 @@ public class LeistungsbeschreibungEditor extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	private final JPanel editorHost = new JPanel(new BorderLayout());
-	private final FxHtmlEditor editor = new FxHtmlEditor();
+	private final FxHtmlEditorAI editor = new FxHtmlEditorAI();
 	
 	private volatile boolean fxReady = false;
 	private String pendingHtml; // Puffer
@@ -28,7 +29,7 @@ public class LeistungsbeschreibungEditor extends JFrame {
     	
     	super("Leistungsbeschreibungs Editor");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(1200, 600);
+        setSize(1500, 800);
         setLocationRelativeTo(null);
 
         editorHost.add(editor, BorderLayout.CENTER);
@@ -36,7 +37,7 @@ public class LeistungsbeschreibungEditor extends JFrame {
         add(editorHost, BorderLayout.CENTER);
         
         JPanel south = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
-        JButton btnGetHtml = createButton("<html>OK</html>", "ok.png", null);
+        JButton btnGetHtml = createButton("<html>OK</html>", ButtonIcon.OK.icon(), null);
         btnGetHtml.setFont(new Font("Tahoma", Font.BOLD, 14));
         btnGetHtml.setPreferredSize(new Dimension(130, 50));
         btnGetHtml.setEnabled(true);

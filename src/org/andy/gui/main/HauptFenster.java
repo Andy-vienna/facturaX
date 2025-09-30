@@ -1,7 +1,7 @@
 package org.andy.gui.main;
 
-import static org.andy.toolbox.misc.CreateObject.createButton;
-import static org.andy.toolbox.misc.Tools.saveSettingsApp;
+import static org.andy.code.misc.FileTools.saveSettingsApp;
+import static org.andy.gui.misc.CreateButton.createButton;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -28,7 +28,6 @@ import java.time.temporal.ChronoUnit;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -68,6 +67,10 @@ import org.andy.code.main.overview.table.LadeEinkauf;
 import org.andy.code.main.overview.table.LadeLieferschein;
 import org.andy.code.main.overview.table.LadeSvTax;
 import org.andy.code.misc.BD;
+import org.andy.gui.iconHandler.ButtonIcon;
+import org.andy.gui.iconHandler.FrameIcon;
+import org.andy.gui.iconHandler.MenuIcon;
+import org.andy.gui.iconHandler.TabIcon;
 import org.andy.gui.main.dialogs.ABDialog;
 import org.andy.gui.main.dialogs.DateianzeigeDialog;
 import org.andy.gui.main.dialogs.InfoDialog;
@@ -101,11 +104,11 @@ import org.andy.gui.main.settings_panels.text_panels.TextPanelFactory;
 import org.andy.gui.main.table_panels.ErzeugePanelA;
 import org.andy.gui.main.table_panels.ErzeugePanelB;
 import org.andy.gui.main.table_panels.ErzeugeTabelle;
+import org.andy.gui.main.table_panels.TabMask;
+import org.andy.gui.main.table_panels.TableHeader;
 import org.andy.gui.misc.BusyDialog;
 import org.andy.gui.misc.RoundedBorder;
 import org.andy.gui.misc.WrapLayout;
-import org.andy.toolbox.misc.SetFrameIcon;
-import org.andy.toolbox.misc.SetMenuIcon;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -115,13 +118,7 @@ public class HauptFenster extends JFrame {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LogManager.getLogger(HauptFenster.class);
 
-    private final String[] HEADER_AN = { "AN-Nummer", "Status", "Datum", "Referenz", "Kunde", "Netto" };
-    private final String[] HEADER_RE = { "RE-Nummer", "Status", "Datum", "Leistungszeitraum", "Referenz", "Kunde", "Netto", "USt.", "Brutto" };
-    private final String[] HEADER_BE = { "BE-Nummer", "Status", "Datum", "Referenz", "Lieferant", "Netto", "USt.", "Brutto" };
-    private final String[] HEADER_LS = { "LS-Nummer", "Status", "Datum", "Referenz", "Empfänger" };
-    private final String[] HEADER_PU = { "RE-Datum","RE-Nummer", "Kreditor Name", "Land", "Steuersatz", "Netto", "USt.", "Brutto", "Zahlungsziel", "bezahlt", "Dateiname" };
-    private final String[] HEADER_EX = { "Datum", "Bezeichnung", "Land", "Steuersatz", "Netto (EUR)", "Steuer (EUR)", "Brutto (EUR)", "Dateiname" };
-    private final String[] HEADER_ST = { "Datum", "Zahlungsempfänger", "Bezeichnung", "Betrag", "Fälligkeit", "Art", "Dateiname" };
+    private TableHeader header = new TableHeader();
     private final static int BUTTONX = 130; private static final int BUTTONY = 50;
 
     // Status/Session
@@ -166,13 +163,14 @@ public class HauptFenster extends JFrame {
     // Rollen
     enum Role { NONE, USER, SUPERUSER, FINANCIALUSER, ADMIN }
     private static String u, r;
+    private static int tc;
     
 	//###################################################################################################################################################
 	// public Teil
 	//###################################################################################################################################################
     
-    public static void loadGUI(String u, String r) {
-    	HauptFenster.u = u; HauptFenster.r = r;
+    public static void loadGUI(String u, String r, int tc) {
+    	HauptFenster.u = u; HauptFenster.r = r; HauptFenster.tc = tc;
         if (SwingUtilities.isEventDispatchThread()) {
             ensureInstanceEDT().setVisible(true);
         } else {
@@ -198,16 +196,13 @@ public class HauptFenster extends JFrame {
     }
 
     private HauptFenster() {
-        try {
-            setIconImage(SetFrameIcon.getFrameIcon("icon.png"));
-        } catch (IOException e) {
-            logger.error("error loading frame icon", e);
-        }
+    	
         sLic = StartUp.getAPP_LICENSE();
         iLic = StartUp.getAPP_MODE();
         role = roleFromLogin(r);
         Einstellungen.setStrAktUser(u); // angemeldeten User in globale Variable schreiben
 
+        setIconImage(FrameIcon.ICON.image());
         setTitle("FacturaX v2 (" + StartUp.APP_VERSION + ") - Wirtschaftsjahr " + Einstellungen.getStrAktGJ() + " - " + sLic);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -234,9 +229,9 @@ public class HauptFenster extends JFrame {
         JMenu menu6 = new JMenu("Ansicht");
         JMenu menu9 = new JMenu("Info");
 
-        JMenuItem exit = new JMenuItem("Exit", safeIcon("exit.png"));
-        JMenuItem aktualisieren = new JMenuItem("Aktualisieren", safeIcon("actualize.png"));
-        JMenuItem info = new JMenuItem("Info", safeIcon("info.png"));
+        JMenuItem exit = new JMenuItem("Exit", MenuIcon.EXIT.icon());
+        JMenuItem aktualisieren = new JMenuItem("Aktualisieren", MenuIcon.ACT.icon());
+        JMenuItem info = new JMenuItem("Info", MenuIcon.INFO.icon());
 
         menu1.add(exit);
         menu6.add(aktualisieren);
@@ -276,62 +271,42 @@ public class HauptFenster extends JFrame {
         tabPanel = new JTabbedPane(JTabbedPane.TOP);
         tabPanel.setFont(new Font("Tahoma", Font.BOLD, 12));
 
-        switch (role) {
-            case USER -> {
-                doAngebotPanel(0);
-                doRechnungPanel(0);
-                tabPanel.addTab("Angebote", pageAN);
-                tabPanel.addTab("Rechnungen", pageRE);
-                tabPanel.setIconAt(0, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/offer.png")));
-                tabPanel.setIconAt(1, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/invoice.png")));
-            }
-            case SUPERUSER -> {
-                doAngebotPanel(0);
-                doRechnungPanel(0);
-                doBestellungPanel(0);
-                doLieferscheinPanel(0);
-                doEinkaufPanel(0);
-                doAusgabenPanel();
-                doSvsTaxPanel();
-                doJahresergebnis();
-                tabPanel.addTab("Angebote", pageAN);
-                tabPanel.addTab("Rechnungen", pageRE);
-                tabPanel.addTab("Bestellungen", pageBE);
-                tabPanel.addTab("Lieferscheine", pageLS);
-                tabPanel.addTab("Einkauf", pagePU);
-                tabPanel.addTab("Betriebsausgaben", pageEX);
-                tabPanel.addTab("SV und Steuer", pageST);
-                tabPanel.addTab("Jahresergebnis", pageOv);
-                tabPanel.setIconAt(0, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/offer.png")));
-                tabPanel.setIconAt(1, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/invoice.png")));
-                tabPanel.setIconAt(2, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/bestellen.png")));
-                tabPanel.setIconAt(3, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/lieferschein.png")));
-                tabPanel.setIconAt(4, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/purchase.png")));
-                tabPanel.setIconAt(5, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/expenses.png")));
-                tabPanel.setIconAt(6, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/tax.png")));
-                tabPanel.setIconAt(7, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/result.png")));
-            }
-            case FINANCIALUSER -> {
-                doSvsTaxPanel();
-                doJahresergebnis();
-                doEinkaufPanel(0);
-                doAusgabenPanel();
-                tabPanel.addTab("Einkauf", pagePU);
-                tabPanel.addTab("Betriebsausgaben", pageEX);
-                tabPanel.addTab("SV und Steuer", pageST);
-                tabPanel.addTab("Jahresergebnis", pageOv);
-                tabPanel.setIconAt(0, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/purchase.png")));
-                tabPanel.setIconAt(1, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/expenses.png")));
-                tabPanel.setIconAt(2, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/tax.png")));
-                tabPanel.setIconAt(3, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/result.png")));
-            }
-            case ADMIN -> {
-                doEinstellungen();
-                tabPanel.addTab("Einstellungen", pageAdmin);
-                tabPanel.setIconAt(0, new ImageIcon(HauptFenster.class.getResource("/org/resources/icons/config.png")));
-            }
-            default -> System.exit(2);
+        if (TabMask.visible(tc, TabMask.Tab.OFFER)) {
+        	doAngebotPanel(0);
+        	tabPanel.addTab("Angebote", TabIcon.OFFER.icon(), pageAN);
         }
+		if (TabMask.visible(tc, TabMask.Tab.INVOICE)) {
+			doRechnungPanel(0);
+			tabPanel.addTab("Rechnungen", TabIcon.INVOICE.icon(), pageRE);
+		}
+		if (TabMask.visible(tc, TabMask.Tab.ORDER)) {
+        	doBestellungPanel(0);
+        	tabPanel.addTab("Bestellungen", TabIcon.ORDER.icon(), pageBE);
+        }
+		if (TabMask.visible(tc, TabMask.Tab.DELIVERY)) {
+			doLieferscheinPanel(0);
+			tabPanel.addTab("Lieferscheine", TabIcon.DELIVERY_NOTE.icon(), pageLS);
+		}
+		if (TabMask.visible(tc, TabMask.Tab.PURCHASE)) {
+        	doEinkaufPanel(0);
+        	tabPanel.addTab("Einkauf", TabIcon.PURCHASE.icon(), pagePU);
+        }
+		if (TabMask.visible(tc, TabMask.Tab.EXPENSES)) {
+			doAusgabenPanel();
+			tabPanel.addTab("Betriebsausgaben", TabIcon.EXPENSES.icon(), pageEX);
+		}
+		if (TabMask.visible(tc, TabMask.Tab.TAX)) {
+			doSvsTaxPanel();
+        	tabPanel.addTab("SV und Steuer", TabIcon.TAX.icon(), pageST);
+        }
+		if (TabMask.visible(tc, TabMask.Tab.RESULT)) {
+			doJahresergebnis();
+			tabPanel.addTab("Jahresergebnis", TabIcon.RESULT.icon(), pageOv);
+		}
+		if (TabMask.visible(tc, TabMask.Tab.SETTINGS)) {
+			doEinstellungen();
+			tabPanel.addTab("Einstellungen", TabIcon.SETTINGS.icon(), pageAdmin);
+		}
         contentPane.add(tabPanel, BorderLayout.CENTER);
     }
 
@@ -339,39 +314,38 @@ public class HauptFenster extends JFrame {
     // Panels
 
     private void doAngebotPanel(int use) {
-        if (role != Role.USER && role != Role.SUPERUSER) return;
 
         JButton[] btn = null;
         switch(use) {
         	case 0 -> {
         		btn = new JButton[5];
                 offerPanel = EditPanelFactory.create("AN");
-                btn[0] = createButton("<html>Kunde<br>neu/bearb.</html>", "edit.png", new Color(168,168,168));
-                btn[1] = createButton("<html>Artikel<br>neu/bearb.</html>", "edit.png", new Color(159,182,205));
-                btn[2] = createButton("<html>neues<br>Angebot</html>", "new.png", new Color(191,239,255));
-                btn[3] = createButton("<html>Angebot<br>drucken</html>", "print.png", null);
-                btn[4] = createButton("<html>AB<br>drucken</html>", "print.png", null);
+                btn[0] = createButton("<html>Kunde<br>neu/bearb.</html>", ButtonIcon.EDIT.icon(), new Color(168,168,168));
+                btn[1] = createButton("<html>Artikel<br>neu/bearb.</html>", ButtonIcon.EDIT.icon(), new Color(159,182,205));
+                btn[2] = createButton("<html>neues<br>Angebot</html>", ButtonIcon.NEW.icon(), new Color(191,239,255));
+                btn[3] = createButton("<html>Angebot<br>drucken</html>", ButtonIcon.PRINT.icon(), null);
+                btn[4] = createButton("<html>AB<br>drucken</html>", ButtonIcon.PRINT.icon(), null);
                 btn[1].setEnabled(true); btn[2].setEnabled(true);
         	}
         	case 1 -> {
         		btn = new JButton[1];
                 offerPanel = EditPanelFactory.create("NA");
-                btn[0] = createButton("zurück", "aktualisieren.png", null);
+                btn[0] = createButton("zurück", ButtonIcon.ACT.icon(), null);
         	}
         	case 2 -> {
         		btn = new JButton[1];
             	offerPanel = EditPanelFactory.create("NK");
-                btn[0] = createButton("zurück", "aktualisieren.png", null);
+                btn[0] = createButton("zurück", ButtonIcon.ACT.icon(), null);
         	}
         	case 3 -> {
         		btn = new JButton[1];
             	offerPanel = EditPanelFactory.create("NArt");
-                btn[0] = createButton("zurück", "aktualisieren.png", null);
+                btn[0] = createButton("zurück", ButtonIcon.ACT.icon(), null);
         	}
         }
         btn[0].setEnabled(true);
 
-        sPaneAN = new ErzeugeTabelle<>(sTempAN, HEADER_AN, new TableANcr(this));
+        sPaneAN = new ErzeugeTabelle<>(sTempAN, header.getHEADER_AN(), new TableANcr(this));
         sPaneAN.getTable().addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) { actionClickAN(sPaneAN.getTable(), e); }
         });
@@ -423,39 +397,38 @@ public class HauptFenster extends JFrame {
     //###################################################################################################################################################
 
     private void doRechnungPanel(int use) {
-        if (role != Role.USER && role != Role.SUPERUSER) return;
 
         JButton[] btn = null;
         switch(use) {
         	case 0 -> {
         		btn = new JButton[5];
         		billPanel = EditPanelFactory.create("RE");
-                btn[0] = createButton("<html>Kunde<br>neu/bearb.</html>", "edit.png", new Color(168,168,168));
-                btn[1] = createButton("<html>Artikel<br>neu/bearb.</html>", "edit.png", new Color(159,182,205));
-                btn[2] = createButton("<html>neue<br>Rechnung</html>", "new.png", new Color(191,239,255));
-                btn[3] = createButton("<html>Rechnung<br>drucken</html>", "print.png", null);
-                btn[4] = createButton("<html>Mahn-<br>verfahren</html>", "print.png", null);
+                btn[0] = createButton("<html>Kunde<br>neu/bearb.</html>", ButtonIcon.EDIT.icon(), new Color(168,168,168));
+                btn[1] = createButton("<html>Artikel<br>neu/bearb.</html>", ButtonIcon.EDIT.icon(), new Color(159,182,205));
+                btn[2] = createButton("<html>neue<br>Rechnung</html>", ButtonIcon.NEW.icon(), new Color(191,239,255));
+                btn[3] = createButton("<html>Rechnung<br>drucken</html>", ButtonIcon.PRINT.icon(), null);
+                btn[4] = createButton("<html>Mahn-<br>verfahren</html>", ButtonIcon.PRINT.icon(), null);
                 btn[1].setEnabled(true); btn[2].setEnabled(true);
         	}
         	case 1 -> {
         		btn = new JButton[1];
         		billPanel = EditPanelFactory.create("NR");
-                btn[0] = createButton("zurück", "aktualisieren.png", null);
+                btn[0] = createButton("zurück", ButtonIcon.ACT.icon(), null);
         	}
         	case 2 -> {
         		btn = new JButton[1];
         		billPanel = EditPanelFactory.create("NK");
-                btn[0] = createButton("zurück", "aktualisieren.png", null);
+                btn[0] = createButton("zurück", ButtonIcon.ACT.icon(), null);
         	}
         	case 3 -> {
         		btn = new JButton[1];
         		billPanel = EditPanelFactory.create("NArt");
-                btn[0] = createButton("zurück", "aktualisieren.png", null);
+                btn[0] = createButton("zurück", ButtonIcon.ACT.icon(), null);
         	}
         }
         btn[0].setEnabled(true);
 
-        sPaneRE = new ErzeugeTabelle<>(sTempRE, HEADER_RE, new TableREcr(this));
+        sPaneRE = new ErzeugeTabelle<>(sTempRE, header.getHEADER_RE(), new TableREcr(this));
         sPaneRE.getTable().addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) { actionClickRE(sPaneRE.getTable(), e); }
         });
@@ -503,38 +476,37 @@ public class HauptFenster extends JFrame {
     //###################################################################################################################################################
     
     private void doBestellungPanel(int use) {
-    	if (role != Role.SUPERUSER && role != Role.FINANCIALUSER) return;
         
         JButton[] btn = null;
         switch(use) {
         	case 0 -> {
         		btn = new JButton[4];
         		bestellungPanel = EditPanelFactory.create("BE");
-        		btn[0] = createButton("<html>Lieferant<br>neu/bearb.</html>", "edit.png", new Color(168,168,168));
-                btn[1] = createButton("<html>Artikel<br>neu/bearb.</html>", "edit.png", new Color(159,182,205));
-                btn[2] = createButton("<html>neue<br>Bestellung</html>", "new.png", new Color(191,239,255));
-                btn[3] = createButton("<html>Bestellung<br>drucken</html>", "print.png", null);
+        		btn[0] = createButton("<html>Lieferant<br>neu/bearb.</html>", ButtonIcon.EDIT.icon(), new Color(168,168,168));
+                btn[1] = createButton("<html>Artikel<br>neu/bearb.</html>", ButtonIcon.EDIT.icon(), new Color(159,182,205));
+                btn[2] = createButton("<html>neue<br>Bestellung</html>", ButtonIcon.NEW.icon(), new Color(191,239,255));
+                btn[3] = createButton("<html>Bestellung<br>drucken</html>", ButtonIcon.PRINT.icon(), null);
                 btn[1].setEnabled(true); btn[2].setEnabled(true);
         	}
         	case 1 -> {
         		btn = new JButton[1];
         		bestellungPanel = EditPanelFactory.create("NB");
-                btn[0] = createButton("zurück", "aktualisieren.png", null);
+                btn[0] = createButton("zurück", ButtonIcon.ACT.icon(), null);
         	}
         	case 2 -> {
         		btn = new JButton[1];
         		bestellungPanel = EditPanelFactory.create("NL");
-                btn[0] = createButton("zurück", "aktualisieren.png", null);
+                btn[0] = createButton("zurück", ButtonIcon.ACT.icon(), null);
         	}
         	case 3 -> {
         		btn = new JButton[1];
         		bestellungPanel = EditPanelFactory.create("NArt");
-                btn[0] = createButton("zurück", "aktualisieren.png", null);
+                btn[0] = createButton("zurück", ButtonIcon.ACT.icon(), null);
         	}
         }
         btn[0].setEnabled(true);
         
-        sPaneBE = new ErzeugeTabelle<>(sTempBE, HEADER_BE, new TableBEcr(this));
+        sPaneBE = new ErzeugeTabelle<>(sTempBE, header.getHEADER_BE(), new TableBEcr(this));
         sPaneBE.getTable().addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) { actionClickBE(sPaneBE.getTable(), e); }
         });
@@ -581,20 +553,19 @@ public class HauptFenster extends JFrame {
     //###################################################################################################################################################
     
     private void doLieferscheinPanel(int use) {
-    	if (role != Role.SUPERUSER && role != Role.FINANCIALUSER) return;
     	
     	JButton[] btn = null;
         switch(use) {
         	case 0 -> {
         		btn = new JButton[2];
         		lieferscheinPanel = EditPanelFactory.create("LS");
-                btn[0] = createButton("<html>neuer<br>Lieferschein</html>", "new.png", new Color(191,239,255));
-                btn[1] = createButton("<html>Lieferschein<br>drucken</html>", "print.png", null);
+                btn[0] = createButton("<html>neuer<br>Lieferschein</html>", ButtonIcon.NEW.icon(), new Color(191,239,255));
+                btn[1] = createButton("<html>Lieferschein<br>drucken</html>", ButtonIcon.PRINT.icon(), null);
         	}
         	case 1 -> {
         		btn = new JButton[1];
         		lieferscheinPanel = EditPanelFactory.create("nLS");
-                btn[0] = createButton("zurück", "aktualisieren.png", null);
+                btn[0] = createButton("zurück", ButtonIcon.ACT.icon(), null);
         	}
         	case 2 -> {
         		
@@ -605,7 +576,7 @@ public class HauptFenster extends JFrame {
         }
         btn[0].setEnabled(true);
         
-        sPaneLS = new ErzeugeTabelle<>(sTempLS, HEADER_LS, new TableLScr(this));
+        sPaneLS = new ErzeugeTabelle<>(sTempLS, header.getHEADER_LS(), new TableLScr(this));
         sPaneLS.getTable().addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) { actionClickLS(sPaneLS.getTable(), e); }
         });
@@ -648,19 +619,18 @@ public class HauptFenster extends JFrame {
     //###################################################################################################################################################
 
     private void doEinkaufPanel(int use) {
-        if (role != Role.SUPERUSER && role != Role.FINANCIALUSER) return;
         
         JButton[] btn = null;
         switch(use) {
         	case 0 -> {
         		btn = new JButton[1];
         		purchasePanel = EditPanelFactory.create("PU");
-        		btn[0] = createButton("<html>Lieferant<br>neu/bearb.</html>", "edit.png", new Color(168,168,168));
+        		btn[0] = createButton("<html>Lieferant<br>neu/bearb.</html>", ButtonIcon.EDIT.icon(), new Color(168,168,168));
         	}
         	case 1 -> {
         		btn = new JButton[1];
         		purchasePanel = EditPanelFactory.create("NL");
-        		btn[0] = createButton("zurück", "aktualisieren.png", null);
+        		btn[0] = createButton("zurück", ButtonIcon.ACT.icon(), null);
         	}
         }
         btn[0].setEnabled(true);
@@ -670,7 +640,7 @@ public class HauptFenster extends JFrame {
             pup.setBtnText(0, "..."); pup.setBtnText(1, "save");
         }
 
-        sPanePU = new ErzeugeTabelle<>(sTempPU, HEADER_PU, new TablePUcr());
+        sPanePU = new ErzeugeTabelle<>(sTempPU, header.getHEADER_PU(), new TablePUcr());
         sPanePU.getTable().addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) { actionClickPU(sPanePU.getTable(), e); }
         });
@@ -701,7 +671,6 @@ public class HauptFenster extends JFrame {
     //###################################################################################################################################################
 
     private void doAusgabenPanel() {
-        if (role != Role.SUPERUSER && role != Role.FINANCIALUSER) return;
 
         expensesPanel = EditPanelFactory.create("EX");
         if (expensesPanel instanceof AusgabenPanel ep) {
@@ -709,7 +678,7 @@ public class HauptFenster extends JFrame {
             ep.setBtnText(0, "..."); ep.setBtnText(1, "save");
         }
 
-        sPaneEX = new ErzeugeTabelle<>(sTempEX, HEADER_EX, new TableEXcr());
+        sPaneEX = new ErzeugeTabelle<>(sTempEX, header.getHEADER_EX(), new TableEXcr());
         sPaneEX.getTable().addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) { actionClickEX(sPaneEX.getTable(), e); }
         });
@@ -730,7 +699,6 @@ public class HauptFenster extends JFrame {
     //###################################################################################################################################################
 
     private void doSvsTaxPanel() {
-    	if (role != Role.SUPERUSER && role != Role.FINANCIALUSER) return;
 
         svTaxPanel = EditPanelFactory.create("SVT");
         if (svTaxPanel instanceof SvTaxPanel svt) {
@@ -738,7 +706,7 @@ public class HauptFenster extends JFrame {
             svt.setBtnText(0, "..."); svt.setBtnText(1, "save");
         }
 
-        sPaneST = new ErzeugeTabelle<>(sTempST, HEADER_ST, new TableSTcr());
+        sPaneST = new ErzeugeTabelle<>(sTempST, header.getHEADER_ST(), new TableSTcr());
         sPaneST.getTable().addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) { actionClickST(sPaneST.getTable(), e); }
         });
@@ -758,7 +726,6 @@ public class HauptFenster extends JFrame {
     //###################################################################################################################################################
 
     private void doJahresergebnis() {
-    	if (role != Role.SUPERUSER && role != Role.FINANCIALUSER) return;
 
         panelUSt = new UStPanel(); panelUSt.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         panelZM = new ZMeldungPanel(); panelZM.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
@@ -788,7 +755,6 @@ public class HauptFenster extends JFrame {
     //###################################################################################################################################################
 
     private void doEinstellungen() {
-        if (role != Role.ADMIN) return;
 
         String[] select = { "", "Eigentümerdaten", "Bankdaten", "Stammdatenverwaltung", "Pfadverwaltung", "Benutzerverwaltung",
                 "Steuerdaten", "SEPA QR-Code", "Datenbank",
@@ -890,19 +856,19 @@ public class HauptFenster extends JFrame {
     
     private void loadData() {
     	sTempAN = LadeAngebot.loadAngebot(false);
-        if (sTempAN == null) sTempAN = new String[0][HEADER_AN.length];
+        if (sTempAN == null) sTempAN = new String[0][header.getHEADER_AN().length];
         sTempRE = LadeRechnung.loadRechnung(false);
-        if (sTempRE == null) sTempRE = new String[0][HEADER_RE.length];
+        if (sTempRE == null) sTempRE = new String[0][header.getHEADER_RE().length];
         sTempBE = LadeBestellung.loadBestellung(false);
-        if (sTempBE == null) sTempBE = new String[0][HEADER_BE.length];
+        if (sTempBE == null) sTempBE = new String[0][header.getHEADER_BE().length];
         sTempLS = LadeLieferschein.loadLieferschein(false);
-        if (sTempLS == null) sTempLS = new String[0][HEADER_LS.length];
+        if (sTempLS == null) sTempLS = new String[0][header.getHEADER_LS().length];
     	sTempPU = LadeEinkauf.loadEinkaufsRechnung(false);
-        if (sTempPU == null) sTempPU = new String[0][HEADER_PU.length];
+        if (sTempPU == null) sTempPU = new String[0][header.getHEADER_PU().length];
         sTempEX = LadeAusgaben.loadAusgaben(false);
-        if (sTempEX == null) sTempEX = new String[0][HEADER_EX.length];
+        if (sTempEX == null) sTempEX = new String[0][header.getHEADER_EX().length];
         sTempST = LadeSvTax.loadSvTax(false);
-        if (sTempST == null) sTempST = new String[0][HEADER_ST.length];
+        if (sTempST == null) sTempST = new String[0][header.getHEADER_ST().length];
     }
 
     private void setSumAN() {
@@ -1196,42 +1162,52 @@ public class HauptFenster extends JFrame {
         pageOv = null; pageErg = null;
 
         loadData();
-        switch (role) {
-            case USER -> {
-            	pageAN.removeAll();
-				pageRE.removeAll();
-				doAngebotPanel(0);
-				doRechnungPanel(0);
-            }
-            case SUPERUSER -> {
-            	pageAN.removeAll();
-				pageRE.removeAll();
-				pageBE.removeAll();
-				pageLS.removeAll();
-				pagePU.removeAll();
-				pageEX.removeAll();
-				pageST.removeAll();
-				doAngebotPanel(0);
-				doRechnungPanel(0);
-				doBestellungPanel(0);
-				doLieferscheinPanel(0);
-				doEinkaufPanel(0);
-				doAusgabenPanel();
-				doSvsTaxPanel();
-				doJahresergebnis();
-            }
-            case FINANCIALUSER -> {
-            	pagePU.removeAll();
-				pageEX.removeAll();
-            	pageST.removeAll();
-            	doEinkaufPanel(0);
-				doAusgabenPanel();
-				doSvsTaxPanel();
-				doJahresergebnis();
-            }
-            case ADMIN -> { /* bleibt */ }
-            default -> {}
+        if (TabMask.visible(tc, TabMask.Tab.OFFER)) {
+        	pageAN.removeAll();
+        	doAngebotPanel(0);
+        	tabPanel.addTab("Angebote", TabIcon.OFFER.icon(), pageAN);
         }
+		if (TabMask.visible(tc, TabMask.Tab.INVOICE)) {
+			pageRE.removeAll();
+			doRechnungPanel(0);
+			tabPanel.addTab("Rechnungen", TabIcon.INVOICE.icon(), pageRE);
+		}
+		if (TabMask.visible(tc, TabMask.Tab.ORDER)) {
+			pageBE.removeAll();
+        	doBestellungPanel(0);
+        	tabPanel.addTab("Bestellungen", TabIcon.ORDER.icon(), pageBE);
+        }
+		if (TabMask.visible(tc, TabMask.Tab.DELIVERY)) {
+			pageLS.removeAll();
+			doLieferscheinPanel(0);
+			tabPanel.addTab("Lieferscheine", TabIcon.DELIVERY_NOTE.icon(), pageLS);
+		}
+		if (TabMask.visible(tc, TabMask.Tab.PURCHASE)) {
+			pagePU.removeAll();
+        	doEinkaufPanel(0);
+        	tabPanel.addTab("Einkauf", TabIcon.PURCHASE.icon(), pagePU);
+        }
+		if (TabMask.visible(tc, TabMask.Tab.EXPENSES)) {
+			pageEX.removeAll();
+			doAusgabenPanel();
+			tabPanel.addTab("Betriebsausgaben", TabIcon.EXPENSES.icon(), pageEX);
+		}
+		if (TabMask.visible(tc, TabMask.Tab.TAX)) {
+			pageST.removeAll();
+			doSvsTaxPanel();
+        	tabPanel.addTab("SV und Steuer", TabIcon.TAX.icon(), pageST);
+        }
+		if (TabMask.visible(tc, TabMask.Tab.RESULT)) {
+			tabPanel.removeTabAt(tabPanel.indexOfTab("Jahresergebnis"));
+			doJahresergebnis();
+			tabPanel.addTab("Jahresergebnis", TabIcon.RESULT.icon(), pageOv);
+		}
+		if (TabMask.visible(tc, TabMask.Tab.SETTINGS)) {
+			tabPanel.removeTabAt(tabPanel.indexOfTab("Einstellungen"));
+			doEinstellungen();
+			tabPanel.addTab("Einstellungen", TabIcon.SETTINGS.icon(), pageAdmin);
+		}
+
         contentPane.revalidate();
         contentPane.repaint();
     }
@@ -1246,11 +1222,6 @@ public class HauptFenster extends JFrame {
         };
     }
     
-    private ImageIcon safeIcon(String file) {
-        try { return new ImageIcon(SetMenuIcon.getMenuIcon(file)); }
-        catch (IOException e) { logger.warn("icon missing: {}", file, e); return new ImageIcon(); }
-    }
-
     private void actionFile(String value, Kunde kunde) {
         if (value == null || kunde == null) return;
         DateianzeigeDialog.loadGUI(value, kunde);

@@ -1,6 +1,6 @@
 package org.andy.gui.main.dialogs;
 
-import static org.andy.toolbox.misc.CreateObject.createButton;
+import static org.andy.gui.misc.CreateButton.createButton;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -27,6 +27,7 @@ import com.github.lgooddatepicker.components.DatePickerSettings;
 
 import org.andy.code.dataExport.ExcelAuftragsbestaetigung;
 import org.andy.code.main.StartUp;
+import org.andy.gui.iconHandler.ButtonIcon;
 import org.andy.gui.main.HauptFenster;
 
 public final class ABDialog extends JDialog {
@@ -57,7 +58,7 @@ public final class ABDialog extends JDialog {
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setResizable(false);
-        setIconSafe("/icons/edit_color.png");
+        setIconSafe("/icons/frames/edit_color.png");
 
         initPickers();
         setContentPane(buildContent());
@@ -123,7 +124,7 @@ public final class ABDialog extends JDialog {
     private JButton createOkButton() {
         JButton ok;
         try {
-            ok = createButton("OK", "ok.png", null);
+            ok = createButton("OK", ButtonIcon.OK.icon(), null);
         } catch (RuntimeException ex) {
             log.warn("OK-Button ohne Icon, cause: {}", ex.getMessage());
             ok = new JButton("OK");

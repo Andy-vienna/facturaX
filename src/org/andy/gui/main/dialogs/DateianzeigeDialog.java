@@ -2,11 +2,11 @@ package org.andy.gui.main.dialogs;
 
 import static org.andy.code.dataStructure.HibernateUtil.getSessionFactoryDb2;
 import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
-import static org.andy.toolbox.misc.SelectFile.chooseFile;
-import static org.andy.toolbox.misc.SelectFile.choosePath;
-import static org.andy.toolbox.misc.SelectFile.getNotSelected;
-import static org.andy.toolbox.misc.Tools.cutFromRight;
-import static org.andy.toolbox.misc.Tools.isLocked;
+import static org.andy.code.misc.FileSelect.chooseFile;
+import static org.andy.code.misc.FileSelect.choosePath;
+import static org.andy.code.misc.FileSelect.getNotSelected;
+import static org.andy.code.misc.FileTools.isLocked;
+import static org.andy.code.misc.TextFormatter.*;
 
 import java.awt.BorderLayout;
 import java.awt.Desktop;
@@ -20,7 +20,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -35,7 +34,9 @@ import org.andy.code.dataStructure.entitiyProductive.FileStore;
 import org.andy.code.dataStructure.repositoryProductive.FileStoreRepository;
 import org.andy.code.main.Einstellungen;
 import org.andy.code.main.StartUp;
-import org.andy.toolbox.misc.SetFrameIcon;
+import org.andy.gui.iconHandler.ButtonIcon;
+import org.andy.gui.iconHandler.FileIcon;
+import org.andy.gui.iconHandler.FrameIcon;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
@@ -137,19 +138,14 @@ public class DateianzeigeDialog extends JFrame {
 
 	private DateianzeigeDialog() {
 
-		try {
-			setIconImage(SetFrameIcon.getFrameIcon("file.png"));
-		} catch (IOException e) {
-			logger.error("error loading frame icon - " + e);
-		}
-
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				destroyWindow();
 			}
 		});
-
+		
+		setIconImage(FrameIcon.FILE.image());
 		setResizable(false);
 		setTitle("Dateihandling - " + StartUp.APP_NAME + StartUp.APP_VERSION);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -348,19 +344,19 @@ public class DateianzeigeDialog extends JFrame {
 		button.setFont(new Font("Tahoma", Font.BOLD, 11));
 		switch(btnText) {
 		case UPLOAD:
-			button.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/up.png")));
+			button.setIcon(ButtonIcon.UP.icon());
 			break;
 		case DOWNLOAD:
-			button.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/down.png")));
+			button.setIcon(ButtonIcon.DOWN.icon());
 			break;
 		case UPDATE:
-			button.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/update.png")));
+			button.setIcon(ButtonIcon.UPDATE.icon());
 			break;
 		case DELETE:
-			button.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/delete.png")));
+			button.setIcon(ButtonIcon.DEL.icon());
 			break;
 		case SEND:
-			button.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/mail.png")));
+			button.setIcon(ButtonIcon.MAIL.icon());
 			break;
 		}
 		return button;
@@ -427,64 +423,64 @@ public class DateianzeigeDialog extends JFrame {
 		String typ = cutFromRight(fileName, '.');
 		switch(typ) {
 		case PDF:
-			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/pdf.png")));
+			lbl.setIcon(FileIcon.FILE_PDF.icon());
 			return 1;
 		case PNG:
-			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/png.png")));
+			lbl.setIcon(FileIcon.FILE_PNG.icon());
 			return 1;
 		case JPG:
-			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/jpg.png")));
+			lbl.setIcon(FileIcon.FILE_JPG.icon());
 			return 1;
 		case CSV:
-			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/csv.png")));
+			lbl.setIcon(FileIcon.FILE_CSV.icon());
 			return 1;
 		case MSG:
-			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/msg.png")));
+			lbl.setIcon(FileIcon.FILE_MSG.icon());
 			return 1;
 		case XML:
-			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/xml.png")));
+			lbl.setIcon(FileIcon.FILE_XML.icon());
 			return 1;
 		case XLSX:
-			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/xlsx.png")));
+			lbl.setIcon(FileIcon.FILE_XLSX.icon());
 			return 1;
 		case XLSM:
-			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/xlsm.png")));
+			lbl.setIcon(FileIcon.FILE_XLSM.icon());
 			return 1;
 		case RAR:
-			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/rar.png")));
+			lbl.setIcon(FileIcon.FILE_RAR.icon());
 			return 1;
 		case ZIP:
-			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/zip.png")));
+			lbl.setIcon(FileIcon.FILE_ZIP.icon());
 			return 1;
 		case UPDF:
-			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/pdf.png")));
+			lbl.setIcon(FileIcon.FILE_PDF.icon());
 			return 1;
 		case UPNG:
-			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/png.png")));
+			lbl.setIcon(FileIcon.FILE_PNG.icon());
 			return 1;
 		case UJPG:
-			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/jpg.png")));
+			lbl.setIcon(FileIcon.FILE_JPG.icon());
 			return 1;
 		case UCSV:
-			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/csv.png")));
+			lbl.setIcon(FileIcon.FILE_CSV.icon());
 			return 1;
 		case UMSG:
-			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/msg.png")));
+			lbl.setIcon(FileIcon.FILE_MSG.icon());
 			return 1;
 		case UXML:
-			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/xml.png")));
+			lbl.setIcon(FileIcon.FILE_XML.icon());
 			return 1;
 		case UXLSX:
-			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/xlsx.png")));
+			lbl.setIcon(FileIcon.FILE_XLSX.icon());
 			return 1;
 		case UXLSM:
-			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/xlsm.png")));
+			lbl.setIcon(FileIcon.FILE_XLSM.icon());
 			return 1;
 		case URAR:
-			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/rar.png")));
+			lbl.setIcon(FileIcon.FILE_RAR.icon());
 			return 1;
 		case UZIP:
-			lbl.setIcon(new ImageIcon(DateianzeigeDialog.class.getResource("/org/resources/icons/zip.png")));
+			lbl.setIcon(FileIcon.FILE_ZIP.icon());
 			return 1;
 		default:
 			lbl.setIcon(null);

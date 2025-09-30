@@ -1,7 +1,6 @@
 package org.andy.gui.main.settings_panels.text_panels;
 
 import static org.andy.code.misc.ArithmeticHelper.parseStringToIntSafe;
-import static org.andy.toolbox.misc.CreateObject.applyHighlighting;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -18,6 +17,7 @@ import javax.swing.text.BadLocationException;
 
 import org.andy.code.dataStructure.entitiyMaster.Text;
 import org.andy.code.dataStructure.repositoryMaster.TextRepository;
+import org.andy.code.misc.TextHighlighting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -119,7 +119,7 @@ public class TextEditor extends TextPanel  {
 					String text = panes.get(i).getText();
 					panes.get(i).setText(""); // Zurücksetzen, um doppeltes Styling zu vermeiden
 					try {
-						applyHighlighting(panes.get(i), text);
+						TextHighlighting.applyHighlighting(panes.get(i), text);
 					} catch (BadLocationException e) {
 						logger.error("error applying text highlighting - " + e);
 					}
