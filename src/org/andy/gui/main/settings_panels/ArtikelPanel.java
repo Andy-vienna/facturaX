@@ -85,7 +85,7 @@ public class ArtikelPanel extends JPanel {
                 .map(Artikel::getText)   // oder .getId(), oder beliebiges Feld
                 .toArray(String[]::new);
         cmbSelect = new JComboBox<>(artikelTexte);
-        cmbSelect.setBounds(10, 20, 750, 25);
+        cmbSelect.setBounds(10, 20, 1000, 25);
         cmbSelect.addActionListener(actionListener);
         add(cmbSelect);
 
@@ -97,13 +97,13 @@ public class ArtikelPanel extends JPanel {
         x = lblFields[labels.length - 1].getX() + lblFields[labels.length - 1].getWidth();
 
         for (int i = 0; i < txtFields.length; i++) {
-            txtFields[i] = makeField(x, y + i * 25, 650, 25, false, null);
+            txtFields[i] = makeField(x, y + i * 25, 900, 25, false, null);
             add(txtFields[i]);
         }
         txtFields[0].setText(artikelRepository.findMaxNummer());
         txtFields[0].setEditable(false);
         attachCommaToDot(txtFields[2]);
-        x = 110; y = y + ((txtFields.length - 1) * 25);
+        x = 600; y = y + ((txtFields.length - 1) * 25);
 
         try {
             btnFields[0] = createButton("<html>Artikel<br>anlegen</html>", ButtonIcon.NEW.icon(), null);

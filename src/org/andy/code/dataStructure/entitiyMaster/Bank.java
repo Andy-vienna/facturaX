@@ -10,16 +10,16 @@ public class Bank {
     @Column(name = "Id", nullable = false)
     private int id;
 
-    @Column(name = "BankName")
+    @Column(name = "BankName", nullable = false)
     private String bankName;
     
-    @Column(name = "IBAN")
+    @Column(name = "BIC", nullable = false)
+    private String bic;
+    
+    @Column(name = "IBAN", nullable = false)
     private String iban;
     
-    @Column(name = "BIC")
-    private String bic;
-
-    @Column(name = "Kontoinhaber")
+    @Column(name = "Kontoinhaber", nullable = false)
     private String ktoName;
 
 	//###################################################################################################################################################
@@ -42,20 +42,20 @@ public class Bank {
         this.bankName = bankName;
     }
     
-    public String getIban() {
-        return iban;
-    }
-    
-    public void setIban(String iban) {
-        this.iban = iban != null ? iban.toUpperCase() : null;
-    }
-    
     public String getBic() {
         return bic;
     }
     
     public void setBic(String bic) {
         this.bic = bic != null ? bic.toUpperCase() : null;
+    }
+    
+    public String getIban() {
+        return iban;
+    }
+    
+    public void setIban(String iban) {
+        this.iban = iban != null ? iban.toUpperCase() : null;
     }
     
     public String getKtoName() {

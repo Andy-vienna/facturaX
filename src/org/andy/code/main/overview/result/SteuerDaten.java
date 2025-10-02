@@ -52,6 +52,7 @@ public class SteuerDaten {
 	
 	private static void setValues(SteuerPanel panel) {
 		
+		bdSVYear = BD.ZERO; // Variable neu initialisieren
 		getDBData(); // Steuergrenzen und Gewinnfreibetragsgrenzen aus DB lesen
 		
 		List<BigDecimal> GwbStufe = new ArrayList<>();

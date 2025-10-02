@@ -120,6 +120,9 @@ public class HauptFenster extends JFrame {
 
     private TableHeader header = new TableHeader();
     private final static int BUTTONX = 130; private static final int BUTTONY = 50;
+    
+    // Rollen
+    enum Role { NONE, USER, SUPERUSER, FINANCIALUSER, ADMIN }
 
     // Status/Session
     private String sLic;
@@ -160,10 +163,8 @@ public class HauptFenster extends JFrame {
     // Auswahl
     private String vZelleAN, vStateAN, vZelleRE, vStateRE, vZelleBE, vStateBE, vZelleLS, vStateLS;
 
-    // Rollen
-    enum Role { NONE, USER, SUPERUSER, FINANCIALUSER, ADMIN }
-    private static String u, r;
-    private static int tc;
+    private static String u, r; // user und Rolle
+    private static int tc; // Tab-Config
     
 	//###################################################################################################################################################
 	// public Teil
@@ -324,7 +325,7 @@ public class HauptFenster extends JFrame {
                 btn[1] = createButton("<html>Artikel<br>neu/bearb.</html>", ButtonIcon.EDIT.icon(), new Color(159,182,205));
                 btn[2] = createButton("<html>neues<br>Angebot</html>", ButtonIcon.NEW.icon(), new Color(191,239,255));
                 btn[3] = createButton("<html>Angebot<br>drucken</html>", ButtonIcon.PRINT.icon(), null);
-                btn[4] = createButton("<html>AB<br>drucken</html>", ButtonIcon.PRINT.icon(), null);
+                btn[4] = createButton("<html>AB<br>drucken</html>", ButtonIcon.BEST.icon(), null);
                 btn[1].setEnabled(true); btn[2].setEnabled(true);
         	}
         	case 1 -> {
@@ -344,6 +345,8 @@ public class HauptFenster extends JFrame {
         	}
         }
         btn[0].setEnabled(true);
+        
+        if ((use == 0) && role.name().equals("USER")) {	btn[0].setEnabled(false); btn[1].setEnabled(false); }
 
         sPaneAN = new ErzeugeTabelle<>(sTempAN, header.getHEADER_AN(), new TableANcr(this));
         sPaneAN.getTable().addMouseListener(new MouseAdapter() {
@@ -407,7 +410,7 @@ public class HauptFenster extends JFrame {
                 btn[1] = createButton("<html>Artikel<br>neu/bearb.</html>", ButtonIcon.EDIT.icon(), new Color(159,182,205));
                 btn[2] = createButton("<html>neue<br>Rechnung</html>", ButtonIcon.NEW.icon(), new Color(191,239,255));
                 btn[3] = createButton("<html>Rechnung<br>drucken</html>", ButtonIcon.PRINT.icon(), null);
-                btn[4] = createButton("<html>Mahn-<br>verfahren</html>", ButtonIcon.PRINT.icon(), null);
+                btn[4] = createButton("<html>Mahn-<br>verfahren</html>", ButtonIcon.ALARM.icon(), null);
                 btn[1].setEnabled(true); btn[2].setEnabled(true);
         	}
         	case 1 -> {
@@ -427,6 +430,8 @@ public class HauptFenster extends JFrame {
         	}
         }
         btn[0].setEnabled(true);
+        
+        if ((use == 0) && role.name().equals("USER")) {	btn[0].setEnabled(false); btn[1].setEnabled(false); }
 
         sPaneRE = new ErzeugeTabelle<>(sTempRE, header.getHEADER_RE(), new TableREcr(this));
         sPaneRE.getTable().addMouseListener(new MouseAdapter() {
@@ -465,7 +470,7 @@ public class HauptFenster extends JFrame {
         	        this::updScreen
         	    );
         	});
-            btn[4].addActionListener(_ -> { if (vZelleRE != null) { MahnstufeDialog.open(null, vZelleRE); updScreen(); }});
+            btn[4].addActionListener(_ -> { if (vZelleRE != null) { MahnstufeDialog.open(null, vZelleRE, vStateRE); updScreen(); }});
         }
 
         pageRE.removeAll();
@@ -505,6 +510,8 @@ public class HauptFenster extends JFrame {
         	}
         }
         btn[0].setEnabled(true);
+        
+        if ((use == 0) && role.name().equals("USER")) {	btn[0].setEnabled(false); btn[1].setEnabled(false); }
         
         sPaneBE = new ErzeugeTabelle<>(sTempBE, header.getHEADER_BE(), new TableBEcr(this));
         sPaneBE.getTable().addMouseListener(new MouseAdapter() {
@@ -635,6 +642,8 @@ public class HauptFenster extends JFrame {
         }
         btn[0].setEnabled(true);
         
+        if ((use == 0) && role.name().equals("USER")) {	btn[0].setEnabled(false); }
+        
         if (purchasePanel instanceof EinkaufPanel pup) {
             pup.setsTitel("");
             pup.setBtnText(0, "..."); pup.setBtnText(1, "save");
@@ -647,8 +656,9 @@ public class HauptFenster extends JFrame {
         sPanePU.setColumnWidths(new int[] {100,150,400,50,100,100,100,100,150,80,400});
         sPanePU.getTable().setAutoCreateRowSorter(true);
 
-        infoPU = new SummenPanelB(7, new String[] {"Netto:", "Brutto:", "USt.AT 10%", "USt.AT 20%", "USt.EU (EURO)", "USt.EU sonst.", "USt. Welt"},
-        							new boolean[] {true, true, true, true, true, false, false});
+        infoPU = new SummenPanelB(13, new String[] {"Netto:", "Brutto:", "USt.AT 10% Q1", "USt.AT 20% Q1", "USt.AT 10% Q2", "USt.AT 20% Q2",
+        		"USt.AT 10% Q3", "USt.AT 20% Q3", "USt.AT 10% Q4", "USt.AT 20% Q4", "USt.EU (EURO)", "USt.EU sonst.", "USt. Welt", "", },
+				new boolean[] {true, true, true, true, true, true, true, true, true, true, true, false, false,});
         setSumPU();
         
         if (use == 1) infoPU.setVisible(false);
@@ -895,14 +905,23 @@ public class HauptFenster extends JFrame {
     }
     
     private void setSumPU() {
-        double dNetto = LadeEinkauf.getBdNetto().doubleValue(); double dBrutto = LadeEinkauf.getBdBrutto().doubleValue();
-        double d10Proz = LadeEinkauf.getBd10Proz().doubleValue(); double d20Proz = LadeEinkauf.getBd20Proz().doubleValue();
-        double dSonstEU = LadeEinkauf.getBdUstEU().doubleValue(); double dSonstEUnoEURO = LadeEinkauf.getBdUstEUnoEURO().doubleValue();
-        double dUstWelt = LadeEinkauf.getBdUstNonEU().doubleValue();
+    	BigDecimal[] tmp10Q = new BigDecimal[4]; BigDecimal[] tmp20Q = new BigDecimal[4];
+    	double[] d10ProzQ = new double[4]; double[] d20ProzQ = new double[4];
+    	double dNetto = LadeEinkauf.getBdNetto().doubleValue(); double dBrutto = LadeEinkauf.getBdBrutto().doubleValue();
+    	tmp10Q = LadeEinkauf.getBd10ProzQ(); tmp20Q = LadeEinkauf.getBd20ProzQ();
+        d10ProzQ[0] = tmp10Q[0].doubleValue(); d10ProzQ[1] = tmp10Q[1].doubleValue();
+        d10ProzQ[2] = tmp10Q[2].doubleValue(); d10ProzQ[2] = tmp10Q[2].doubleValue();
+        d20ProzQ[0] = tmp20Q[0].doubleValue(); d20ProzQ[1] = tmp20Q[1].doubleValue();
+        d20ProzQ[2] = tmp20Q[2].doubleValue(); d20ProzQ[2] = tmp20Q[2].doubleValue();
+        double dUstSonst = LadeEinkauf.getUstEU().doubleValue(); double dSonstEUnoEURO = LadeEinkauf.getBdUstEUnoEURO().doubleValue();
+        double dUstWelt = LadeEinkauf.getUstNonEU().doubleValue();
         infoPU.setTxtSum(0, dNetto); infoPU.setTxtSum(1, dBrutto);
-        infoPU.setTxtSum(2, d10Proz); infoPU.setTxtSum(3, d20Proz);
-        infoPU.setTxtSum(4, dSonstEU); infoPU.setTxtSum(5, dSonstEUnoEURO);
-        infoPU.setTxtSum(6, dUstWelt);
+        infoPU.setTxtSum(2, d10ProzQ[0]); infoPU.setTxtSum(3, d20ProzQ[0]);
+        infoPU.setTxtSum(4, d10ProzQ[1]); infoPU.setTxtSum(5, d20ProzQ[1]);
+        infoPU.setTxtSum(6, d10ProzQ[2]); infoPU.setTxtSum(7, d20ProzQ[2]);
+        infoPU.setTxtSum(8, d10ProzQ[3]); infoPU.setTxtSum(9, d20ProzQ[3]);
+        infoPU.setTxtSum(10, dUstSonst); infoPU.setTxtSum(11, dSonstEUnoEURO);
+        infoPU.setTxtSum(12, dUstWelt);
     }
 
     private void setSumEX() {
@@ -921,7 +940,7 @@ public class HauptFenster extends JFrame {
         infoEX.setTxtSum(4, d10ProzQ[1]); infoEX.setTxtSum(5, d20ProzQ[1]);
         infoEX.setTxtSum(6, d10ProzQ[2]); infoEX.setTxtSum(7, d20ProzQ[2]);
         infoEX.setTxtSum(8, d10ProzQ[3]); infoEX.setTxtSum(9, d20ProzQ[3]);
-        infoEX.setTxtSum(10, dUstSonst); ; infoEX.setTxtSum(11, dSonstEUnoEURO);
+        infoEX.setTxtSum(10, dUstSonst); infoEX.setTxtSum(11, dSonstEUnoEURO);
         infoEX.setTxtSum(12, dUstWelt);
     }
 
@@ -1157,11 +1176,13 @@ public class HauptFenster extends JFrame {
     //###################################################################################################################################################
     
     private void updScreen() {
-        // Tabs je nach Rolle neu befüllen
+    	int oldIdx = tabPanel.getSelectedIndex(); // aktuell angewählten Tab sichern
+
     	sTempAN = sTempRE = sTempBE = sTempLS = sTempPU = sTempEX = sTempST = null;
         pageOv = null; pageErg = null;
 
         loadData();
+        
         if (TabMask.visible(tc, TabMask.Tab.OFFER)) {
         	pageAN.removeAll();
         	doAngebotPanel(0);
@@ -1210,6 +1231,9 @@ public class HauptFenster extends JFrame {
 
         contentPane.revalidate();
         contentPane.repaint();
+        
+        int idx = Math.min(Math.max(oldIdx, 0), tabPanel.getTabCount() - 1);
+        tabPanel.setSelectedIndex(idx); // vorher aktiven Tab wieder aktivieren
     }
 
     private Role roleFromLogin(String r) {
@@ -1250,7 +1274,7 @@ public class HauptFenster extends JFrame {
     private void setBillButtonsByState(String state, JButton[] btn) {
         boolean print = "erstellt".equals(state);
         boolean dunning = switch (state) {
-            case "gedruckt", "Zahlungserinnerung", "Mahnstufe 1", "Mahnstufe 2" -> true;
+            case "gedruckt", "Zahlungserinnerung", "Mahnstufe 1" -> true;
             default -> false;
         };
         btn[3].setEnabled(print);

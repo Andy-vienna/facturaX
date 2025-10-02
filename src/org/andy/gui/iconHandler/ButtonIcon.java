@@ -8,6 +8,8 @@ import javax.swing.ImageIcon;
 
 public enum ButtonIcon {
     ACT("act.png"),
+    ALARM("alarm.png"),
+    BEST("best.png"),
     CALC("calc.png"),
     DEL("del.png"),
     DOWN("down.png"),

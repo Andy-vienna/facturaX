@@ -1,7 +1,5 @@
 package org.andy.gui.main;
 
-import static org.andy.code.misc.Password.verifyPwd;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
@@ -12,6 +10,7 @@ import javax.swing.*;
 
 import org.andy.code.dataStructure.entitiyMaster.User;
 import org.andy.code.dataStructure.repositoryMaster.UserRepository;
+import org.andy.code.misc.Password;
 
 public final class AnmeldeFenster {
 
@@ -58,7 +57,7 @@ public final class AnmeldeFenster {
         frame.setSize(450, 265); //(850, 500);
         frame.setLocationRelativeTo(null);
         frame.setUndecorated(true);
-        setAppIcon(frame, "/icons/icon.png");
+        setAppIcon(frame, "/icons/frames/icon.png");
         JRootPane rootPane = frame.getRootPane();
         rootPane.setDefaultButton(loginBtn);
         wireActions(rootPane);
@@ -133,7 +132,7 @@ public final class AnmeldeFenster {
                     User u = userRepository.findById(userId);
                     if (u == null) return null;
                     String hash = u.getHash();
-                    boolean ok = verifyPwd(pwd, hash);
+                    boolean ok = Password.verifyPwd(pwd, hash);
                     return ok ? u : null;
                 } finally {
                     Arrays.fill(pwd, '\0');

@@ -1,7 +1,5 @@
 package org.andy.code.main;
 
-import static org.andy.code.misc.License.getLicense;
-
 import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +20,7 @@ import org.andy.code.dataStructure.repositoryMaster.UserRepository;
 import org.andy.gui.main.HauptFenster;
 import org.andy.gui.main.AnmeldeFenster;
 import org.andy.gui.misc.MyFlatTabbedPaneUI;
-
+import org.apache.logging.log4j.LogManager;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 
 public class StartUp {
@@ -35,7 +33,7 @@ public class StartUp {
 
 	public static final String APP_NAME = "FacturaX v2";
 	public static String APP_VERSION = null;
-	public static String APP_BUILD = null;
+	public static String[] APP_BUILD = null;
 	private static String APP_LICENSE = null;
 	private static int APP_MODE = 0;
 
@@ -50,7 +48,7 @@ public class StartUp {
 	public static void main(String[] args) {
         // 1) Logging konfigurieren
         System.setProperty("log4j.configurationFile", "log4j2.xml");
-        logger = org.apache.logging.log4j.LogManager.getLogger(StartUp.class);
+        logger = LogManager.getLogger(StartUp.class);
 
         // 2) Globale Fehlerbehandlung
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
@@ -65,18 +63,19 @@ public class StartUp {
         }
 
         // 4) Lizenz einlesen
-        try {
-            APP_MODE = getLicense(Einstellungen.getFileLicense());
-            APP_MODE = 2; // aktuell auch ohne Lizenzfile ...
-        } catch (java.security.NoSuchAlgorithmException | java.io.IOException e) {
-            logger.error("error reading license", e);
-            APP_MODE = 0;
-        }
+        //try {
+            //APP_MODE = License.getLicense(Einstellungen.getFileLicense());
+            APP_MODE = 2; // aktuell ohne Lizenzfile ...
+        //} catch (java.security.NoSuchAlgorithmException | java.io.IOException e) {
+            //logger.error("error reading license", e);
+            //APP_MODE = 0;
+        //}
         APP_LICENSE = switch (APP_MODE) {
-            case 1 -> "Lizenz DEMO";
-            case 2 -> "Lizenz OK";
-            default -> "unlizensiertes Produkt";
-        };
+            			  //case 1 -> "Lizenz DEMO";
+            			  //case 2 -> "Lizenz OK";
+            			  case 2 -> "freie Version";
+            			  default -> "unlizensiertes Produkt";
+        			  };
 
         // 5) Version lesen
         APP_VERSION = getVersion();
@@ -169,17 +168,19 @@ public class StartUp {
 	}
     
     // Bild-Date-and-Time aus Manifest lesen
-    private static String getBuildTime() {
+    private static String[] getBuildTime() {
+    	String[] tmp = new String[2];
     	try (InputStream is = StartUp.class.getResourceAsStream("/META-INF/MANIFEST.MF")) {
     	    if (is == null) return null; // kein Manifest gefunden
     	    Manifest mf = new Manifest(is);
     	    String build = mf.getMainAttributes().getValue("Built-Date");
     	    Instant instant = Instant.parse(build); // Formattierer für Date-and-Time
     	    ZonedDateTime local = instant.atZone(ZoneId.systemDefault());
-    	    String formatted = local.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
-    	    return formatted;
+    	    tmp[0] = local.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
+    	    tmp[1] = mf.getMainAttributes().getValue("Build-Jdk-Spec");
+    	    return tmp;
     	} catch (IOException e) {
-    		return "no manifest found";
+    		return new String[] { "no build date", "no Java version" };
     	}
     }
 	

@@ -32,7 +32,7 @@ public final class InfoDialog extends JDialog {
 	// public Teil
 	// ###################################################################################################################################################
 
-    public InfoDialog(Window owner, String appName, String appVersion, String appBuild) {
+    public InfoDialog(Window owner, String appName, String appVersion, String[] appBuild) {
         super(owner, "Über " + appName + " (" + appVersion + ")", ModalityType.APPLICATION_MODAL);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setContentPane(buildContent(appName, appVersion, appBuild));
@@ -45,7 +45,7 @@ public final class InfoDialog extends JDialog {
     }
     
     // Convenience
-    public static void show(Window owner, String appName, String appVersion, String appBuild) {
+    public static void show(Window owner, String appName, String appVersion, String[] appBuild) {
         new InfoDialog(owner, appName, appVersion, appBuild).setVisible(true);
     }
 
@@ -53,7 +53,7 @@ public final class InfoDialog extends JDialog {
 	// private Teil
 	// ###################################################################################################################################################
 
-    private JPanel buildContent(String appName, String appVersion, String appBuild) {
+    private JPanel buildContent(String appName, String appVersion, String[] appBuild) {
         JPanel root = new JPanel(new BorderLayout(16, 16));
         root.setBorder(new EmptyBorder(16, 8, 16, 8));
 
@@ -66,7 +66,11 @@ public final class InfoDialog extends JDialog {
 
         JLabel title = new JLabel("<html>" +
         		"<span style='font-size:24px; font-weight:bold;'>" + appName + " (" + appVersion + ") " + "</span><br>" +
-        		"<span style='font-size:8px; font-weight:bold; color:blue;'>" + "build: " + appBuild + "</span>" +
+        		"<span style='font-size:9px; font-weight:bold; color:blue;'></span><br>" +
+        		"<span style='font-size:8px; font-weight:bold; color:black;'>build date / time: </span>" +
+        		"<span style='font-size:8px; font-weight:bold; color:blue;'>" + appBuild[0] + "</span><br>" +
+        		"<span style='font-size:10px; font-weight:bold; color:black;'>Java JDK version : </span>" +
+        		"<span style='font-size:10px; font-weight:bold; color:red ;'>" + appBuild[1] + "</span>" +
         		"</html>");
         //title.setFont(title.getFont().deriveFont(Font.BOLD, 24f));
         title.setForeground(new Color(20, 20, 20));

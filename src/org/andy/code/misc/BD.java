@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public class BD {
 	
-	private BD() {} // Verhindert Instanziierung
+	private BD() {} // Verhindert Instanzierung
 
 	public static final BigDecimal M_ONE       = new BigDecimal("-1").setScale(2);
     public static final BigDecimal ZERO        = BigDecimal.ZERO.setScale(2);

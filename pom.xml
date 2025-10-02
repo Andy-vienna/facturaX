@@ -72,7 +72,6 @@
 										<exclude>META-INF/INDEX.LIST</exclude>
 										<exclude>META-INF/LICENSE*</exclude>
 										<exclude>META-INF/NOTICE*</exclude>
-										<exclude>**/*.kotlin_metadata</exclude>
 									</excludes>
 								</filter>
 							</filters>

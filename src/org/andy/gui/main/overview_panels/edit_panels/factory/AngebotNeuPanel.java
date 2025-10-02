@@ -156,7 +156,6 @@ public class AngebotNeuPanel extends EditPanel {
         JLabel lbl29=new JLabel("Referenz");        lbl29.setBounds(1010,105,60,25);  add(lbl29);
         
         lblHinweis = new JLabel(String.format(preFlightLabel, Einstellungen.getTplDescriptionBase()));
-        //lblHinweis.setFont(new Font("Tahoma", Font.BOLD, 11));
         lblHinweis.setBounds(1130,155,700,75); lblHinweis.setVisible(false); add(lblHinweis);
 
         // Combos/Textfelder links

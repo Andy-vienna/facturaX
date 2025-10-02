@@ -40,6 +40,12 @@ public class BenutzerPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
     private static final Logger logger = LogManager.getLogger(QrCodePanel.class);
     
+    private final boolean[] selUser = {true,true,true,true,false,false,false,false,false};
+    private final boolean[] selSuser = {true,true,true,true,true,true,true,true,false};
+    private final boolean[] selFuser = {false,false,false,false,true,true,true,true,false};
+    private final boolean[] selAdmin = {false,false,false,false,false,false,false,false,true};
+    private final boolean[] selDefault = {false,false,false,false,false,false,false,false,false};
+    
     private static JButton btnShowPwd = null, btnPwdOK = null;
     
     private final Font font = new Font("Tahoma", Font.BOLD, 11);
@@ -189,17 +195,12 @@ public class BenutzerPanel extends JPanel {
     
     private void isSelectable(String role) {
     	boolean[] cbRole = null;
-    	boolean[] selUser = {true,true,true,true,false,false,false,false,false};
-    	boolean[] selSuser = {true,true,true,true,true,true,true,true,false};
-    	boolean[] selFuser = {false,false,false,false,true,true,true,true,false};
-    	boolean[] selAdmin = {false,false,false,false,false,false,false,false,true};
-    	boolean[] selDefault = {false,false,false,false,false,false,false,false,false};
     	switch(role) {
-    	case "user" -> cbRole = selUser;
-    	case "superuser" -> cbRole = selSuser;
-    	case "financialuser" -> cbRole = selFuser;
-    	case "admin" -> cbRole = selAdmin;
-    	default -> cbRole = selDefault;
+    		case "user" -> cbRole = selUser;
+    		case "superuser" -> cbRole = selSuser;
+    		case "financialuser" -> cbRole = selFuser;
+    		case "admin" -> cbRole = selAdmin;
+    		default -> cbRole = selDefault;
     	}
     	for (int x = 0; x < chkConfig.length; x++) {
     		chkConfig[x].setEnabled(cbRole[x]);

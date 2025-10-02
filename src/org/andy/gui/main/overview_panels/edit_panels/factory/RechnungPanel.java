@@ -612,7 +612,7 @@ public class RechnungPanel extends EditPanel {
     	case 1:
     		txtFieldsFocusable(true);
     		break;
-    	case 11:
+    	case 11, 211, 311, 411:
     		String[] selectState = null;
     		if (rechnung.getSkonto1() == 1) {
     			selectState = new String[] {"", "storniert", "bezahlt", "bezahlt Skonto 1"};

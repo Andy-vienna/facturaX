@@ -10,7 +10,7 @@ public class Artikel {
     @Column(name = "Id", nullable = false)
     private String id;
 
-    @Column(name = "Text")
+    @Column(name = "Text", nullable = false)
     private String text;
 
     @Column(name = "Wert", precision = 9, scale = 2, nullable = false)

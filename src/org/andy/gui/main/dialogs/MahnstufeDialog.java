@@ -31,14 +31,16 @@ public final class MahnstufeDialog extends JDialog {
     private final String sachId;
     private final Map<Stage, JRadioButton> radios = new EnumMap<>(Stage.class);
     private final ButtonGroup group = new ButtonGroup();
+    
+    private String stufe;
 
 	//###################################################################################################################################################
 	// public Teil
 	//###################################################################################################################################################
     
-    public static void open(Window owner, String sId) {
+    public static void open(Window owner, String sId, String state) {
         SwingUtilities.invokeLater(() -> {
-            MahnstufeDialog d = new MahnstufeDialog(owner, sId);
+            MahnstufeDialog d = new MahnstufeDialog(owner, sId, state);
             d.setVisible(true);
         });
     }
@@ -47,9 +49,9 @@ public final class MahnstufeDialog extends JDialog {
 	// private Teil
 	//###################################################################################################################################################
 
-    private MahnstufeDialog(Window owner, String sId) {
+    private MahnstufeDialog(Window owner, String sId, String state) {
         super(owner, "Mahnstufe einleiten", ModalityType.APPLICATION_MODAL);
-        this.sachId = sId;
+        this.sachId = sId; this.stufe = state;
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setResizable(false);
@@ -94,8 +96,15 @@ public final class MahnstufeDialog extends JDialog {
         addRadio(p, Stage.S0, "Zahlungserinnerung");
         addRadio(p, Stage.S1, "Mahnstufe 1");
         addRadio(p, Stage.S2, "Mahnstufe 2");
+        
+        radios.get(Stage.S0).setEnabled(false); radios.get(Stage.S1).setEnabled(false); radios.get(Stage.S2).setEnabled(false);
+        
+        switch(stufe) {
+        	case "gedruckt" -> {radios.get(Stage.S0).setEnabled(true); radios.get(Stage.S0).setSelected(true);}
+        	case "Zahlungserinnerung" -> {radios.get(Stage.S1).setEnabled(true); radios.get(Stage.S1).setSelected(true);}
+        	case "Mahnstufe 1" -> {radios.get(Stage.S2).setEnabled(true); radios.get(Stage.S2).setSelected(true);}
+        }
 
-        radios.get(Stage.S0).setSelected(true);
         return p;
     }
 

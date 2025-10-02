@@ -23,7 +23,7 @@ import org.andy.code.misc.CodeListen;
 public class LadeEinkauf {
 	
 	private static BigDecimal bdNetto = BD.ZERO; private static BigDecimal bdBrutto = BD.ZERO;
-	private static BigDecimal bd10Proz = BD.ZERO; private static BigDecimal bd20Proz = BD.ZERO;
+	private static BigDecimal[] bd10ProzQ = new BigDecimal[4]; private static BigDecimal[] bd20ProzQ = new BigDecimal[4];
 	private static BigDecimal bdUstEU = BD.ZERO; private static BigDecimal bdUstEUnoEURO = BD.ZERO;
 	private static BigDecimal bdUstNonEU = BD.ZERO;
 	
@@ -41,11 +41,15 @@ public class LadeEinkauf {
 	
 	private static String[][] loadData(boolean reRun) {
 
+		Currency currency = Currency.getInstance("EUR");
 		DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Locale.GERMANY);
 		DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
 		
-		bdNetto = BD.ZERO; bdBrutto = BD.ZERO; bd10Proz = BD.ZERO; bd20Proz = BD.ZERO;
+		bdNetto = BD.ZERO; bdBrutto = BD.ZERO;
 		bdUstEU = BD.ZERO; bdUstEUnoEURO = BD.ZERO; bdUstNonEU = BD.ZERO;
+		for (int n = 0; n < bd10ProzQ.length; n++) {
+			bd10ProzQ[n] = BD.ZERO; bd20ProzQ[n] = BD.ZERO;
+		}
 
 		EinkaufRepository einkaufRepository = new EinkaufRepository();
 	    List<Einkauf> einkaufListe = new ArrayList<>();
@@ -77,7 +81,6 @@ public class LadeEinkauf {
 	        String datum = date.format(outputFormatter);
 	        String datumZZ = dateZZ.format(outputFormatter);
 	        
-	        Currency currency = Currency.getInstance(einkauf.getWaehrung());
 	        String netto = df.format(einkauf.getNetto()) + " " + currency.getCurrencyCode();
 	        String ust = df.format(einkauf.getUst()) + " " + currency.getCurrencyCode();
 	        String brutto = df.format(einkauf.getBrutto()) + " " + currency.getCurrencyCode();
@@ -115,8 +118,17 @@ public class LadeEinkauf {
 			
 			if (eu) {
 				if (land.equals("AT")) {
-					if (steuer.equals("10")) bd10Proz = bd10Proz.add(einkauf.getUst());
-					if (steuer.equals("20")) bd20Proz = bd20Proz.add(einkauf.getUst());
+					
+					int quartal = getQuartalFromString(einkauf.getReDatum().toString(), "yyyy-MM-dd") - 1;
+					String sTax = steuer;
+					BigDecimal bdVal = einkauf.getUst();
+					if (quartal >= 0 && quartal < 4) {
+						switch (sTax) {
+						case "20" -> bd20ProzQ[quartal] = bd20ProzQ[quartal].add(bdVal);
+						case "10" -> bd10ProzQ[quartal] = bd10ProzQ[quartal].add(bdVal);
+						}
+					}
+					
 				} else if (euro) {
 					bdUstEU = bdUstEU.add(einkauf.getUst());
 				} else {
@@ -131,6 +143,16 @@ public class LadeEinkauf {
 	}
 	
 	//###################################################################################################################################################
+	// Hilfsmethoden
+	//###################################################################################################################################################
+	
+	private static int getQuartalFromString(String datumString, String fPattern) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(fPattern);
+        LocalDate datum = LocalDate.parse(datumString, formatter);
+        return (datum.getMonthValue() - 1) / 3 + 1;
+    }
+	
+	//###################################################################################################################################################
 	// Getter und Setter für Felder
 	//###################################################################################################################################################
 
@@ -142,24 +164,24 @@ public class LadeEinkauf {
 		return bdBrutto;
 	}
 	
-	public static BigDecimal getBd10Proz() {
-		return bd10Proz;
-	}
-
-	public static BigDecimal getBd20Proz() {
-		return bd20Proz;
-	}
-
-	public static BigDecimal getBdUstEU() {
+	public static BigDecimal getUstEU() {
 		return bdUstEU;
 	}
-
-	public static BigDecimal getBdUstNonEU() {
+	
+	public static BigDecimal getUstNonEU() {
 		return bdUstNonEU;
 	}
-
+	
 	public static BigDecimal getBdUstEUnoEURO() {
 		return bdUstEUnoEURO;
+	}
+
+	public static BigDecimal[] getBd10ProzQ() {
+		return bd10ProzQ;
+	}
+
+	public static BigDecimal[] getBd20ProzQ() {
+		return bd20ProzQ;
 	}
 
 }
