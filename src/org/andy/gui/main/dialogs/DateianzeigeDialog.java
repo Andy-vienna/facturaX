@@ -147,7 +147,7 @@ public class DateianzeigeDialog extends JFrame {
 		
 		setIconImage(FrameIcon.FILE.image());
 		setResizable(false);
-		setTitle("Dateihandling - " + StartUp.APP_NAME + StartUp.APP_VERSION);
+		setTitle("Dateihandling - " + StartUp.APP_NAME + " " + " (" + StartUp.APP_VERSION + ")");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 785, 650);
 		setLocationRelativeTo(null);

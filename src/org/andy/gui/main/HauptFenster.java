@@ -910,9 +910,9 @@ public class HauptFenster extends JFrame {
     	double dNetto = LadeEinkauf.getBdNetto().doubleValue(); double dBrutto = LadeEinkauf.getBdBrutto().doubleValue();
     	tmp10Q = LadeEinkauf.getBd10ProzQ(); tmp20Q = LadeEinkauf.getBd20ProzQ();
         d10ProzQ[0] = tmp10Q[0].doubleValue(); d10ProzQ[1] = tmp10Q[1].doubleValue();
-        d10ProzQ[2] = tmp10Q[2].doubleValue(); d10ProzQ[2] = tmp10Q[2].doubleValue();
+        d10ProzQ[2] = tmp10Q[2].doubleValue(); d10ProzQ[3] = tmp10Q[3].doubleValue();
         d20ProzQ[0] = tmp20Q[0].doubleValue(); d20ProzQ[1] = tmp20Q[1].doubleValue();
-        d20ProzQ[2] = tmp20Q[2].doubleValue(); d20ProzQ[2] = tmp20Q[2].doubleValue();
+        d20ProzQ[2] = tmp20Q[2].doubleValue(); d20ProzQ[3] = tmp20Q[3].doubleValue();
         double dUstSonst = LadeEinkauf.getUstEU().doubleValue(); double dSonstEUnoEURO = LadeEinkauf.getBdUstEUnoEURO().doubleValue();
         double dUstWelt = LadeEinkauf.getUstNonEU().doubleValue();
         infoPU.setTxtSum(0, dNetto); infoPU.setTxtSum(1, dBrutto);
@@ -930,9 +930,9 @@ public class HauptFenster extends JFrame {
     	double dNetto = LadeAusgaben.getBdNetto().doubleValue(); double dBrutto = LadeAusgaben.getBdBrutto().doubleValue();
     	tmp10Q = LadeAusgaben.getBd10ProzQ(); tmp20Q = LadeAusgaben.getBd20ProzQ();
         d10ProzQ[0] = tmp10Q[0].doubleValue(); d10ProzQ[1] = tmp10Q[1].doubleValue();
-        d10ProzQ[2] = tmp10Q[2].doubleValue(); d10ProzQ[2] = tmp10Q[2].doubleValue();
+        d10ProzQ[2] = tmp10Q[2].doubleValue(); d10ProzQ[3] = tmp10Q[3].doubleValue();
         d20ProzQ[0] = tmp20Q[0].doubleValue(); d20ProzQ[1] = tmp20Q[1].doubleValue();
-        d20ProzQ[2] = tmp20Q[2].doubleValue(); d20ProzQ[2] = tmp20Q[2].doubleValue();
+        d20ProzQ[2] = tmp20Q[2].doubleValue(); d20ProzQ[3] = tmp20Q[3].doubleValue();
         double dUstSonst = LadeAusgaben.getUstEU().doubleValue(); double dSonstEUnoEURO = LadeAusgaben.getBdUstEUnoEURO().doubleValue();
         double dUstWelt = LadeAusgaben.getUstNonEU().doubleValue();
         infoEX.setTxtSum(0, dNetto); infoEX.setTxtSum(1, dBrutto);

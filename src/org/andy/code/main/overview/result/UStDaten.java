@@ -80,7 +80,7 @@ public final class UStDaten {
 
 		// Berechnung Bemessungsgrundlage (Ausgangsrechnungen Inland | Ausgangsrechnungen Ausland)
 		try {
-			for (int x = 1; x < rechnungListe.size(); x++) {
+			for (int x = 0; x < rechnungListe.size(); x++) {
 				Rechnung rechnung = rechnungListe.get(x);
 				int quartal = getQuartalFromString(rechnung.getDatum().toString(), "yyyy-MM-dd") - 1;
 				BigDecimal bdTax = rechnung.getUst();
@@ -106,7 +106,7 @@ public final class UStDaten {
 		
 		// Berechnung der abziehbaren Vorsteuer (Eingangsrechnungen Inland mit Steuersatz 20%, 10% und 13%)
 		try {
-			for (int x = 1; x < einkaufListe.size(); x++) {
+			for (int x = 0; x < einkaufListe.size(); x++) {
 				Lieferant lieferant = new Lieferant();
 				Einkauf einkauf = einkaufListe.get(x);
 				int quartal = getQuartalFromString(einkauf.getReDatum().toString(), "yyyy-MM-dd") - 1;
@@ -134,7 +134,7 @@ public final class UStDaten {
 
 		// Berechnung der abziehbaren Vorsteuer (Betriebsausgaben Inland mit Steuersatz 20%, 10% und 13%)
 		try {
-			for (int x = 1; x < ausgabenListe.size(); x++) {
+			for (int x = 0; x < ausgabenListe.size(); x++) {
 				Ausgaben ausgaben = ausgabenListe.get(x);
 				int quartal = getQuartalFromString(ausgaben.getDatum().toString(), "yyyy-MM-dd") - 1;
 				String sTax = ausgaben.getSteuersatz();

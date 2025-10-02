@@ -37,7 +37,7 @@ public final class InfoDialog extends JDialog {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setContentPane(buildContent(appName, appVersion, appBuild));
         pack();
-        setMinimumSize(new Dimension(250, 450));
+        setMinimumSize(new Dimension(250, 475));
         setLocationRelativeTo(owner);
         getRootPane().setDefaultButton(closeButton);
         bindEscToClose();

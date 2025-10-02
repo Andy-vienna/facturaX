@@ -79,7 +79,7 @@ public class SteuerDaten {
 		rechnungListe.addAll(rechnungRepository.findAllByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()))); // Rechnungen nach GJ laden
 		
 		try {
-			for(int x = 1; x < rechnungListe.size(); x++) {
+			for(int x = 0; x < rechnungListe.size(); x++) {
 				Rechnung rechnung = rechnungListe.get(x);
 				if(rechnung.getState() > 0) { // Rechnung wurde ausgestellt
 					netto = netto.add(rechnung.getNetto());
