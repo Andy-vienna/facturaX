@@ -91,12 +91,9 @@ public class DatenbankPanel extends JPanel {
 		chkEncryption.setBounds(190, 195, 155, 25);
 		chkServerCert.setBounds(190, 220, 155, 25);
 
-		try {
-			btnDBEdit = createButton(null, ButtonIcon.EDIT.icon(), null);
-			btnDBOK = createButton(null, ButtonIcon.OK.icon(), null);
-		} catch (RuntimeException e1) {
-			logger.error("error creating button - " + e1);
-		}
+		btnDBEdit = createButton(null, ButtonIcon.EDIT.icon(), null);
+		btnDBOK = createButton(null, ButtonIcon.OK.icon(), null);
+		
 		btnDBEdit.setEnabled(true);
 		btnDBEdit.setBounds(410, 20, HauptFenster.getButtonx(), HauptFenster.getButtony());
 		btnDBOK.setBounds(410, 70, HauptFenster.getButtonx(), HauptFenster.getButtony());

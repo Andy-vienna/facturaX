@@ -32,14 +32,10 @@ import org.andy.fx.code.dataStructure.repositoryMaster.UserRepository;
 import org.andy.fx.gui.iconHandler.ButtonIcon;
 import org.andy.fx.gui.main.HauptFenster;
 import org.andy.fx.gui.main.table_panels.TabMask;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class BenutzerPanel extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
-    private static final Logger logger = LogManager.getLogger(QrCodePanel.class);
-    
     private final boolean[] selUser = {true,true,true,true,false,false,false,false,false,false};
     private final boolean[] selSuser = {true,true,true,true,true,true,true,true,false,false};
     private final boolean[] selFuser = {false,false,false,false,true,true,true,true,false,false};
@@ -54,6 +50,7 @@ public class BenutzerPanel extends JPanel {
     private JComboBox<String> cmbSelect;
     private JTextField userExist = new JTextField();
     private JPasswordField[] passFields = new JPasswordField[3];
+    private JTextField eMail = new JTextField();
     private JComboBox<String> cmbRoles;
     private JCheckBox[] chkConfig = new JCheckBox[10];
     
@@ -90,7 +87,7 @@ public class BenutzerPanel extends JPanel {
     	int btnHeight = HauptFenster.getButtony();
     	
     	String[] roles = {"", "user", "superuser", "financialuser", "admin"};
-    	String[] label = {"vorh. User", "Username", "Kennwort alt", "Kennwort neu", "Kennw. wiederh.", "Benutzerrolle"};
+    	String[] label = {"vorh. User", "Username", "Kennwort alt", "Kennwort neu", "Kennw. wiederh.", "E-Mail", "Benutzerrolle"};
     	String[] config = { "Angebot", "Rechnung", "Bestellung", "Lieferschein", "Einkauf", "Betriebsausgaben", "SV und Steuer",
     			"Jahresergenis", "Einstellungen", "DB Migration" };
     	
@@ -128,6 +125,10 @@ public class BenutzerPanel extends JPanel {
 		passFields[0].setEnabled(false);
 		passFields[2].addKeyListener(passListener);
 		y = 145;
+		
+		eMail.setBounds(x, y, 220, 25);
+		add(eMail);
+		y = 170;
 
 		cmbRoles = new JComboBox<>(roles);
 		cmbRoles.setBounds(x, y, 220, 25);
@@ -143,12 +144,9 @@ public class BenutzerPanel extends JPanel {
 		}
 		y = chkConfig[chkConfig.length - 1].getY() + chkConfig[chkConfig.length - 1].getHeight();
 
-		try {
-			btnShowPwd = createButton("...", null, null);
-			btnPwdOK = createButton(null, ButtonIcon.OK.icon(), null);
-		} catch (RuntimeException e1) {
-			logger.error("error creating button - " + e1);
-		}
+		btnShowPwd = createButton("...", null, null);
+		btnPwdOK = createButton(null, ButtonIcon.OK.icon(), null);
+		
 		btnShowPwd.addActionListener(btnShow);
 		btnPwdOK.addActionListener(btnOK);
 		btnShowPwd.setEnabled(true);
@@ -178,6 +176,7 @@ public class BenutzerPanel extends JPanel {
 		passFields[0].setText("");
 		passFields[1].setText("");
 		passFields[2].setText("");
+		eMail.setText("");
 		cmbRoles.setSelectedIndex(0);
 		for (int i = 0; i < chkConfig.length; i++) {
 			chkConfig[i].setSelected(false);
@@ -229,6 +228,7 @@ public class BenutzerPanel extends JPanel {
                 cmbRoles.setSelectedIndex(0);
             } else {
                 userExist.setText(user.getId());
+                eMail.setText(user.getEmail());
                 switch(user.getRoles().trim()) {
                 	case "user" -> cmbRoles.setSelectedIndex(1);
                 	case "superuser" -> cmbRoles.setSelectedIndex(2);
@@ -352,6 +352,7 @@ public class BenutzerPanel extends JPanel {
 						return;
 					}
 					User newUser = new User();
+					newUser.setEmail(eMail.getText().trim());
 					newUser.setId(userExist.getText().trim());
 					newUser.setHash(newPass);
 					newUser.setRoles(userRole);
@@ -368,6 +369,7 @@ public class BenutzerPanel extends JPanel {
 
 			if(bCheckUser) { //bekannter User
 				if (passFields[0].getPassword().length == 0 && passFields[1].getPassword().length == 0 && passFields[2].getPassword().length == 0) {
+					storedUser.setEmail(eMail.getText());
 					storedUser.setRoles(cmbRoles.getSelectedItem().toString());
 					storedUser.setTabConfig(value);
 					userRepository.update(storedUser);

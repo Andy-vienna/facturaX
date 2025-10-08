@@ -26,14 +26,10 @@ import org.andy.fx.code.dataStructure.repositoryMaster.KundeRepository;
 import org.andy.fx.code.misc.CodeListen;
 import org.andy.fx.gui.iconHandler.ButtonIcon;
 import org.andy.fx.gui.main.HauptFenster;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class KundePanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger logger = LogManager.getLogger(KundePanel.class);
-    
     private CodeListen cl = new CodeListen();
 	private JComboBox<String> cmbLand = new JComboBox<>();
 	private String iso2code;
@@ -118,25 +114,22 @@ public class KundePanel extends JPanel {
 
 		x = 510 + 10;
         y = txtFields[txtFields.length - 6].getY() - 10;
-        try {
-            btnFields[0] = createButton("<html>Kunde<br>anlegen</html>", ButtonIcon.NEW.icon(), null);
-            btnFields[1] = createButton("<html>Kunde<br>updaten</html>", ButtonIcon.UPDATE.icon(), null);
-            btnFields[2] = createButton("<html>Kunde<br>loeschen</html>", ButtonIcon.DEL.icon(), null);
-            for (int i = 0; i < btnFields.length; i++) {
-                btnFields[i].setBounds(x, y + i * (btnHeight + 5), btnWidth, btnHeight);
-                add(btnFields[i]);
-            }
-            for (int i = 0; i < btnFields.length; i++) {
-                final int index = i;
-                btnFields[i].addActionListener(_ -> {
-                    operations[index].accept(txtFields);
-                    rebuild();
-                });
-            }
-            btnFields[0].setEnabled(true);
-        } catch (RuntimeException e1) {
-            logger.error("error creating button - " + e1);
+
+        btnFields[0] = createButton("<html>Kunde<br>anlegen</html>", ButtonIcon.NEW.icon(), null);
+        btnFields[1] = createButton("<html>Kunde<br>updaten</html>", ButtonIcon.UPDATE.icon(), null);
+        btnFields[2] = createButton("<html>Kunde<br>loeschen</html>", ButtonIcon.DEL.icon(), null);
+        for (int i = 0; i < btnFields.length; i++) {
+            btnFields[i].setBounds(x, y + i * (btnHeight + 5), btnWidth, btnHeight);
+            add(btnFields[i]);
         }
+        for (int i = 0; i < btnFields.length; i++) {
+            final int index = i;
+            btnFields[i].addActionListener(_ -> {
+                operations[index].accept(txtFields);
+                rebuild();
+            });
+        }
+        btnFields[0].setEnabled(true);
         
         x = 10 + ((lblFields[labels.length - 1].getWidth() + txtFields[txtFields.length - 1].getWidth())) + btnWidth + 20;
         y = txtFields[txtFields.length - 1].getY() + 45;

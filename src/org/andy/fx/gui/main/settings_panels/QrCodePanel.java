@@ -112,13 +112,9 @@ public class QrCodePanel extends JPanel {
 		textQRtext.setBounds(110, 270, 140, 25);
 		textQRanzeige.setBounds(110, 295, 140, 25);
 
-		try {
-			btnQREdit = createButton(null, ButtonIcon.EDIT.icon(), null);
-			btnQROK = createButton(null, ButtonIcon.OK.icon(), null);
-		} catch (RuntimeException e1) {
-			logger.error("error creating button - " + e1);
-		}
-
+		btnQREdit = createButton(null, ButtonIcon.EDIT.icon(), null);
+		btnQROK = createButton(null, ButtonIcon.OK.icon(), null);
+		
 		btnQREdit.setEnabled(true);
 		btnQREdit.setBounds(260, 220, HauptFenster.getButtonx(), HauptFenster.getButtony());
 		btnQROK.setBounds(260, 270, HauptFenster.getButtonx(), HauptFenster.getButtony());

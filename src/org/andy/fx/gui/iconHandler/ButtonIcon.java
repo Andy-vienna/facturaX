@@ -16,6 +16,7 @@ public enum ButtonIcon {
     EDIT("edit.png"),
     EXPORT("export.png"),
     GEMINI("gemini.png"),
+    GOOGLE("google.png"),
     MAIL("mail.png"),
     NEW("new.png"),
     OK("ok.png"),

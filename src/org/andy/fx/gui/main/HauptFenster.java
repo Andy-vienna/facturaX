@@ -25,7 +25,6 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -164,15 +163,16 @@ public class HauptFenster extends JFrame {
     // Auswahl
     private String vZelleAN, vStateAN, vZelleRE, vStateRE, vZelleBE, vStateBE, vZelleLS, vStateLS;
 
-    private static String u, r; // user und Rolle
+    private static String u, r, m; // user, Rolle, Mail
     private static int tc; // Tab-Config
     
 	//###################################################################################################################################################
 	// public Teil
 	//###################################################################################################################################################
     
-    public static void loadGUI(String u, String r, int tc) {
-    	HauptFenster.u = u; HauptFenster.r = r; HauptFenster.tc = tc;
+    public static void loadGUI(String u, String m, String r, int tc) {
+    	HauptFenster.u = u; HauptFenster.r = r; HauptFenster.m = m; HauptFenster.tc = tc;
+    	
         if (SwingUtilities.isEventDispatchThread()) {
             ensureInstanceEDT().setVisible(true);
         } else {
@@ -221,6 +221,7 @@ public class HauptFenster extends JFrame {
         loadData();        // Tabellen-Daten laden
         buildTabs(role);   // Tabs aufbauen und anzeigen
         buildStatusBar();  // Statuszeile bauen
+        
     }
 
     //###################################################################################################################################################
@@ -843,14 +844,27 @@ public class HauptFenster extends JFrame {
     // Statusbar
 
     private void buildStatusBar() {
+    	String myMail = m != null ? myMail = m : "no E-Mail provided";
     	var dateNow = java.time.LocalDate.now(java.time.ZoneId.systemDefault());
         var dfDate = java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy");
         var dtNow = dateNow.format(dfDate);
-        String sStatus = String.format(
-                "<html><b>%s</b> | %s | Angemeldeter Benutzer: <font color='blue'><b>%s</b> (%s)</font>"
-                        + " | Master-DB: <font color='blue'><b>%s</b></font>"
-                        + " | Produktiv-DB: <font color='blue'><b>%s</b></font></html>",
-                dtNow, sLic, u, role, Einstellungen.getStrDBNameSource(), Einstellungen.getStrDBNameDest());
+        String sStatus = String.format("<html>"
+                		+ "<b>%s</b>"														// Datum
+                		+ " | %s"															// Lizenz
+                		+ " | Angemeldeter Benutzer: <font color='blue'><b>%s</b></font>"	// Benutzer
+                		+ " | Rolle: <font color='blue'>%s</font>"							// Rolle
+                		+ " | E-Mail: <font color='blue'><b>%s</b></font>"					// E-Mail
+                        + " | Master-DB: <font color='blue'><b>%s</b></font>"				// DB-Name Master-Datenbank
+                        + " | Daten-DB: <font color='blue'><b>%s</b></font>"				// DB-Name Produktiv-Datenbank
+                        + " | Server: <font color='red'><b>%s</b></font>"					// DB-Server
+                        + "</html>",
+					                dtNow,								// Datum
+					                sLic,								// Lizenz
+					                u, role,							// Benutzer und Rolle
+					                myMail,								// E-Mail
+					                Einstellungen.getStrDBNameSource(),	// DB-Name Master-Datenbank
+					                Einstellungen.getStrDBNameDest(),	// DB-Name Produktiv-Datenbank
+					                StartUp.getAPP_BUILD()[2]);			// DB-Server
 
         lblState = new JLabel(sStatus);
         lblState.setBorder(new RoundedBorder(10));
@@ -1254,6 +1268,8 @@ public class HauptFenster extends JFrame {
 			doMigration();
 			tabPanel.addTab("Datenmigration", TabIcon.MIGRATION.icon(), pageMigration);
 		}
+		
+		buildStatusBar();
 
         contentPane.revalidate();
         contentPane.repaint();

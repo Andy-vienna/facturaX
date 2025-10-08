@@ -186,12 +186,9 @@ public class LieferscheinPanel extends EditPanel {
 	    add(cmbState);
 	    
 	    // Buttons
-		try {
-			btnFields[0] = createButton("<html>update</html>", ButtonIcon.SAVE.icon(), null);
-			btnFields[1] = createButton("<html>Status<br>setzen</html>", ButtonIcon.SAVE.icon(), null);
-		} catch (RuntimeException e1) {
-			logger.error("error creating button - " + e1);
-		}
+		btnFields[0] = createButton("<html>update</html>", ButtonIcon.SAVE.icon(), null);
+		btnFields[1] = createButton("<html>Status<br>setzen</html>", ButtonIcon.SAVE.icon(), null);
+		
 		btnFields[0].setBounds(1625, 320, HauptFenster.getButtonx(), HauptFenster.getButtony());
 		btnFields[1].setBounds(1625, 70, HauptFenster.getButtonx(), HauptFenster.getButtony());
 		btnFields[1].setVisible(false);

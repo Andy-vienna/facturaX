@@ -24,14 +24,10 @@ import org.andy.fx.code.dataStructure.repositoryMaster.OwnerRepository;
 import org.andy.fx.code.misc.CodeListen;
 import org.andy.fx.gui.iconHandler.ButtonIcon;
 import org.andy.fx.gui.main.HauptFenster;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class OwnerPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger logger = LogManager.getLogger(OwnerPanel.class);
-    
     private CodeListen cl = new CodeListen();
 	private JComboBox<String> cmbLand = new JComboBox<>();
 	private JComboBox<String> cmbCurr = new JComboBox<>();
@@ -102,22 +98,19 @@ public class OwnerPanel extends JPanel {
 		add(cmbCurr);
 
 		x = 110; y = y + ((txtFields.length - 1) * 25);
-        try {
-            btnFields[0] = createButton("<html>Owner<br>anlegen</html>", ButtonIcon.NEW.icon(), null);
-            btnFields[1] = createButton("<html>Owner<br>updaten</html>", ButtonIcon.UPDATE.icon(), null);
-            for (int i = 0; i < btnFields.length; i++) {
-                btnFields[i].setBounds(x + i * (btnWidth + 10), y + 30, btnWidth, btnHeight);
-                add(btnFields[i]);
-            }
-            for (int i = 0; i < btnFields.length; i++) {
-                final int index = i;
-                btnFields[i].addActionListener(_ -> {
-                    operations[index].accept(txtFields);
-                    rebuild();
-                });
-            }
-        } catch (RuntimeException e1) {
-            logger.error("error creating button - " + e1);
+		
+        btnFields[0] = createButton("<html>Owner<br>anlegen</html>", ButtonIcon.NEW.icon(), null);
+        btnFields[1] = createButton("<html>Owner<br>updaten</html>", ButtonIcon.UPDATE.icon(), null);
+        for (int i = 0; i < btnFields.length; i++) {
+            btnFields[i].setBounds(x + i * (btnWidth + 10), y + 30, btnWidth, btnHeight);
+            add(btnFields[i]);
+        }
+        for (int i = 0; i < btnFields.length; i++) {
+            final int index = i;
+            btnFields[i].addActionListener(_ -> {
+                operations[index].accept(txtFields);
+                rebuild();
+            });
         }
         
         rebuild(); // Textfelder befüllen

@@ -22,6 +22,15 @@ public class UserRepository {
                     .getSingleResult();
         }
     }
+    
+    public User findByEmail(String email) {
+    	try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
+            return session.createQuery(
+                    "FROM User r WHERE r.email = :email", User.class)
+                    .setParameter("email", email)
+                    .getSingleResult();
+        }
+	}
 
     public void insert(User user) {
         try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
@@ -47,5 +56,7 @@ public class UserRepository {
             tx.commit();
         }
     }
+
+	
 }
 

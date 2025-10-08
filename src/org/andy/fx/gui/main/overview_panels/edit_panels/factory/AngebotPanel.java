@@ -233,15 +233,12 @@ public class AngebotPanel extends EditPanel {
         chkPage2.setBounds(1440,140,150,50); chkPage2.setEnabled(false); add(chkPage2);
 	    
 	    // Buttons
-		try {
-			btnFields[0] = createButton("<html>neu<br>berechnen</html>", ButtonIcon.CALC.icon(), null);
-			btnFields[1] = createButton("<html>update</html>", ButtonIcon.SAVE.icon(), null);
-			btnFields[2] = createButton("<html>Status<br>setzen</html>", ButtonIcon.SAVE.icon(), null);
-			btnFields[3] = createButton("<html>Revision<br>anlegen</html>", ButtonIcon.REV.icon(), null);
-			btnFields[4] = createButton("<html>Editor</html>", ButtonIcon.EDIT.icon(), null);
-		} catch (RuntimeException e1) {
-			logger.error("error creating button - " + e1);
-		}
+		btnFields[0] = createButton("<html>neu<br>berechnen</html>", ButtonIcon.CALC.icon(), null);
+		btnFields[1] = createButton("<html>update</html>", ButtonIcon.SAVE.icon(), null);
+		btnFields[2] = createButton("<html>Status<br>setzen</html>", ButtonIcon.SAVE.icon(), null);
+		btnFields[3] = createButton("<html>Revision<br>anlegen</html>", ButtonIcon.REV.icon(), null);
+		btnFields[4] = createButton("<html>Editor</html>", ButtonIcon.EDIT.icon(), null);
+		
 		btnFields[0].setBounds(1625, 260, HauptFenster.getButtonx(), HauptFenster.getButtony());
 		btnFields[1].setBounds(1625, 320, HauptFenster.getButtonx(), HauptFenster.getButtony());
 		btnFields[2].setBounds(1625, 70, HauptFenster.getButtonx(), HauptFenster.getButtony());

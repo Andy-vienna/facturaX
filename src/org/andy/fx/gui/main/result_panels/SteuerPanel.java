@@ -209,12 +209,7 @@ public class SteuerPanel extends JPanel {
         }
 
         // Export-Button
-        try {
-            btnExportP109a = createButton("<html>Export<br>§109a</html>", ButtonIcon.EXPORT.icon(), null);
-        } catch (RuntimeException e1) {
-            // logger.error("error creating button - " + e1);
-            btnExportP109a = new JButton("Export §109a");
-        }
+        btnExportP109a = createButton("<html>Export<br>§109a</html>", ButtonIcon.EXPORT.icon(), null);
         btnExportP109a.setEnabled(true);
         btnExportP109a.setBounds(4 * 130 + 60, 320, 130, 50);
         add(btnExportP109a);

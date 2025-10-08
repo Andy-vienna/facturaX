@@ -66,6 +66,9 @@ public class StartUp {
         	JOptionPane.showMessageDialog(null, "Es läuft bereits eine Instanz von FacturaX v2", "FacturaX v2", JOptionPane.ERROR_MESSAGE);
             System.exit(99);
         }
+        
+        // 3.b) prüfen ob Debug-Modus aktiv ist
+        boolean DEBUG = Boolean.getBoolean("app.debug");
 
         // 4) Lizenz einlesen
         //try {
@@ -84,7 +87,7 @@ public class StartUp {
 
         // 5) Version lesen
         APP_VERSION = getVersion();
-        APP_BUILD = getBuildTime();
+        APP_BUILD = getBuildTime(DEBUG);
         
         // 5a) aktuelles Datum setzen
         dtNow = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
@@ -142,12 +145,12 @@ public class StartUp {
     				u.setTabConfig(256);
     				userRep.insert(u);
             	}
-            	HauptFenster.loadGUI("admin", "admin", 768);
+            	HauptFenster.loadGUI("admin", "no E-Mail", "admin", 768);
             } else {
             	// ansonsten 'normaler' Start
                 new AnmeldeFenster(new UserRepository(), new AnmeldeFenster.AuthCallback() {
                 	@Override
-                    public void onSuccess(User u) { HauptFenster.loadGUI(u.getId(), u.getRoles(), u.getTabConfig()); }
+                    public void onSuccess(User u) { HauptFenster.loadGUI(u.getId(), u.getEmail(), u.getRoles(), u.getTabConfig()); }
                     public void onCancel() { System.exit(0); }
                 }).show();
             }
@@ -204,8 +207,13 @@ public class StartUp {
 	}
     
     // Bild-Date-and-Time aus Manifest lesen
-    private static String[] getBuildTime() {
+    private static String[] getBuildTime(boolean debug) {
     	String[] tmp = new String[3];
+    	if (debug) {
+    		tmp[0] = "--.--.----";
+    		tmp[1] = "debug-mode";
+    		return tmp;
+    	}
     	try (InputStream is = StartUp.class.getResourceAsStream("/META-INF/MANIFEST.MF")) {
     	    if (is == null) return null; // kein Manifest gefunden
     	    Manifest mf = new Manifest(is);

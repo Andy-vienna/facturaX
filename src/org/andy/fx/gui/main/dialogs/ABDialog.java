@@ -122,13 +122,7 @@ public final class ABDialog extends JDialog {
 	//###################################################################################################################################################
 
     private JButton createOkButton() {
-        JButton ok;
-        try {
-            ok = createButton("OK", ButtonIcon.OK.icon(), null);
-        } catch (RuntimeException ex) {
-            log.warn("OK-Button ohne Icon, cause: {}", ex.getMessage());
-            ok = new JButton("OK");
-        }
+        JButton ok = createButton("OK", ButtonIcon.OK.icon(), null);
         ok.setEnabled(true);
         ok.setMnemonic(KeyEvent.VK_O);
         ok.addActionListener(_ -> onOk());

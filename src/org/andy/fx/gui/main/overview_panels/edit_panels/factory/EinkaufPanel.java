@@ -270,11 +270,7 @@ public class EinkaufPanel extends EditPanel {
 	    cmbState.setVisible(false);
 	    add(cmbState);
 
-		try {
-			btnFields[1] = createButton("", ButtonIcon.SAVE.icon(), null);
-		} catch (RuntimeException e1) {
-			logger.error("error creating button - " + e1);
-		}
+		btnFields[1] = createButton("", ButtonIcon.SAVE.icon(), null);
 		btnFields[1].setEnabled(false);
 		btnFields[1].setBounds(1440, 145, HauptFenster.getButtonx(), HauptFenster.getButtony());
 		add(btnFields[1]);

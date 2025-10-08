@@ -62,14 +62,10 @@ import org.andy.fx.code.dataStructure.repositoryProductive.RechnungRepository;
 import org.andy.fx.code.dataStructure.repositoryProductive.SVSteuerRepository;
 import org.andy.fx.code.main.Einstellungen;
 import org.andy.fx.gui.main.HauptFenster;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class MigrationPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = LogManager.getLogger(MigrationPanel.class);
-
 	private final Font font = new Font("Tahoma", Font.BOLD, 11);
 	private final Color titleColor = Color.BLUE;
 
@@ -170,15 +166,12 @@ public class MigrationPanel extends JPanel {
 		add(lblMaster);
 		y = lblMaster.getY() + lblMaster.getHeight() + 10;
 
-		try {
-			for (int i = 0; i < btnFieldsM.length; i++) {
-				btnFieldsM[i] = createButton(btnLblMaster[i], null, null);
-				btnFieldsM[i].setBounds(x + i * (btnWidth + 10), y, btnWidth, btnHeight);
-				btnFieldsM[i].setEnabled(true);
-				add(btnFieldsM[i]);
-			}
-		} catch (RuntimeException e1) {
-			logger.error("error creating button - " + e1);
+
+		for (int i = 0; i < btnFieldsM.length; i++) {
+			btnFieldsM[i] = createButton(btnLblMaster[i], null, null);
+			btnFieldsM[i].setBounds(x + i * (btnWidth + 10), y, btnWidth, btnHeight);
+			btnFieldsM[i].setEnabled(true);
+			add(btnFieldsM[i]);
 		}
 		y = btnFieldsM[0].getY() + btnFieldsM[0].getHeight() + 50;
 
@@ -187,15 +180,11 @@ public class MigrationPanel extends JPanel {
 		add(lblWork);
 		y = lblWork.getY() + lblWork.getHeight() + 10;
 
-		try {
-			for (int i = 0; i < btnFieldsW.length; i++) {
-				btnFieldsW[i] = createButton(btnLblWork[i], null, null);
-				btnFieldsW[i].setBounds(x + i * (btnWidth + 10), y, btnWidth, btnHeight);
-				btnFieldsW[i].setEnabled(true);
-				add(btnFieldsW[i]);
-			}
-		} catch (RuntimeException e1) {
-			logger.error("error creating button - " + e1);
+		for (int i = 0; i < btnFieldsW.length; i++) {
+			btnFieldsW[i] = createButton(btnLblWork[i], null, null);
+			btnFieldsW[i].setBounds(x + i * (btnWidth + 10), y, btnWidth, btnHeight);
+			btnFieldsW[i].setEnabled(true);
+			add(btnFieldsW[i]);
 		}
 		y = btnFieldsW[0].getY() + btnFieldsW[0].getHeight() + 50;
 		

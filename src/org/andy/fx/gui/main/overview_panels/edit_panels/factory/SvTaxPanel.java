@@ -204,11 +204,7 @@ public class SvTaxPanel extends EditPanel {
 	    btnFields[0].setBounds(145, 145, 65, 25);
 	    add(btnFields[0]);
 
-		try {
-			btnFields[1] = createButton("", ButtonIcon.SAVE.icon(), null);
-		} catch (RuntimeException e1) {
-			logger.error("error creating button - " + e1);
-		}
+		btnFields[1] = createButton("", ButtonIcon.SAVE.icon(), null);
 		btnFields[1].setEnabled(true);
 		btnFields[1].setBounds(660, 120, HauptFenster.getButtonx(), HauptFenster.getButtony());
 		add(btnFields[1]);

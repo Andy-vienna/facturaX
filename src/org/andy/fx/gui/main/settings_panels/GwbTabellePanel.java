@@ -28,14 +28,10 @@ import org.andy.fx.code.misc.CommaHelper;
 import org.andy.fx.code.misc.ArithmeticHelper.LocaleFormat;
 import org.andy.fx.gui.iconHandler.ButtonIcon;
 import org.andy.fx.gui.main.HauptFenster;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class GwbTabellePanel extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
-    private static final Logger logger = LogManager.getLogger(GwbTabellePanel.class);
-    
     private GwbRepository gwbRepository = new GwbRepository();
     private List<Gwb> gwbListe = new ArrayList<>();
     private Gwb leer = new Gwb();
@@ -140,12 +136,8 @@ public class GwbTabellePanel extends JPanel {
         x = txtFields[txtFields.length - 1].getX() + txtFields[txtFields.length - 1].getWidth() + 100;
         y = txtFields[5].getY();
         
-        try {
-			btnFields[0] = createButton("<html>Jahr anlegen</html>", null, null);
-			btnFields[1] = createButton("<html>Tabelle<br>updaten</html>", ButtonIcon.UPDATE.icon(), null);
-		} catch (RuntimeException e1) {
-			logger.error("error creating button - " + e1);
-		}
+		btnFields[0] = createButton("<html>Jahr anlegen</html>", null, null);
+		btnFields[1] = createButton("<html>Tabelle<br>updaten</html>", ButtonIcon.UPDATE.icon(), null);
 
         btnFields[0].setEnabled(true);
         btnFields[0].setVisible(false);

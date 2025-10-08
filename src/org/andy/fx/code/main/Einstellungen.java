@@ -25,6 +25,7 @@ public class Einstellungen {
 	private static Properties prpAppSettings = new Properties();
 
 	private static String strAktUser;
+	private static String strOauth;
 	private static String strAktGJ;
 	private static String htmlBaseText;
 	private static String htmlBaseStyle;
@@ -83,6 +84,7 @@ public class Einstellungen {
 		// ------------------------------------------------------------------------------
 		try {
 			prpAppSettings = loadSettingsEx(new File(System.getProperty("user.dir") + "\\app.properties")); // App-Einstellungen laden
+			strOauth = prpAppSettings.getProperty("oauth");
 			strAktGJ = prpAppSettings.getProperty("year");
 			strQRschema = prpAppSettings.getProperty("qrschema");
 			tplOffer = prpAppSettings.getProperty("templateoffer");
@@ -467,6 +469,10 @@ public class Einstellungen {
 
 	public static void setStrDBpass(String strDBpass) {
 		Einstellungen.strDBpass = strDBpass;
+	}
+
+	public static String getStrOauth() {
+		return strOauth;
 	}
 
 }

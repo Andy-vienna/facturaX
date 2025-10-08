@@ -1,16 +1,23 @@
 package org.andy.fx.gui.main;
 
+import static org.andy.fx.gui.misc.CreateButton.createGradientButton;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Objects;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import org.andy.fx.code.WebAuth.ClientSecret;
+import org.andy.fx.code.WebAuth.GoogleOAuthDesktop;
+import org.andy.fx.code.WebAuth.ClientSecret.ClientSecrets;
 import org.andy.fx.code.dataStructure.entityMaster.User;
 import org.andy.fx.code.dataStructure.repositoryMaster.UserRepository;
+import org.andy.fx.code.main.Einstellungen;
 import org.andy.fx.code.misc.Password;
+import org.andy.fx.gui.iconHandler.ButtonIcon;
 
 public final class AnmeldeFenster {
 
@@ -24,13 +31,11 @@ public final class AnmeldeFenster {
     private final JPasswordField passField = new JPasswordField(12);
     private final JButton loginBtn = new JButton("OK");
     private final JButton cancelBtn = new JButton("Cancel");
+    
+    private JButton helloBtn;
 
     private final UserRepository userRepository;
     private final AuthCallback callback;
-    
-	//###################################################################################################################################################
-	// public Teil
-	//###################################################################################################################################################
 
     public AnmeldeFenster(UserRepository repo, AuthCallback cb) {
         this.userRepository = Objects.requireNonNull(repo);
@@ -43,18 +48,18 @@ public final class AnmeldeFenster {
         JPanel form = buildFormPanel();
 
         GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 0; 
+        c.gridx = 0;
         c.gridy = 0;
-        c.weightx = 1; 
-        c.weighty = 1;                 // Platz oberhalb aufnehmen
-        c.anchor  = GridBagConstraints.SOUTH;   // Panel nach unten
+        c.weightx = 1;
+        c.weighty = 1;
+        c.anchor  = GridBagConstraints.SOUTH;
         c.fill    = GridBagConstraints.HORIZONTAL;
-        c.insets  = new Insets(0, 0, 25, 0);    // Abstand zum unteren Rand
+        c.insets  = new Insets(0, 0, 25, 0);
         root.add(form, c);
 
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame.setContentPane(root);
-        frame.setSize(450, 265); //(850, 500);
+        frame.setSize(450, 265);
         frame.setLocationRelativeTo(null);
         frame.setUndecorated(true);
         setAppIcon(frame, "/icons/frames/icon.png");
@@ -66,10 +71,6 @@ public final class AnmeldeFenster {
     public void show() {
         frame.setVisible(true);
     }
-    
-	//###################################################################################################################################################
-	// private Teil
-	//###################################################################################################################################################
 
     private JPanel buildFormPanel() {
         JPanel p = new JPanel(new GridBagLayout());
@@ -89,10 +90,10 @@ public final class AnmeldeFenster {
 
         gc.gridwidth = 1;
 
-        gc.gridy = 1; gc.gridx = 0; //p.add(new JLabel("Benutzer"), gc);
+        gc.gridy = 1; gc.gridx = 0;
         gc.gridx = 1; p.add(userField, gc);
 
-        gc.gridy = 2; gc.gridx = 0; //p.add(new JLabel("Passwort"), gc);
+        gc.gridy = 2; gc.gridx = 0;
         gc.gridx = 1; p.add(passField, gc);
 
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 0));
@@ -102,26 +103,44 @@ public final class AnmeldeFenster {
 
         gc.gridy = 3; gc.gridx = 0; gc.gridwidth = 2;
         p.add(buttons, gc);
+        
+        JPanel btnGoogle = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        btnGoogle.setOpaque(false);
+        
+        helloBtn = createGradientButton(
+        	"Google Login",
+        	ButtonIcon.GOOGLE.icon(),
+        	new float[]{0f, 0.33f, 0.66f, 1f},
+        	new Color[]{new Color(66, 133, 244), new Color(52, 168, 83), new Color(251, 188, 5), new Color(234, 67, 53)},
+        	false);
+        helloBtn.setPreferredSize(new Dimension(155, 21));
+        helloBtn.setVisible(false);
+        if (Einstellungen.getStrOauth().equals("1")) helloBtn.setVisible(true); // nur nach Freischaltung sichtbar
+        btnGoogle.add(helloBtn);
+        
+        gc.gridy = 4; gc.gridx = 0; gc.gridwidth = 2;
+        p.add(btnGoogle, gc);
 
         return p;
     }
 
     private void wireActions(JRootPane root) {
         // Enter = Login, Esc = Cancel
-    	InputMap im = root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-    	ActionMap am = root.getActionMap();
-    	im.put(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ESCAPE, 0), "CANCEL");
-    	am.put("CANCEL", new AbstractAction() {
-    	    @Override public void actionPerformed(java.awt.event.ActionEvent e) { doCancel(); }
-    	});
+        InputMap im = root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap am = root.getActionMap();
+        im.put(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ESCAPE, 0), "CANCEL");
+        am.put("CANCEL", new AbstractAction() {
+            @Override public void actionPerformed(java.awt.event.ActionEvent e) { doCancel(); }
+        });
 
         loginBtn.addActionListener(_ -> doLogin());
         cancelBtn.addActionListener(_ -> doCancel());
+        helloBtn.addActionListener(_ -> doHelloLogin());
     }
 
     private void doLogin() {
-        loginBtn.setEnabled(false);
-        cancelBtn.setEnabled(false);
+    	userField.setEnabled(false); passField.setEnabled(false);
+    	loginBtn.setEnabled(false); cancelBtn.setEnabled(false); helloBtn.setEnabled(false);
 
         final String userId = userField.getText().trim();
         final char[] pwd = passField.getPassword();
@@ -159,7 +178,6 @@ public final class AnmeldeFenster {
                             "Fehler beim Start der Anwendung.",
                             "Anmeldung",
                             JOptionPane.ERROR_MESSAGE);
-                    System.out.println(ex);
                     passField.setText("");
                     loginBtn.setEnabled(true);
                     cancelBtn.setEnabled(true);
@@ -167,6 +185,48 @@ public final class AnmeldeFenster {
                     callback.onCancel();
                 }
             }
+        }.execute();
+    }
+
+    private void doHelloLogin() {
+    	userField.setEnabled(false); passField.setEnabled(false);
+    	loginBtn.setEnabled(false); cancelBtn.setEnabled(false); helloBtn.setEnabled(false);
+    
+        new SwingWorker<User, Void>() {
+        	@Override
+			protected User doInBackground() throws Exception {
+        		User u = null;
+        		try {
+            		ClientSecrets cs = ClientSecret.loadClientSecrets(Paths.get("client_secret.json"));
+                    var r = GoogleOAuthDesktop.login(frame, cs.clientId(), cs.clientSecret());
+                    u = userRepository.findByEmail(r.email); // user per Mail-Adresse finden 
+                    boolean ok = u != null ? ok = true : false;
+                    return ok ? u : null;
+                } catch (Exception ex) {
+                	String message = "<html>" +
+                			"<span style='font-size:10px; font-weight:bold; color:black;'>Google Login fehlgeschlagen:</span><br>" +
+                			"<span style='font-size:10px; font-weight:bold; color:red;'>E-Mail Adresse für Nutzer nicht hinterlegt ...</span><br>" +
+                			"</html>";
+                    JOptionPane.showMessageDialog(frame, message, "Anmeldung", JOptionPane.ERROR_MESSAGE);
+                }
+        		boolean ok = true;
+        		return ok ? u : null;
+			}
+        	@Override protected void done() {
+        		try {
+        			User u = get();
+                    if (u != null) {
+                        frame.dispose();
+                        callback.onSuccess(u);
+                    }
+        		} catch (Exception ex) {
+        			String message = "<html>" +
+                			"<span style='font-size:10px; font-weight:bold; color:black;'>Google Login fehlgeschlagen:</span><br>" +
+                			"<span style='font-size:10px; font-weight:bold; color:red;'>kein Nutzer für E-Mail Adresse gefunden ...</span><br>" +
+                			"</html>";
+                    JOptionPane.showMessageDialog(frame, message, "Anmeldung", JOptionPane.ERROR_MESSAGE);
+        		}
+        	}
         }.execute();
     }
 
@@ -190,8 +250,8 @@ public final class AnmeldeFenster {
 
     // Panel mit skaliertem Hintergrund
     private static final class BackgroundPanel extends JPanel {
-		private static final long serialVersionUID = 1L;
-		private final Image bg;
+        private static final long serialVersionUID = 1L;
+        private final Image bg;
         BackgroundPanel(Image bg) { this.bg = bg; }
         @Override protected void paintComponent(Graphics g) {
             super.paintComponent(g);
