@@ -1,7 +1,5 @@
 package org.andy.fx.code.dataExport;
 
-import static org.andy.fx.code.misc.FileTools.isLocked;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -47,9 +45,9 @@ public class ExcelP109a {
 	
 	private static void setData(ArrayList<BigDecimal> listContent) {
 		
-		sExcelIn = Einstellungen.getTplP109a();
-		sExcelOut = Einstellungen.getWorkPath() + "\\Mitteilung_nach_P109a_" + Einstellungen.getStrAktGJ() + ".xlsx";
-		sPdfOut = Einstellungen.getWorkPath() + "\\Mitteilung_nach_P109a_" + Einstellungen.getStrAktGJ() + ".pdf";
+		sExcelIn = Einstellungen.getAppSettings().tplP109a;
+		sExcelOut = Einstellungen.getAppSettings().work + "\\Mitteilung_nach_P109a_" + Einstellungen.getAppSettings().year + ".xlsx";
+		sPdfOut = Einstellungen.getAppSettings().work + "\\Mitteilung_nach_P109a_" + Einstellungen.getAppSettings().year + ".pdf";
 		
 		//#######################################################################
 		// Rechnungs-Excel erzeugen
@@ -121,7 +119,7 @@ public class ExcelP109a {
 			//#######################################################################
 			owner.setCellValue(OwnerText); //Name
 			taxID.setCellValue("Steuernummer: " + ExportHelper.getSteuerNummer()); //Steuernummer
-			year.setCellValue(Einstellungen.getStrAktGJ()); //Wirtschaftsjahr
+			year.setCellValue(Einstellungen.getAppSettings().year); //Wirtschaftsjahr
 			
 			P109In.setCellValue(listContent.get(0).doubleValue()); //Einkünfte aus selbstständiger Arbeit
 			P109SVSQ1.setCellValue(listContent.get(1).doubleValue()); //SV-Beiträge 1. Quartal
@@ -157,7 +155,7 @@ public class ExcelP109a {
 		//#######################################################################
 		// Ursprungs-Excel löschen
 		//#######################################################################
-		boolean bLockedxlsx = isLocked(sExcelOut);
+		boolean bLockedxlsx = Einstellungen.isLocked(sExcelOut);
 		while(bLockedxlsx) {
 			System.out.println("warte auf Dateien ...");
 		}

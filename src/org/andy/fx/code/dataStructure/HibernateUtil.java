@@ -72,8 +72,8 @@ public class HibernateUtil {
 
         // ---- HikariCP-Einstellungen (DB1) ----
         settings.put("hibernate.hikari.jdbcUrl", Einstellungen.getsMasterData());
-        settings.put("hibernate.hikari.username", Einstellungen.getStrDBuser());
-        settings.put("hibernate.hikari.password", Einstellungen.getStrDBpass());
+        settings.put("hibernate.hikari.username", Einstellungen.getDbSettings().dbUser);
+        settings.put("hibernate.hikari.password", Einstellungen.getDbSettings().dbPass);
 
         // Pooling-Parameter – an deine Last anpassen
         settings.put("hibernate.hikari.maximumPoolSize", "10");
@@ -86,7 +86,7 @@ public class HibernateUtil {
         // Hibernate
         settings.put("hibernate.show_sql", "false");
         settings.put("hibernate.format_sql", "false");
-        settings.put("hibernate.hbm2ddl.auto", Einstellungen.getStrDBmode()); // wie bisher
+        settings.put("hibernate.hbm2ddl.auto", Einstellungen.getDbSettings().dbMode); // wie bisher
 
         StandardServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(settings)
@@ -119,8 +119,8 @@ public class HibernateUtil {
 
         // ---- HikariCP-Einstellungen (DB2) ----
         settings.put("hibernate.hikari.jdbcUrl", Einstellungen.getsProductiveData());
-        settings.put("hibernate.hikari.username", Einstellungen.getStrDBuser());
-        settings.put("hibernate.hikari.password", Einstellungen.getStrDBpass());
+        settings.put("hibernate.hikari.username", Einstellungen.getDbSettings().dbUser);
+        settings.put("hibernate.hikari.password", Einstellungen.getDbSettings().dbPass);
 
         settings.put("hibernate.hikari.maximumPoolSize", "10");
         settings.put("hibernate.hikari.minimumIdle", "2");
@@ -132,7 +132,7 @@ public class HibernateUtil {
         // Hibernate
         settings.put("hibernate.show_sql", "false");
         settings.put("hibernate.format_sql", "false");
-        settings.put("hibernate.hbm2ddl.auto", Einstellungen.getStrDBmode());
+        settings.put("hibernate.hbm2ddl.auto", Einstellungen.getDbSettings().dbMode);
 
         StandardServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(settings)

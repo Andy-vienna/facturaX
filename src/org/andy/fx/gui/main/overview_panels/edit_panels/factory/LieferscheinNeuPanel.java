@@ -1,7 +1,6 @@
 package org.andy.fx.gui.main.overview_panels.edit_panels.factory;
 
 import static org.andy.fx.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
-import static org.andy.fx.code.misc.ArithmeticHelper.parseStringToIntSafe;
 import static org.andy.fx.gui.misc.CreateButton.createButton;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -254,7 +253,7 @@ public class LieferscheinNeuPanel extends EditPanel {
 
         Lieferschein l = new Lieferschein();
         l.setIdNummer(nextLsNummer());
-        l.setJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
+        l.setJahr(Einstellungen.getAppSettings().year);
         l.setDatum(dateOrToday(datePicker));
         Kunde k = kunde.get(cmbKunde.getSelectedIndex());
         l.setIdKunde(Objects.toString(k.getId(),""));
@@ -377,8 +376,8 @@ public class LieferscheinNeuPanel extends EditPanel {
     }
 
     private String nextLsNummer() {
-        int max = lieferscheinRepository.findMaxNummerByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
-        return "LS-" + Einstellungen.getStrAktGJ() + "-" + String.format("%04d", max + 1);
+        int max = lieferscheinRepository.findMaxNummerByJahr(Einstellungen.getAppSettings().year);
+        return "LS-" + Einstellungen.getAppSettings().year + "-" + String.format("%04d", max + 1);
     }
 
     private static void info(String msg){

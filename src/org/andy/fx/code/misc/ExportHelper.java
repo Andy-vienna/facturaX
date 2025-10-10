@@ -25,8 +25,8 @@ import org.andy.fx.code.dataStructure.repositoryProductive.AngebotRepository;
 import org.andy.fx.code.dataStructure.repositoryProductive.BestellungRepository;
 import org.andy.fx.code.dataStructure.repositoryProductive.LieferscheinRepository;
 import org.andy.fx.code.dataStructure.repositoryProductive.RechnungRepository;
-import org.andy.fx.code.main.Einstellungen;
 import org.andy.fx.code.main.StartUp;
+import org.andy.fx.gui.main.HauptFenster;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -251,7 +251,7 @@ public class ExportHelper {
 	    owTmp.add(owner.getUstid());
 	    
 	    senderOwner = owner.getName() + ", " + owner.getAdresse() + ", " + owner.getPlz() + " " + owner.getOrt();
-	    footerLeft = owner.getName() + " | Bearbeiter: " + Einstellungen.getStrAktUser();
+	    footerLeft = owner.getName() + " | Bearbeiter: " + HauptFenster.getU();
 		footerCenter = owner.getKontaktTel() + " | " + owner.getKontaktMail();
 		kontaktName = owner.getKontaktName();
 		steuerNummer = owner.getTaxid();

@@ -39,7 +39,7 @@ public class AngebotRepository {
         int prefixLength = prefix.length();
 
         try (Session session = HibernateUtil.getSessionFactoryDb2().openSession()) {
-            String dbType = Einstellungen.getStrDBtype();
+            String dbType = Einstellungen.getDbSettings().dbType;
             if (dbType == null || dbType.isBlank()) {
                 dbType = session.doReturningWork(c -> c.getMetaData().getDatabaseProductName());
             }

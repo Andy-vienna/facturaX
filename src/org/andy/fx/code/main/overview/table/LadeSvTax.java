@@ -1,7 +1,5 @@
 package org.andy.fx.code.main.overview.table;
 
-import static org.andy.fx.code.misc.ArithmeticHelper.parseStringToIntSafe;
-
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -53,7 +51,7 @@ public class LadeSvTax {
 		
 		SVSteuerRepository svsteuerRepository = new SVSteuerRepository();
 	    List<SVSteuer> svsteuerListe = new ArrayList<>();
-	    svsteuerListe.addAll(svsteuerRepository.findAllByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ())));
+	    svsteuerListe.addAll(svsteuerRepository.findAllByJahr(Einstellungen.getAppSettings().year));
 		
 		String[][] sTemp = new String [svsteuerListe.size() + 1][7];
 		belegID = new int[svsteuerListe.size()];

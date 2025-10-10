@@ -1,8 +1,6 @@
 package org.andy.fx.code.main.overview.result;
 
 import static org.andy.fx.code.misc.ArithmeticHelper.parseBigDecimalToStringSafe;
-import static org.andy.fx.code.misc.ArithmeticHelper.parseStringToIntSafe;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -58,15 +56,15 @@ public final class UStDaten {
 		
 		RechnungRepository rechnungRepository = new RechnungRepository();
 	    List<Rechnung> rechnungListe = new ArrayList<>();
-		rechnungListe.addAll(rechnungRepository.findAllByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()))); // Rechnungen nach GJ laden
+		rechnungListe.addAll(rechnungRepository.findAllByJahr(Einstellungen.getAppSettings().year)); // Rechnungen nach GJ laden
 		
 		EinkaufRepository einkaufRepository = new EinkaufRepository();
 	    List<Einkauf> einkaufListe = new ArrayList<>();
-	    einkaufListe.addAll(einkaufRepository.findAllByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()))); // Einkäufe nach GJ laden
+	    einkaufListe.addAll(einkaufRepository.findAllByJahr(Einstellungen.getAppSettings().year)); // Einkäufe nach GJ laden
 	    
 	    AusgabenRepository ausgabenRepository = new AusgabenRepository();
 	    List<Ausgaben> ausgabenListe = new ArrayList<>();
-		ausgabenListe.addAll(ausgabenRepository.findAllByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()))); // Betriebsausgebane nach GJ laden
+		ausgabenListe.addAll(ausgabenRepository.findAllByJahr(Einstellungen.getAppSettings().year)); // Betriebsausgebane nach GJ laden
 		
 		// Initialisieren
 		for (int i = 0; i < 4; i++) {

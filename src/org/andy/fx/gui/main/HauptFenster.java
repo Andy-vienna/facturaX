@@ -1,6 +1,5 @@
 package org.andy.fx.gui.main;
 
-import static org.andy.fx.code.misc.FileTools.saveSettingsApp;
 import static org.andy.fx.gui.misc.CreateButton.createButton;
 
 import java.awt.BorderLayout;
@@ -34,11 +33,11 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
@@ -52,6 +51,8 @@ import org.andy.fx.code.dataExport.ExcelBestellung;
 import org.andy.fx.code.dataExport.ExcelLieferschein;
 import org.andy.fx.code.dataStructure.entityMaster.Kunde;
 import org.andy.fx.code.dataStructure.entityMaster.Lieferant;
+import org.andy.fx.code.dataStructure.jsonSettings.JsonApp;
+import org.andy.fx.code.dataStructure.jsonSettings.JsonUtil;
 import org.andy.fx.code.dataStructure.repositoryMaster.KundeRepository;
 import org.andy.fx.code.dataStructure.repositoryMaster.LieferantRepository;
 import org.andy.fx.code.main.Einstellungen;
@@ -133,8 +134,6 @@ public class HauptFenster extends JFrame {
     private JPanel contentPane;
     private JTabbedPane tabPanel;
     private JLabel lblState;
-    private JTextField txtWirtschaftsjahr;
-
     // Seiten
     private final JPanel pageAN = new JPanel(new BorderLayout());
     private final JPanel pageRE = new JPanel(new BorderLayout());
@@ -143,7 +142,7 @@ public class HauptFenster extends JFrame {
     private final JPanel pagePU = new JPanel(new BorderLayout());
     private final JPanel pageEX = new JPanel(new BorderLayout());
     private final JPanel pageST = new JPanel(new BorderLayout());
-    private JPanel pageOv, pageErg, pageAdmin, pageSetting, pageMigration;
+    private JPanel status, pageOv, pageErg, pageAdmin, pageSetting, pageMigration;
 
     // Panels, Tabellen, Summen
     private EditPanel offerPanel, billPanel, bestellungPanel, lieferscheinPanel, purchasePanel, svTaxPanel, expensesPanel;
@@ -202,10 +201,9 @@ public class HauptFenster extends JFrame {
         sLic = StartUp.getAPP_LICENSE();
         iLic = StartUp.getAPP_MODE();
         role = roleFromLogin(r);
-        Einstellungen.setStrAktUser(u); // angemeldeten User in globale Variable schreiben
 
         setIconImage(FrameIcon.ICON.image());
-        setTitle("FacturaX v2 (" + StartUp.APP_VERSION + ") - Wirtschaftsjahr " + Einstellungen.getStrAktGJ() + " - " + sLic);
+        setTitle("FacturaX v2 (" + StartUp.APP_VERSION + ") - " + sLic);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         Rectangle screenBounds = ge.getMaximumWindowBounds(); // liefert Arbeitsbereich ohne Taskleiste
@@ -392,7 +390,7 @@ public class HauptFenster extends JFrame {
 							logger.error("error exporting offer: ", ex);
 						}
 					},
-        	        this::updScreen   // oder: this::actScreen, falls so benannt
+        	        this::updScreen
         	    );
         	});
             btn[4].addActionListener(_ -> { if (vZelleAN != null) { try { ABDialog.showDialog(vZelleAN); updScreen(); } catch (Exception ex) { logger.error("AN AB", ex); } }});
@@ -856,15 +854,15 @@ public class HauptFenster extends JFrame {
                 		+ " | E-Mail: <font color='blue'><b>%s</b></font>"					// E-Mail
                         + " | Master-DB: <font color='blue'><b>%s</b></font>"				// DB-Name Master-Datenbank
                         + " | Daten-DB: <font color='blue'><b>%s</b></font>"				// DB-Name Produktiv-Datenbank
-                        + " | Server: <font color='red'><b>%s</b></font>"					// DB-Server
+                        + " | DB-Server: <font color='red'><b>%s</b></font>"					// DB-Server
                         + "</html>",
-					                dtNow,								// Datum
-					                sLic,								// Lizenz
-					                u, role,							// Benutzer und Rolle
-					                myMail,								// E-Mail
-					                Einstellungen.getStrDBNameSource(),	// DB-Name Master-Datenbank
-					                Einstellungen.getStrDBNameDest(),	// DB-Name Produktiv-Datenbank
-					                StartUp.getAPP_BUILD()[2]);			// DB-Server
+					                dtNow,									// Datum
+					                sLic,									// Lizenz
+					                u, role,								// Benutzer und Rolle
+					                myMail,									// E-Mail
+					                Einstellungen.getDbSettings().dbMaster,	// DB-Name Master-Datenbank
+					                Einstellungen.getDbSettings().dbData,	// DB-Name Produktiv-Datenbank
+					                StartUp.getAPP_BUILD()[2]);				// DB-Server
 
         lblState = new JLabel(sStatus);
         lblState.setBorder(new RoundedBorder(10));
@@ -877,22 +875,36 @@ public class HauptFenster extends JFrame {
             default -> Color.PINK;
         });
 
-        txtWirtschaftsjahr = new JTextField(Einstellungen.getStrAktGJ(), 8);
-        txtWirtschaftsjahr.addActionListener(_ -> {
-            Einstellungen.setStrAktGJ(txtWirtschaftsjahr.getText());
-            Einstellungen.setPrpAppSettings("year", Einstellungen.getStrAktGJ());
-            try { saveSettingsApp(Einstellungen.getPrpAppSettings()); }
-            catch (IOException ex) { logger.error("error writing financial year", ex); }
-            updScreen();
-        });
-        txtWirtschaftsjahr.setBackground(new Color(176, 224, 230));
-        txtWirtschaftsjahr.setHorizontalAlignment(SwingConstants.CENTER);
-        txtWirtschaftsjahr.setFont(new Font("Tahoma", Font.BOLD, 12));
-        txtWirtschaftsjahr.setForeground(Color.BLACK);
-
-        JPanel status = new JPanel(new BorderLayout(1, 0));
+        JButton btn = new JButton(String.valueOf(Einstellungen.getAppSettings().year));
+    	btn.setBackground(new Color(176, 224, 230));
+    	btn.setHorizontalAlignment(SwingConstants.CENTER);
+    	btn.setFont(new Font("Tahoma", Font.BOLD, 12));
+    	btn.setForeground(Color.BLACK);
+    	btn.addActionListener(_ ->
+	        SwingUtilities.invokeLater(() -> {
+	        	String eingabe = null;
+	        	do {
+            	  eingabe = JOptionPane.showInputDialog(null, "Bitte gewünschtes Geschaäftsjahr eingeben", "Geschäftsjahr ändern", JOptionPane.QUESTION_MESSAGE);
+            	  if (eingabe == null) return;
+            	} while (eingabe == null || eingabe.length() < 4 || eingabe.length() > 4);
+	        	try {
+	                int y = Integer.parseInt(eingabe);
+	                JsonApp s = Einstellungen.getAppSettings(); // Live-Objekt
+	                s.year = y;
+	                Einstellungen.setAppSettings(s);
+	                JsonUtil.saveAPP(Einstellungen.getFileApp(), s);
+	                updScreen(); // Gesamt-Update ausführen
+	            } catch (NumberFormatException ex) {
+	                logger.warn("error parsing string to integer: " + ex.getMessage());
+	            } catch (IOException ex) {
+	                logger.error("error writing app settings: " + ex.getMessage());
+	            }
+	        })
+	    );
+        
+        status = new JPanel(new BorderLayout(1, 0));
         status.add(lblState, BorderLayout.CENTER);
-        status.add(txtWirtschaftsjahr, BorderLayout.EAST);
+        status.add(btn, BorderLayout.EAST);
         contentPane.add(status, BorderLayout.SOUTH);
     }
     
@@ -1215,8 +1227,10 @@ public class HauptFenster extends JFrame {
 
     	sTempAN = sTempRE = sTempBE = sTempLS = sTempPU = sTempEX = sTempST = null;
         pageOv = null; pageErg = null;
-
-        loadData();
+        
+        status.removeAll();
+        this.remove(status);
+        loadData(); // Daten neu laden
         
         if (TabMask.visible(tc, TabMask.Tab.OFFER)) {
         	pageAN.removeAll();
@@ -1270,14 +1284,13 @@ public class HauptFenster extends JFrame {
 		}
 		
 		buildStatusBar();
-
         contentPane.revalidate();
         contentPane.repaint();
         
         int idx = Math.min(Math.max(oldIdx, 0), tabPanel.getTabCount() - 1);
         tabPanel.setSelectedIndex(idx); // vorher aktiven Tab wieder aktivieren
     }
-
+    
     private Role roleFromLogin(String r) {
         return switch (r) {
             case "user" -> Role.USER;
@@ -1570,6 +1583,10 @@ public class HauptFenster extends JFrame {
 
 	public static int getButtony() {
 		return BUTTONY;
+	}
+
+	public static String getU() {
+		return u;
 	}
 
 }

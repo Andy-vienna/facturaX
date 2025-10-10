@@ -1,7 +1,5 @@
 package org.andy.fx.code.dataExport;
 
-import static org.andy.fx.code.misc.FileTools.isLocked;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -49,9 +47,9 @@ public class ExcelBestellung implements Identified {
 	//###################################################################################################################################################
 
 	public static void beExport(String sNr) throws Exception {
-		String sExcelIn = Einstellungen.getTplBestellung();
-		String sExcelOut = Einstellungen.getWorkPath() + "Bestellung_" + sNr + ".xlsx";
-		String sPdfOut = Einstellungen.getWorkPath() + "Bestellung_" + sNr + ".pdf";
+		String sExcelIn = Einstellungen.getAppSettings().tplOrder;
+		String sExcelOut = Einstellungen.getAppSettings().work + "Bestellung_" + sNr + ".xlsx";
+		String sPdfOut = Einstellungen.getAppSettings().work + "Bestellung_" + sNr + ".pdf";
 
 		final Cell bePos[] = new Cell[12];
 		final Cell beText[] = new Cell[12];
@@ -144,8 +142,8 @@ public class ExcelBestellung implements Identified {
 		ErzeugePDF.toPDF(sExcelOut, sPdfOut);
 		ErzeugePDF.setPdfMetadata(sNr, "BE", sPdfOut);
 
-		boolean bLockedXLSX = isLocked(sExcelOut);
-		boolean bLockedPDF = isLocked(sPdfOut);
+		boolean bLockedXLSX = Einstellungen.isLocked(sExcelOut);
+		boolean bLockedPDF = Einstellungen.isLocked(sPdfOut);
 		while(bLockedXLSX || bLockedPDF) {
 			System.out.println("warte auf Datei ...");
 		}
@@ -184,8 +182,8 @@ public class ExcelBestellung implements Identified {
 		//#######################################################################
 		// Ursprungs-Excel und -pdf löschen
 		//#######################################################################
-		boolean bLockedpdf = isLocked(sPdfOut);
-		boolean bLockedxlsx = isLocked(sExcelOut);
+		boolean bLockedpdf = Einstellungen.isLocked(sPdfOut);
+		boolean bLockedxlsx = Einstellungen.isLocked(sExcelOut);
 		while(bLockedpdf || bLockedxlsx) {
 			System.out.println("warte auf Dateien ...");
 		}

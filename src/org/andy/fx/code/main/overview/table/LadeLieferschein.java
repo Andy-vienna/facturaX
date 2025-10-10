@@ -1,7 +1,5 @@
 package org.andy.fx.code.main.overview.table;
 
-import static org.andy.fx.code.misc.ArithmeticHelper.parseStringToIntSafe;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -36,7 +34,7 @@ public class LadeLieferschein {
 		
 		LieferscheinRepository lieferscheinRepository = new LieferscheinRepository();
 	    List<Lieferschein> lieferscheinListe = new ArrayList<>();
-	    lieferscheinListe.addAll(lieferscheinRepository.findAllByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ())));
+	    lieferscheinListe.addAll(lieferscheinRepository.findAllByJahr(Einstellungen.getAppSettings().year));
 		
 		String[][] sTemp = new String [lieferscheinListe.size()][5];
 

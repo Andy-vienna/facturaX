@@ -1,7 +1,6 @@
 package org.andy.fx.gui.main.overview_panels.edit_panels.factory;
 
 import static org.andy.fx.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
-import static org.andy.fx.code.misc.ArithmeticHelper.parseStringToIntSafe;
 import static org.andy.fx.gui.misc.CreateButton.createButton;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -275,7 +274,7 @@ public class BestellungNeuPanel extends EditPanel {
 
         Bestellung b = new Bestellung();
         b.setIdNummer(nextBeNummer());
-        b.setJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
+        b.setJahr(Einstellungen.getAppSettings().year);
         b.setDatum(dateOrToday(datePicker));
         Lieferant l = lieferant.get(cmbLieferant.getSelectedIndex());
         b.setIdLieferant(Objects.toString(l.getId(),""));
@@ -406,8 +405,8 @@ public class BestellungNeuPanel extends EditPanel {
     }
 
     private String nextBeNummer() {
-        int max = bestellungRepository.findMaxNummerByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
-        return "BE-" + Einstellungen.getStrAktGJ() + "-" + String.format("%04d", max + 1);
+        int max = bestellungRepository.findMaxNummerByJahr(Einstellungen.getAppSettings().year);
+        return "BE-" + Einstellungen.getAppSettings().year + "-" + String.format("%04d", max + 1);
     }
 
     private static void info(String msg){

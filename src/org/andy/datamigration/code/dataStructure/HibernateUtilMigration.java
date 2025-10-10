@@ -76,8 +76,8 @@ public final class HibernateUtilMigration {
                 "org.hibernate.hikaricp.internal.HikariCPConnectionProvider");
 
         putIfNotBlank(settings, "hibernate.hikari.jdbcUrl", MigrationPanel.getMigMasterJDBC());
-        putIfNotBlank(settings, "hibernate.hikari.username", Einstellungen.getStrDBuser());
-        putIfNotBlank(settings, "hibernate.hikari.password", Einstellungen.getStrDBpass());
+        putIfNotBlank(settings, "hibernate.hikari.username", Einstellungen.getDbSettings().dbUser);
+        putIfNotBlank(settings, "hibernate.hikari.password", Einstellungen.getDbSettings().dbPass);
 
         settings.put("hibernate.hikari.maximumPoolSize", "10");
         settings.put("hibernate.hikari.minimumIdle", "2");
@@ -86,7 +86,7 @@ public final class HibernateUtilMigration {
         settings.put("hibernate.hikari.connectionTimeout", "30000");
         settings.put("hibernate.hikari.poolName", "FX-DB1");
 
-        putIfNotBlank(settings, "hibernate.hbm2ddl.auto", Einstellungen.getStrDBmode());
+        putIfNotBlank(settings, "hibernate.hbm2ddl.auto", Einstellungen.getDbSettings().dbMode);
         settings.put("hibernate.show_sql", "false");
         settings.put("hibernate.format_sql", "false");
 
@@ -112,8 +112,8 @@ public final class HibernateUtilMigration {
                 "org.hibernate.hikaricp.internal.HikariCPConnectionProvider");
 
         putIfNotBlank(settings, "hibernate.hikari.jdbcUrl", MigrationPanel.getMigWorkJDBC());
-        putIfNotBlank(settings, "hibernate.hikari.username", Einstellungen.getStrDBuser());
-        putIfNotBlank(settings, "hibernate.hikari.password", Einstellungen.getStrDBpass());
+        putIfNotBlank(settings, "hibernate.hikari.username", Einstellungen.getDbSettings().dbUser);
+        putIfNotBlank(settings, "hibernate.hikari.password", Einstellungen.getDbSettings().dbPass);
 
         settings.put("hibernate.hikari.maximumPoolSize", "10");
         settings.put("hibernate.hikari.minimumIdle", "2");
@@ -122,7 +122,7 @@ public final class HibernateUtilMigration {
         settings.put("hibernate.hikari.connectionTimeout", "30000");
         settings.put("hibernate.hikari.poolName", "FX-DB2");
 
-        putIfNotBlank(settings, "hibernate.hbm2ddl.auto", Einstellungen.getStrDBmode());
+        putIfNotBlank(settings, "hibernate.hbm2ddl.auto", Einstellungen.getDbSettings().dbMode);
         settings.put("hibernate.show_sql", "false");
         settings.put("hibernate.format_sql", "false");
 

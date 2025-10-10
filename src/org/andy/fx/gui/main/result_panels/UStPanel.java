@@ -72,7 +72,7 @@ public class UStPanel extends JPanel {
 
 	    // Spaltenlabels (Quartale + Jahr)
 	    for (int c = 0; c < cols; c++) {
-	        String colLabel = colLabels[c] + " - " + Einstellungen.getStrAktGJ();
+	        String colLabel = colLabels[c] + " - " + Einstellungen.getAppSettings().year;
 	        lblCols[c] = new JLabel(colLabel);
 	        lblCols[c].setFont(new Font("Tahoma", Font.BOLD, 11));
 	        lblCols[c].setHorizontalAlignment(SwingConstants.CENTER);

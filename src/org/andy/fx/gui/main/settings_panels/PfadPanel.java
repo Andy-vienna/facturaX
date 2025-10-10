@@ -5,7 +5,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.function.Consumer;
+import java.io.IOException;
 import java.util.function.Function;
 
 import javax.swing.BorderFactory;
@@ -15,6 +15,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
+import org.andy.fx.code.dataStructure.jsonSettings.JsonApp;
+import org.andy.fx.code.dataStructure.jsonSettings.JsonUtil;
 import org.andy.fx.code.main.Einstellungen;
 import org.andy.fx.code.misc.FileSelect;
 
@@ -24,6 +26,8 @@ public class PfadPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	JPanel panel = new JPanel();
+	
+	private JsonApp s = Einstellungen.getAppSettings();
 	
 	// Titel definieren
 	String titel = "Pfadverwaltung";
@@ -58,22 +62,6 @@ public class PfadPanel extends JPanel {
 	//###################################################################################################################################################
 	
 	private void buildPanel() {
-		
-		String[] propertyKeys = {
-				"templateoffer",
-				"templateofferrev",
-				"templatedescription",
-				"templatedescriptionbase",
-				"templatedescriptionstyle",
-				"templateconfirmation",
-				"templatebill",
-				"templatereminder",
-				"templatemahnung",
-				"templatebestellung",
-				"templatelieferschein",
-				"templatep109a",
-				"work",
-				};
 		
 		String labels[] = {
 				"Angebot Vorlage (Excel-Vorlage *.xlsx)",
@@ -119,8 +107,28 @@ public class PfadPanel extends JPanel {
 	                	chosenPath = FileSelect.choosePath(defaultPath);
 	                }
 	                if (chosenPath != null) {
-	                    setters[index].accept(chosenPath);
-	                    Einstellungen.setPrpAppSettings(propertyKeys[index], chosenPath);
+	                	
+	                	s.tplOffer = txtFields[0].getText();
+	                	s.tplOfferRev = txtFields[1].getText();
+	                	s.tplDescription = txtFields[2].getText();
+	                	s.tplDescriptionBase = txtFields[3].getText();
+	                	s.tplDescriptionStyle = txtFields[4].getText();
+	                	s.tplOfferConfirm = txtFields[5].getText();
+	                	s.tplBill = txtFields[6].getText();
+	                	s.tplReminder = txtFields[7].getText();
+	                	s.tplStrictReminder = txtFields[8].getText();
+	                	s.tplOrder = txtFields[9].getText();
+	                	s.tplDeliveryNote = txtFields[10].getText();
+	                	s.tplP109a = txtFields[11].getText();
+	                	s.work = txtFields[12].getText();
+	                	
+	                	try {
+							JsonUtil.saveAPP(Einstellungen.getFileApp(), s);
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+	                	
 	                    txtFields[index].setText(chosenPath);
 	                }
 	            }
@@ -152,37 +160,19 @@ public class PfadPanel extends JPanel {
     // Get-Methoden (als Function<Void, String>)
     @SuppressWarnings("unchecked")
     Function<Void, String>[] getters = new Function[] {
-        _ -> Einstellungen.getTplOffer(),
-        _ -> Einstellungen.getTplOfferRev(),
-        _ -> Einstellungen.getTplDescription(),
-        _ -> Einstellungen.getTplDescriptionBase(),
-        _ -> Einstellungen.getTplDescriptionStyle(),
-        _ -> Einstellungen.getTplConfirmation(),
-        _ -> Einstellungen.getTplBill(),
-        _ -> Einstellungen.getTplReminder(),
-        _ -> Einstellungen.getTplMahnung(),
-        _ -> Einstellungen.getTplBestellung(),
-        _ -> Einstellungen.getTplLieferschein(),
-        _ -> Einstellungen.getTplP109a(),
-        _ -> Einstellungen.getWorkPath()
-    };
-
-    // Set-Methoden (als Consumer<String>)
-    @SuppressWarnings("unchecked")
-    Consumer<String>[] setters = new Consumer[] {
-        (Consumer<String>) val -> Einstellungen.setTplOffer(val),
-        (Consumer<String>) val -> Einstellungen.setTplOfferRev(val),
-        (Consumer<String>) val -> Einstellungen.setTplDescription(val),
-        (Consumer<String>) val -> Einstellungen.setTplDescriptionBase(val),
-        (Consumer<String>) val -> Einstellungen.setTplDescriptionStyle(val),
-        (Consumer<String>) val -> Einstellungen.setTplConfirmation(val),
-        (Consumer<String>) val -> Einstellungen.setTplBill(val),
-        (Consumer<String>) val -> Einstellungen.setTplReminder(val),
-        (Consumer<String>) val -> Einstellungen.setTplMahnung(val),
-        (Consumer<String>) val -> Einstellungen.setTplBestellung(val),
-        (Consumer<String>) val -> Einstellungen.setTplLieferschein(val),
-        (Consumer<String>) val -> Einstellungen.setTplP109a(val),
-        (Consumer<String>) val -> Einstellungen.setWorkPath(val)
+        _ -> Einstellungen.getAppSettings().tplOffer,
+        _ -> Einstellungen.getAppSettings().tplOfferRev,
+        _ -> Einstellungen.getAppSettings().tplDescription,
+        _ -> Einstellungen.getAppSettings().tplDescriptionBase,
+        _ -> Einstellungen.getAppSettings().tplDescriptionStyle,
+        _ -> Einstellungen.getAppSettings().tplOfferConfirm,
+        _ -> Einstellungen.getAppSettings().tplBill,
+        _ -> Einstellungen.getAppSettings().tplReminder,
+        _ -> Einstellungen.getAppSettings().tplStrictReminder,
+        _ -> Einstellungen.getAppSettings().tplOrder,
+        _ -> Einstellungen.getAppSettings().tplDeliveryNote,
+        _ -> Einstellungen.getAppSettings().tplP109a,
+        _ -> Einstellungen.getAppSettings().work
     };
 
 }

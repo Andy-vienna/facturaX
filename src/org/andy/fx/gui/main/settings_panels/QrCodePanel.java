@@ -16,8 +16,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
+import org.andy.fx.code.dataStructure.jsonSettings.JsonApp;
+import org.andy.fx.code.dataStructure.jsonSettings.JsonUtil;
 import org.andy.fx.code.main.Einstellungen;
-import org.andy.fx.code.misc.FileTools;
 import org.andy.fx.gui.iconHandler.ButtonIcon;
 import org.andy.fx.gui.main.HauptFenster;
 import org.apache.logging.log4j.LogManager;
@@ -26,8 +27,10 @@ import org.apache.logging.log4j.Logger;
 public class QrCodePanel extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
-    private static final Logger logger = LogManager.getLogger(QrCodePanel.class);
-    
+	private static final Logger logger = LogManager.getLogger(QrCodePanel.class);
+	
+	private JsonApp s = Einstellungen.getAppSettings();
+	
     private static JButton btnQREdit = null, btnQROK = null;
     
     private final Font font = new Font("Tahoma", Font.BOLD, 11);
@@ -54,7 +57,7 @@ public class QrCodePanel extends JPanel {
 	//###################################################################################################################################################
 
     private void buildPanel() {
-    	String[] sQRschema = Einstellungen.getStrQRschema().split("/"); // Properties Eintrag zerlegen
+    	String[] sQRschema = s.qrScheme.split("/"); // Properties Eintrag zerlegen
 
 		if (sQRschema.length != 10) {
 			sQRschema = new String[] { "BCD","002","1","SCT","{BIC}","{KI}","{IBAN}","EUR{SUM}","","{RENR}" };
@@ -187,18 +190,19 @@ public class QrCodePanel extends JPanel {
 		btnQROK.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Einstellungen.setStrQRschema(txtQRbcd.getText() + "/" + textQRversion.getText() + "/" + textQRcode.getText()
+				
+				String schema = txtQRbcd.getText() + "/" + textQRversion.getText() + "/" + textQRcode.getText()
 				+ "/" + textQRsct.getText() + "/" + txtQRbic.getText() + "/" + txtQRki.getText() + "/"
 				+ txtQRiban.getText() + "/" + txtQReursum.getText() + "/" + textQRzweck.getText() + "/"
-				+ textQRref.getText() + "/" + textQRtext.getText() + "/" + textQRanzeige.getText());
-
-				Einstellungen.setPrpAppSettings("qrschema", Einstellungen.getStrQRschema());
-
-				try {
-					FileTools.saveSettingsApp(Einstellungen.getPrpAppSettings());
+				+ textQRref.getText() + "/" + textQRtext.getText() + "/" + textQRanzeige.getText();
+				
+	        	s.qrScheme = schema;
+	        	try {
+					JsonUtil.saveAPP(Einstellungen.getFileApp(), s);
 				} catch (IOException e1) {
-					logger.error("JFsettings() - " + e1);
+					logger.error("error writing app settings: " + e1.getMessage());
 				}
+
 				txtQRbcd.setEnabled(false);
 				textQRversion.setEnabled(false);
 				textQRcode.setEnabled(false);
@@ -214,7 +218,6 @@ public class QrCodePanel extends JPanel {
 				btnQROK.setEnabled(false);
 				btnQREdit.setEnabled(true);
 
-				Einstellungen.setbFinished(true);
 			}
 		});
 		

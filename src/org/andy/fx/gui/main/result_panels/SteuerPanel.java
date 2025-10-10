@@ -68,12 +68,12 @@ public class SteuerPanel extends JPanel {
 
         // Labels
         String[] labels = {
-                "E/A-Rechnung ($109a Mitteilung) - " + Einstellungen.getStrAktGJ(),
+                "E/A-Rechnung ($109a Mitteilung) - " + Einstellungen.getAppSettings().year,
                 "Einkünfte aus selbstständiger Tätigkeit",
-                "SVS Vorschreibung Q1/" + Einstellungen.getStrAktGJ(),
-                "SVS Vorschreibung Q2/" + Einstellungen.getStrAktGJ(),
-                "SVS Vorschreibung Q3/" + Einstellungen.getStrAktGJ(),
-                "SVS Vorschreibung Q4/" + Einstellungen.getStrAktGJ(),
+                "SVS Vorschreibung Q1/" + Einstellungen.getAppSettings().year,
+                "SVS Vorschreibung Q2/" + Einstellungen.getAppSettings().year,
+                "SVS Vorschreibung Q3/" + Einstellungen.getAppSettings().year,
+                "SVS Vorschreibung Q4/" + Einstellungen.getAppSettings().year,
                 "50% Öffi-Pauschale",
                 "großes Arbeitsplatzpauschale",
                 "Betriebsausgaben netto",
@@ -176,7 +176,7 @@ public class SteuerPanel extends JPanel {
             add(lblE1Stufen[i]);
         }
 
-        lblE1Summe = new JLabel("vorauss. Einkommensteuer für das Jahr " + Einstellungen.getStrAktGJ(),
+        lblE1Summe = new JLabel("vorauss. Einkommensteuer für das Jahr " + Einstellungen.getAppSettings().year,
         		new ImageIcon(SteuerPanel.class.getResource("/icons/panels/stern.png")), JLabel.LEFT);
         lblE1Summe.setBounds(left5, 290, iWidth, iHeight);
         lblE1Summe.setFont(new Font("Tahoma", Font.BOLD, 11));

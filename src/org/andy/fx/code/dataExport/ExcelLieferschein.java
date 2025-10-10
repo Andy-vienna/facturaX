@@ -1,7 +1,5 @@
 package org.andy.fx.code.dataExport;
 
-import static org.andy.fx.code.misc.FileTools.isLocked;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -46,9 +44,9 @@ public class ExcelLieferschein implements Identified {
 	//###################################################################################################################################################
 
 	public static void lsExport(String sNr) throws Exception {
-		String sExcelIn = Einstellungen.getTplLieferschein();
-		String sExcelOut = Einstellungen.getWorkPath() + "Lieferschein_" + sNr + ".xlsx";
-		String sPdfOut = Einstellungen.getWorkPath() + "Lieferschein_" + sNr + ".pdf";
+		String sExcelIn = Einstellungen.getAppSettings().tplDeliveryNote;
+		String sExcelOut = Einstellungen.getAppSettings().work + "Lieferschein_" + sNr + ".xlsx";
+		String sPdfOut = Einstellungen.getAppSettings().work + "Lieferschein_" + sNr + ".pdf";
 
 		final Cell lsPos[] = new Cell[12];
 		final Cell lsText[] = new Cell[12];
@@ -129,8 +127,8 @@ public class ExcelLieferschein implements Identified {
 		ErzeugePDF.toPDF(sExcelOut, sPdfOut);
 		ErzeugePDF.setPdfMetadata(sNr, "BE", sPdfOut);
 
-		boolean bLockedXLSX = isLocked(sExcelOut);
-		boolean bLockedPDF = isLocked(sPdfOut);
+		boolean bLockedXLSX = Einstellungen.isLocked(sExcelOut);
+		boolean bLockedPDF = Einstellungen.isLocked(sPdfOut);
 		while(bLockedXLSX || bLockedPDF) {
 			System.out.println("warte auf Datei ...");
 		}
@@ -169,8 +167,8 @@ public class ExcelLieferschein implements Identified {
 		//#######################################################################
 		// Ursprungs-Excel und -pdf löschen
 		//#######################################################################
-		boolean bLockedpdf = isLocked(sPdfOut);
-		boolean bLockedxlsx = isLocked(sExcelOut);
+		boolean bLockedpdf = Einstellungen.isLocked(sPdfOut);
+		boolean bLockedxlsx = Einstellungen.isLocked(sExcelOut);
 		while(bLockedpdf || bLockedxlsx) {
 			System.out.println("warte auf Dateien ...");
 		}

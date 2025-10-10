@@ -1,8 +1,6 @@
 package org.andy.fx.code.dataExport;
 
 import static org.andy.fx.code.misc.TextFormatter.FormatIBAN;
-import static org.andy.fx.code.misc.FileTools.isLocked;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -57,10 +55,10 @@ public class ExcelAngebot implements Identified {
 	//###################################################################################################################################################
 
 	public static void anExport(String sNr) throws Exception {
-		String sExcelIn = Einstellungen.getTplOffer();
-		String sExcelOut = Einstellungen.getWorkPath() + "Angebot_" + sNr + ".xlsx";
-		String sPdfOut = Einstellungen.getWorkPath() + "Angebot_" + sNr + ".pdf";
-		String sPdfDesc = Einstellungen.getWorkPath() + "Leistungsbeschreibung_Angebot_" + sNr + ".pdf";
+		String sExcelIn = Einstellungen.getAppSettings().tplOffer;
+		String sExcelOut = Einstellungen.getAppSettings().work + "Angebot_" + sNr + ".xlsx";
+		String sPdfOut = Einstellungen.getAppSettings().work + "Angebot_" + sNr + ".pdf";
+		String sPdfDesc = Einstellungen.getAppSettings().work + "Leistungsbeschreibung_Angebot_" + sNr + ".pdf";
 
 		final Cell anPos[] = new Cell[13];
 		final Cell anText[] = new Cell[13];
@@ -185,8 +183,8 @@ public class ExcelAngebot implements Identified {
 		ErzeugePDF.toPDF(sExcelOut, sPdfOut);
 		ErzeugePDF.setPdfMetadata(sNr, "AN", sPdfOut);
 
-		boolean bLockedXLSX = isLocked(sExcelOut);
-		boolean bLockedPDF = isLocked(sPdfOut);
+		boolean bLockedXLSX = Einstellungen.isLocked(sExcelOut);
+		boolean bLockedPDF = Einstellungen.isLocked(sPdfOut);
 		while(bLockedXLSX || bLockedPDF) {
 			System.out.println("warte auf Datei ...");
 		}
@@ -240,9 +238,9 @@ public class ExcelAngebot implements Identified {
 		//#######################################################################
 		// Ursprungs-Excel und -pdf löschen
 		//#######################################################################
-		boolean bLockedpdf = isLocked(sPdfOut);
-		boolean bLockedDesc = isLocked(sPdfDesc);
-		boolean bLockedxlsx = isLocked(sExcelOut);
+		boolean bLockedpdf = Einstellungen.isLocked(sPdfOut);
+		boolean bLockedDesc = Einstellungen.isLocked(sPdfDesc);
+		boolean bLockedxlsx = Einstellungen.isLocked(sExcelOut);
 		while(bLockedpdf || bLockedDesc || bLockedxlsx) {
 			System.out.println("warte auf Dateien ...");
 		}

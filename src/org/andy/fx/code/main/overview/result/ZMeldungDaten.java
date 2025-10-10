@@ -1,7 +1,5 @@
 package org.andy.fx.code.main.overview.result;
 
-import static org.andy.fx.code.misc.ArithmeticHelper.parseStringToIntSafe;
-
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -49,7 +47,7 @@ public class ZMeldungDaten {
 		
 		RechnungRepository rechnungRepository = new RechnungRepository();
 	    List<Rechnung> rechnungListe = new ArrayList<>();
-		rechnungListe.addAll(rechnungRepository.findAllByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()))); // Rechnungen nach GJ laden
+		rechnungListe.addAll(rechnungRepository.findAllByJahr(Einstellungen.getAppSettings().year)); // Rechnungen nach GJ laden
 		
 	    List<Map<String, Statistik>> mapProQuartal = new ArrayList<>();
 	    for (int i = 0; i < 4; i++) {

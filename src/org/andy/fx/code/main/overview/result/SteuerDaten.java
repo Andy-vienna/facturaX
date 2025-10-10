@@ -1,8 +1,6 @@
 package org.andy.fx.code.main.overview.result;
 
 import static org.andy.fx.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
-import static org.andy.fx.code.misc.ArithmeticHelper.parseStringToIntSafe;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
@@ -76,7 +74,7 @@ public class SteuerDaten {
 		
 		RechnungRepository rechnungRepository = new RechnungRepository();
 	    List<Rechnung> rechnungListe = new ArrayList<>();
-		rechnungListe.addAll(rechnungRepository.findAllByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()))); // Rechnungen nach GJ laden
+		rechnungListe.addAll(rechnungRepository.findAllByJahr(Einstellungen.getAppSettings().year)); // Rechnungen nach GJ laden
 		
 		try {
 			for(int x = 0; x < rechnungListe.size(); x++) {
@@ -414,7 +412,7 @@ public class SteuerDaten {
 		
 		for (int x = 0; x < taxListe.size(); x++) {
 			Tax tax = taxListe.get(x);
-			if (String.valueOf(tax.getYear()).equals(Einstellungen.getStrAktGJ())) {
+			if (tax.getYear() == Einstellungen.getAppSettings().year) {
 				arrTaxValues[1][2] = tax.getVon_1().toString();
 				arrTaxValues[1][3] = tax.getBis_1().toString();
 				arrTaxValues[1][4] = tax.getTax_1().toString();
@@ -443,7 +441,7 @@ public class SteuerDaten {
 		
 		for ( int x = 0; x < gwbListe.size(); x++) {
 			Gwb gwb = gwbListe.get(x);
-			if (String.valueOf(gwb.getYear()).equals(Einstellungen.getStrAktGJ())) {
+			if (gwb.getYear() == Einstellungen.getAppSettings().year) {
 				arrGwbValues[1][2] = gwb.getBis_1().toString();
 				arrGwbValues[1][3] = gwb.getVal_1().toString();
 				arrGwbValues[1][4] = gwb.getWeitere_2().toString();

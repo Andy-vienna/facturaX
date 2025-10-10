@@ -1,8 +1,6 @@
 package org.andy.fx.code.dataExport;
 
 import static org.andy.fx.code.misc.TextFormatter.FormatIBAN;
-import static org.andy.fx.code.misc.FileTools.isLocked;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -69,9 +67,9 @@ public class ExcelRechnung implements Identified {
 
 	public static void reExport(String sNr) throws Exception {
 		
-		String sExcelIn = Einstellungen.getTplBill();
-		String sExcelOut = Einstellungen.getWorkPath() + "Rechnung_" + sNr + ".xlsx";
-		String sPdfOut = Einstellungen.getWorkPath() + "Rechnung_" + sNr + ".pdf";
+		String sExcelIn = Einstellungen.getAppSettings().tplBill;
+		String sExcelOut = Einstellungen.getAppSettings().work + "Rechnung_" + sNr + ".xlsx";
+		String sPdfOut = Einstellungen.getAppSettings().work + "Rechnung_" + sNr + ".pdf";
 
 		DecimalFormat formatter = new DecimalFormat("#.##");
 
@@ -198,7 +196,7 @@ public class ExcelRechnung implements Identified {
 			//#######################################################################
 			String sBrutto = formatter.format(rechnung.getBrutto());
 			try {
-				ZxingQR.makeQR(Einstellungen.getStrQRschema(), bank.getKtoName(), bank.getIban(), bank.getBic(), sBrutto.replace(",", "."), sNr);
+				ZxingQR.makeQR(Einstellungen.getAppSettings().qrScheme, bank.getKtoName(), bank.getIban(), bank.getBic(), sBrutto.replace(",", "."), sNr);
 			} catch (WriterException e) {
 				logger.error("makeQR(...) - " + e);
 			} catch (IOException e) {
@@ -241,7 +239,7 @@ public class ExcelRechnung implements Identified {
 		
 		switch(kunde.geteBillTyp()) {
 		case ZUGFeRD:
-			sFile = Einstellungen.getWorkPath() + "Rechnung_" + sNr + "_ZUGFeRD.pdf";
+			sFile = Einstellungen.getAppSettings().work + "Rechnung_" + sNr + "_ZUGFeRD.pdf";
 
 			try {
 				ZUGFeRDpdf.generateZUGFeRDpdf(rechnung, bank, kunde, ExportHelper.getOwner(), sPdfOut, sFile);
@@ -252,7 +250,7 @@ public class ExcelRechnung implements Identified {
 			break;
 
 		case XRECHNUNG:
-			sFile = Einstellungen.getWorkPath() + "Rechnung_" + sNr + "_XRechnung.xml";
+			sFile = Einstellungen.getAppSettings().work + "Rechnung_" + sNr + "_XRechnung.xml";
 
 			try {
 				XRechnungXML.generateXRechnungXML(rechnung, bank, kunde, ExportHelper.getOwner(), sFile);
@@ -267,7 +265,7 @@ public class ExcelRechnung implements Identified {
 		}
 		
 		if (bResult) {
-			boolean bLockedoutput = isLocked(sFile);
+			boolean bLockedoutput = Einstellungen.isLocked(sFile);
 			while(bLockedoutput) {
 				System.out.println("warte auf Datei ...");
 			}
@@ -303,9 +301,9 @@ public class ExcelRechnung implements Identified {
 			//#######################################################################
 			// Ursprungs-Excel und -pdf löschen
 			//#######################################################################
-			boolean bLockedpdf = isLocked(sPdfOut);
-			boolean bLockedxlsx = isLocked(sExcelOut);
-			boolean bLockedout = isLocked(sFile);
+			boolean bLockedpdf = Einstellungen.isLocked(sPdfOut);
+			boolean bLockedxlsx = Einstellungen.isLocked(sExcelOut);
+			boolean bLockedout = Einstellungen.isLocked(sFile);
 			while(bLockedpdf || bLockedxlsx || bLockedout) {
 				System.out.println("warte auf Dateien ...");
 			}

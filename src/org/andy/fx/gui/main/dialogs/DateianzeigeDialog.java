@@ -1,11 +1,9 @@
 package org.andy.fx.gui.main.dialogs;
 
 import static org.andy.fx.code.dataStructure.HibernateUtil.getSessionFactoryDb2;
-import static org.andy.fx.code.misc.ArithmeticHelper.parseStringToIntSafe;
 import static org.andy.fx.code.misc.FileSelect.chooseFile;
 import static org.andy.fx.code.misc.FileSelect.choosePath;
 import static org.andy.fx.code.misc.FileSelect.getNotSelected;
-import static org.andy.fx.code.misc.FileTools.isLocked;
 import static org.andy.fx.code.misc.TextFormatter.*;
 
 import java.awt.BorderLayout;
@@ -223,7 +221,7 @@ public class DateianzeigeDialog extends JFrame {
 
 		    // Senden (Mail-Template abhängig vom Typ/Index)
 		    btnSendMail[i].addActionListener(_ -> {
-		        String completeFileName = getFileForMail(typ, sNummer, Einstellungen.getWorkPath());
+		        String completeFileName = getFileForMail(typ, sNummer, Einstellungen.getAppSettings().work);
 		        String fileName = completeFileName;
 		        try { fileName = cutFromRight(completeFileName, '\\'); } 
 		        catch (IOException ex) { logger.error("error cutting filename", ex); }
@@ -271,7 +269,7 @@ public class DateianzeigeDialog extends JFrame {
 
 			// Datei als Anhang hinzufügen
 			Dispatch attachments = Dispatch.get(mail, "Attachments").toDispatch();
-			Dispatch.call(attachments, "Add", Einstellungen.getWorkPath() + "\\" + sSubject);
+			Dispatch.call(attachments, "Add", Einstellungen.getAppSettings().work + "\\" + sSubject);
 
 			// E-Mail senden
 			Dispatch.call(mail, "Send");
@@ -284,11 +282,11 @@ public class DateianzeigeDialog extends JFrame {
 			outlook.safeRelease();
 		}
 
-		boolean bLocked = isLocked(Einstellungen.getWorkPath() + "\\" + sSubject);
+		boolean bLocked = Einstellungen.isLocked(Einstellungen.getAppSettings().work + "\\" + sSubject);
 		while(bLocked) {
 			System.out.println("warte auf Dateien ...");
 		}
-		File MailFile = new File(Einstellungen.getWorkPath() + "\\" + sSubject);
+		File MailFile = new File(Einstellungen.getAppSettings().work + "\\" + sSubject);
 		if(MailFile.delete()) {
 
 		}else {
@@ -570,7 +568,7 @@ public class DateianzeigeDialog extends JFrame {
 	//###################################################################################################################################################
 
 	private static void upsertFileHibernate(String typ, String id) {
-	    String filePath = chooseFile(Einstellungen.getWorkPath());
+	    String filePath = chooseFile(Einstellungen.getAppSettings().work);
 	    if (filePath.equals(getNotSelected())) return;
 
 	    File f = new File(filePath);
@@ -590,7 +588,7 @@ public class DateianzeigeDialog extends JFrame {
 	        if (fs == null) {
 	            fs = new FileStore();
 	            fs.setIdNummer(id);
-	            fs.setJahr(aktJahr()); // falls vorhanden
+	            fs.setJahr(Einstellungen.getAppSettings().year);
 	        }
 	        setNameAndData(fs, typ, name, bytes);
 	        s.merge(fs);
@@ -630,7 +628,7 @@ public class DateianzeigeDialog extends JFrame {
 
 	private static String exportFileHibernate(String typ, String id, String targetDirOrNull) throws IOException {
 	    // Zielpfad bestimmen
-	    String dir = targetDirOrNull != null ? targetDirOrNull : choosePath(Einstellungen.getWorkPath());
+	    String dir = targetDirOrNull != null ? targetDirOrNull : choosePath(Einstellungen.getAppSettings().work);
 	    if (dir == null || dir.equals(getNotSelected())) return getNotSelected();
 	    Path outDir = Paths.get(dir);
 
@@ -662,11 +660,6 @@ public class DateianzeigeDialog extends JFrame {
 	//###################################################################################################################################################
 	// Getter und Setter
 	//###################################################################################################################################################
-
-	private static int aktJahr() {
-	    // falls du das Geschäftsjahr als String hast (z. B. "2025"):
-	    return parseStringToIntSafe(Einstellungen.getStrAktGJ());
-	}
 
 	private static void setNameAndData(FileStore fs, String typ, String name, byte[] data) {
 	    switch (typ) {

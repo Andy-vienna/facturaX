@@ -361,7 +361,7 @@ public class RechnungNeuPanel extends EditPanel {
 
         Rechnung r = new Rechnung();
         r.setIdNummer(nextAnNummer());
-        r.setJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
+        r.setJahr(Einstellungen.getAppSettings().year);
         r.setDatum(dateOrToday(datePicker));
         Kunde k = kunden.get(cmbKunde.getSelectedIndex());
         Bank  b = banken.get(cmbBank.getSelectedIndex());
@@ -516,8 +516,8 @@ public class RechnungNeuPanel extends EditPanel {
     }
 
     private String nextAnNummer() {
-        int max = rechnungRepository.findMaxNummerByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
-        return "RE-" + Einstellungen.getStrAktGJ() + "-" + String.format("%04d", max + 1);
+        int max = rechnungRepository.findMaxNummerByJahr(Einstellungen.getAppSettings().year);
+        return "RE-" + Einstellungen.getAppSettings().year + "-" + String.format("%04d", max + 1);
     }
 
     private static void info(String msg){

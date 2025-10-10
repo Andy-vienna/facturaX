@@ -1,7 +1,5 @@
 package org.andy.fx.code.main.overview.table;
 
-import static org.andy.fx.code.misc.ArithmeticHelper.parseStringToIntSafe;
-
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -53,7 +51,7 @@ public class LadeAusgaben {
 
 		AusgabenRepository ausgabenRepository = new AusgabenRepository();
 	    List<Ausgaben> ausgabenListe = new ArrayList<>();
-		ausgabenListe.addAll(ausgabenRepository.findAllByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ())));
+		ausgabenListe.addAll(ausgabenRepository.findAllByJahr(Einstellungen.getAppSettings().year));
 		
 		String[][] sTemp = new String [ausgabenListe.size() + 1][8];
 		belegID = new int[ausgabenListe.size()];

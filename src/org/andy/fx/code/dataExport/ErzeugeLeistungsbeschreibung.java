@@ -50,7 +50,7 @@ public class ErzeugeLeistungsbeschreibung {
 			throw new IllegalStateException("Runner exit=" + code);
 		}
 		// 3) Overlay: Content in Vorlage platzieren
-		File vorlage = new File(Einstellungen.getTplDescription());
+		File vorlage = new File(Einstellungen.getAppSettings().tplDescription);
 		File out = new File(pdfDescription);
 
 		overlay(vorlage, contentPdf.toFile(), out); // Overlay erzeugen

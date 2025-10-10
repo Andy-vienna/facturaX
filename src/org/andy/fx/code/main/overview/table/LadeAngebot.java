@@ -1,7 +1,5 @@
 package org.andy.fx.code.main.overview.table;
 
-import static org.andy.fx.code.misc.ArithmeticHelper.parseStringToIntSafe;
-
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -44,7 +42,7 @@ public class LadeAngebot {
 		
 		AngebotRepository angebotRepository = new AngebotRepository();
 	    List<Angebot> angebotListe = new ArrayList<>();
-		angebotListe.addAll(angebotRepository.findAllByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ())));
+		angebotListe.addAll(angebotRepository.findAllByJahr(Einstellungen.getAppSettings().year));
 		
 		String[][] sTemp = new String [angebotListe.size()][6];
 		

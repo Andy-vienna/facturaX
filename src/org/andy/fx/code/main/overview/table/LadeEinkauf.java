@@ -1,7 +1,5 @@
 package org.andy.fx.code.main.overview.table;
 
-import static org.andy.fx.code.misc.ArithmeticHelper.parseStringToIntSafe;
-
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -53,7 +51,7 @@ public class LadeEinkauf {
 
 		EinkaufRepository einkaufRepository = new EinkaufRepository();
 	    List<Einkauf> einkaufListe = new ArrayList<>();
-	    einkaufListe.addAll(einkaufRepository.findAllByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ())));
+	    einkaufListe.addAll(einkaufRepository.findAllByJahr(Einstellungen.getAppSettings().year));
 	    
 	    LieferantRepository lieferantRepository = new LieferantRepository();
 	    List<Lieferant> lieferantListe = new ArrayList<>();

@@ -115,7 +115,7 @@ public final class AnmeldeFenster {
         	false);
         helloBtn.setPreferredSize(new Dimension(155, 21));
         helloBtn.setVisible(false);
-        if (Einstellungen.getStrOauth().equals("1")) helloBtn.setVisible(true); // nur nach Freischaltung sichtbar
+        if (Einstellungen.getAppSettings().oAuth) helloBtn.setVisible(true); // nur nach Freischaltung sichtbar
         btnGoogle.add(helloBtn);
         
         gc.gridy = 4; gc.gridx = 0; gc.gridwidth = 2;

@@ -1,6 +1,5 @@
 package org.andy.fx.code.main;
 
-import static org.andy.fx.code.misc.FileTools.saveSettingsDB;
 import static org.andy.fx.code.misc.Password.checkComplexity;
 import static org.andy.fx.code.misc.Password.hashPwd;
 
@@ -20,6 +19,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.andy.fx.code.dataStructure.entityMaster.User;
+import org.andy.fx.code.dataStructure.jsonSettings.JsonApp;
+import org.andy.fx.code.dataStructure.jsonSettings.JsonDb;
+import org.andy.fx.code.dataStructure.jsonSettings.JsonUtil;
 import org.andy.fx.code.dataStructure.repositoryMaster.UserRepository;
 import org.andy.fx.gui.main.HauptFenster;
 import org.andy.fx.gui.main.AnmeldeFenster;
@@ -124,7 +126,7 @@ public class StartUp {
             }
             
             // wenn die Einstellung 'mode' auf "create" steht (Neu-Erzeugung aller Datentabellen)
-            if (Einstellungen.getStrDBmode().equals("create")) {
+            if (Einstellungen.getDbSettings().dbMode.equals("create")) {
             	String eingabe;
             	String hinweis = "<html>" +
             					"<span style='font-size:10px; font-weight:bold; color:black;'>Bitte ein Passwort für den Administrator-Zugang erstellen:</span><br>" +
@@ -180,12 +182,17 @@ public class StartUp {
     }
 
     private static void releaseSingleInstanceLock() {
-    	Einstellungen.setPrpDBSettings("mode", "none");
+    	
     	try {
-			saveSettingsDB(Einstellungen.getPrpDBSettings());
-		} catch (IOException e1) {
-			logger.error("save settings - " + e1);
+    		JsonApp sApp = Einstellungen.getAppSettings();
+    		JsonDb sDB = Einstellungen.getDbSettings();
+        	sDB.dbMode = "none";
+        	JsonUtil.saveAPP(Einstellungen.getFileApp(), sApp);
+			JsonUtil.saveDB(Einstellungen.getFileDB(), sDB);
+		} catch (IOException e) {
+			logger.error("error saving app and db settings: " + e.getMessage());
 		}
+    	
         try { if (LOCK != null && LOCK.isValid()) LOCK.release(); } catch (Exception ignore) {}
         try { if (LOCK_CH != null && LOCK_CH.isOpen()) LOCK_CH.close(); } catch (Exception ignore) {}
         try { if (LOCK_PATH != null) java.nio.file.Files.deleteIfExists(LOCK_PATH); } catch (Exception ignore) {}

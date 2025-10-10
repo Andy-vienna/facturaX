@@ -1,8 +1,6 @@
 package org.andy.fx.code.dataExport;
 
 import static org.andy.fx.code.misc.TextFormatter.FormatIBAN;
-import static org.andy.fx.code.misc.FileTools.isLocked;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -41,9 +39,9 @@ public class ExcelZahlungserinnerung implements Identified {
 	public static void reminderExport(String sNr) throws Exception {
 
 		new ArrayList<>();
-		String sExcelIn = Einstellungen.getTplReminder();
-		String sExcelOut = Einstellungen.getWorkPath() + "Zahlungserinnerung_" + sNr + ".xlsx";
-		String sPdfOut = Einstellungen.getWorkPath() + "Zahlungserinnerung_" + sNr + ".pdf";
+		String sExcelIn = Einstellungen.getAppSettings().tplReminder;
+		String sExcelOut = Einstellungen.getAppSettings().work + "Zahlungserinnerung_" + sNr + ".xlsx";
+		String sPdfOut = Einstellungen.getAppSettings().work + "Zahlungserinnerung_" + sNr + ".pdf";
 
 		Rechnung rechnung = ExportHelper.loadRechnung(sNr);
 		Kunde kunde = ExportHelper.kundeData(rechnung.getIdKunde());
@@ -111,7 +109,7 @@ public class ExcelZahlungserinnerung implements Identified {
 		ErzeugePDF.toPDF(sExcelOut, sPdfOut);
 		ErzeugePDF.setPdfMetadata(sNr, "ZE", sPdfOut);
 
-		boolean bLockedPDF = isLocked(sPdfOut);
+		boolean bLockedPDF = Einstellungen.isLocked(sPdfOut);
 		while(bLockedPDF) {
 			System.out.println("warte auf Datei ...");
 		}
@@ -145,8 +143,8 @@ public class ExcelZahlungserinnerung implements Identified {
 		//#######################################################################
 		// Ursprungs-Excel und -pdf löschen
 		//#######################################################################
-		boolean bLockedpdf = isLocked(sPdfOut);
-		boolean bLockedxlsx = isLocked(sExcelOut);
+		boolean bLockedpdf = Einstellungen.isLocked(sPdfOut);
+		boolean bLockedxlsx = Einstellungen.isLocked(sExcelOut);
 		while(bLockedpdf || bLockedxlsx) {
 			System.out.println("warte auf Dateien ...");
 		}

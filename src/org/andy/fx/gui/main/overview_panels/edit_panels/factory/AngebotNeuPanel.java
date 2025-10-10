@@ -1,7 +1,6 @@
 package org.andy.fx.gui.main.overview_panels.edit_panels.factory;
 
 import static org.andy.fx.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
-import static org.andy.fx.code.misc.ArithmeticHelper.parseStringToIntSafe;
 import static org.andy.fx.code.misc.TextFormatter.FormatIBAN;
 import static org.andy.fx.gui.misc.CreateButton.createButton;
 
@@ -155,7 +154,7 @@ public class AngebotNeuPanel extends EditPanel {
         JLabel lbl26=new JLabel("Angebotsdatum:");  lbl26.setBounds(1010,80,125,25); add(lbl26);
         JLabel lbl29=new JLabel("Referenz");        lbl29.setBounds(1010,105,60,25);  add(lbl29);
         
-        lblHinweis = new JLabel(String.format(preFlightLabel, Einstellungen.getTplDescriptionBase()));
+        lblHinweis = new JLabel(String.format(preFlightLabel, Einstellungen.getAppSettings().tplDescriptionBase));
         lblHinweis.setBounds(1130,155,700,75); lblHinweis.setVisible(false); add(lblHinweis);
 
         // Combos/Textfelder links
@@ -349,7 +348,7 @@ public class AngebotNeuPanel extends EditPanel {
 
         Angebot a = new Angebot();
         a.setIdNummer(nextAnNummer());
-        a.setJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
+        a.setJahr(Einstellungen.getAppSettings().year);
         a.setDatum(dateOrToday(datePicker));
         Kunde k = kunden.get(cmbKunde.getSelectedIndex());
         Bank  b = banken.get(cmbBank.getSelectedIndex());
@@ -484,8 +483,8 @@ public class AngebotNeuPanel extends EditPanel {
     }
 
     private String nextAnNummer() {
-        int max = angebotRepository.findMaxNummerByJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
-        return "AN-" + Einstellungen.getStrAktGJ() + "-" + String.format("%04d", max + 1);
+        int max = angebotRepository.findMaxNummerByJahr(Einstellungen.getAppSettings().year);
+        return "AN-" + Einstellungen.getAppSettings().year + "-" + String.format("%04d", max + 1);
     }
 
     private static void info(String msg){

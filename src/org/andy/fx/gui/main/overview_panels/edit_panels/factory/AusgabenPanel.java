@@ -1,7 +1,6 @@
 package org.andy.fx.gui.main.overview_panels.edit_panels.factory;
 
 import static org.andy.fx.code.misc.ArithmeticHelper.parseStringToBigDecimalSafe;
-import static org.andy.fx.code.misc.ArithmeticHelper.parseStringToIntSafe;
 import static org.andy.fx.code.misc.FileSelect.chooseFile;
 import static org.andy.fx.code.misc.FileSelect.choosePath;
 import static org.andy.fx.code.misc.FileSelect.getNotSelected;
@@ -202,7 +201,7 @@ public class AusgabenPanel extends EditPanel {
 			public void mouseClicked(MouseEvent e) {
 				if(lblFileTyp.getIcon() != null) {
 					String outputPath;
-					outputPath = choosePath(Einstellungen.getWorkPath());
+					outputPath = choosePath(Einstellungen.getAppSettings().work);
 					Path path = Paths.get(outputPath);
 					if (outputPath.equals(getNotSelected())) {
 						return; // nichts ausgewählt
@@ -219,7 +218,7 @@ public class AusgabenPanel extends EditPanel {
 	    btnFields[0].addActionListener(new ActionListener() {
  			@Override
  			public void actionPerformed(ActionEvent e) {
- 				String FileNamePath = chooseFile(Einstellungen.getWorkPath());
+ 				String FileNamePath = chooseFile(Einstellungen.getAppSettings().work);
  				File fn = new File(FileNamePath);
  				String FileName = fn.getName();
  				txtFields[7].setText(FileName);
@@ -239,7 +238,7 @@ public class AusgabenPanel extends EditPanel {
  			public void actionPerformed(ActionEvent e) {
  				if (neuBeleg) {
  					
- 					a.setJahr(parseStringToIntSafe(Einstellungen.getStrAktGJ()));
+ 					a.setJahr(Einstellungen.getAppSettings().year);
  	 				
  	 				boolean bResult = checkInput();
  	 				if (!bResult) {

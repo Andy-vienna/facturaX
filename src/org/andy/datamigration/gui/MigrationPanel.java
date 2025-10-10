@@ -106,8 +106,8 @@ public class MigrationPanel extends JPanel {
 		String text1 = "Panel zur Datenmigration von Datenbank zu Datenbank";
 		String text2 = "Diese Funktion sollte nur durch versierte Administratoren verwendet werden. - Bitte die Dokumentation beachten ... !";
 		String text3 = "Die Connection-Strings sind in direkter JDBC Notation einzutragen. User und Passwort für die Ziel-DB muss gleich der Quell-DB sein.";
-		String text4 = "aktueller user: " + Einstellungen.getStrDBuser() + " | aktuelles Passwort: "
-				+ Einstellungen.getStrDBpass();
+		String text4 = "aktueller user: " + Einstellungen.getDbSettings().dbUser + " | aktuelles Passwort: "
+				+ Einstellungen.getDbSettings().dbPass;
 
 		String description = "<html>" + "<span style='font-size:24px; font-weight:bold; color:black;'>" + text1
 				+ "</span><br>" + "<span style='font-size:16px; font-weight:bold; color:red  ;'>" + text2
