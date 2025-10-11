@@ -21,6 +21,7 @@ import javax.swing.border.TitledBorder;
 import org.andy.fx.code.dataStructure.jsonSettings.JsonDb;
 import org.andy.fx.code.dataStructure.jsonSettings.JsonUtil;
 import org.andy.fx.code.main.Einstellungen;
+import org.andy.fx.code.main.StartUp;
 import org.andy.fx.gui.iconHandler.ButtonIcon;
 import org.andy.fx.gui.main.HauptFenster;
 import org.apache.logging.log4j.LogManager;
@@ -198,7 +199,7 @@ public class DatenbankPanel extends JPanel {
 				btnDBOK.setEnabled(false);
 				
 				try {
-					JsonUtil.saveDB(Einstellungen.getFileDB(), s);
+					JsonUtil.saveDB(StartUp.getFileDB(), s);
 				} catch (IOException e1) {
 					logger.error("error writing db settings: " + e1.getMessage());
 				}

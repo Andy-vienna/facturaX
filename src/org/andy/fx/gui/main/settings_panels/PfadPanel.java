@@ -18,12 +18,16 @@ import javax.swing.border.TitledBorder;
 import org.andy.fx.code.dataStructure.jsonSettings.JsonApp;
 import org.andy.fx.code.dataStructure.jsonSettings.JsonUtil;
 import org.andy.fx.code.main.Einstellungen;
+import org.andy.fx.code.main.StartUp;
 import org.andy.fx.code.misc.FileSelect;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class PfadPanel extends JPanel {
 	
 	// Serialisierungs-ID für die Klasse
 	private static final long serialVersionUID = 1L;
+	private static final Logger logger = LogManager.getLogger(PfadPanel.class);
 	
 	JPanel panel = new JPanel();
 	
@@ -123,10 +127,9 @@ public class PfadPanel extends JPanel {
 	                	s.work = txtFields[12].getText();
 	                	
 	                	try {
-							JsonUtil.saveAPP(Einstellungen.getFileApp(), s);
+							JsonUtil.saveAPP(StartUp.getFileApp(), s);
 						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
+							logger.error("error writing app settings: " + e1.getMessage());
 						}
 	                	
 	                    txtFields[index].setText(chosenPath);

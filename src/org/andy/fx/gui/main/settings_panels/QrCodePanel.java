@@ -19,6 +19,7 @@ import javax.swing.border.TitledBorder;
 import org.andy.fx.code.dataStructure.jsonSettings.JsonApp;
 import org.andy.fx.code.dataStructure.jsonSettings.JsonUtil;
 import org.andy.fx.code.main.Einstellungen;
+import org.andy.fx.code.main.StartUp;
 import org.andy.fx.gui.iconHandler.ButtonIcon;
 import org.andy.fx.gui.main.HauptFenster;
 import org.apache.logging.log4j.LogManager;
@@ -198,7 +199,7 @@ public class QrCodePanel extends JPanel {
 				
 	        	s.qrScheme = schema;
 	        	try {
-					JsonUtil.saveAPP(Einstellungen.getFileApp(), s);
+					JsonUtil.saveAPP(StartUp.getFileApp(), s);
 				} catch (IOException e1) {
 					logger.error("error writing app settings: " + e1.getMessage());
 				}

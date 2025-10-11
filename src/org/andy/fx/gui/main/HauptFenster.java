@@ -197,7 +197,6 @@ public class HauptFenster extends JFrame {
     }
 
     private HauptFenster() {
-    	
         sLic = StartUp.getAPP_LICENSE();
         iLic = StartUp.getAPP_MODE();
         role = roleFromLogin(r);
@@ -219,7 +218,6 @@ public class HauptFenster extends JFrame {
         loadData();        // Tabellen-Daten laden
         buildTabs(role);   // Tabs aufbauen und anzeigen
         buildStatusBar();  // Statuszeile bauen
-        
     }
 
     //###################################################################################################################################################
@@ -254,7 +252,7 @@ public class HauptFenster extends JFrame {
         }
 
         // Actions
-        exit.addActionListener(_ -> System.exit(0));
+        exit.addActionListener(_ -> StartUp.gracefulQuit(0));
         aktualisieren.addActionListener(_ -> updScreen());
         info.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -872,6 +870,7 @@ public class HauptFenster extends JFrame {
         lblState.setBackground(switch (iLic) {
             case 1 -> new Color(255, 246, 143);
             case 2 -> new Color(152, 251, 152);
+            case 3 -> Color.YELLOW;
             default -> Color.PINK;
         });
 
@@ -892,7 +891,7 @@ public class HauptFenster extends JFrame {
 	                JsonApp s = Einstellungen.getAppSettings(); // Live-Objekt
 	                s.year = y;
 	                Einstellungen.setAppSettings(s);
-	                JsonUtil.saveAPP(Einstellungen.getFileApp(), s);
+	                JsonUtil.saveAPP(StartUp.getFileApp(), s);
 	                updScreen(); // Gesamt-Update ausführen
 	            } catch (NumberFormatException ex) {
 	                logger.warn("error parsing string to integer: " + ex.getMessage());

@@ -4,7 +4,6 @@ import static org.andy.fx.gui.misc.CreateButton.createGradientButton;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Objects;
 import javax.imageio.ImageIO;
@@ -32,7 +31,7 @@ public final class AnmeldeFenster {
     private final JButton loginBtn = new JButton("OK");
     private final JButton cancelBtn = new JButton("Cancel");
     
-    private JButton helloBtn;
+    private JButton oAuth2Btn;
 
     private final UserRepository userRepository;
     private final AuthCallback callback;
@@ -107,16 +106,16 @@ public final class AnmeldeFenster {
         JPanel btnGoogle = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
         btnGoogle.setOpaque(false);
         
-        helloBtn = createGradientButton(
+        oAuth2Btn = createGradientButton(
         	"Google Login",
         	ButtonIcon.GOOGLE.icon(),
         	new float[]{0f, 0.33f, 0.66f, 1f},
         	new Color[]{new Color(66, 133, 244), new Color(52, 168, 83), new Color(251, 188, 5), new Color(234, 67, 53)},
         	false);
-        helloBtn.setPreferredSize(new Dimension(155, 21));
-        helloBtn.setVisible(false);
-        if (Einstellungen.getAppSettings().oAuth) helloBtn.setVisible(true); // nur nach Freischaltung sichtbar
-        btnGoogle.add(helloBtn);
+        oAuth2Btn.setPreferredSize(new Dimension(155, 21));
+        oAuth2Btn.setVisible(false);
+        if (Einstellungen.getAppSettings().oAuth) oAuth2Btn.setVisible(true); // nur nach Freischaltung sichtbar
+        btnGoogle.add(oAuth2Btn);
         
         gc.gridy = 4; gc.gridx = 0; gc.gridwidth = 2;
         p.add(btnGoogle, gc);
@@ -135,12 +134,12 @@ public final class AnmeldeFenster {
 
         loginBtn.addActionListener(_ -> doLogin());
         cancelBtn.addActionListener(_ -> doCancel());
-        helloBtn.addActionListener(_ -> doHelloLogin());
+        oAuth2Btn.addActionListener(_ -> doOAuth2Login());
     }
 
     private void doLogin() {
     	userField.setEnabled(false); passField.setEnabled(false);
-    	loginBtn.setEnabled(false); cancelBtn.setEnabled(false); helloBtn.setEnabled(false);
+    	loginBtn.setEnabled(false); cancelBtn.setEnabled(false); oAuth2Btn.setEnabled(false);
 
         final String userId = userField.getText().trim();
         final char[] pwd = passField.getPassword();
@@ -188,28 +187,29 @@ public final class AnmeldeFenster {
         }.execute();
     }
 
-    private void doHelloLogin() {
+    private void doOAuth2Login() {
     	userField.setEnabled(false); passField.setEnabled(false);
-    	loginBtn.setEnabled(false); cancelBtn.setEnabled(false); helloBtn.setEnabled(false);
+    	loginBtn.setEnabled(false); cancelBtn.setEnabled(false); oAuth2Btn.setEnabled(false);
     
         new SwingWorker<User, Void>() {
         	@Override
 			protected User doInBackground() throws Exception {
-        		User u = null;
+        		User u = null; boolean ok;
         		try {
-            		ClientSecrets cs = ClientSecret.loadClientSecrets(Paths.get("client_secret.json"));
+            		ClientSecrets cs = ClientSecret.loadClientSecrets(Einstellungen.getSecretOAuth2());
                     var r = GoogleOAuthDesktop.login(frame, cs.clientId(), cs.clientSecret());
                     u = userRepository.findByEmail(r.email); // user per Mail-Adresse finden 
-                    boolean ok = u != null ? ok = true : false;
-                    return ok ? u : null;
+                    ok = u != null ? ok = true : false;
                 } catch (Exception ex) {
                 	String message = "<html>" +
                 			"<span style='font-size:10px; font-weight:bold; color:black;'>Google Login fehlgeschlagen:</span><br>" +
                 			"<span style='font-size:10px; font-weight:bold; color:red;'>E-Mail Adresse für Nutzer nicht hinterlegt ...</span><br>" +
                 			"</html>";
                     JOptionPane.showMessageDialog(frame, message, "Anmeldung", JOptionPane.ERROR_MESSAGE);
+                    ok = false;
+                    userField.setEnabled(true); passField.setEnabled(true);
+                	loginBtn.setEnabled(true); cancelBtn.setEnabled(true); oAuth2Btn.setEnabled(true);
                 }
-        		boolean ok = true;
         		return ok ? u : null;
 			}
         	@Override protected void done() {
