@@ -18,10 +18,12 @@ import org.andy.fx.code.dataStructure.entityMaster.Kunde;
 import org.andy.fx.code.dataStructure.entityMaster.Owner;
 import org.andy.fx.code.dataStructure.entityProductive.Rechnung;
 import org.andy.fx.code.main.Einstellungen;
-import org.andy.fx.code.main.StartUp;
+import org.andy.fx.code.misc.App;
 
 public class ZUGFeRDpdf {
 
+	private static App a = new App();
+	
 	private static String[] SENDER;
 
 	@SuppressWarnings({ "resource" })
@@ -47,9 +49,9 @@ public class ZUGFeRDpdf {
 			}
 			ZUGFeRDExporterFromA3 ze = new ZUGFeRDExporterFromA3().load(sPdfInput)
 					.setProfile(Profiles.getByName("EN16931"))
-					.setCreatorTool(StartUp.APP_NAME + StartUp.APP_VERSION)
-					.setProducer(StartUp.APP_NAME + StartUp.APP_VERSION)
-					.setCreator(StartUp.APP_NAME + StartUp.APP_VERSION)
+					.setCreatorTool(a.NAME + a.VERSION)
+					.setProducer(a.NAME + a.VERSION)
+					.setCreator(a.NAME + a.VERSION)
 					.ignorePDFAErrors();
 			int anz = 0;
 			while(sAttachment[anz] != null) {
@@ -64,17 +66,17 @@ public class ZUGFeRDpdf {
 					break;
 				}
 			}
-			ze.setCreatorTool(StartUp.APP_NAME);
+			ze.setCreatorTool(a.NAME);
 			ze.setTransaction(i);
 			ze.export(sFeRDpdf);
 		} else if(dialogButton == JOptionPane.NO_OPTION) {
 			ZUGFeRDExporterFromA3 ze = new ZUGFeRDExporterFromA3().load(sPdfInput)
 					.setProfile(Profiles.getByName("EN16931"))
-					.setCreatorTool(StartUp.APP_NAME + StartUp.APP_VERSION)
-					.setProducer(StartUp.APP_NAME + StartUp.APP_VERSION)
-					.setCreator(StartUp.APP_NAME + StartUp.APP_VERSION)
+					.setCreatorTool(a.NAME + a.VERSION)
+					.setProducer(a.NAME + a.VERSION)
+					.setCreator(a.NAME + a.VERSION)
 					.ignorePDFAErrors();
-			ze.setCreatorTool(StartUp.APP_NAME);
+			ze.setCreatorTool(a.NAME);
 			ze.setTransaction(i);
 			ze.export(sFeRDpdf);
 		}

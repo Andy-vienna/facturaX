@@ -67,6 +67,7 @@ import org.andy.fx.code.main.overview.table.LadeAngebot;
 import org.andy.fx.code.main.overview.table.LadeEinkauf;
 import org.andy.fx.code.main.overview.table.LadeLieferschein;
 import org.andy.fx.code.main.overview.table.LadeSvTax;
+import org.andy.fx.code.misc.App;
 import org.andy.fx.code.misc.BD;
 import org.andy.fx.gui.iconHandler.ButtonIcon;
 import org.andy.fx.gui.iconHandler.FrameIcon;
@@ -118,6 +119,7 @@ public class HauptFenster extends JFrame {
 
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LogManager.getLogger(HauptFenster.class);
+    private static App a = new App();
 
     private TableHeader header = new TableHeader();
     private final static int BUTTONX = 130; private static final int BUTTONY = 50;
@@ -197,12 +199,12 @@ public class HauptFenster extends JFrame {
     }
 
     private HauptFenster() {
-        sLic = StartUp.getAPP_LICENSE();
-        iLic = StartUp.getAPP_MODE();
+        sLic = a.LICENSE;
+        iLic = a.MODE;
         role = roleFromLogin(r);
 
         setIconImage(FrameIcon.ICON.image());
-        setTitle("FacturaX v2 (" + StartUp.APP_VERSION + ") - " + sLic);
+        setTitle(a.NAME + " (" + a.VERSION + ") - " + sLic);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         Rectangle screenBounds = ge.getMaximumWindowBounds(); // liefert Arbeitsbereich ohne Taskleiste
@@ -225,28 +227,28 @@ public class HauptFenster extends JFrame {
 
     private void buildMenuBar() {
         JMenu menu1 = new JMenu("Datei");
-        JMenu menu6 = new JMenu("Ansicht");
-        JMenu menu9 = new JMenu("Info");
+        JMenu menu2 = new JMenu("Ansicht");
+        JMenu menu3 = new JMenu("Info");
 
         JMenuItem exit = new JMenuItem("Exit", MenuIcon.EXIT.icon());
         JMenuItem aktualisieren = new JMenuItem("Aktualisieren", MenuIcon.ACT.icon());
         JMenuItem info = new JMenuItem("Info", MenuIcon.INFO.icon());
 
         menu1.add(exit);
-        menu6.add(aktualisieren);
-        menu9.add(info);
+        menu2.add(aktualisieren);
+        menu3.add(info);
 
         JMenuBar menuBar = new JMenuBar();
         menuBar.setBorderPainted(false);
         menuBar.add(menu1);
-        menuBar.add(menu6);
-        menuBar.add(menu9);
+        menuBar.add(menu2);
+        menuBar.add(menu3);
         setJMenuBar(menuBar);
 
         // Lizenzzustand
         if (iLic == 0) { // nicht lizenziert
             menu1.setEnabled(false);
-            menu6.setEnabled(false);
+            menu2.setEnabled(false);
         } else if (iLic == 1) { // Demo
             aktualisieren.setEnabled(false);
         }
@@ -258,7 +260,7 @@ public class HauptFenster extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				Component c = (Component) e.getSource();
 	        	Window owner = SwingUtilities.getWindowAncestor(c);
-	        	InfoDialog.show(owner, StartUp.APP_NAME, StartUp.APP_VERSION, StartUp.APP_BUILD);
+	        	InfoDialog.show(owner, a);
 			}
 		});
     }
@@ -860,7 +862,7 @@ public class HauptFenster extends JFrame {
 					                myMail,									// E-Mail
 					                Einstellungen.getDbSettings().dbMaster,	// DB-Name Master-Datenbank
 					                Einstellungen.getDbSettings().dbData,	// DB-Name Produktiv-Datenbank
-					                StartUp.getAPP_BUILD()[2]);				// DB-Server
+					                App.DB);								// DB-Server
 
         lblState = new JLabel(sStatus);
         lblState.setBorder(new RoundedBorder(10));

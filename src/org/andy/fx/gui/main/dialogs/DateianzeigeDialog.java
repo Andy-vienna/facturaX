@@ -31,7 +31,7 @@ import org.andy.fx.code.dataStructure.entityMaster.Lieferant;
 import org.andy.fx.code.dataStructure.entityProductive.FileStore;
 import org.andy.fx.code.dataStructure.repositoryProductive.FileStoreRepository;
 import org.andy.fx.code.main.Einstellungen;
-import org.andy.fx.code.main.StartUp;
+import org.andy.fx.code.misc.App;
 import org.andy.fx.gui.iconHandler.ButtonIcon;
 import org.andy.fx.gui.iconHandler.FileIcon;
 import org.andy.fx.gui.iconHandler.FrameIcon;
@@ -46,8 +46,8 @@ import com.jacob.com.Dispatch;
 public class DateianzeigeDialog extends JFrame {
 
 	private static final Logger logger = LogManager.getLogger(DateianzeigeDialog.class);
-
 	private static final long serialVersionUID = 1L;
+	private static App a = new App();
 
 	private JPanel contentPane = new JPanel();
 
@@ -145,7 +145,7 @@ public class DateianzeigeDialog extends JFrame {
 		
 		setIconImage(FrameIcon.FILE.image());
 		setResizable(false);
-		setTitle("Dateihandling - " + StartUp.APP_NAME + " " + " (" + StartUp.APP_VERSION + ")");
+		setTitle("Dateihandling - " + a.NAME + " " + " (" + a.VERSION + ")");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 785, 650);
 		setLocationRelativeTo(null);

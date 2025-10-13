@@ -26,7 +26,7 @@ import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
 
 import org.andy.fx.code.dataExport.ExcelAuftragsbestaetigung;
-import org.andy.fx.code.main.StartUp;
+import org.andy.fx.code.misc.App;
 import org.andy.fx.gui.iconHandler.ButtonIcon;
 import org.andy.fx.gui.main.HauptFenster;
 
@@ -34,6 +34,7 @@ public final class ABDialog extends JDialog {
 
     private static final Logger log = LogManager.getLogger(ABDialog.class);
     private static final long serialVersionUID = 1L;
+    private static App a = new App();
 
     private final JTextField txtConfNr = new JTextField(12);
     private final DatePicker dpConfDatum = new DatePicker(new DatePickerSettings());
@@ -152,7 +153,7 @@ public final class ABDialog extends JDialog {
         if (confNr.isEmpty() || dDatum == null || dStart == null) {
             JOptionPane.showMessageDialog(this,
                     "Dateneingabe unvollständig.",
-                    StartUp.APP_NAME,
+                    a.NAME,
                     JOptionPane.INFORMATION_MESSAGE);
             return;
         }

@@ -18,7 +18,7 @@ import org.andy.fx.code.dataStructure.entityProductive.Lieferschein;
 import org.andy.fx.code.dataStructure.entityProductive.Rechnung;
 import org.andy.fx.code.dataStructure.entityProductive.SVSteuer;
 import org.andy.fx.code.main.Einstellungen;
-import org.andy.fx.code.main.StartUp;
+import org.andy.fx.code.misc.App;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.apache.logging.log4j.core.config.DefaultConfiguration;
@@ -53,11 +53,8 @@ public class HibernateUtil {
         sessionFactoryDb1 = buildSessionFactoryDb1();
         sessionFactoryDb2 = buildSessionFactoryDb2();
         
-        String[] appBuild = StartUp.getAPP_BUILD();
-        String dbInfo = sessionFactoryDb1.openSession().doReturningWork(c -> c.getMetaData().getDatabaseProductName()) + " " +
-        		sessionFactoryDb1.openSession().doReturningWork(c -> c.getMetaData().getDatabaseProductVersion());
-        appBuild[2] = dbInfo;
-        StartUp.setAPP_BUILD(appBuild);
+        App.setDB(sessionFactoryDb1.openSession().doReturningWork(c -> c.getMetaData().getDatabaseProductName()) + " " +
+        		sessionFactoryDb1.openSession().doReturningWork(c -> c.getMetaData().getDatabaseProductVersion()));
     }
 
     private static SessionFactory buildSessionFactoryDb1() {

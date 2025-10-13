@@ -25,7 +25,6 @@ import org.andy.fx.code.dataStructure.repositoryProductive.AngebotRepository;
 import org.andy.fx.code.dataStructure.repositoryProductive.BestellungRepository;
 import org.andy.fx.code.dataStructure.repositoryProductive.LieferscheinRepository;
 import org.andy.fx.code.dataStructure.repositoryProductive.RechnungRepository;
-import org.andy.fx.code.main.StartUp;
 import org.andy.fx.gui.main.HauptFenster;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -50,6 +49,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class ExportHelper {
 	
 	private static final Logger logger = LogManager.getLogger(ExportHelper.class);
+	private static App a = new App();
 	private static final String FOOTER_STYLE = "&\"Arial,Regular\"&9&K7F7F7F";
 	
 	private static String senderOwner;
@@ -351,7 +351,7 @@ public class ExportHelper {
         Footer footer = ws.getFooter();
         footer.setLeft(FOOTER_STYLE + ExportHelper.getFooterLeft());
         footer.setCenter(FOOTER_STYLE + ExportHelper.getFooterCenter());
-        footer.setRight(FOOTER_STYLE + StartUp.APP_VERSION);
+        footer.setRight(FOOTER_STYLE + a.VERSION);
 
         // Fonts einmal anlegen
         XSSFFont ownerHead = font(wb, "Arial", (short)24, IndexedColors.GREY_50_PERCENT);

@@ -5,16 +5,9 @@ import static org.andy.fx.code.misc.Password.hashPwd;
 
 import java.awt.Color;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Properties;
-import java.util.jar.Manifest;
-
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -23,7 +16,6 @@ import org.andy.fx.code.dataStructure.entityMaster.User;
 import org.andy.fx.code.dataStructure.jsonSettings.JsonDb;
 import org.andy.fx.code.dataStructure.jsonSettings.JsonUtil;
 import org.andy.fx.code.dataStructure.repositoryMaster.UserRepository;
-import org.andy.fx.code.misc.License;
 import org.andy.fx.gui.main.HauptFenster;
 import org.andy.fx.gui.main.AnmeldeFenster;
 import org.andy.fx.gui.misc.MyFlatTabbedPaneUI;
@@ -39,12 +31,6 @@ public class StartUp {
 	private static java.nio.channels.FileChannel LOCK_CH;
 	private static java.nio.channels.FileLock LOCK;
 	private static java.nio.file.Path LOCK_PATH;
-
-	public static final String APP_NAME = "FacturaX v2";
-	public static String APP_VERSION = null;
-	public static String[] APP_BUILD = new String[3];
-	private static String APP_LICENSE = null;
-	private static int APP_MODE = 0;
 
 	private static Path fileApp;
 	private static Path fileDB;
@@ -62,7 +48,7 @@ public class StartUp {
 		// 1) Logging konfigurieren
 		System.setProperty("log4j.configurationFile", "classpath:log4j2.xml");
 		logger.debug("FacturaX startet ..."); // zwingt Initialisierung
-		Exit.init(); // JSON laden
+		Exit.init(); // Exit-Codes laden
 		//-----------------------------------------------------------------------------------------------------------------------
 		// 2) ShutdownHook initialisieren
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {	releaseSingleInstanceLock(); }));
@@ -93,38 +79,13 @@ public class StartUp {
 			gracefulQuit(99);
 		}
 		//-----------------------------------------------------------------------------------------------------------------------
-		// 6) prüfen ob Debug-Modus aktiv ist
-		boolean DEBUG = Boolean.getBoolean("app.debug");
-		//-----------------------------------------------------------------------------------------------------------------------
-		// 7) Lizenz einlesen
-		try {
-			if (DEBUG) {
-				APP_MODE = 3;
-			} else {
-				APP_MODE = License.getLicense(Einstellungen.getFileLicense());
-			}
-		} catch (java.security.NoSuchAlgorithmException | java.io.IOException e) {
-			logger.error("error reading license", e);
-			APP_MODE = 0;
-		}
-		APP_LICENSE = switch (APP_MODE) {
-		case 1 -> "Lizenz DEMO";
-		case 2 -> "Lizenz OK";
-		case 3 -> "DebugMode aktiv";
-		default -> "unlizensiertes Produkt";
-		};
-		//-----------------------------------------------------------------------------------------------------------------------
-		// 8) Version lesen
-		APP_VERSION = getVersion();
-		APP_BUILD = getBuildTime(DEBUG);
-		//-----------------------------------------------------------------------------------------------------------------------
-		// 9) aktuelles Datum setzen
+		// 6) aktuelles Datum setzen
 		dtNow = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
 		//-----------------------------------------------------------------------------------------------------------------------
-		// 10) Einstellungen laden
+		// 7) Einstellungen laden
 		Einstellungen.LoadProgSettings(fileApp, fileDB);
 		//-----------------------------------------------------------------------------------------------------------------------
-		// 11) UI auf EDT starten
+		// 8) UI auf EDT starten
 		SwingUtilities.invokeLater(() -> {
 			try {
 				FlatIntelliJLaf.setup();
@@ -245,55 +206,9 @@ public class StartUp {
 		}
 	}
 
-	private static String getVersion() {
-		InputStream input = StartUp.class.getClassLoader().getResourceAsStream("version.properties");
-		Properties properties = new Properties();
-		try (input) {
-			if (input == null) {
-				return "unknown version";
-			}
-			properties.load(input);
-			input.close();
-			return properties.getProperty("version");
-		} catch (IOException e) {
-			return "0.0.0";
-		}
-	}
-
-	// Bild-Date-and-Time aus Manifest lesen
-	private static String[] getBuildTime(boolean debug) {
-		String[] tmp = new String[3];
-		if (debug) {
-			tmp[0] = "--.--.----";
-			tmp[1] = "debug-mode";
-			return tmp;
-		}
-		try (InputStream is = StartUp.class.getResourceAsStream("/META-INF/MANIFEST.MF")) {
-			if (is == null)
-				return null; // kein Manifest gefunden
-			Manifest mf = new Manifest(is);
-			String build = mf.getMainAttributes().getValue("Built-Date");
-			Instant instant = Instant.parse(build); // Formattierer für Date-and-Time
-			ZonedDateTime local = instant.atZone(ZoneId.systemDefault());
-			tmp[0] = local.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
-			tmp[1] = mf.getMainAttributes().getValue("Build-Jdk-Spec");
-			return tmp;
-		} catch (IOException e) {
-			return new String[] { "no build date", "no Java version" };
-		}
-	}
-
 	// ###################################################################################################################################################
 	// Getter und Setter
 	// ###################################################################################################################################################
-
-	public static String getAPP_LICENSE() {
-		return APP_LICENSE;
-	}
-
-	public static int getAPP_MODE() {
-		return APP_MODE;
-	}
 
 	public static String getDtNow() {
 		return dtNow;
@@ -305,14 +220,6 @@ public class StartUp {
 
 	public static final DateTimeFormatter getDfdate() {
 		return dfDate;
-	}
-
-	public static String[] getAPP_BUILD() {
-		return APP_BUILD;
-	}
-
-	public static void setAPP_BUILD(String[] aPP_BUILD) {
-		APP_BUILD = aPP_BUILD;
 	}
 
 	public static Path getFileApp() {

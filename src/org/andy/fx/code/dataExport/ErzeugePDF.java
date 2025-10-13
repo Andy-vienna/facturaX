@@ -10,12 +10,13 @@ import com.spire.pdf.PdfDocument;
 import com.spire.pdf.PdfDocumentInformation;
 import com.spire.pdf.conversion.PdfStandardsConverter;
 
-import org.andy.fx.code.main.StartUp;
+import org.andy.fx.code.misc.App;
 import org.andy.fx.code.misc.ExportHelper;
 
 public class ErzeugePDF {
 
 	private static final Logger logger = LogManager.getLogger(ErzeugePDF.class);
+	private static App a = new App();
 
 	private static final String OFFER = "Angebot";
 	private static final String CONFIRMATION = "Auftragsbestätigung";
@@ -61,13 +62,12 @@ public class ErzeugePDF {
 		document.loadFromFile(sPdf);
 
 		PdfDocumentInformation info = document.getDocumentInformation(); // Zugriff auf die Dokumentinformationen
-
 		// Metadaten festlegen
 		info.setAuthor(ExportHelper.getKontaktName());
 		info.setTitle(sTitel + " " + sNr);
 		info.setSubject(sTitel);
 		info.setKeywords(sTitel + "," + sNr + "," + ExportHelper.getKontaktName());
-		info.setCreator(StartUp.APP_NAME);
+		info.setCreator(a.NAME);
 
 		// PDF speichern
 		document.saveToFile(sPdf);

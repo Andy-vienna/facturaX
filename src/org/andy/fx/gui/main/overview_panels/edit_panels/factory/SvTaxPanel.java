@@ -33,6 +33,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 
 import org.andy.fx.code.dataStructure.entityProductive.SVSteuer;
@@ -154,6 +155,19 @@ public class SvTaxPanel extends EditPanel {
 	    }
 	    txtFields[0].setVisible(false);
 	    attachCommaToDot(txtFields[1]);
+	    
+	    txtFields[1].getDocument().addDocumentListener(new DocumentListener() {
+	        private void onChange() {
+	        	String txt = txtFields[1].getText();
+	            if (txt.length() > 0) {
+	            	rbZahllast.setEnabled(true);
+	            	rbZahlung.setEnabled(true);
+	            }
+	        }
+	        @Override public void insertUpdate(javax.swing.event.DocumentEvent e) { onChange(); }
+	        @Override public void removeUpdate(javax.swing.event.DocumentEvent e)  { onChange(); }
+	        @Override public void changedUpdate(javax.swing.event.DocumentEvent e) { /* bei JTextField meist nie */ }
+	    });
 	    
 	    rbZahllast.setBounds(400, 95, 100, 25); rbZahlung.setBounds(500, 95, 100, 25);
 	    add(rbZahllast); add(rbZahlung);
@@ -409,7 +423,6 @@ public class SvTaxPanel extends EditPanel {
     		txtFields[0].setVisible(false);
     		cmbOrganisation.setEnabled(true);
         	cmbBezeichnung.setEnabled(true); cmbBezeichnung.setVisible(true);
-        	rbZahllast.setEnabled(true); rbZahlung.setEnabled(true);
         	rbZahllast.setSelected(false); rbZahlung.setSelected(false);
     		svsteuer = new SVSteuer();
     		neuBeleg = true;
