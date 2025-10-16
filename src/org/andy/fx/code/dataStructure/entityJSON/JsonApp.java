@@ -1,8 +1,7 @@
-package org.andy.fx.code.dataStructure.jsonSettings;
+package org.andy.fx.code.dataStructure.entityJSON;
 
 public class JsonApp {
 	
-	public boolean oAuth;
 	public String qrScheme;
 	public String tplBill;
 	public String tplDeliveryNote;

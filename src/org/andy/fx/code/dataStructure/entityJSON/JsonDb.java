@@ -1,4 +1,4 @@
-package org.andy.fx.code.dataStructure.jsonSettings;
+package org.andy.fx.code.dataStructure.entityJSON;
 
 public class JsonDb {
 	

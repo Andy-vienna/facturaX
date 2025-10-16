@@ -49,10 +49,10 @@ import org.andy.fx.code.dataExport.ExcelAngebot;
 import org.andy.fx.code.dataExport.ExcelAngebotRevision;
 import org.andy.fx.code.dataExport.ExcelBestellung;
 import org.andy.fx.code.dataExport.ExcelLieferschein;
+import org.andy.fx.code.dataStructure.entityJSON.JsonApp;
+import org.andy.fx.code.dataStructure.entityJSON.JsonUtil;
 import org.andy.fx.code.dataStructure.entityMaster.Kunde;
 import org.andy.fx.code.dataStructure.entityMaster.Lieferant;
-import org.andy.fx.code.dataStructure.jsonSettings.JsonApp;
-import org.andy.fx.code.dataStructure.jsonSettings.JsonUtil;
 import org.andy.fx.code.dataStructure.repositoryMaster.KundeRepository;
 import org.andy.fx.code.dataStructure.repositoryMaster.LieferantRepository;
 import org.andy.fx.code.main.Einstellungen;
@@ -111,6 +111,7 @@ import org.andy.fx.gui.main.table_panels.TableHeader;
 import org.andy.fx.gui.misc.BusyDialog;
 import org.andy.fx.gui.misc.RoundedBorder;
 import org.andy.fx.gui.misc.WrapLayout;
+import org.andy.versuche.gui.VersuchPanel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -144,7 +145,7 @@ public class HauptFenster extends JFrame {
     private final JPanel pagePU = new JPanel(new BorderLayout());
     private final JPanel pageEX = new JPanel(new BorderLayout());
     private final JPanel pageST = new JPanel(new BorderLayout());
-    private JPanel status, pageOv, pageErg, pageAdmin, pageSetting, pageMigration;
+    private JPanel status, pageOv, pageErg, pageAdmin, pageSetting, pageMigration, pageVersuch;
 
     // Panels, Tabellen, Summen
     private EditPanel offerPanel, billPanel, bestellungPanel, lieferscheinPanel, purchasePanel, svTaxPanel, expensesPanel;
@@ -311,6 +312,10 @@ public class HauptFenster extends JFrame {
 		if (TabMask.visible(tc, TabMask.Tab.MIGRATION)) {
 			doMigration();
 			tabPanel.addTab("Datenmigration", TabIcon.MIGRATION.icon(), pageMigration);
+		}
+		if (TabMask.visible(tc,  TabMask.Tab.TRIALS)) {
+			doVersuch();
+			tabPanel.addTab("Versuche",  TabIcon.MIGRATION.icon(), pageVersuch);
 		}
         contentPane.add(tabPanel, BorderLayout.CENTER);
     }
@@ -839,6 +844,22 @@ public class HauptFenster extends JFrame {
     }
     
     //###################################################################################################################################################
+
+    private void doVersuch() {
+    	
+    	VersuchPanel testPanel = new VersuchPanel();
+    	
+    	TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), null);
+        border.setTitleJustification(TitledBorder.LEFT);
+        border.setTitlePosition(TitledBorder.TOP);
+
+        pageVersuch = new JPanel(new BorderLayout());
+        pageVersuch.setBorder(border);
+        pageVersuch.add(new JScrollPane(testPanel), BorderLayout.CENTER);
+    	
+    }
+    
+    //###################################################################################################################################################
     // Statusbar
 
     private void buildStatusBar() {
@@ -1283,6 +1304,11 @@ public class HauptFenster extends JFrame {
 			doMigration();
 			tabPanel.addTab("Datenmigration", TabIcon.MIGRATION.icon(), pageMigration);
 		}
+		if (TabMask.visible(tc,  TabMask.Tab.TRIALS)) {
+			tabPanel.removeTabAt(tabPanel.indexOfTab("Versuche"));
+			doVersuch();
+			tabPanel.addTab("Versuche",  TabIcon.MIGRATION.icon(), pageVersuch);
+		}
 		
 		buildStatusBar();
         contentPane.revalidate();
@@ -1558,11 +1584,17 @@ public class HauptFenster extends JFrame {
                     int daysPayable = Math.toIntExact(ChronoUnit.DAYS.between(dateNow, datePay));
 
                     String bezahlt = String.valueOf(table.getValueAt(row, 5));
+                    setForeground(Color.BLACK);
                     if ("Zahllast".equals(bezahlt)) {
                         if (daysPayable < 0) setBackground(Color.PINK);
                         else if (daysPayable < 3) setBackground(Color.ORANGE);
                     } else if ("Eingang".equals(bezahlt)) {
                         setBackground(new Color(152,251,152));
+                    }
+                    String typ = String.valueOf(table.getValueAt(row,  2));
+                    if (typ.contains("Dateiablage")) {
+                    	setBackground(new Color(202,225,255));
+                    	setForeground(Color.BLUE);
                     }
                 } catch (Exception e) {
                     logger.error("ST render date error", e);

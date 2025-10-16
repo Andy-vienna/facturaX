@@ -16,8 +16,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import org.andy.fx.code.dataStructure.jsonSettings.JsonApp;
-import org.andy.fx.code.dataStructure.jsonSettings.JsonUtil;
+import org.andy.fx.code.dataStructure.entityJSON.JsonApp;
+import org.andy.fx.code.dataStructure.entityJSON.JsonUtil;
 import org.andy.fx.code.main.Einstellungen;
 import org.andy.fx.code.main.StartUp;
 import org.andy.fx.gui.iconHandler.ButtonIcon;

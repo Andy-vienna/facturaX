@@ -390,7 +390,7 @@ public class AusgabenPanel extends EditPanel {
 	
 	public void setIcon() {
 		try {
-			DateianzeigeDialog.setFileIcon(lblFileTyp, txtFields[6].getText());
+			DateianzeigeDialog.setFileIcon(lblFileTyp, txtFields[7].getText());
 			lblFileTyp.setHorizontalAlignment(SwingConstants.CENTER);
 		} catch (IOException e) {
 			logger.error("setIcon() - " + e);

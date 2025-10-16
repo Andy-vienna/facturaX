@@ -44,7 +44,7 @@ public class App {
 	
 	public static String[] selectBuildInfo(boolean debug) {
 	    String[] tmp = new String[4];
-	    if (debug) return new String[]{"date not relevant", "debug-mode", "debug", "fX"};
+	    if (debug) return new String[]{"date not relevant for debug", "debug-mode", "debug", "fX"};
 
 	    try (InputStream is = StartUp.class.getResourceAsStream("/META-INF/MANIFEST.MF")) {
 	        if (is == null) return new String[]{"no build date", "no Java version", null, null};

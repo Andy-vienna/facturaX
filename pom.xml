@@ -119,6 +119,7 @@
 			<version>4.0.0-rc-4</version>
 		</dependency>
 
+		<!-- Logging framework -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
@@ -134,7 +135,14 @@
 			<artifactId>log4j-slf4j-impl</artifactId>
 			<version>2.24.3</version>
 		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>2.0.16</version>
+			<scope>test</scope>
+		</dependency>
 
+		<!-- Google Online Dienste -->
 		<dependency>
 			<groupId>com.google.api-client</groupId>
 			<artifactId>google-api-client</artifactId>
@@ -144,6 +152,27 @@
 			<groupId>com.google.http-client</groupId>
 			<artifactId>google-http-client-gson</artifactId>
 			<version>2.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>google-cloud-document-ai</artifactId>
+			<version>2.80.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.auth</groupId>
+			<artifactId>google-auth-library-credentials</artifactId>
+			<version>1.40.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.auth</groupId>
+			<artifactId>google-auth-library-oauth2-http</artifactId>
+			<version>1.40.0</version>
+		</dependency>
+		<!-- Google QR-Code Erzeugung -->
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>core</artifactId>
+			<version>3.5.3</version>
 		</dependency>
 
 		<!-- Hibernate ORM -->
@@ -177,6 +206,7 @@
 			<version>42.7.8</version>
 		</dependency>
 
+		<!-- Passwort Verschlüsselung -->
 		<dependency>
 			<groupId>com.kosprov.jargon2</groupId>
 			<artifactId>jargon2-api</artifactId>
@@ -188,6 +218,7 @@
 			<version>1.1.1</version>
 		</dependency>
 
+		<!-- JavaFX (für den Editor) -->
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-controls</artifactId>
@@ -204,12 +235,14 @@
 			<version>26-ea+10</version>
 		</dependency>
 
+		<!-- UI Manager -->
 		<dependency>
 			<groupId>com.formdev</groupId>
 			<artifactId>flatlaf</artifactId>
 			<version>3.6.2</version>
 		</dependency>
 
+		<!-- Datepicker -->
 		<dependency>
 			<groupId>com.github.lgooddatepicker</groupId>
 			<artifactId>LGoodDatePicker</artifactId>
@@ -228,24 +261,20 @@
 			<version>9.13.0</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.google.zxing</groupId>
-			<artifactId>core</artifactId>
-			<version>3.5.3</version>
-		</dependency>
-
+		<!-- ZUGFeRD / X-Rechnung implementieren -->
 		<dependency>
 			<groupId>org.mustangproject</groupId>
 			<artifactId>library</artifactId>
 			<version>2.19.1</version>
 		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>org.mustangproject</groupId>
 			<artifactId>validator</artifactId>
 			<version>2.19.1</version>
 			<classifier>shaded</classifier>
-		</dependency>
+		</dependency>-->
 
+		<!-- pdf erzeugen, bzw. umwandeln -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>

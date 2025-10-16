@@ -9,12 +9,10 @@ import java.util.Objects;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-import org.andy.fx.code.WebAuth.ClientSecret;
-import org.andy.fx.code.WebAuth.GoogleOAuthDesktop;
-import org.andy.fx.code.WebAuth.ClientSecret.ClientSecrets;
 import org.andy.fx.code.dataStructure.entityMaster.User;
 import org.andy.fx.code.dataStructure.repositoryMaster.UserRepository;
-import org.andy.fx.code.main.Einstellungen;
+import org.andy.fx.code.googleServices.CheckEnvAI;
+import org.andy.fx.code.googleServices.GoogleOAuthDesktop;
 import org.andy.fx.code.misc.Password;
 import org.andy.fx.gui.iconHandler.ButtonIcon;
 
@@ -114,7 +112,7 @@ public final class AnmeldeFenster {
         	false);
         oAuth2Btn.setPreferredSize(new Dimension(155, 21));
         oAuth2Btn.setVisible(false);
-        if (Einstellungen.getAppSettings().oAuth) oAuth2Btn.setVisible(true); // nur nach Freischaltung sichtbar
+        if (CheckEnvAI.getSettingsAI().isOAuth2Login) oAuth2Btn.setVisible(true); // nur nach Freischaltung sichtbar
         btnGoogle.add(oAuth2Btn);
         
         gc.gridy = 4; gc.gridx = 0; gc.gridwidth = 2;
@@ -196,8 +194,7 @@ public final class AnmeldeFenster {
 			protected User doInBackground() throws Exception {
         		User u = null; boolean ok;
         		try {
-            		ClientSecrets cs = ClientSecret.loadClientSecrets(Einstellungen.getSecretOAuth2());
-                    var r = GoogleOAuthDesktop.login(frame, cs.clientId(), cs.clientSecret());
+                    var r = GoogleOAuthDesktop.login(frame, CheckEnvAI.getCs().clientId(), CheckEnvAI.getCs().clientSecret());
                     u = userRepository.findByEmail(r.email); // user per Mail-Adresse finden 
                     ok = u != null ? ok = true : false;
                 } catch (Exception ex) {

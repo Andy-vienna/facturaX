@@ -1,5 +1,4 @@
 {
-  "oAuth": true,
   "qrScheme": "BCD/002/1/SCT/{BIC}/{KI}/{IBAN}/EUR{SUM}//{RENR}//",
   "tplBill": "C:\\Users\\andre\\Documents\\eclipse.workspace\\facturaX\\templates\\template-rechnung_deu_v2.12.xlsx",
   "tplDeliveryNote": "C:\\Users\\andre\\Documents\\eclipse.workspace\\facturaX\\templates\\template-lieferschein_deu_v2.12.xlsx",

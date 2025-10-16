@@ -1,6 +1,7 @@
 *.lic
 *.log
 /target/
+/secrets/
 client_secret*.json
 
 

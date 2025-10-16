@@ -1,13 +1,22 @@
-package org.andy.fx.code.WebAuth;
+package org.andy.fx.code.googleServices;
 
 import java.nio.file.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+
 import com.google.gson.*;
 
 public class ClientSecret {
 	
+	// ###################################################################################################################################################
+	// Record bilden
+	// ###################################################################################################################################################
+
 	public record ClientSecrets(String clientId, String projectId, String clientSecret, List<String> redirectUris) {}
+
+	// ###################################################################################################################################################
+	// json-File lesen
+	// ###################################################################################################################################################
 
 	public static ClientSecrets loadClientSecrets(Path jsonPath) throws Exception {
 	    String json = Files.readString(jsonPath, StandardCharsets.UTF_8);
@@ -23,5 +32,6 @@ public class ClientSecret {
 	    }
 	    return new ClientSecrets(clientId, projectId, clientSecret, redirects);
 	}
+
 }
 

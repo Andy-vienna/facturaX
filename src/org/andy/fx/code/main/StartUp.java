@@ -12,9 +12,9 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import org.andy.fx.code.dataStructure.entityJSON.JsonDb;
+import org.andy.fx.code.dataStructure.entityJSON.JsonUtil;
 import org.andy.fx.code.dataStructure.entityMaster.User;
-import org.andy.fx.code.dataStructure.jsonSettings.JsonDb;
-import org.andy.fx.code.dataStructure.jsonSettings.JsonUtil;
 import org.andy.fx.code.dataStructure.repositoryMaster.UserRepository;
 import org.andy.fx.gui.main.HauptFenster;
 import org.andy.fx.gui.main.AnmeldeFenster;
@@ -34,6 +34,7 @@ public class StartUp {
 
 	private static Path fileApp;
 	private static Path fileDB;
+	private static Path fileAI;
 
 	private static LocalDate dateNow;
 	private static String dtNow;
@@ -56,6 +57,7 @@ public class StartUp {
 		// 3) Einstellungs-Dateien festlegen und reagieren, wenn nicht da
 		boolean app = Einstellungen.fileExist("settingsApp.json");
 		boolean db = Einstellungen.fileExist("settingsDb.json");
+		boolean ai = Einstellungen.fileExist("secrets\\settingsAI.json");
 		if (!app || !db) {
 			JOptionPane.showMessageDialog(null,
 					"<html>Anwendungs- und/oder DB-Einstellungen nicht vorhanden<br>Anwendung wird beendet ...",
@@ -65,6 +67,7 @@ public class StartUp {
 		Path dir = Path.of(System.getProperty("user.dir"));
 		fileApp = dir.resolve("settingsApp.json"); // Dateiname anhängen
 		fileDB = dir.resolve("settingsDb.json"); // Dateiname anhängen
+		if (ai) fileAI = dir.resolve("secrets\\settingsAI.json");
 		//-----------------------------------------------------------------------------------------------------------------------
 		// 4) Globale Fehlerbehandlung
 		Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
@@ -83,7 +86,7 @@ public class StartUp {
 		dtNow = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
 		//-----------------------------------------------------------------------------------------------------------------------
 		// 7) Einstellungen laden
-		Einstellungen.LoadProgSettings(fileApp, fileDB);
+		Einstellungen.LoadProgSettings(fileApp, fileDB, fileAI);
 		//-----------------------------------------------------------------------------------------------------------------------
 		// 8) UI auf EDT starten
 		SwingUtilities.invokeLater(() -> {
@@ -124,10 +127,8 @@ public class StartUp {
 				UserRepository userRep = new UserRepository();
 				User u = new User();
 				do {
-					eingabe = JOptionPane.showInputDialog(null, hinweis, "Passwort erstellen",
-							JOptionPane.QUESTION_MESSAGE);
-					if (eingabe == null)
-						Exit.exit(55);
+					eingabe = JOptionPane.showInputDialog(null, hinweis, "Passwort erstellen", JOptionPane.QUESTION_MESSAGE);
+					if (eingabe == null) gracefulQuit(55); // wenn nichts eingegeben, dann Ende
 				} while (!checkComplexity(eingabe.toCharArray()));
 				boolean bCheckComplexity = checkComplexity(eingabe.toCharArray());
 				if (bCheckComplexity) {
@@ -228,6 +229,10 @@ public class StartUp {
 
 	public static Path getFileDB() {
 		return fileDB;
+	}
+
+	public static Path getFileAI() {
+		return fileAI;
 	}
 
 }

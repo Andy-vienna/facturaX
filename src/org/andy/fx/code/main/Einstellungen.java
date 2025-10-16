@@ -4,16 +4,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileLock;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
-
 import javax.swing.JOptionPane;
 
-import org.andy.fx.code.dataStructure.jsonSettings.JsonApp;
-import org.andy.fx.code.dataStructure.jsonSettings.JsonDb;
-import org.andy.fx.code.dataStructure.jsonSettings.JsonUtil;
+import org.andy.fx.code.dataStructure.entityJSON.JsonAI;
+import org.andy.fx.code.dataStructure.entityJSON.JsonApp;
+import org.andy.fx.code.dataStructure.entityJSON.JsonDb;
+import org.andy.fx.code.dataStructure.entityJSON.JsonUtil;
+import org.andy.fx.code.googleServices.CheckEnvAI;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,7 +21,6 @@ public class Einstellungen {
 	private static final Logger logger = LogManager.getLogger(Einstellungen.class);
 
 	private static final String FILE_LICENSE = System.getProperty("user.dir") + "\\license.lic";
-	private static Path secretOAuth2 = null;
 	
 	private static JsonApp appSettings = new JsonApp();
 	private static JsonDb dbSettings = new JsonDb();
@@ -37,15 +35,15 @@ public class Einstellungen {
 	// public teil
 	// ###################################################################################################################################################
 
-	public static void LoadProgSettings(Path fileApp, Path fileDB) {
-		LoadSettings(fileApp, fileDB);
+	public static void LoadProgSettings(Path fileApp, Path fileDB, Path fileAI) {
+		LoadSettings(fileApp, fileDB, fileAI);
 	}
 
 	// ###################################################################################################################################################
 	// private Teil
 	// ###################################################################################################################################################
 
-	private static void LoadSettings(Path fileApp, Path fileDB) {
+	private static void LoadSettings(Path fileApp, Path fileDB, Path fileAI) {
 		
 		// ------------------------------------------------------------------------------
 		// App- und DB-Einstellungen laden
@@ -55,6 +53,17 @@ public class Einstellungen {
 			dbSettings = JsonUtil.loadDB(fileDB);
 		} catch (IOException e) {
 			logger.error("error loading app or db settings: " + e.getMessage());
+			StartUp.gracefulQuit(92);
+		}
+		
+		if (fileAI != null) {
+			CheckEnvAI.checkAI(fileAI);
+		} else {
+			JsonAI aiSettings = CheckEnvAI.getSettingsAI();
+			aiSettings.isDocumentAI = false;
+			aiSettings.isGeminiAPI = false;
+			aiSettings.isOAuth2Login = false;
+			CheckEnvAI.setSettingsAI(aiSettings);
 		}
 		
 		// ------------------------------------------------------------------------------
@@ -83,20 +92,7 @@ public class Einstellungen {
 		htmlBaseText = htmlBaseText();
 		htmlBaseStyle = htmlBaseStyle();
 		
-		// Die Datei clent_secret*.json kann ohne Änderungen im Dateinamen (Download Google) verwendet werden. Der Dateiname
-		// muss nur mit 'client_secret' beginnen und die Dateiendung '.json' haben. Der Rest vom Dateinamen ist egal.
-		// Sollte die 'client_secret*.json' nicht vorhanden sein, dann auch keine Google Schaltfläche
-		boolean ok = hasClientSecretJson(Path.of(System.getProperty("user.dir")));
-		appSettings.oAuth = ok ? ok : false; // bei Erfolg bleibt oAuth auf true
-		if (!ok) return;
 		
-		Optional<Path> secretFile = java.util.Optional.empty();
-		try {
-			secretFile = findClientSecretJson(Path.of(System.getProperty("user.dir")));
-		} catch (IOException e) {
-			logger.error("error finding client_secrets*.jason: " + e.getMessage());
-		}
-		secretOAuth2 = secretFile.get();
 	}
 
 	// ###################################################################################################################################################
@@ -131,24 +127,6 @@ public class Einstellungen {
 		File f = new File(fileName);
 		return f.isFile() ? true : false;
 	}
-	
-	public static Optional<Path> findClientSecretJson(Path dir) throws IOException {
-	    try (DirectoryStream<Path> ds = Files.newDirectoryStream(dir, "client_secret*.json")) {
-	      for (Path p : ds) {
-	        if (Files.isRegularFile(p)) return Optional.of(p);
-	      }
-	    }
-	    return Optional.empty();
-	  }
-	
-	private static boolean hasClientSecretJson(Path dir) {
-	    try (DirectoryStream<Path> ds = Files.newDirectoryStream(dir, "client_secret*.json")) {
-	      return ds.iterator().hasNext();
-	    } catch (IOException e) {
-	    	logger.error("error getting information for client_secret*.json: " + e.getMessage());
-	    	return false;
-		}
-	  }
 	
 	public static boolean isLocked(String fileName) {
 		try (RandomAccessFile randomAccessFile = new RandomAccessFile(fileName, "rw");
@@ -193,10 +171,6 @@ public class Einstellungen {
 
 	public static void setAppSettings(JsonApp appSettings) {
 		Einstellungen.appSettings = appSettings;
-	}
-
-	public static Path getSecretOAuth2() {
-		return secretOAuth2;
 	}
 
 }

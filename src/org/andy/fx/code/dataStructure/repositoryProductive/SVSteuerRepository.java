@@ -20,7 +20,7 @@ public class SVSteuerRepository {
     public List<SVSteuer> findAllByJahr(int jahr) {
         try (Session session = HibernateUtil.getSessionFactoryDb2().openSession()) {
             return session.createQuery(
-                    "FROM SVSteuer r WHERE r.jahr = :jahr ORDER BY r.id", SVSteuer.class)
+                    "FROM SVSteuer r WHERE r.jahr = :jahr ORDER BY r.datum", SVSteuer.class)
                     .setParameter("jahr", jahr)
                     .getResultList();
         }

@@ -11,6 +11,8 @@ import java.util.concurrent.TimeoutException;
 
 import javax.swing.JPanel;
 
+import org.andy.fx.code.googleServices.CheckEnvAI;
+
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
@@ -186,7 +188,7 @@ public class FxHtmlEditorAI extends JPanel {
         Button aiBtn = new Button("Gemini Textvorschlag", iv);
         aiBtn.setTooltip(tip);
         aiBtn.setStyle("-fx-background-color:#fff2cc; -fx-text-fill:green; -fx-font-weight:bold;");
-        //aiBtn.setOnAction(_ -> askGemini("Formuliere eine präzise, formelle Angebotsbeschreibung in Deutsch."));
+        aiBtn.setDisable(!CheckEnvAI.getSettingsAI().isGeminiAPI);
         aiBtn.setOnAction(_ -> askGeminiInteractive());
 
         HBox spacer = new HBox(); spacer.setMinWidth(10);
@@ -333,7 +335,7 @@ public class FxHtmlEditorAI extends JPanel {
         String selection = String.valueOf(engine.executeScript("window.getSelection().toString()"));
 
         CompletableFuture
-            .supplyAsync(() -> callGeminiREST(loadGeminiKey(), "gemini-2.5-flash", instruction, selection))
+            .supplyAsync(() -> callGeminiREST(CheckEnvAI.getGem(), "gemini-2.5-flash", instruction, selection))
             .whenComplete((text, ex) -> Platform.runLater(() -> {
                 hideBusy();
                 if (ex != null) {
@@ -370,7 +372,7 @@ public class FxHtmlEditorAI extends JPanel {
                 String context = taCtx.getText();
                 showBusy("KI formuliert …");
                 CompletableFuture
-                    .supplyAsync(() -> callGeminiREST(loadGeminiKey(), "gemini-2.5-flash", instruction, context))
+                    .supplyAsync(() -> callGeminiREST(CheckEnvAI.getGem(), "gemini-2.5-flash", instruction, context))
                     .whenComplete((text, ex) -> Platform.runLater(() -> {
                         hideBusy();
                         if (ex == null && text != null && !text.isBlank()) {
@@ -379,12 +381,6 @@ public class FxHtmlEditorAI extends JPanel {
                     }));
             });
         });
-    }
-
-    private static String loadGeminiKey() {
-        String k = System.getenv("GEMINI_API_KEY");
-        if ((k == null || k.isBlank())) k = System.getProperty("GEMINI_API_KEY");
-        return (k == null || k.isBlank()) ? null : k.trim();
     }
 
     private static String callGeminiREST(String apiKey, String model, String instruction, String context) {

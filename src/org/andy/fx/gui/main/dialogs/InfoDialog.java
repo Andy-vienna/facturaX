@@ -3,6 +3,8 @@ package org.andy.fx.gui.main.dialogs;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import org.andy.fx.code.dataStructure.entityJSON.JsonAI;
+import org.andy.fx.code.googleServices.CheckEnvAI;
 import org.andy.fx.code.misc.App;
 
 import java.awt.*;
@@ -40,7 +42,7 @@ public final class InfoDialog extends JDialog {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setContentPane(buildContent(a));
         pack();
-        setMinimumSize(new Dimension(250, 475));
+        setMinimumSize(new Dimension(250, 495));
         setLocationRelativeTo(owner);
         getRootPane().setDefaultButton(closeButton);
         bindEscToClose();
@@ -59,6 +61,12 @@ public final class InfoDialog extends JDialog {
     private JPanel buildContent(App a) {
         JPanel root = new JPanel(new BorderLayout(16, 16));
         root.setBorder(new EmptyBorder(16, 8, 16, 8));
+        
+        JsonAI ai = CheckEnvAI.getSettingsAI();
+        String aiState = "not enabled";
+        boolean aiAny = ai.isOAuth2Login || ai.isGeminiAPI || ai.isDocumentAI;
+        if (aiAny) aiState = "partially enabled";
+        if (ai.isOAuth2Login && ai.isGeminiAPI && ai.isDocumentAI) aiState = "fully enabled";
 
         // Right: Titel, Untertitel, Lizenztext
         JPanel right = new JPanel(new GridBagLayout());
@@ -69,13 +77,15 @@ public final class InfoDialog extends JDialog {
 
         JLabel title = new JLabel("<html>" +
         		"<span style='font-size:24px; font-weight:bold;'>" + a.NAME + " (" + a.VERSION + ") " + "</span><br>" +
-        		"<span style='font-size:9px; font-weight:bold; color:blue;'></span><br>" +
-        		"<span style='font-size:8px; font-weight:bold; color:black;'>built date / time: </span>" +
-        		"<span style='font-size:8px; font-weight:bold; color:blue;'>" + a.TIME + "</span><br>" +
+        		"<span style='font-size:10px; font-weight:bold; color:blue;'></span><br>" +
+        		"<span style='font-size:10px; font-weight:bold; color:black;'>built date / time : </span>" +
+        		"<span style='font-size:10px; font-weight:bold; color:blue;'>" + a.TIME + "</span><br>" +
         		"<span style='font-size:10px; font-weight:bold; color:black;'>Java JDK version : </span>" +
         		"<span style='font-size:10px; font-weight:bold; color:red ;'>" + a.JDK + "</span><br>" +
-        		"<span style='font-size:10px; font-weight:bold; color:black;'>Datenbank : </span>" +
-        		"<span style='font-size:10px; font-weight:bold; color:red ;'>" + App.DB + "</span>" +
+        		"<span style='font-size:10px; font-weight:bold; color:black;'>Database-Server : </span>" +
+        		"<span style='font-size:10px; font-weight:bold; color:red ;'>" + App.DB + "</span><br>" +
+        		"<span style='font-size:10px; font-weight:bold; color:black;'>AI Features : </span>" +
+        		"<span style='font-size:10px; font-weight:bold; color:green;'>" + aiState + "</span>" +
         		"</html>");
         //title.setFont(title.getFont().deriveFont(Font.BOLD, 24f));
         title.setForeground(new Color(20, 20, 20));
@@ -88,6 +98,7 @@ public final class InfoDialog extends JDialog {
 
         JEditorPane license = new JEditorPane("text/html", TEXT_B_HTML);
         license.setEditable(false);
+        license.setFocusable(false);
         license.setOpaque(false);
         license.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
         license.addHyperlinkListener(e -> {

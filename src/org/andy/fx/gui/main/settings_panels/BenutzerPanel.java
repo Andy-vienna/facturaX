@@ -36,11 +36,11 @@ import org.andy.fx.gui.main.table_panels.TabMask;
 public class BenutzerPanel extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
-    private final boolean[] selUser = {true,true,true,true,false,false,false,false,false,false};
-    private final boolean[] selSuser = {true,true,true,true,true,true,true,true,false,false};
-    private final boolean[] selFuser = {false,false,false,false,true,true,true,true,false,false};
-    private final boolean[] selAdmin = {false,false,false,false,false,false,false,false,true,true};
-    private final boolean[] selDefault = {false,false,false,false,false,false,false,false,false,false};
+    private final boolean[] selUser = {true,true,true,true,false,false,false,false,false,false,false};
+    private final boolean[] selSuser = {true,true,true,true,true,true,true,true,false,false,true};
+    private final boolean[] selFuser = {false,false,false,false,true,true,true,true,false,false,false};
+    private final boolean[] selAdmin = {false,false,false,false,false,false,false,false,true,true,false};
+    private final boolean[] selDefault = {false,false,false,false,false,false,false,false,false,false,false};
     
     private static JButton btnShowPwd = null, btnPwdOK = null;
     
@@ -52,7 +52,7 @@ public class BenutzerPanel extends JPanel {
     private JPasswordField[] passFields = new JPasswordField[3];
     private JTextField eMail = new JTextField();
     private JComboBox<String> cmbRoles;
-    private JCheckBox[] chkConfig = new JCheckBox[10];
+    private JCheckBox[] chkConfig = new JCheckBox[11];
     
     private UserRepository userRepository = new UserRepository();
 	private List<User> userListe = new ArrayList<>();
@@ -89,7 +89,7 @@ public class BenutzerPanel extends JPanel {
     	String[] roles = {"", "user", "superuser", "financialuser", "admin"};
     	String[] label = {"vorh. User", "Username", "Kennwort alt", "Kennwort neu", "Kennw. wiederh.", "E-Mail", "Benutzerrolle"};
     	String[] config = { "Angebot", "Rechnung", "Bestellung", "Lieferschein", "Einkauf", "Betriebsausgaben", "SV und Steuer",
-    			"Jahresergenis", "Einstellungen", "DB Migration" };
+    			"Jahresergenis", "Einstellungen", "DB Migration", "Versuche" };
     	
     	JLabel[] lblFields = new JLabel[label.length];
     	for (int i= 0; i < label.length; i++) {
@@ -253,6 +253,7 @@ public class BenutzerPanel extends JPanel {
                 if (TabMask.visible(user.getTabConfig(), TabMask.Tab.RESULT)) chkConfig[7].setSelected(true);
                 if (TabMask.visible(user.getTabConfig(), TabMask.Tab.SETTINGS)) chkConfig[8].setSelected(true);
                 if (TabMask.visible(user.getTabConfig(), TabMask.Tab.MIGRATION)) chkConfig[9].setSelected(true);
+                if (TabMask.visible(user.getTabConfig(), TabMask.Tab.TRIALS)) chkConfig[10].setSelected(true);
             }
             String tmp = cmbRoles.getSelectedItem().toString();
             isSelectable(tmp);
