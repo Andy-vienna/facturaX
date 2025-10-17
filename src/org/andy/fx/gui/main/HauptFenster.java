@@ -9,21 +9,27 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GraphicsEnvironment;
+import java.awt.GraphicsConfiguration;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowStateListener;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -43,12 +49,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import org.andy.fx.code.dataExport.ExcelRechnung;
 import org.andy.datamigration.gui.MigrationPanel;
 import org.andy.fx.code.dataExport.ExcelAngebot;
 import org.andy.fx.code.dataExport.ExcelAngebotRevision;
 import org.andy.fx.code.dataExport.ExcelBestellung;
 import org.andy.fx.code.dataExport.ExcelLieferschein;
+import org.andy.fx.code.dataExport.ExcelRechnung;
 import org.andy.fx.code.dataStructure.entityJSON.JsonApp;
 import org.andy.fx.code.dataStructure.entityJSON.JsonUtil;
 import org.andy.fx.code.dataStructure.entityMaster.Kunde;
@@ -60,12 +66,12 @@ import org.andy.fx.code.main.StartUp;
 import org.andy.fx.code.main.overview.result.SteuerDaten;
 import org.andy.fx.code.main.overview.result.UStDaten;
 import org.andy.fx.code.main.overview.result.ZMeldungDaten;
-import org.andy.fx.code.main.overview.table.LadeRechnung;
+import org.andy.fx.code.main.overview.table.LadeAngebot;
 import org.andy.fx.code.main.overview.table.LadeAusgaben;
 import org.andy.fx.code.main.overview.table.LadeBestellung;
-import org.andy.fx.code.main.overview.table.LadeAngebot;
 import org.andy.fx.code.main.overview.table.LadeEinkauf;
 import org.andy.fx.code.main.overview.table.LadeLieferschein;
+import org.andy.fx.code.main.overview.table.LadeRechnung;
 import org.andy.fx.code.main.overview.table.LadeSvTax;
 import org.andy.fx.code.misc.App;
 import org.andy.fx.code.misc.BD;
@@ -81,18 +87,20 @@ import org.andy.fx.gui.main.overview_panels.SummenPanelA;
 import org.andy.fx.gui.main.overview_panels.SummenPanelB;
 import org.andy.fx.gui.main.overview_panels.edit_panels.EditPanel;
 import org.andy.fx.gui.main.overview_panels.edit_panels.EditPanelFactory;
-import org.andy.fx.gui.main.overview_panels.edit_panels.factory.RechnungPanel;
+import org.andy.fx.gui.main.overview_panels.edit_panels.factory.AngebotPanel;
 import org.andy.fx.gui.main.overview_panels.edit_panels.factory.AusgabenPanel;
 import org.andy.fx.gui.main.overview_panels.edit_panels.factory.BestellungPanel;
-import org.andy.fx.gui.main.overview_panels.edit_panels.factory.AngebotPanel;
 import org.andy.fx.gui.main.overview_panels.edit_panels.factory.EinkaufPanel;
 import org.andy.fx.gui.main.overview_panels.edit_panels.factory.LieferscheinPanel;
+import org.andy.fx.gui.main.overview_panels.edit_panels.factory.RechnungPanel;
 import org.andy.fx.gui.main.overview_panels.edit_panels.factory.SvTaxPanel;
 import org.andy.fx.gui.main.result_panels.SteuerPanel;
 import org.andy.fx.gui.main.result_panels.UStPanel;
 import org.andy.fx.gui.main.result_panels.ZMeldungPanel;
+import org.andy.fx.gui.main.settings_panels.AIfeaturePanel;
 import org.andy.fx.gui.main.settings_panels.ArtikelPanel;
 import org.andy.fx.gui.main.settings_panels.BankPanel;
+import org.andy.fx.gui.main.settings_panels.BenutzerPanel;
 import org.andy.fx.gui.main.settings_panels.DatenbankPanel;
 import org.andy.fx.gui.main.settings_panels.GwbTabellePanel;
 import org.andy.fx.gui.main.settings_panels.KundePanel;
@@ -101,7 +109,6 @@ import org.andy.fx.gui.main.settings_panels.OwnerPanel;
 import org.andy.fx.gui.main.settings_panels.PfadPanel;
 import org.andy.fx.gui.main.settings_panels.QrCodePanel;
 import org.andy.fx.gui.main.settings_panels.SteuertabellePanel;
-import org.andy.fx.gui.main.settings_panels.BenutzerPanel;
 import org.andy.fx.gui.main.settings_panels.text_panels.TextPanelFactory;
 import org.andy.fx.gui.main.table_panels.ErzeugePanelA;
 import org.andy.fx.gui.main.table_panels.ErzeugePanelB;
@@ -207,13 +214,46 @@ public class HauptFenster extends JFrame {
         setIconImage(FrameIcon.ICON.image());
         setTitle(a.NAME + " (" + a.VERSION + ") - " + sLic);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        Rectangle screenBounds = ge.getMaximumWindowBounds(); // liefert Arbeitsbereich ohne Taskleiste
-        setMinimumSize(new Dimension(1280, 1080));
-        setMaximizedBounds(screenBounds);
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setLocationRelativeTo(null);
 
+        //---------------------------------------------------------------------------------------------------
+        // 2 Monitor Betrieb - kann immer auf dem aktuellen Monitor maximiert werden
+        setMinimumSize(new Dimension(1280, 1080));
+
+	    // Funktion: MaxBounds für den aktuellen Monitor setzen
+	    Runnable applyMaxBounds = () -> {
+	        GraphicsConfiguration gc = getGraphicsConfiguration();
+	        if (gc == null) return;
+	        Rectangle b = gc.getBounds();
+	        Insets in = Toolkit.getDefaultToolkit().getScreenInsets(gc);
+	        Rectangle usable = new Rectangle(
+	                b.x + in.left,
+	                b.y + in.top,
+	                b.width - in.left - in.right,
+	                b.height - in.top - in.bottom
+	        );
+	        setMaximizedBounds(usable);
+	    };
+	    // initial anwenden
+	    applyMaxBounds.run();
+	
+	    // Bei Move/Resize neu berechnen (Monitorwechsel durch Ziehen)
+	    addComponentListener(new ComponentAdapter() {
+	        @Override public void componentMoved(ComponentEvent e)  { applyMaxBounds.run(); }
+	        @Override public void componentResized(ComponentEvent e){ applyMaxBounds.run(); }
+	    });
+	
+	    // Bei Maximize sicherstellen, dass aktueller Monitor verwendet wird
+	    addWindowStateListener((WindowStateListener) e -> {
+	        if ((e.getNewState() & JFrame.MAXIMIZED_BOTH) != 0) {
+	            applyMaxBounds.run();
+	            SwingUtilities.invokeLater(() ->
+	                setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH)
+	            );
+	        }
+	    });
+	    setExtendedState(JFrame.MAXIMIZED_BOTH); // startet direkt maximiert
+	    //---------------------------------------------------------------------------------------------------
+	    
         contentPane = new JPanel(new BorderLayout());
         setContentPane(contentPane);
         
@@ -781,7 +821,7 @@ public class HauptFenster extends JFrame {
                 "Auftragsbestätigungstexte (Textbausteine)", "Rechnungstexte (Textbausteine)",
                 "Zahlungserinnerungstexte (Textbausteine)", "Mahnungstexte Mahnstufe 1 (Textbausteine)",
                 "Mahnungstexte Mahnstufe 2 (Textbausteine)", "Bestellungstexte (Textbausteine)",
-                "Lieferscheintexte (Textbausteine)"};
+                "Lieferscheintexte (Textbausteine)", "AI Features"};
 
         TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), null);
         border.setTitleJustification(TitledBorder.LEFT);
@@ -821,6 +861,7 @@ public class HauptFenster extends JFrame {
                 case 15 -> pageSetting.add(TextPanelFactory.create("T7"));
                 case 16 -> pageSetting.add(TextPanelFactory.create("T8"));
                 case 17 -> pageSetting.add(TextPanelFactory.create("T9"));
+                case 18 -> pageSetting.add(new AIfeaturePanel());
                 default -> {}
             }
             pageSetting.revalidate(); pageSetting.repaint();

@@ -8,9 +8,11 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 public enum FrameIcon {
+	AIPFEIL("aipfeil.png"),
 	EDIT("edit.png"),
     FILE("file.png"),
     ICON("icon.png"),
+    IDEE("idee.png"),
     RUFZEICHEN("rufzeichen.png");
 
 	private static final String BASE = "/org/resources/icons/frames/";

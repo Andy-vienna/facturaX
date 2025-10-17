@@ -39,7 +39,7 @@ public class BenutzerPanel extends JPanel {
     private final boolean[] selUser = {true,true,true,true,false,false,false,false,false,false,false};
     private final boolean[] selSuser = {true,true,true,true,true,true,true,true,false,false,true};
     private final boolean[] selFuser = {false,false,false,false,true,true,true,true,false,false,false};
-    private final boolean[] selAdmin = {false,false,false,false,false,false,false,false,true,true,false};
+    private final boolean[] selAdmin = {false,false,false,false,false,false,false,false,true,true,true};
     private final boolean[] selDefault = {false,false,false,false,false,false,false,false,false,false,false};
     
     private static JButton btnShowPwd = null, btnPwdOK = null;

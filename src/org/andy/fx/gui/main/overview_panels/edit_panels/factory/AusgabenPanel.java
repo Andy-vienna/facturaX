@@ -5,10 +5,13 @@ import static org.andy.fx.code.misc.FileSelect.chooseFile;
 import static org.andy.fx.code.misc.FileSelect.choosePath;
 import static org.andy.fx.code.misc.FileSelect.getNotSelected;
 import static org.andy.fx.gui.misc.CreateButton.createButton;
+import static org.andy.fx.gui.misc.CreateButton.createGradientButton;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -20,6 +23,9 @@ import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -28,23 +34,33 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 
+import org.andy.fx.code.dataStructure.entityJSON.JsonAI;
 import org.andy.fx.code.dataStructure.entityProductive.Ausgaben;
 import org.andy.fx.code.dataStructure.repositoryProductive.AusgabenRepository;
+import org.andy.fx.code.googleServices.CheckEnvAI;
+import org.andy.fx.code.googleServices.CloudInvoiceExtractor;
+import org.andy.fx.code.googleServices.InterfaceBuilder.DocAiConfig;
+import org.andy.fx.code.googleServices.InterfaceBuilder.InvoiceExtractionResult;
 import org.andy.fx.code.main.Einstellungen;
+import org.andy.fx.code.main.StartUp;
 import org.andy.fx.code.misc.ArithmeticHelper.LocaleFormat;
 import org.andy.fx.code.misc.BD;
 import org.andy.fx.code.misc.CodeListen;
 import org.andy.fx.code.misc.CommaHelper;
+import org.andy.fx.code.misc.FileSelect;
 import org.andy.fx.gui.iconHandler.ButtonIcon;
+import org.andy.fx.gui.iconHandler.FrameIcon;
 import org.andy.fx.gui.main.HauptFenster;
 import org.andy.fx.gui.main.dialogs.DateianzeigeDialog;
 import org.andy.fx.gui.main.overview_panels.edit_panels.EditPanel;
+import org.andy.fx.gui.misc.BusyDialog;
 import org.andy.fx.gui.misc.RoundedBorder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -73,12 +89,20 @@ public class AusgabenPanel extends EditPanel {
 	private JTextField[] txtFields = new JTextField[8];
 	private JLabel lblFileTyp = new JLabel();
 	private JButton[] btnFields = new JButton[2];
+	private JLabel lblHinweis; private JLabel lblPfeil;
+	private JButton btnParseAI;
 	
 	private boolean file = false;
 	private boolean neuBeleg = false;
 	
 	private AusgabenRepository ausgabenRepository = new AusgabenRepository();
 	private Ausgaben a = new Ausgaben();
+	
+	private final String hinweisAI = "<html>" +
+    		"<span style='font-size:16px; font-weight:bold; color:red;'>generatives AI-Feature</span><br>" +
+    		"<span style='font-size:10px; font-weight:bold; color:blue;'>bitte unbedingt sämtliche Daten vor dem</span><br>" +
+    		"<span style='font-size:10px; font-weight:bold; color:blue;'>Speichern kontrollieren und ggf. korrigieren !!</span>" +
+    		"</html>";
 	
 	//###################################################################################################################################################
 	// public Teil
@@ -189,6 +213,26 @@ public class AusgabenPanel extends EditPanel {
 		btnFields[1].setBounds(660, 195, HauptFenster.getButtonx(), HauptFenster.getButtony());
 		add(btnFields[1]);
 		
+		lblHinweis = new JLabel(hinweisAI, FrameIcon.IDEE.icon(), JLabel.LEFT);
+		lblHinweis.setBounds(850, 45, 400, 70);
+		lblHinweis.setVisible(false);
+		add(lblHinweis);
+		
+		lblPfeil = new JLabel("", FrameIcon.AIPFEIL.icon(), JLabel.LEFT);
+		lblPfeil.setBounds(850, 125, 50, 50);
+		lblPfeil.setVisible(false);
+		add(lblPfeil);
+		
+		btnParseAI = createGradientButton(
+	        	"<html>'load and parse'<br>Beleg bearbeiten</html>",
+	        	ButtonIcon.GOOGLE.icon(),
+	        	new float[]{0f, 0.33f, 0.66f, 1f},
+	        	new Color[]{new Color(66, 133, 244), new Color(52, 168, 83), new Color(251, 188, 5), new Color(234, 67, 53)},
+	        	false);
+		btnParseAI.setBounds(925, 125, HauptFenster.getButtonx() + 30, HauptFenster.getButtony());
+		btnParseAI.setEnabled(true); btnParseAI.setVisible(false);
+		add(btnParseAI);
+		
 		txtFieldsFocusable(false);
 		btnFields[0].setEnabled(false);
 		setPreferredSize(new Dimension(1000, 20 + 8 * 25 + 50));
@@ -262,6 +306,28 @@ public class AusgabenPanel extends EditPanel {
  				}
  			}
  		});
+	    
+	    btnParseAI.addActionListener(e -> {
+	        Path fileIn = Paths.get(FileSelect.chooseFile(Einstellungen.getAppSettings().work));
+	        if (fileIn.toString().equals("---") || fileIn.toString().isEmpty()) return;
+
+	        Window w = SwingUtilities.getWindowAncestor((Component) e.getSource());
+	        BusyDialog.runAI(
+	            w,
+	            "Bitte warten",
+	            "Google DocumentAI aktiv ...",
+	            () -> {                           // Supplier<InvoiceExtractionResult>
+	                try {
+	                    return doParseAI(fileIn);
+	                } catch (Exception ex) {
+	                    logger.error("error parsing document: " + ex.getMessage());
+	                    StartUp.gracefulQuit(66);
+	                    return null;
+	                }
+	            },
+	            this::doAIresult                  // Consumer<InvoiceExtractionResult>
+	        );
+	    });
 	}
 	
 	//###################################################################################################################################################
@@ -291,6 +357,7 @@ public class AusgabenPanel extends EditPanel {
     	this.txtFields[1].setFocusable(false);
     	this.txtFields[2].setFocusable(false);
     	this.txtFields[7].setFocusable(false);
+    	lblHinweis.setVisible(false); lblPfeil.setVisible(false); btnParseAI.setVisible(false);
     }
     
     private boolean checkInput() {
@@ -335,6 +402,42 @@ public class AusgabenPanel extends EditPanel {
     	this.txtFields[2].setText(currency3code);
     }
     
+    private InvoiceExtractionResult doParseAI(Path fileIn) throws Exception {
+		JsonAI settingsAI = CheckEnvAI.getSettingsAI();
+		DocAiConfig cfg = new DocAiConfig(settingsAI.documentAIprojectID, settingsAI.documentAIlocation, settingsAI.documentAIprocessorId);
+				
+		CloudInvoiceExtractor cloud = new CloudInvoiceExtractor(cfg);
+		return cloud.extract(fileIn); // Dokument parsen und zurück geben
+	}
+    
+    private void doAIresult(InvoiceExtractionResult result) {
+    	List<String> tmpList = cl.getCurrencies();
+    	for (int i = 1; i < tmpList.size(); i++) {
+    		String tmp = tmpList.get(i).substring(0, 3);
+    		if (result.currency().equals(tmp)) {
+    			cmbCurr.setSelectedIndex(i);
+    			break;
+    		}
+    	}
+    	
+    	if (cl.isCurrency(result.currency())) cmbCurr.setEnabled(false);
+    	
+    	LocalDate datum = LocalDate.parse(result.header().get("invoiceDate"), DateTimeFormatter.ISO_LOCAL_DATE);
+    	datePicker.setDate(datum);
+    	
+    	txtFields[0].setText(result.lineItems().get(0).get("description"));
+    	//txtFields[1].setText() - Land ist noch nicht geparst
+    	txtFields[2].setText(result.currency());
+    	txtFields[3].setText(result.header().get("taxRate"));
+    	txtFields[4].setText(result.header().get("netAmount"));
+    	txtFields[5].setText(result.header().get("taxAmount"));
+    	txtFields[6].setText(result.header().get("totalAmount"));
+    	
+    	//-------------------------------------------------------------------------------------------------------------------------------
+    	JOptionPane.showMessageDialog(null, hinweisAI, "Belegeingabe", JOptionPane.INFORMATION_MESSAGE);
+    	//-------------------------------------------------------------------------------------------------------------------------------
+    }
+    
 	//###################################################################################################################################################
 	// Getter und Setter für Felder
 	//###################################################################################################################################################
@@ -359,6 +462,11 @@ public class AusgabenPanel extends EditPanel {
     		for (int i = 0; i < this.btnFields.length; i++) {
 				this.btnFields[i].setEnabled(true);
 			}
+    		if (CheckEnvAI.getSettingsAI().isDocumentAI) { // nur sichtbar machen wenn AI-Feature verfügbar ist
+    			lblHinweis.setVisible(true);
+        		lblPfeil.setVisible(true);
+        		btnParseAI.setVisible(true);
+    		}
     		a = new Ausgaben();
     		neuBeleg = true;
 			return;

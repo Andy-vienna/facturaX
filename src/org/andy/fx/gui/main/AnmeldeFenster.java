@@ -13,6 +13,7 @@ import org.andy.fx.code.dataStructure.entityMaster.User;
 import org.andy.fx.code.dataStructure.repositoryMaster.UserRepository;
 import org.andy.fx.code.googleServices.CheckEnvAI;
 import org.andy.fx.code.googleServices.GoogleOAuthDesktop;
+import org.andy.fx.code.main.StartUp;
 import org.andy.fx.code.misc.Password;
 import org.andy.fx.gui.iconHandler.ButtonIcon;
 
@@ -204,8 +205,7 @@ public final class AnmeldeFenster {
                 			"</html>";
                     JOptionPane.showMessageDialog(frame, message, "Anmeldung", JOptionPane.ERROR_MESSAGE);
                     ok = false;
-                    userField.setEnabled(true); passField.setEnabled(true);
-                	loginBtn.setEnabled(true); cancelBtn.setEnabled(true); oAuth2Btn.setEnabled(true);
+                    StartUp.gracefulQuit(10);
                 }
         		return ok ? u : null;
 			}
@@ -222,6 +222,7 @@ public final class AnmeldeFenster {
                 			"<span style='font-size:10px; font-weight:bold; color:red;'>kein Nutzer für E-Mail Adresse gefunden ...</span><br>" +
                 			"</html>";
                     JOptionPane.showMessageDialog(frame, message, "Anmeldung", JOptionPane.ERROR_MESSAGE);
+                    StartUp.gracefulQuit(10);
         		}
         	}
         }.execute();

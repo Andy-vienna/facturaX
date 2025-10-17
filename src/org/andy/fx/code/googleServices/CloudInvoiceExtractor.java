@@ -4,6 +4,8 @@ import com.google.api.gax.rpc.ApiException;
 import com.google.cloud.documentai.v1.*;
 import com.google.protobuf.ByteString;
 import java.nio.file.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
@@ -39,12 +41,12 @@ public class CloudInvoiceExtractor implements InvoiceExtractor {
 
 			var header = new LinkedHashMap<String, String>();
 			var items = new ArrayList<java.util.Map<String, String>>();
-			String currency = null;
+			String currency = null; String tmpDate = null; String tmpVat = null;
 			
 			for (Document.Entity e : d.getEntitiesList()) {
 				switch (e.getType()) {
 				case "invoice_id" -> header.put("invoiceId", val(e));
-				case "invoice_date" -> header.put("invoiceDate", norm(e));
+				case "invoice_date" -> tmpDate = norm(e); // Datum erstmal abfangen
 				case "due_date" -> header.put("dueDate", norm(e));
 				case "supplier_name" -> header.put("supplierName", norm(e));
 				case "supplier_address" -> header.put("supplierAddress", norm(e));
@@ -62,7 +64,7 @@ public class CloudInvoiceExtractor implements InvoiceExtractor {
 				case "remit_to_name" -> header.put("RemitToName", norm(e));
 				case "remit_to_address" -> header.put("RemitToAddress", norm(e));
 				case "currency" -> currency = norm(e);
-				case "vat" -> header.put("taxRate", norm(e));
+				case "vat" -> tmpVat = norm(e);
 				case "net_amount" -> header.put("netAmount", norm(e));
 				case "total_tax_amount" -> header.put("taxAmount", norm(e));
 				case "total_amount" -> header.put("totalAmount", norm(e));
@@ -80,6 +82,14 @@ public class CloudInvoiceExtractor implements InvoiceExtractor {
 				}
 				}
 			}
+			LocalDate invDate = DateParser.parseOrDefault(tmpDate, LocalDate.of(1900,1,1)); // Datum parsen oder default 01.01.1900 ausgeben
+	        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // Datum nachformattieren
+	        String datum = invDate.format(outputFormatter);
+			header.put("invoiceDate", datum); // Rechnungsdatum korrekt formattiert eintragen
+			
+			if (tmpVat.contains("%")) tmpVat = tmpVat.replace("%", "");
+			header.put("taxRate", tmpVat); // Steuersatz bereinigt vom %-Zeichen
+			
 			return new InvoiceExtractionResult(header, items, currency, d.getText());
 		} catch (ApiException ex) {
 			throw ex; // Orchestrator fängt ab und fällt zurück

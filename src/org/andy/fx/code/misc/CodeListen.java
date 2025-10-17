@@ -39,6 +39,18 @@ public class CodeListen {
         return EUROZONE.contains(iso2.toUpperCase(Locale.ROOT));
     }
     
+    public boolean isCurrency(String code) {
+    	List<String> c = new ArrayList<>();
+		for (Currency curr : currencyCodes) {
+            String entry = curr.getCurrencyCode();
+            c.add(entry);
+        }
+    	for (int i = 0; i < c.size(); i++) {
+    		if (code.equals(c.get(i))) return true;
+    	}
+    	return false;
+    }
+    
 	//###################################################################################################################################################
 	// private Teil
 	//###################################################################################################################################################

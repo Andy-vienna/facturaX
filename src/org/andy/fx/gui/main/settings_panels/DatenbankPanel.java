@@ -45,7 +45,7 @@ public class DatenbankPanel extends JPanel {
     
     public DatenbankPanel() {
         setLayout(null);
-        TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "SEPA OR-Code Einstellungen (wirksam nach Neustart)");
+        TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Datenbank Einstellungen (wirksam nach Neustart)");
         border.setTitleFont(font);
         border.setTitleColor(titleColor);
         border.setTitleJustification(TitledBorder.LEFT);
