@@ -83,6 +83,7 @@ public class StartUp {
 		}
 		//-----------------------------------------------------------------------------------------------------------------------
 		// 6) aktuelles Datum setzen
+		dateNow = LocalDate.now();
 		dtNow = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
 		//-----------------------------------------------------------------------------------------------------------------------
 		// 7) Einstellungen laden

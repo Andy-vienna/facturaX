@@ -64,14 +64,16 @@ public class LadeSvTax {
 	        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 	        String datum = date.format(outputFormatter);
 	        String datumF = dateF.format(outputFormatter);
-
-	        String zahllast = df.format(svsteuer.getZahllast()) + " " + currency.getCurrencyCode();
 	        
 	        String status = null;
 	        switch(svsteuer.getStatus()) {
-	        	case 0 -> status = "Zahllast";
-	        	case 10 -> status = "Eingang";
+	        	case 0 -> status = "Forderung";
+	        	case 10 -> status = "Zahlung";
+	        	case 55 -> status = "Dateiablage";
 	        }
+	        
+	        String zahllast = df.format(svsteuer.getZahllast()) + " " + currency.getCurrencyCode();
+	        if (status.equals("Dateiablage")) { zahllast = ""; datumF = ""; }
 		
 	        sTemp[i][0] = datum;
 	        sTemp[i][1] = svsteuer.getOrganisation();
@@ -84,19 +86,19 @@ public class LadeSvTax {
 	        belegID[i] = svsteuer.getId();
 			
 	        if (svsteuer.getOrganisation().contains("Sozialversicherung")) {
-	        	if (status.equals("Zahllast")) bdSV = bdSV.add(svsteuer.getZahllast());
+	        	if (status.equals("Forderung")) bdSV = bdSV.add(svsteuer.getZahllast());
 	        	for (int x = 0; x < 4; x++) {
 	        	    String token = "Q" + (x + 1);
-	        	    if (svsteuer.getBezeichnung().contains(token) && status.equals("Zahllast")) {
+	        	    if (svsteuer.getBezeichnung().contains(token) && status.equals("Forderung")) {
 	        	        bdSVQ[x] = bdSVQ[x].add(svsteuer.getZahllast());
 	        	    }
 	        	}
-	        	if (status.equals("Eingang")) bdSvEing = bdSvEing.add(svsteuer.getZahllast()); 
+	        	if (status.equals("Zahlung")) bdSvEing = bdSvEing.add(svsteuer.getZahllast()); 
 	        	bdSVoffen = bdSV.add(bdSvEing);
 	        }
 	        if (svsteuer.getOrganisation().contains("Finanzamt")) {
-	        	if (status.equals("Zahllast")) bdST = bdST.add(svsteuer.getZahllast());
-	        	if (status.equals("Eingang")) bdStEing = bdStEing.add(svsteuer.getZahllast());
+	        	if (status.equals("Forderung")) bdST = bdST.add(svsteuer.getZahllast());
+	        	if (status.equals("Zahlung")) bdStEing = bdStEing.add(svsteuer.getZahllast());
 	        	bdSToffen = bdST.add(bdStEing);
 	        }
 		}

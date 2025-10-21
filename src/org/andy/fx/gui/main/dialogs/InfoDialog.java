@@ -17,6 +17,21 @@ public final class InfoDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 
 	private final JButton closeButton = new JButton("Schließen");
+	private static final String TEXT_A_HTML =
+			"<html>"
+			+ "<div style='font-size:24px;font-weight:bold;'>%s(%s)</div>"
+			+ "<table style='font-size:10px;font-weight:bold;' cellspacing='0' cellpadding='0'>"
+			+ "<tr><td width='140' style='padding-right:8px;white-space:nowrap;'></td>"
+			+ "<td><span style='color:blue;'></span></td></tr>"
+			+ "<tr><td style='padding-right:8px;white-space:nowrap;'>built date / time :</td>"
+			+ "<td><span style='color:blue;'>%s</span></td></tr>"
+			+ "<tr><td style='padding-right:8px;white-space:nowrap;'>Java JDK version :</td>"
+			+ "<td><span style='color:red;'>%s</span></td></tr>"
+			+ "<tr><td style='padding-right:8px;white-space:nowrap;'>Database-Server :</td>"
+			+ "<td><span style='color:red;'>%s</span></td></tr>"
+			+ "<tr><td style='padding-right:8px;white-space:nowrap;'>Google AI Features :</td>"
+			+ "<td><span style='color:green;'>%s</span></td></tr></table>"
+			+ "</html>";
 	private static final String TEXT_B_HTML =
             """
             <html style='font-family:sans-serif;'>
@@ -42,7 +57,7 @@ public final class InfoDialog extends JDialog {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setContentPane(buildContent(a));
         pack();
-        setMinimumSize(new Dimension(250, 495));
+        setMinimumSize(new Dimension(250, 510));
         setLocationRelativeTo(owner);
         getRootPane().setDefaultButton(closeButton);
         bindEscToClose();
@@ -75,19 +90,8 @@ public final class InfoDialog extends JDialog {
         gc.insets = new Insets(6, 6, 6, 6);
         gc.gridx = 0; gc.weightx = 1; gc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel title = new JLabel("<html>" +
-        		"<span style='font-size:24px; font-weight:bold;'>" + a.NAME + " (" + a.VERSION + ") " + "</span><br>" +
-        		"<span style='font-size:10px; font-weight:bold; color:blue;'></span><br>" +
-        		"<span style='font-size:10px; font-weight:bold; color:black;'>built date / time : </span>" +
-        		"<span style='font-size:10px; font-weight:bold; color:blue;'>" + a.TIME + "</span><br>" +
-        		"<span style='font-size:10px; font-weight:bold; color:black;'>Java JDK version : </span>" +
-        		"<span style='font-size:10px; font-weight:bold; color:red ;'>" + a.JDK + "</span><br>" +
-        		"<span style='font-size:10px; font-weight:bold; color:black;'>Database-Server : </span>" +
-        		"<span style='font-size:10px; font-weight:bold; color:red ;'>" + App.DB + "</span><br>" +
-        		"<span style='font-size:10px; font-weight:bold; color:black;'>AI Features : </span>" +
-        		"<span style='font-size:10px; font-weight:bold; color:green;'>" + aiState + "</span>" +
-        		"</html>");
-        //title.setFont(title.getFont().deriveFont(Font.BOLD, 24f));
+        String html = String.format(TEXT_A_HTML, a.NAME, a.VERSION, a.TIME, a.JDK, App.DB, aiState);
+		JLabel title = new JLabel(html);
         title.setForeground(new Color(20, 20, 20));
         gc.gridy = 0;
         right.add(title, gc);

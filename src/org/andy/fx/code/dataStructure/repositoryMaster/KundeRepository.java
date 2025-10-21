@@ -15,6 +15,15 @@ public class KundeRepository {
         }
     }
     
+    public Kunde findById(String id) {
+    	try (Session session = HibernateUtil.getSessionFactoryDb1().openSession()) {
+            return session.createQuery(
+                    "FROM Kunde r WHERE r.id = :id", Kunde.class)
+                    .setParameter("id", id)
+                    .getSingleResult();
+        }
+    }
+    
     public String findMaxNummer() {
     	String sql = null;
     	switch(Einstellungen.getDbSettings().dbType) {

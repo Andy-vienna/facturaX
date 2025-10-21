@@ -14,8 +14,13 @@ import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -29,6 +34,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.NumberFormatter;
 
@@ -57,8 +64,9 @@ public class RechnungPanel extends EditPanel {
 
 	// Serialisierungs-ID für die Klasse
 	private static final long serialVersionUID = 1L;
-
 	private static final Logger logger = LogManager.getLogger(RechnungPanel.class);
+	private static final Pattern P = Pattern.compile("^(\\d{2})\\.(\\d{2})\\.(\\d{4})-(\\d{2})\\.(\\d{2})\\.(\\d{4})$");
+	private static final DateTimeFormatter F = DateTimeFormatter.ofPattern("dd.MM.uuuu").withResolverStyle(ResolverStyle.STRICT);
 	
 	JPanel panel = new JPanel();
 	private Border b;
@@ -199,6 +207,18 @@ public class RechnungPanel extends EditPanel {
 	    	txtFieldsHead[r].setFocusable(false);
 	    	add(txtFieldsHead[r]);
 	    }
+		JTextField tf = txtFieldsHead[1];
+		tf.getDocument().addDocumentListener(new DocumentListener() {
+			@Override public void insertUpdate(DocumentEvent e) {	onChange();	}
+			@Override public void removeUpdate(DocumentEvent e) {	onChange();	}
+			@Override public void changedUpdate(DocumentEvent e) { }
+			private void onChange() {
+				tf.setOpaque(true); txtFieldsHead[0].setOpaque(true);
+				tf.setBackground(tf.getText().contains("eintragen") ? Color.PINK : Color.WHITE);
+				txtFieldsHead[0].setBackground(tf.getText().contains("eintragen") ? Color.PINK : Color.WHITE);
+				tf.repaint(); txtFieldsHead[0].repaint();
+			  }
+		});
 	    for (int r = 0; r < txtFieldsPos.length; r++) {
 	    	txtFieldsPos[r] = makeField(50, 70 + r * 25, 800, 25, false, null);
 	    	txtFieldsAnz[r] = makeField(850, 70 + r * 25, 75, 25, false, null);
@@ -404,6 +424,10 @@ public class RechnungPanel extends EditPanel {
     
     private void updateTable() {
     	
+        if (datePicker[0].getDate() == null) { info("Rechnungsdatum fehlt …"); return; }
+        if (!isValidRange(txtFieldsHead[1].getText())) { info("Leistungszeitraum falsch …"); return; }
+        if (isEmpty(txtFieldsHead[0])) { info("Kundenreferenz fehlt …"); return; }
+    	
     	int anzPos = 0;
     	String[] sPosText = new String[13];
     	BigDecimal[] bdAnzahl = new BigDecimal[this.txtFieldsPos.length];
@@ -512,6 +536,24 @@ public class RechnungPanel extends EditPanel {
     	}
     	newNetto = oldNetto.subtract(skonto); newUSt = newNetto.multiply(taxRate); newBrutto = newNetto.add(newUSt);
     	r.setNetto(newNetto); r.setUst(newUSt); r.setBrutto(newBrutto);
+    }
+    
+    public static boolean isValidRange(String s) {
+        Matcher m = P.matcher(s);
+        if (!m.matches()) return false;
+        try {
+            LocalDate from = LocalDate.parse(m.group(1)+"."+m.group(2)+"."+m.group(3), F);
+            LocalDate to   = LocalDate.parse(m.group(4)+"."+m.group(5)+"."+m.group(6), F);
+            return !to.isBefore(from);
+        } catch (DateTimeParseException ex) {
+            return false; // z. B. 31.02.2025
+        }
+    }
+    
+    private static boolean isEmpty(JTextField t){ return t.getText()==null || t.getText().trim().isEmpty(); }
+    
+    private static void info(String msg){
+        JOptionPane.showMessageDialog(null, msg, "Rechnung erstellen", JOptionPane.INFORMATION_MESSAGE);
     }
     
 	//###################################################################################################################################################

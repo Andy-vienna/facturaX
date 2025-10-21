@@ -66,6 +66,7 @@ import org.andy.fx.code.main.StartUp;
 import org.andy.fx.code.main.overview.result.SteuerDaten;
 import org.andy.fx.code.main.overview.result.UStDaten;
 import org.andy.fx.code.main.overview.result.ZMeldungDaten;
+import org.andy.fx.code.main.overview.table.ErzeugeReVonAn;
 import org.andy.fx.code.main.overview.table.LadeAngebot;
 import org.andy.fx.code.main.overview.table.LadeAusgaben;
 import org.andy.fx.code.main.overview.table.LadeBestellung;
@@ -368,13 +369,14 @@ public class HauptFenster extends JFrame {
         JButton[] btn = null;
         switch(use) {
         	case 0 -> {
-        		btn = new JButton[5];
+        		btn = new JButton[6];
                 offerPanel = EditPanelFactory.create("AN");
                 btn[0] = createButton("<html>Kunde<br>neu/bearb.</html>", ButtonIcon.EDIT.icon(), new Color(168,168,168));
                 btn[1] = createButton("<html>Artikel<br>neu/bearb.</html>", ButtonIcon.EDIT.icon(), new Color(159,182,205));
                 btn[2] = createButton("<html>neues<br>Angebot</html>", ButtonIcon.NEW.icon(), new Color(191,239,255));
                 btn[3] = createButton("<html>Angebot<br>drucken</html>", ButtonIcon.PRINT.icon(), null);
                 btn[4] = createButton("<html>AB<br>drucken</html>", ButtonIcon.BEST.icon(), null);
+                btn[5] = createButton("<html>Rechnung<br>erzeugen</html>", ButtonIcon.FORWARD.icon(), null);
                 btn[1].setEnabled(true); btn[2].setEnabled(true);
         	}
         	case 1 -> {
@@ -439,6 +441,7 @@ public class HauptFenster extends JFrame {
         	    );
         	});
             btn[4].addActionListener(_ -> { if (vZelleAN != null) { try { ABDialog.showDialog(vZelleAN); updScreen(); } catch (Exception ex) { logger.error("AN AB", ex); } }});
+            btn[5].addActionListener(_ -> { if (vZelleAN != null) { ErzeugeReVonAn.doReVonAn(vZelleAN); updScreen(); }});
         }
 
         pageAN.removeAll();
@@ -1390,8 +1393,10 @@ public class HauptFenster extends JFrame {
     private void setOfferButtonsByState(String state, JButton[] btn) {
         boolean print = "erstellt".equals(state);
         boolean confirm = "bestellt".equals(state);
+        boolean confirmed = "bestätigt".equals(state);
         btn[3].setEnabled(print);
         btn[4].setEnabled(confirm);
+        btn[5].setEnabled(confirmed);
     }
 
     private void setBillButtonsByState(String state, JButton[] btn) {
@@ -1618,24 +1623,22 @@ public class HauptFenster extends JFrame {
 
             Object v0 = table.getValueAt(row, 0);
             if (v0 != null) {
+            	int daysPayable = 0;
                 try {
                     DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy");
                     LocalDate dateNow = LocalDate.now();
-                    LocalDate datePay = LocalDate.parse(table.getValueAt(row, 4).toString(), inputFormat);
-                    int daysPayable = Math.toIntExact(ChronoUnit.DAYS.between(dateNow, datePay));
-
-                    String bezahlt = String.valueOf(table.getValueAt(row, 5));
-                    setForeground(Color.BLACK);
-                    if ("Zahllast".equals(bezahlt)) {
-                        if (daysPayable < 0) setBackground(Color.PINK);
-                        else if (daysPayable < 3) setBackground(Color.ORANGE);
-                    } else if ("Eingang".equals(bezahlt)) {
-                        setBackground(new Color(152,251,152));
+                    if (table.getValueAt(row, 4).toString() != "") {
+                    	LocalDate datePay = LocalDate.parse(table.getValueAt(row, 4).toString(), inputFormat);
+                        daysPayable = Math.toIntExact(ChronoUnit.DAYS.between(dateNow, datePay));
                     }
-                    String typ = String.valueOf(table.getValueAt(row,  2));
-                    if (typ.contains("Dateiablage")) {
-                    	setBackground(new Color(202,225,255));
-                    	setForeground(Color.BLUE);
+                    
+                    setForeground(Color.BLACK);
+                    String s = String.valueOf(table.getValueAt(row, 5));
+                    switch(s) {
+                    	case "Forderung" -> { if (daysPayable < 0) setBackground(Color.PINK);
+                    					else if (daysPayable < 3) setBackground(Color.ORANGE); }
+                    	case "Zahlung" -> setBackground(new Color(152,251,152));
+                    	case "Dateiablage" -> { setBackground(new Color(202,225,255)); setForeground(Color.BLUE); }
                     }
                 } catch (Exception e) {
                     logger.error("ST render date error", e);

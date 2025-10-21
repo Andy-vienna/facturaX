@@ -56,7 +56,7 @@ import org.andy.fx.gui.misc.RoundedBorder;
 public class RechnungNeuPanel extends EditPanel {
 	
     private static final long serialVersionUID = 1L;
-    private static final Logger logger = LogManager.getLogger(AngebotNeuPanel.class);
+    private static final Logger logger = LogManager.getLogger(RechnungNeuPanel.class);
 
     private static final int POS_COUNT = 12;
 
@@ -174,7 +174,7 @@ public class RechnungNeuPanel extends EditPanel {
         txtBank=setRO(1110,280); txtIBAN=setRO(1110,305); txtBIC=setRO(1110,330);
         add(txtBank); add(txtIBAN); add(txtBIC);
 
-        txtNummer = new JTextField(nextAnNummer());
+        txtNummer = new JTextField(nextReNummer());
         txtNummer.setBounds(1130,55,140,25);
         txtNummer.setForeground(Color.BLUE);
         txtNummer.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -360,7 +360,7 @@ public class RechnungNeuPanel extends EditPanel {
         if (isEmpty(txtReferenz)) { info("Kundenreferenz fehlt …"); return; }
 
         Rechnung r = new Rechnung();
-        r.setIdNummer(nextAnNummer());
+        r.setIdNummer(nextReNummer());
         r.setJahr(Einstellungen.getAppSettings().year);
         r.setDatum(dateOrToday(datePicker));
         Kunde k = kunden.get(cmbKunde.getSelectedIndex());
@@ -515,7 +515,7 @@ public class RechnungNeuPanel extends EditPanel {
         chkRevCharge.setVisible(false);
     }
 
-    private String nextAnNummer() {
+    private String nextReNummer() {
         int max = rechnungRepository.findMaxNummerByJahr(Einstellungen.getAppSettings().year);
         return "RE-" + Einstellungen.getAppSettings().year + "-" + String.format("%04d", max + 1);
     }
