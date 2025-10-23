@@ -87,7 +87,7 @@ public class CloudInvoiceExtractor implements InvoiceExtractor {
 	        String datum = invDate.format(outputFormatter);
 			header.put("invoiceDate", datum); // Rechnungsdatum korrekt formattiert eintragen
 			
-			if (tmpVat.contains("%")) tmpVat = tmpVat.replace("%", "");
+			if (tmpVat != null && tmpVat.contains("%")) tmpVat = tmpVat.replace("%", "");
 			header.put("taxRate", tmpVat); // Steuersatz bereinigt vom %-Zeichen
 			
 			return new InvoiceExtractionResult(header, items, currency, d.getText());
